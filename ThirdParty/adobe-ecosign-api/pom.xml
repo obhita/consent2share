@@ -1,0 +1,96 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.echosign</groupId>
+	<artifactId>adobe-ecosign</artifactId>
+	<version>15</version>
+
+	<properties>
+		<java.version>1.6</java.version>
+	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>deployment</id>
+			<name>Internal Releases</name>
+			<url>http://obhitamvnrepo01/nexus/content/repositories/thirdparty/</url>
+		</repository>
+	</distributionManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.xfire</groupId>
+			<artifactId>xfire-all</artifactId>
+			<version>1.2.5</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>xfire-spring</artifactId>
+					<groupId>org.codehaus.xfire</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jmock</artifactId>
+					<groupId>jmock</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>junit</artifactId>
+					<groupId>junit</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>ant</artifactId>
+					<groupId>ant</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xfire-java5</artifactId>
+					<groupId>org.codehaus.xfire</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>mail</artifactId>
+					<groupId>javax.mail</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xfire-annotations</artifactId>
+					<groupId>org.codehaus.xfire</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xfire-xmlbeans</artifactId>
+					<groupId>org.codehaus.xfire</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xfire-generator</artifactId>
+					<groupId>org.codehaus.xfire</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.0</version>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

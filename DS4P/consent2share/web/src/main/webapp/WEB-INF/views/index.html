@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/common :: headerFragment" >
+	<meta charset="utf-8" />
+	<!-- title needs to be dynamic -->
+	<title>Consent2Share</title>
+	<meta name="description" content="Consent Management System" />
+	<meta name="author" content="FEiSystems" />
+	<!-- END: Meta -->
+	<!-- START: Mobile Specific -->
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- END: Mobile Specific -->
+	<!-- START: CSS -->
+	<link id="bootstrap-style" href="../../resources/css/bootstrap.css" rel="stylesheet"/>
+	<link href="../../resources/css/bootstrap-responsive.min.css" rel="stylesheet"/>
+	<link href="../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
+	<link href="../../resources/css/sentinel-style.css" rel="stylesheet"/>
+	<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
+	<link href="../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+	<!-- END: CSS -->
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
+	<!-- START: Favicon -->
+	<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
+	<!-- END: Favicon -->
+
+</head>
+
+<body class="home-body">
+	<!-- START: Page Header -->
+
+	<div id="login-navbar" class="navbar">
+		<div class="navbar-inner-header">
+			<div class="container-fluid">
+				<a class="btn btn-navbar" data-toggle="collapse"
+					data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse"></a>
+				<h1>
+					<span class="nav-title">Share with confidence.</span>
+				</h1>
+
+				<!--
+        <div id="nav-container" class="span8">
+	            	<ul class="nav nav-pills">
+		            	<li><a href="#">Learn About Us</a></li>
+		            	<li><a href="#">Your Privacy</a></li>
+		            	<li><a href="#">Name of pill</a></li>
+	            	</ul>
+            	</div>
+-->
+
+				<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+			</div>
+		</div>
+	</div>
+
+	<div id="under-header"></div>
+	<!-- END : Page Header -->
+
+	<div class="container-fluid">
+		<div id="content" class="row-fluid">
+
+			<!-- END: Side Nav Menu -->
+			<!-- JavaScrip Enable Message -->
+			<noscript>
+				<div class="alert alert-block span10">
+					<p id="h4-style" class="alert-heading">Warning!</p>
+
+					<p>
+						You need to have <a href="http://en.wikipedia.org/wiki/JavaScript"
+							th:href="@{http://en.wikipedia.org/wiki/JavaScript}"
+							target="_blank">JavaScript</a> enabled to use this site.
+					</p>
+				</div>
+			</noscript>
+			<!-- !START: Content Region-->
+
+			<div class="span12">
+				<div class="row-fluid">
+					<!-- !Signup Now-->
+					<div>
+						<section class="top-margin10">
+							<div id="home-feature-container">
+								<div id="home-feature-image">
+									<span id="home-feature-text">Your health is between you
+										and your doctor, so take control of your medical privacy.</span>
+								</div>
+							</div>
+						</section>
+						<div id="home-login-container" class="offset6 span5 overlay">
+
+							<fieldset class="login-section">
+
+								<div class="login-section">
+									<a href="registration.html" th:href="@{registration.html}"
+										class="btn btn-block btn-success btn-large btn-signup">Sign
+										up Now.</a>
+
+									<p>Your medical privacy is important to you, so take
+										control of your health records and decide what information to
+										share and with whom to share it with. Get started today with a
+										free account, setup is easy and fast.</p>
+								</div>
+							</fieldset>
+
+							<!-- !SECTION: Login With CMS Account -->
+
+							<fieldset class="login-section login-fields">
+								<legend>Log in with your C2S account</legend>
+
+								<div class="login-center">	
+										<div class="span-10 append-2 last" 
+									     xmlns:th="http://www.thymeleaf.org"
+									     th:with="lastUsernameKey=${T(org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter).SPRING_SECURITY_LAST_USERNAME_KEY},
+									              lastExceptionKey=${T(org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter).SPRING_SECURITY_LAST_EXCEPTION_KEY}">
+
+										    <div class="loginError" style="color: red;" th:if="${param.login_error}">
+										        <span class="errormsg" th:text="${session[__${lastExceptionKey}__].message}">Invalid password</span><p/> 
+										    </div>
+										    <span class="errormsg" style="color: red;"></span><p/>
+									    </div>
+									
+									<form th:action="@{/resources/j_spring_security_check}" id="loginForm"
+										method="post">
+										
+										    <div><label for="j_username">Username:</label><input type="text"
+											class="input-xlarge-fluid" id="j_username" name="j_username"
+											autofocus="autofocus" required="required"
+											aria-required="true" /> 
+											</div>
+											<div><label for="j_password">Password:</label><input
+											type="password" class="input-xlarge-fluid" id="j_password"
+											name="j_password" required="required" aria-required="true" />
+											</div>
+										<p />
+
+										<div class="controls">
+											<input type="submit" class="btn btn-primary" id="loginButton" name="loginButton"
+												value="Login" />
+										</div>
+										<div class="top-margin10">
+                                    		<a href="loginTrouble.html" th:href="@{loginTrouble.html}"><i>Trouble accessing your account?</i></a>
+                                    	</div>
+                                    
+									</form>
+								</div>
+
+							</fieldset>
+							<!-- !SECTION: Sign Up Now -->
+
+							<!-- !SECTION: Login With Third Party Account -->
+							<!--
+							<form>
+                               <fieldset class="login-section">
+                                    <legend>Login using facebook, google or linked-in</legend>
+
+                                    <div id="icon-set"> <img class="social-icons" src="images/facebook-gray.png" alt="facebook"> <img class="social-icons" src="images/google-gray.png" alt="google"><img class="social-icons" src="images/linkedin-gray.png" alt="linkedin"></div>
+		                       </fieldset>
+	                       </form>
+-->
+						</div>
+					</div>
+
+					<div id="body-features">
+						<div class="span4">
+							<h3>What is privacy consent?</h3>
+							<p>If you have ever visited a doctors office to receive
+								treatment, you most likely were asked by a receptionist at the
+								lobby to fill out a privacy consent form as part of your office
+								visit. But what is a privacy consent form, and how does it
+								effect your health and your privacy?</p>
+							<a href="#"> learn more</a>
+						</div>
+
+						<div class="span4">
+							<h3>About Consent 2 Share.</h3>
+							<p>Consent 2 Share is a publicly funded program which
+								provides individuals with education resources and electronic
+								tools necessary to manage sharing of health records in a safe
+								and secure manner.</p>
+							<a href="#"> learn more</a>
+						</div>
+
+
+						<div class="span4">
+							<h3>Learn about privacy.</h3>
+							<p>Every year millions of individuals visit the doctors
+								office and are asked to share their medical records as part of
+								receiving treatment. The unintended consequence is that...</p>
+							<a href="#"> learn more</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end row-fluid -->
+		</div>
+		<!-- end span10-->
+	</div>
+	<!-- end content row-fluid -->
+	<!-- END: Content Region -->
+	<!-- ELEMENT: Divider -->
+
+	<!--         <div class="clearfix"></div> -->
+
+
+	<!-- START: Footer Region -->
+
+	<footer class="home-footer">
+
+		<div id="footer-features">
+
+			<div class="span4">
+				<h3>Education Center</h3>
+				<ul class="nav nav-pills">
+					<li><a href="#">Balancing Safety and Privacy </a></li>
+					<li><a href="#">Consulting Your Doctor</a></li>
+					<li><a href="#">Using The Consent 2 Share</a></li>
+					<li><a href="#">Health Information Privacy</a></li>
+					<li><a href="#">FAQ</a></li>
+
+				</ul>
+			</div>
+
+			<div class="span4">
+				<h3>About Us</h3>
+				<ul class="nav nav-pills">
+					<li><a href="#">Contact Us</a></li>
+					<li><a href="#">Accessibility</a></li>
+					<li><a href="#">Privacy</a></li>
+					<li><a href="#">Disclaimer</a></li>
+					<li><a href="#">Feedback</a></li>
+					<li><a href="#">Site Map</a></li>
+				</ul>
+			</div>
+
+			<div class="span4">
+				<h3>SAMHSA Resources</h3>
+				<ul class="nav nav-pills">
+					<li><a href="#">The White House</a></li>
+					<li><a href="#">HHS.gov</a></li>
+					<li><a href="#">USA.gov</a></li>
+					<li><a href="#">Grants.gov</a></li>
+				</ul>
+			</div>
+
+
+			<div class="span4">
+				<h3>A Public Service of:</h3>
+				<p>U.S. DEPARTMENT OF HEALTH AND HUMAN SERVICES Substance Abuse
+					and Mental Health Services Administration www.samhsa.gov</p>
+				<div>
+					<img src="../../resources/img/HealthandHumanServicesLogo.png"
+						th:src="@{/resources/img/HealthandHumanServicesLogo.png}"
+						alt="Department of Health and Humand Services Logo" width="107" />
+				</div>
+			</div>
+		</div>
+
+	</footer>
+	<!-- END: Footer Region -->
+	<!-- START: JavaScript-->
+	<script src="../../resources/js/jquery-1.7.2.min.js"
+		th:src="@{/resources/js/jquery-1.7.2.min.js}" type="text/javascript">
+		
+	</script>
+	<noscript>Alternate content for script</noscript>
+	<script src="../../resources/js/bootstrap.js"
+		th:src="@{/resources/js/bootstrap.js}" type="text/javascript">
+		
+	</script>
+	<noscript>Alternate content for script</noscript>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js"  th:src="@{http://ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js}" type="text/javascript"></script>
+	
+	<!-- JavaScript Functions -->
+	<script type="text/javascript">
+		$(function() {
+			$("#loginForm").validate({
+				onfocusout: false,
+			    onkeyup: false,
+			    onclick: false,
+				showErrors: function(errorMap, errorList) {
+		            $(".errormsg").html($.map(errorList, function (el) {
+		            	$('.loginError').empty();
+		                return el.message;
+		            }).join("<br/> "));
+		        },
+		        wrapper: "span",
+				rules: {
+					j_username: {
+						required: true,
+						minlength: 3,
+	                    maxlength: 30
+					} ,
+					j_password: {
+						required: true,
+						minlength: 8,
+	                    maxlength: 30
+					}			
+				},
+				messages: {
+					j_username: {
+						required: "Username is required",
+						minlength: $.format("Username must be at least {0} characters long"),
+	                    maxlength: $.format("Username must less than {0} characters long")
+					} ,
+					j_password: {
+						required: "Password is required",
+						minlength: $.format("Password must be at least {0} characters long"),
+	                    maxlength: $.format("Password must less than {0} characters long")
+					} 
+				}
+			});			
+			
+		});
+	</script>
+	<noscript>Alternate content for script</noscript>
+	<!-- END: JavaScript-->
+	<!-- end container-fluid -->	 
+</body>
+</html>

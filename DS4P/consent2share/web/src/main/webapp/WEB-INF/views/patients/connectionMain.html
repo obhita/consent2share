@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/common :: headerFragment">
+<meta charset="utf-8" />
+<!-- title needs to be dynamic -->
+<title>My Contacts</title>
+<meta name="description" content="Consent Management System" />
+<meta name="author" content="FEiSystems" />
+<!-- END: Meta -->
+<!-- START: Mobile Specific -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- END: Mobile Specific -->
+	<!-- START: CSS -->
+	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css" rel="stylesheet"/>
+	<link href="../../../resources/css/bootstrap-responsive.min.css" rel="stylesheet"/>
+	<link href="../../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
+	<link href="../../../resources/css/joyride-consent2share.css" rel="stylesheet" />
+	<link href="../../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+	<link href="../../../resources/css/sentinel-style.css" rel="stylesheet"/>
+	<!-- END: CSS -->
+	
+
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+
+
+	<!-- START: Favicon -->
+		<!-- 	<link rel="shortcut icon" href="img/favicon.ico"> -->
+	<!-- END: Favicon -->
+
+</head>
+
+<body>
+		
+	<!-- START: Page Header -->
+	
+	<!-- END : Page Header -->	
+
+	<div id="connections-main" class="container-fluid">
+	<div class="navbar" role="navigation">
+		<div class="navbar-inner-header">
+			<div class="container-fluid">
+				<a class="btn btn-navbar" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</a>
+				<h1><span class="nav-title">My Providers</span></h1>
+				<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+
+				<!-- COMPONENT: Header Menu-->
+									<div class="btn-group pull-right">
+					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+							<span class="icon-flag"></span><span
+							class="hidden-phone hidden-tablet"> Language</span> <span
+							class="caret"></span>
+						</a>
+
+						<ul class="dropdown-menu" role="menu">
+							<li role="menuitem"><a th:href="@{'/patients/connectionMain.html?lang=en'}">English</a></li>
+							<li role="menuitem"><a th:href="@{'/patients/connectionMain.html?lang=cn'}">Chinese</a></li>
+						</ul>
+					</div>
+
+				<div class="btn-group pull-right" >
+					<a class="btn" href="#">
+						<span class="icon-envelope"></span><span class="hidden-phone hidden-tablet"> Message Center</span> 
+						<span class="label label-warning hidden-phone">3</span> 
+						<!-- <span class="label label-success hidden-phone">1</span>
+						<span class="label label-important hidden-phone">2</span> -->
+					</a>
+
+				<!-- COMPONENT: User Dropdown -->
+
+					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+						<span class="icon-user"></span><span class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span>
+						<span class="caret"></span>
+					</a>
+					
+					<ul role="menu" class="dropdown-menu">
+						<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_my_profile}">My Profile</a></li>
+						<li role="menuitem" aria-disabled="true" class="divider"></li>
+						<li role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" th:text="#{header_logout}">Logout</a></li>
+					</ul>
+		
+				</div>				
+			</div>
+		</div>
+		
+		<div th:switch="${notification}">
+				<span th:case="'notification_add_provider'">
+				<div class="alert alert-info rounded">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    	Click the <a href="../patients/connectionProviderAdd.html"><strong>'plus'</strong></a> button to add a provider.
+				</div>
+				</span>
+				
+				<span th:case="'notification_add_one_provider_successed'">
+				<div class="alert alert-success rounded">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    	<strong>Congratulations!</strong> You've successfully added a new Provider. Now, you need add your second provider before you create new Consent.
+				</div>
+				</span>
+				
+				<span th:case="'notification_add_second_provider'">
+				<div class="alert alert-success rounded">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    	 Now, you need add your second provider before you create new Consent..
+				</div>
+				</span>
+				
+				<span th:case="'notification_add_second_provider_successed'">
+				<div class="alert alert-success rounded">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    	<strong>Congratulations!</strong> You've successfully added second Provider. Now, you may go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to add a new Consent.
+				</div>
+				</span>
+				
+				<span th:case="'notification_add_consent'">
+					<div class="alert alert-success rounded">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    		Please go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to add a new Consent.
+					</div>
+				</span>
+				
+				<span th:case="'notification_review_sign_consent'">
+				<div class="alert alert-info rounded">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    	You have a unsigned consent.  Please go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to Review and Sign your Consent.
+			    </div>
+			    </span>
+			    
+			    <span th:case="'notification_sign_consent'">
+				<div class="alert alert-info rounded">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    	You have a unsigned consent.  Please go to your mailbox to Sign your Consent.
+			    </div>
+			    </span>
+		
+		</div>
+	</div>
+	<div id="under-header"></div>
+		<div class="row-fluid main-content-wrapper">					
+			<div id="content">
+
+	<!-- START: Side Nav Menu -->
+
+		<div class="span2 main-menu-span">
+			<div class="nav-collapse sidebar-nav">
+				<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
+					<li class="nav-header hidden-tablet" role="menuitem"></li>
+					<li role="menuitem"><a href="home.html"><div class="icon-home"></div><span class="hidden-tablet" th:text="#{sidebar_my_home}"> My Home</span></a></li>
+
+					<li role="menuitem"><a href="../consent/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div><span class="hidden-tablet" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
+
+					<li class="active" role="menuitem"><a href="#"><div class="icon-random icon-white"></div><span class="hidden-tablet"  th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
+							
+					<li role="menuitem"><a href="profile.html"><div class="icon-user"></div><span class="hidden-tablet" th:text="#{sidebar_my_profile}"> My Profile</span></a></li>
+							
+					<li role="menuitem"><a href="../inbox/inboxMain.html" th:href="@{/inbox/inboxMain.html}"><div class="icon-inbox"></div>
+									<span class="hidden-tablet" th:text="#{sidebar_in_box}"> Message Center</span></a></li>
+							
+					<li role="menuitem"><a href="activityHistory.html"><div class="icon-time"></div><span class="hidden-tablet" th:text="#{sidebar_activity_history}"> Activity History</span></a></li>
+							
+					<li role="menuitem"><a href="../clinicaldocuments/mymedicalinfo.html" th:href="@{/patients/medicalinfo.html}"><div class="icon-folder-open"></div><span class="hidden-tablet" th:text="#{sidebar_medical_documents}"> My Medical Information</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+	<!-- END: Side Nav Menu -->
+	
+	
+	<!-- JavaScrip Enable Message -->		
+			<noscript>
+				<div class="alert alert-block span10">
+					<p id="h4-style" class="alert-heading">Warning!</p>
+					<p>You need to have <a href="http://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a> enabled to use this site.</p>
+				</div>
+			</noscript>
+			
+
+				
+	<!-- START: Content Region-->
+	
+			<div role="main" class="span10">			
+			<div class="row-fluid">			
+
+		<!-- COMPONENT: Healthcare Providers -->
+
+			<div id="tour-trigger-area" class="span10">
+			<section class="top-margin10">
+                   
+                        <fieldset class="row-fluid">
+                            <legend>Healthcare Provider <span class="btn-right-align">
+                            <!-- <button id="tour-button" class="btn btn-info btn-mini add-btn">Tour
+                            </button> -->
+                            <button id="add-provider-btn" onClick="window.location.href='connectionProviderAdd.html'" class="btn btn-success btn-mini add-btn">
+                            <span class="icon-plus icon-white"></span>
+                            </button>
+                            </span></legend>
+                                                   
+                            <div class="control-group">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Current Healthcare Providers</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                   <tr >
+				                   		 <td><b>Name/Facility</b></td>
+				                   		 <td><b>Specialty</b></td>
+				                   		 <td><b>NPI</b></td>
+				                   		 <td><b>Contact Number</b></td>
+				                   		 <td><b>Address</b></td>
+				 		     		 	 <td></td>
+								  	 
+								</tr>
+			                   	 <tr th:each="individualProvider : ${individualProviders}">
+			                   		 <td	th:text="${individualProvider.lastName+', '+individualProvider.firstName}">lastName+firstName</td>
+			                   		 <td 	th:text="${individualProvider.providerTaxonomyDescription}">specialty</td>
+			                   		 <td	th:text="${individualProvider.npi}">NPI</td>
+			              		     <td>   
+				                    		 <script th:inline="javascript">	
+							                   		function phoneNumberParser (number){
+								                   		
+							                   			if (number.length==10){
+							                   				number="("+number.substr(0,3)+") "+number.substr(3,3)+"-"+number.substr(6,4);
+							                   			}
+							                   			
+							                   			return number;
+							                   		}
+			                   		  				
+				                   		  			 phonenumber= phoneNumberParser([[${individualProvider.practiceLocationAddressTelephoneNumber}]]);
+				                   		  		    document.write(phonenumber);
+				                   		  		    
+				                   		  </script> 
+			                   	  
+			                   		 </td>
+			                   		 <td>	
+			                   		 	 <script th:inline="javascript">	
+			                   						
+			                   		 						var orgAddress=[[${individualProvider.firstLinePracticeLocationAddress}]];
+			                   								var orgCityName=[[${individualProvider.practiceLocationAddressCityName}]];
+			                   								var orgStateName=[[${individualProvider.practiceLocationAddressStateName}]];
+								                   		    var zipcode= [[${individualProvider.practiceLocationAddressPostalCode}]];
+			     		                   		  			zipcode=zipcode.substr(0,5)
+						                   		  		    document.write(orgAddress+", "+orgCityName+", "+orgStateName+", "+zipcode);
+						                 </script>
+						              </td>
+			 		     		 	
+			 		     		 	 <td class="minus-btn">  <div id="minus-button" class="btn btn-danger btn-mini"> <a href="#" th:href="@{'connectionMain/deleteIndividualProvider/'+ ${individualProvider.id}}"> <span class="icon-minus icon-white"></span></a></div></td>
+			 		     		 	
+								  	 
+								</tr>
+								
+								<tr th:each="organizationalProvider : ${organizationalProviders}">
+			                   		 <td	th:text="${organizationalProvider.orgName}">OfficeName</td>
+			                   		 <td	th:text="${organizationalProvider.providerTaxonomyDescription}">specialty</td>
+			                   		 <td	th:text="${organizationalProvider.npi}">NPI</td>
+			                   		 <td>   
+			                   		 <script th:inline="javascript">	
+						                   		function phoneNumberParser (number){
+						                   			if (number.length==10){
+						                   				number="("+number.substr(0,3)+") "+number.substr(3,3)+"-"+number.substr(6,4);
+						                   			}
+						                   			
+						                   			return number;
+						                   			}
+		                   		  				
+			                   		  			var phonenumber= phoneNumberParser([[${organizationalProvider.practiceLocationAddressTelephoneNumber}]]);
+			                   		  		    document.write(phonenumber);
+			                   		  </script>
+			                   	  
+			                   	
+			                   		 </td>
+			                   		 
+			                   		 
+			                   		 <td >
+			                   		 	<script th:inline="javascript">	
+			                   						
+			                   		 						var orgAddress=[[${organizationalProvider.firstLinePracticeLocationAddress}]];
+			                   								var orgCityName=[[${organizationalProvider.practiceLocationAddressCityName}]];
+			                   								var orgStateName=[[${organizationalProvider.practiceLocationAddressStateName}]];
+								                   		    var zipcode= [[${organizationalProvider.practiceLocationAddressPostalCode}]];
+			     		                   		  			zipcode=zipcode.substr(0,5)
+						                   		  		    document.write(orgAddress+", "+orgCityName+", "+orgStateName+", "+zipcode);
+						                 </script>
+			                   		 </td>
+			 		     		 
+			 		     		 	 <td>
+			 		     		 	 	<div class="minus-btn btn btn-danger btn-mini" > <a href="#" th:href="@{'connectionMain/deleteOrganizationalProvider/'+ ${organizationalProvider.id}}"> <span class="icon-minus icon-white" ></span></a></div></td>
+			 		     		 	
+								  	 
+								</tr>
+                                      
+                              		</tbody>
+                                </table>
+                            </div>
+                        </fieldset>
+                    
+                </section>
+                
+			</div>
+
+
+		<!-- COMPONENT: Connections -->				
+		
+							
+			</div>
+		</div><!--/#content.span10-->
+	</div><!--/fluid-row-->
+	<!-- END: Content Region -->
+
+
+
+	<!-- ELEMENT: Divider -->
+
+		
+	<!-- START: Footer Region -->		
+	
+	
+	<!-- END: Footer Region -->
+
+		</div> 	
+	
+	<ol id="connections-tour" class="hidden">
+			<li class="pete" data-id="add-provider-btn" data-options="tipLocation:right" data-button="First Button" data-class="user-guide">
+			<img class="number-icon" src="../../../resources/img/number-01.png" th:src="@{/resources/img/number-01.png}" alt="step-01" width="20" height="20"/>Click the "plus" button to add a Healthcare Provider to your health records.
+			<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+			<li data-id="minus-button" data-options="tipLocation:right" class="user-guide">
+			<img class="number-icon" src="../../../resources/img/number-02.png" th:src="@{/resources/img/number-02.png}" alt="step-01" width="20" height="20"/>Click the "minus" button to remove this entry.
+			<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+			<li data-id="legal-button" data-options="tipLocation:right" class="user-guide">
+			<img class="number-icon" src="../../../resources/img/number-03.png" th:src="@{/resources/img/number-03.png}" alt="step-01" width="20" height="20"/>Click the plus button to add a Legal Representative to your health records.
+			<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+		</ol>
+	
+	<div class="clearfix"></div>
+	
+	<!-- Add Legal Modal -->
+	<div id="add-legal-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="share-settings-modal" aria-hidden="true">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+			<p class="h3-style">Add a Legal Representative</p>
+		</div><!-- end modal-header -->
+		<div id="add-legal-form" class="modal-body">
+			<section class="top-margin10">
+				<form method="post">									
+					<fieldset class="row-fluid">
+						<div class="alert">
+							Please fill out the required fields below.
+						</div>
+
+						<div class="control-group">
+							<div>
+								<div>
+									<label for="first_name">First Name</label>													  
+								</div>
+								<div class="inline-block">
+									<input id="firstName_add_field" name="firstname" type="text" aria-required="true" />
+									<span id="firstName_add_error" class="required-text" style="color: red;" ></span>
+								</div>
+							</div>
+							
+							<div>
+								<div>
+									<label for="last_name">Last	Name</label> 													
+								</div>
+								<div class="inline-block">
+									<input id="lastName_add_field" name="lastname" type="text"  aria-required="true" /> 
+									<span id="lastName_add_error" class="required-text" style="color: red;" ></span>
+								</div>
+							</div>
+							
+							<div>
+								<div>
+									<label class="control-label">Gender</label>
+								</div>													
+								<div class="controls inline-block">
+									<select id="administrativeGenderCode_add_field" >
+										<option selected="selected" value="">--- Please Select ---</option>
+										<option th:each="gender : ${administrativeGenderCodes}"
+										th:value="${gender.code}" th:text="${gender.displayName}">F</option>
+									</select>
+									<span id="administrativeGenderCode_add_error" class="required-text" ></span>
+								</div>
+							</div>
+							
+							<div class="summary-container">
+								<div>
+									<label for="birth-date">Date of Birth</label> 
+								</div>
+								<div class="input-append datepicker date" data-date="1-01-2013" data-date-format="mm/dd/yyyy">
+									<input size="16" type="text" name="birthdate" id="birthDate_add_field" aria-required="true" />
+									<span class="add-on"><span class="icon-th"></span></span>
+																																			
+								</div>
+									<span id="birthDate_add_error" class="required-text" ></span>									
+							</div>	
+									
+							<div>
+								<div>
+									<label for="email"><strong>Direct</strong> Email</label>
+								</div>
+								<div class="inline-block">													
+									<input id="email_add_field" name="email" type="text"  aria-required="true"/>
+									<span id="email_add_error" class="required-text" ></span>
+								</div>
+								<p style="font-size:small">A <strong>Direct</strong> Email account is a secure email account used to protect all your personal information being transferred by this application, with this contact. <span style="color:red;"><em>You may only send <strong>Direct</strong> emails to other existing <strong>Direct</strong> email accounts.</em></span> For you to share information with this contact, they MUST have an existing Direct Email account. For more information, <a href="#">click here.</a></p>
+
+							</div>
+							
+							<div>
+								<div>
+									<label for="email">Secondary Email</label>
+								</div>
+								<div class="inline-block">													
+									<input id="email_add_field" name="email" type="text"  aria-required="true"/>
+									<span id="email_add_error" class="required-text" ></span>
+								</div>
+								<p style="font-size:small"><em>Secondary Email is used as additional contact information. No Personal information can be shared with this contact using a Secondary Email account.</em></p>
+							</div>
+							
+							<div>
+								<div>
+									<label for="phone">Phone Number</label> 
+								</div>
+								<div class="inline-block">
+									<input id="telephoneTelephone_add_field" name="telephone" type="text"/>												
+									<span id="telephoneTelephone_add_error" class="required-text" ></span>
+								</div>
+							</div>
+							
+							<div class="username-container">
+								<p>Address</p>
+								<label for="street">Street Address</label> 
+								<input id="addressStreetAddressLine_add_field" name="streetAddressLine" type="text" /> 
+								<label for="city">City</label>
+								<input id="addressCity_add_field" name="city" type="text" />
+
+								<label for="state">State</label> 
+								<select id="addressStateCode_add_field">
+									<option selected="selected" value="">--- Please Select ---</option>
+									<option th:each="addressState : ${stateCodes}" th:value="${addressState.code}" th:text="${addressState.displayName}">Alabama</option>
+								</select> 
+								<div>
+									<div>
+										<label for="zip">Zip Code</label>
+									</div>
+									<div class="inline-block"> 
+										<input id="addressPostalCode_add_field" name="postalCode" type="text" />
+										<span id="addressPostalCode_add_error" class="required-text" ></span>
+									</div>
+								</div>
+							</div>
+							
+
+																				
+						</div><!-- end control group -->												
+					</fieldset>
+					
+					<section id="consent-date" class="bottom-margin10">
+						<div class="top-margin10">
+								<label class="control-label">Relationship Type</label>
+								<div class="controls">
+										<select id="legalRepresentativeTypeCode_add_field" name="legalRepresentativeTypeCode">
+											<option selected="selected" value="">--- Please Select ---</option>
+											<option th:each="legalRepresentativeTypeCode : ${legalRepresentativeTypeCodes}" th:value="${legalRepresentativeTypeCode.code}" th:text="${legalRepresentativeTypeCode.displayName}">Guardian</option>
+											<option th:remove="all" value="">Parent</option>
+											<option th:remove="all" value="">Guardian</option>
+										</select>
+								</div>
+							</div>
+						<div>
+						<section id="consent-start-date">
+							<div class="summary-container">
+								
+									<label for="date-picker-start">Relationship Start</label>
+									<div class="input-append datepicker date" data-date="1-01-2013" data-date-format="mm/dd/yyyy">
+										<input id="relationshipStartDate_add_field" name="repStartDate" size="16" type="text"/><span class="add-on"><span class="icon-th"></span></span>
+									</div>
+								
+							</div>
+						</section>
+							
+						<section id="consent-end-date">
+							<div class="summary-container">
+							
+									<label for="date-picker-end">Relationship End</label>
+									<div class="input-append datepicker date" data-date="1-01-2013" data-date-format="mm/dd/yyyy">
+										<input id="relationshipEndDate_add_field"  name="repEndDate" size="16" type="text"/><span class="add-on"><span class="icon-th"></span></span>
+										
+									</div>
+								<span id="relationshipStartDate_add_error" class="required-text"></span>
+							</div>
+						</section>
+							
+						<div class="clearfix"></div>	
+						</div>
+				</section>
+
+							
+
+
+
+				</form>
+				
+			</section>
+		</div><!-- end Modal-body -->
+		<div class="modal-footer">
+					<section class="control-group">
+						<div class="controls">
+							<button type="button" class="btn" data-dismiss="modal" style="margin: 0 10px 0 0;">Cancel</button>
+							<button class="btn btn-primary" onclick="validate_add_legal_form()">Save</button>
+						</div>         		
+					</section>
+		</div><!-- end modal-footer -->
+
+	</div>
+	<!-- end modal2 -->
+
+
+
+		<!-- START: Footer Region -->
+		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
+		<!-- COMPONENT: Action Buttons -->
+				<!--
+				<a href="#" class="btn pull-left" data-dismiss="modal">Close</a>
+				<a href="#" class="btn btn-primary pull-right">Save changes</a>
+				-->
+				
+				<!-- COMPONENT: Copyright Information -->
+				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
+
+		</footer>
+		
+		<!-- END: Footer Region -->
+		<!-- END: Footer Region -->
+	</div>
+
+ 
+
+	<!-- START: JavaScript-->
+
+		<script src="../../../resources/js/jquery.min.js" 
+				th:src="@{/resources/js/jquery.min.js}" 
+				type="text/javascript">
+		</script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/bootstrap.min.js"
+				th:src="@{/resources/js/bootstrap.min.js}" 
+				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/jquery.toggle.buttons.js"
+				th:src="@{/resources/js/jquery.toggle.buttons.js}" 
+				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/bootstrap-datepicker.js"
+				th:src="@{/resources/js/bootstrap-datepicker.js}" 
+				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/bootstrap-popover.js"
+				th:src="@{/resources/js/bootstrap-popover.js}"
+				type="text/javascript"></script>
+				
+		<script src="../../../resources/js/bootstrap-tooltip.js"
+				th:src="@{/resources/js/bootstrap-tooltip.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/jquery.joyride-2.0.3.js" 
+				th:src="@{/resources/js/jquery.joyride-2.0.3.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/jquery.cookie.js" 
+				th:src="@{/resources/js/jquery.cookie.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/modernizr.mq.js" 
+				th:src="@{/resources/js/modernizr.mq.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/formatParser.js" 
+				th:src="@{/resources/js/formatParser.js}"
+				type="text/javascript"></script>
+
+		
+		
+		<!-- end new scripts -->
+		
+		<!-- JavaScript Functions -->
+		<script type="text/javascript">	
+			
+			$(document).ready(function(){
+				$('.datepicker').datepicker();
+			
+				$('#connections-tour').joyride({
+				    tipContainer: '#connections-main',
+				    heightPadding: $('footer').outerHeight() + 10,
+				    mode: 'focus'
+				});
+				
+		/* For Tour HOTSPOT - Add clickable area ID here */
+				$('#tour-button').click(function (e) {
+			        $('#connections-tour').joyride();
+			    });
+
+
+				$("button[id*=edit_legal_submit]").bind('click', function() {
+					var id = $(this).attr("id").split('_')[3];
+					var pageUrl = window.location.pathname;
+					pageUrl = pageUrl.replace(".html", "")+'/editLegalRepresenttive/'+id;
+					
+					$("span[id*=_edit_error]").text("");
+
+					var formData = {	"firstName" : $("#firstName_edit_field-" + id).val() ,
+										"lastName" : $("#lastName_edit_field-" + id).val() ,
+										"administrativeGenderCode" : $("#administrativeGenderCode_edit_field-" + id).val() ,
+										"birthDate" : $("#birthDate_edit_field-" + id).val() , 
+										"email" : $("#email_edit_field-" + id).val() ,
+										"telephoneTelephone" : $("#telephoneTelephone_edit_field-" + id).val() ,
+										"addressStreetAddressLine" : $("#addressStreetAddressLine_edit_field-" + id).val() ,
+										"addressCity" : $("#addressCity_edit_field-" + id).val() ,
+										"addressStateCode" : $("#addressStateCode_edit_field-" + id).val() ,
+										"addressPostalCode" : $("#addressPostalCode_edit_field-" + id).val() ,
+										"legalRepresentativeTypeCode" : $("#legalRepresentativeTypeCode_edit_field-" + id).val() ,
+										"relationshipStartDate" : $("#relationshipStartDate_edit_field-" + id).val() ,
+										"relationshipEndDate" : $("#relationshipEndDate_edit_field-" + id).val() ,
+									};
+
+					$.ajax({
+						  type: "POST",
+						  url: pageUrl, 
+						  data: formData, 
+						  success: function(response, status, xhr){ 
+						    var ct = xhr.getResponseHeader("content-type") || "";
+						    if (ct.indexOf('html') > -1) {
+						    	document.location.reload(true);
+						    }
+						    if (ct.indexOf('json') > -1) {
+						      for(var property in response) {
+								$("#" + property + "_edit_error-" + id).text(response[property]);
+							  }
+						      $("#edit-legal-form-" + id).find("p").remove();
+							  $("#edit-legal-form-" + id).prepend("<p>Please check the error fields below.</p>");
+							  $("p:contains('Please check the error fields below.')").addClass('alert');
+							  $("#edit-legal-form-" + id).animate({scrollTop:0},800);
+						    } 
+						  },
+
+						});
+				});
+				
+				
+			 });
+			function validate_add_legal_form() {
+				var pageUrl = window.location.pathname;
+
+				$("span[id*=_add_error]").text("");
+
+				var formData = {	"firstName" : $("#firstName_add_field").val() ,
+									"lastName" : $("#lastName_add_field").val() ,
+									"administrativeGenderCode" : $("#administrativeGenderCode_add_field").val() ,
+									"birthDate" : $("#birthDate_add_field").val() , 
+									"email" : $("#email_add_field").val() ,
+									"telephoneTelephone" : $("#telephoneTelephone_add_field").val() ,
+									"addressStreetAddressLine" : $("#addressStreetAddressLine_add_field").val() ,
+									"addressCity" : $("#addressCity_add_field").val() ,
+									"addressStateCode" : $("#addressStateCode_add_field").val() ,
+									"addressPostalCode" : $("#addressPostalCode_add_field").val() ,
+									"legalRepresentativeTypeCode" : $("#legalRepresentativeTypeCode_add_field").val() ,
+									"relationshipStartDate" : $("#relationshipStartDate_add_field").val() ,
+									"relationshipEndDate" : $("#relationshipEndDate_add_field").val() ,
+								};
+
+				$.ajax({
+					  type: "POST",
+					  url: pageUrl, 
+					  data: formData, 
+					  success: function(response, status, xhr){ 
+					    var ct = xhr.getResponseHeader("content-type") || "";
+					    if (ct.indexOf('html') > -1) {
+					    	document.location.reload(true);
+					    }
+					    if (ct.indexOf('json') > -1) {
+					      for(var property in response) {
+							$("#" + property + "_add_error").text(response[property]);
+						  }
+						  $("#add-legal-form").animate({scrollTop:0},800);
+					    } 
+					  },
+
+					});
+			}
+			
+		</script><noscript>Alternate content for script</noscript>
+	
+	<!-- END: JavaScript-->
+	
+</body>
+</html>
+

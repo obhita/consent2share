@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/common :: headerFragment">
+<meta charset="utf-8" />
+<!-- title needs to be dynamic -->
+<title>My Connections</title>
+<meta name="description" content="Consent Management System" />
+<meta name="author" content="FEiSystems" />
+<!-- END: Meta -->
+<!-- START: Mobile Specific -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- END: Mobile Specific -->
+	<!-- START: CSS -->
+	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css" rel="stylesheet"/>
+	<link href="../../../resources/css/bootstrap-responsive.min.css" rel="stylesheet"/>
+	<link href="../../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
+	<link href="../../../resources/css/sentinel-style.css" rel="stylesheet"/>
+	<link href="../../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
+	<link href="../../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+	<!-- END: CSS -->
+	
+
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+
+
+	<!-- START: Favicon -->
+		<!-- 	<link rel="shortcut icon" href="img/favicon.ico"> -->
+	<!-- END: Favicon -->
+
+</head>
+
+<body>
+		
+	<!-- START: Page Header -->
+	
+	<!-- END : Page Header -->	
+
+	<div id="connections-main" class="container-fluid">
+	<div class="navbar" role="navigation">
+		<div class="navbar-inner-header">
+			<div class="container-fluid">
+				<a class="btn btn-navbar" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</a>
+				<h1><span class="nav-title">Activity History</span></h1>
+				<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+
+				<!-- COMPONENT: Header Menu-->
+
+				<div class="btn-group pull-right" >
+					<a class="btn" href="#">
+						<span class="icon-envelope"></span><span class="hidden-phone hidden-tablet"> Message Center</span> 
+						<span class="label label-warning hidden-phone">3</span> 
+						<!-- <span class="label label-success hidden-phone">1</span>
+						<span class="label label-important hidden-phone">2</span> -->
+					</a>
+
+				<!-- COMPONENT: User Dropdown -->
+
+					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+						<span class="icon-user"></span><span class="hidden-phone hidden-tablet"> My Account</span>
+						<span class="caret"></span>
+					</a>
+					
+					<ul role="menu" class="dropdown-menu">
+						<li role="menuitem"><a href="#">My Profile</a></li>
+						<li role="menuitem" aria-disabled="true" class="divider"></li>
+						<li role="menuitem"><a href="login.html">Logout</a></li>
+					</ul>
+		
+				</div>				
+			</div>
+		</div>
+	</div>
+	<div id="under-header"></div>
+		<div class="row-fluid main-content-wrapper">					
+			<div id="content">
+
+	<!-- START: Side Nav Menu -->
+
+		<div class="span2 main-menu-span">
+			<div class="nav-collapse sidebar-nav">
+				<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
+					<li class="nav-header hidden-tablet" role="menuitem"></li>
+					<li role="menuitem"><a href="home.html"><div class="icon-home"></div><span class="hidden-tablet"> My Home</span></a></li>
+
+					<li role="menuitem"><a href="../consent/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div><span class="hidden-tablet"> My Consents</span></a></li>
+							
+					<li  role="menuitem"><a href="connectionMain.html"><div class="icon-random "></div><span class="hidden-tablet"> My Providers </span></a></li>
+							
+					<li role="menuitem"><a href="profile.html"><div class="icon-user"></div><span class="hidden-tablet"> My Profile</span></a></li>
+							
+					<li role="menuitem"><a href="../inbox/inboxMain.html" th:href="@{/inbox/inboxMain.html}"><div class="icon-inbox"></div>
+									<span class="hidden-tablet" th:text="#{sidebar_in_box}"> Message Center</span></a></li>
+							
+					<li class="active" role="menuitem"><a href="#"><div class="icon-time icon-white"></div><span class="hidden-tablet"> Activity History</span></a></li>
+							
+					<li role="menuitem"><a href="../clinicaldocuments/clinicalDocuments.html" th:href="@{/patients/medicalinfo.html}"><div class="icon-folder-open"></div><span class="hidden-tablet"> My Medical Information</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+	<!-- END: Side Nav Menu -->
+	
+	
+	<!-- JavaScrip Enable Message -->		
+			<noscript>
+				<div class="alert alert-block span10">
+					<p id="h4-style" class="alert-heading">Warning!</p>
+					<p>You need to have <a href="http://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a> enabled to use this site.</p>
+				</div>
+			</noscript>
+			
+
+				
+	<!-- START: Content Region-->
+	
+			<div role="main" class="span10">			
+			<div class="row-fluid">			
+
+		<!-- COMPONENT: Healthcare Providers -->
+
+			<div id="tour-trigger-area" class="span10">
+			<section class="top-margin10">
+                   
+                        <fieldset class="row-fluid">
+                            <legend>Activity History<span class="btn-right-align"></span>
+                           </legend>
+                                                   
+                            <div class="control-group">
+                                <table class="table table-striped table-bordered">
+
+
+                                    <tbody>
+                                   <tr >
+				                   		 <td><b>Date</b></td>
+				                   		 <td><b>Action</b></td>
+				                   		 <td><b>Type</b></td>
+				                   		 <td><b>Changed by</b></td>
+				                   		
+				                   
+								  	 
+								</tr>
+			                   	 <tr th:each="history : ${historys}">
+			                   		 <td	th:text="${history.timestamp}">date</td>
+			                   		 <td	th:text="${history.recType}">Action</td>
+			                   		 <td	th:text="${history.type}">Type</td>
+			              		     <td  th:text="${history.changedBy}">changeby </td> 
+			              		     
+			                   	  
+		                   		     
+
+                                  </tr>    
+                              		</tbody>
+                                </table>
+                            </div>
+                        </fieldset>
+                    
+                </section>
+ 
+                
+
+              
+                
+			</div>
+
+
+		<!-- COMPONENT: Connections -->				
+		
+							
+			</div>
+		</div><!--/#content.span10-->
+	</div><!--/fluid-row-->
+	<!-- END: Content Region -->
+
+
+
+	<!-- ELEMENT: Divider -->
+
+		
+	<!-- START: Footer Region -->		
+	
+	
+	<!-- END: Footer Region -->
+
+		</div> 	
+	
+
+	<div class="clearfix"></div>
+
+
+		
+		<!-- START: Footer Region -->
+		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
+		<!-- COMPONENT: Action Buttons -->
+				<!--
+				<a href="#" class="btn pull-left" data-dismiss="modal">Close</a>
+				<a href="#" class="btn btn-primary pull-right">Save changes</a>
+				-->
+				
+				<!-- COMPONENT: Copyright Information -->
+				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
+
+		</footer>
+		
+		<!-- END: Footer Region -->
+		<!-- END: Footer Region -->
+	</div>
+
+ 
+
+	<!-- START: JavaScript-->
+
+		<script src="../../../resources/js/jquery.min.js" 
+				th:src="@{/resources/js/jquery.min.js}" 
+				type="text/javascript">
+		</script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/bootstrap.min.js"
+				th:src="@{/resources/js/jquery.min.js}" 
+				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/jquery.toggle.buttons.js"
+				th:src="@{/resources/js/jquery.toggle.buttons.js}" 
+				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/bootstrap-datepicker.js"
+				th:src="@{/resources/js/bootstrap-datepicker.js}" 
+				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/bootstrap-popover.js"
+				th:src="@{/resources/js/bootstrap-popover.js}"
+				type="text/javascript"></script>
+				
+		<script src="../../../resources/js/bootstrap-tooltip.js"
+				th:src="@{/resources/js/bootstrap-tooltip.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/jquery.joyride-2.0.3.js" 
+				th:src="@{/resources/js/jquery.joyride-2.0.3.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/jquery.cookie.js" 
+				th:src="@{/resources/js/jquery.cookie.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/modernizr.mq.js" 
+				th:src="@{/resources/js/modernizr.mq.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/formatParser.js" 
+				th:src="@{/resources/js/formatParser.js}"
+				type="text/javascript"></script>
+
+		
+		
+		<!-- end new scripts -->
+		
+		
+	
+</body>
+</html>
+

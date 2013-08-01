@@ -1,0 +1,12 @@
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (1, 'HMARKT', 'Healthcare Marketing', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (2, 'HOPERAT', 'Healthcare Operations', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (3, 'HLEGAL', 'Legal', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (4, 'FAMRQT', 'Family Requested', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (5, 'PWATRNY', 'Power of Attorney', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (6, 'HPAYMT', 'Healthcare Payment', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (7, 'HRESCH', 'Healthcare Research', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (8, 'CLINTRCH', 'Clinical Trial Research', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (9, 'TREAT', 'Treatment', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (10, 'ETREAT', 'Emergency Treatment', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (11, 'CAREMGT', 'Care Management Treatment', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');
+insert into purpose_of_use_code (id, code, display_name, code_system_name, code_system) values (12, 'CLINTRL', 'Clinical Trial Treatment', 'PurposeOfUse', '2.16.840.1.113883.1.11.20448');

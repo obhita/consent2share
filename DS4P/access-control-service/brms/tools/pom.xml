@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>gov.samhsa.consent2share</groupId>
+		<artifactId>brms</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>brms-tools</artifactId>
+	<name>BRMS - Tools</name>
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.googlecode.sardine</groupId>
+			<artifactId>sardine</artifactId>
+			<version>146</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>brms-tools</finalName>
+		<plugins>
+			<!--  FactModelUploader to Guvnor-->
+			<!-- need to build factmodel before deployment -->
+			
+			<!-- dev deployment -->
+			<!-- mvn clean install exec:java -Denvironment.type=dev -Dexec.mainClass="gov.samhsa.consent2share.accesscontrolservices.brms.guvnor.upload.FactModelUploader" -->
+			
+			<!-- qa deployment -->
+			<!-- mvn clean install exec:java -Denvironment.type=qa -Dexec.mainClass="gov.samhsa.consent2share.accesscontrolservices.brms.guvnor.upload.FactModelUploader" -->
+			
+			<!-- demo deployment -->
+			<!-- mvn clean install exec:java -Denvironment.type=demo -Dexec.mainClass="gov.samhsa.consent2share.accesscontrolservices.brms.guvnor.upload.FactModelUploader" -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>gov.samhsa.consent2share.accesscontrolservices.brms.guvnor.upload.FactModelUploader</mainClass>
+					<arguments>
+						<argument>${maven.guvnor.username}</argument>
+						<argument>${maven.guvnor.password}</argument>
+						<argument>${maven.guvnor.factmodel-put-url}</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+		</plugins>
+		<!-- Build with Java 1.6 -->
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>1.6</source>
+						<target>1.6</target>
+					</configuration>
+				</plugin>
+
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

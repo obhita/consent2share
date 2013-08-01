@@ -1,0 +1,12 @@
+com.feisystems.provider
+com.feisystems.provider.app.service
+com.feisystems.provider.data.dao
+com.feisystems.provider.data.impl.repository
+com.feisystems.provider.data.mapper
+com.feisystems.provider.data.repository
+com.feisystems.provider.data.service
+com.feisystems.provider.repository
+com.feisystems.provider.service
+com.feisystems.provider.service.controllers
+com.feisystems.provider.test
+com.feisystems.provider.values

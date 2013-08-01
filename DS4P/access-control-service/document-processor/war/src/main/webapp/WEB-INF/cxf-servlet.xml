@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:cxf="http://cxf.apache.org/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:soap="http://cxf.apache.org/bindings/soap"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+         http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://cxf.apache.org/jaxws
+         http://cxf.apache.org/schemas/jaxws.xsd
+         http://www.springframework.org/schema/util
+         http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <!-- Import statement optional but often required if you're declaring 
+         other CXF beans in this file such as CXF's JMX MBeans -->
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    
+    <util:properties id="endpointAddressProperties"
+		location="/WEB-INF/endpointAddress.properties" />
+
+    <jaxws:endpoint 
+        id="processdocumentservice"
+        implementor="#processDocumentServiceImpl"
+        wsdlLocation="classpath:ProcessDocumentService.wsdl"
+        address="/processdocumentservice">
+        <jaxws:properties>
+			<entry key="mtom-enabled" value="true" />
+		</jaxws:properties>
+    </jaxws:endpoint>
+    
+    <bean id="processDocumentServiceImpl"
+		class="gov.samhsa.ds4ppilot.documentprocessor.ws.ProcessDocumentServiceImpl"
+		scope="prototype" autowire="byType" />
+
+	<bean id="documentProcessorImpl"
+		class="gov.samhsa.ds4ppilot.documentprocessor.DocumentProcessorImpl"
+		scope="prototype" autowire="constructor" />
+		
+	<bean id="ruleExecutionServiceClientImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentprocessor.brms.RuleExecutionServiceClientImpl"
+		scope="prototype">
+		<constructor-arg value="#{endpointAddressProperties.ruleExecutionService}" />
+	</bean>
+
+	<bean id="auditServiceImpl"
+		class="gov.samhsa.ds4ppilot.documentprocessor.audit.AuditServiceImpl"
+		scope="prototype">
+		<constructor-arg value="#{endpointAddressProperties.auditService}" />
+	</bean>
+    
+</beans>

@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org">
+<head >
+<!-- 	th:include="fragment/common :: headerFragment" -->
+	<!-- START: Meta -->
+
+	<meta charset="utf-8"/>
+	<title>My Consents </title>
+	<meta name="description" content="Consent Management System"/>
+	<meta name="author" content="FEiSystems"/>
+
+	<!-- END: Meta -->
+
+
+	
+	<!-- START: Mobile Specific -->
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	
+	<!-- END: Mobile Specific -->
+
+
+
+	<!-- START: CSS -->
+	
+	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css" th:href="@{/resources/css/bootstrap.css}" rel="stylesheet"/>
+	<link href="../../../resources/css/bootstrap-responsive.min.css" th:href="@{/resources/css/bootstrap-responsive.min.css}" rel="stylesheet"/>
+	<link href="../../../resources/css/themes-style.css" th:href="@{/resources/css/themes-style.css}" rel="stylesheet"/>
+	<link href="../../../resources/css/bootstrap-toggle-buttons.css" th:href="@{/resources/css/bootstrap-toggle-buttons.css}" rel="stylesheet"/>
+	<link href="../../../resources/css/sentinel-style.css" th:href="@{/resources/css/sentinel-style.css}" rel="stylesheet"/>
+	<link href="../../../resources/css/joyride-2.0.3.css" th:href="@{/resources/css/joyride-2.0.3.css}" rel="stylesheet" />
+	<link href="../../../resources/css/font-awesome.css" th:href="@{/resources/css/font-awesome.css}" rel="stylesheet"/>
+	<link href="../../../resources/css/jquery-ui.css" rel="stylesheet" th:href="@{/resources/css/jquery-ui.css}"/>
+
+	
+
+	<!-- END: CSS -->
+
+
+
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+
+
+	<!-- START: Favicon -->
+		<!-- 	<link rel="shortcut icon" href="img/favicon.ico"> -->
+	<!-- END: Favicon -->
+
+</head>
+
+<body>
+	<form hidden="ture" id="formToBeSubmitted" action="#" th:action="@{/consents/addConsent.html}" method="post">
+	</form>
+			
+	
+	<!-- END : Page Header -->	
+
+	<div id="consent-add-main" class="container-fluid" style="overflow:hidden">
+	<!-- START: Page Header -->
+	<div class="navbar" role="navigation">
+		<div class="navbar-inner-header">
+			<div class="container-fluid">
+			
+				<div class="row-fluid">
+				
+					<a id="bread-crumb-btn" href="../consents/listConsents.html" class="btn btn-info" ><span class="icon-chevron-left icon-white"></span></a> 
+					<h1><span class="nav-title">Add a Consent</span></h1>
+				
+					<div class="pull-right">
+						<div class="btn-group pull-left" data-toggle="buttons-radio" style="z-index: 101;">
+							<button id="btn_guide_on" type="button" class="btn btn-mini active">Guide On</button>
+		  					<button id="btn_guide_off" type="button" class="btn btn-mini">Guide Off</button>
+						</div>
+					
+						<a class="brand" href="../index.html" style="float: right;"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+					</div>
+											
+				</div>
+								
+			</div>
+		</div>
+	</div>
+	<div id="under-header"></div>
+		<div class="row-fluid main-content-wrapper">					
+			<div id="content">
+	<!-- START: Side Nav Menu -->
+			<!--
+				<div class="span2 main-menu-span">
+					<div class="nav-collapse sidebar-nav">
+						<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
+							<li class="nav-header hidden-tablet" role="menuitem"></li>
+							<li role="menuitem"><a href=""><div class="icon-file"></div><span class="hidden-tablet"> My Consents</span></a></li>
+							
+							<li role="menuitem"><a href=""><div class="icon-random"></div><span class="hidden-tablet"> My Contacts </span></a></li>
+							
+							<li role="menuitem"><a href=""><div class="icon-user"></div><span class="hidden-tablet"> My Profile</span></a></li>
+							
+							<li role="menuitem"><a href=""><div class="icon-inbox"></div><span class="hidden-tablet"> In Box</span></a></li>
+							
+							<li role="menuitem"><a href=""><div class="icon-time"></div><span class="hidden-tablet"> Activity History</span></a></li>
+							
+							<li role="menuitem"><a href=""><div class="icon-folder-open"></div><span class="hidden-tablet"> Medical Documents</span></a></li>
+						</ul>
+					</div>
+				</div>
+			-->
+
+	<!-- END: Side Nav Menu -->
+	
+	
+	<!-- JavaScrip Enable Message -->		
+			<noscript>
+				<div class="alert alert-block span10">
+					<p class="h4-style alert-heading">Warning!</p>
+					<p>You need to have <a href="http://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a> enabled to use this site.</p>
+				</div>
+			</noscript>
+			
+
+				
+	<!-- START: Content Region-->
+	
+		<div role="main" class="span10" style="adding-bottom: 40px;">			
+			<div class="row-fluid">			
+	
+			<!-- COMPONENT: Consents -->
+			
+			
+					
+				<div class="span10 offset1">
+					<section class="top-margin10">
+						<div class="row-fluid">
+							<fieldset class="control-group">
+							<legend>I, <span th:text="${currentUser.firstName+' '+currentUser.lastName}">John Doe</span>, hereby... </legend>
+							</fieldset>
+						</div>
+					</section>
+					
+					<section id="consent-container" class="row-fluid summary-container">
+						<a href="#authorize-modal" role="button" class="consent-authorize-box bottom-margin10" data-edit-button="#edit1,#content1" data-toggle="modal">
+								<div id="consent-from" class="summary-border">
+									<div class="form-inline">
+							        	<p class="no-click">Authorize the following person(s):</p>
+							        		<ul id="authorizers"></ul>
+<!-- 							        	<li class="uneditable-input" ><span class="icon-user"></span></li> -->
+							        </div>
+							    </div>
+							</a>
+						
+				<!-- authorize modal -->
+						<div id="authorize-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="authorize-modal" aria-hidden="true">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+										<p class="h3-style">Authorize</p>
+									</div>
+							<div class="modal-body">
+								<div>
+									<div class="accordion-heading">
+										
+											<div class="accordion-inner nomargin">
+												<form class="inputformPerson" th:object="${consentDto}">
+													<div>
+														<label for="authorize-list">Type or select the person/program to authorize:</label>
+															
+															<div id="authorize-list">
+															<div th:each="individualProvider:${individualProvidersDto}">
+												        		<label for="inidividualProvider" th:for="'from'+${individualProvider.npi}" class="checkbox">
+																<input class="toDiscloseList" id="inidividualProvider" th:field="*{providersPermittedToDisclose}" th:id="'from'+${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" th:text="${individualProvider.lastName+', '+individualProvider.firstName}" type="checkbox" name="individualConsentAuthorizedFrom"> Doe, John</input>
+																</label>
+															</div>
+															<div th:each="organizationalProvider:${organizationalProvidersDto}">
+												        		<label for="organizationalProvider" th:for="'from'+${organizationalProvider.npi}" class="checkbox">
+																<input class="toDiscloseList" id="organizationalProvider" th:field="*{organizationalProvidersPermittedToDisclose}" th:id="'from'+${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" th:text="${organizationalProvider.orgName}" type="checkbox" name="organizationalConsentAuthorizedFrom">Doe, John</input>
+																</label>
+															</div>
+															</div>
+<!-- 															<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save changes</button> -->
+															<span class="btn-left-align"><button id="saveauthorizer" class="btn btn-success btn-lrg" data-dismiss="modal" aria-hidden="true"><span class="icon-plus icon-white"></span></button></span>
+
+													</div>
+												</form>
+											</div>
+										
+									</div><!-- end accordian-heading -->
+								</div><!-- end --> 
+							</div><!-- end modal-body -->
+						</div>
+				<!-- end authorize modal -->
+						
+						<div id="consent-right-arrow-container" style="vertical-align:top;"><div id="consent-arrow" class="icon-arrow-right"></div>
+						</div>
+						
+						<a href="#disclose-modal" role="button" class="consent-disclose-box" data-edit-button="#edit1,#content1" data-toggle="modal">
+						   <div id="consent-to" class="summary-border">
+								<div class="form-inline">
+							        	<p>To disclose my information to:</p>
+							        	<ul id="consentmadetodisplay"></ul>
+<!-- 							        	<li class="uneditable-input"><span class="icon-user"></span> Grant, U S</li> -->
+							   </div>
+						   </div>
+						   </a>
+						   <!-- disclose modal -->
+						<div id="disclose-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="disclose-modal" aria-hidden="true">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+										<p class="h3-style">Disclosure</p>
+									</div>
+							<div class="modal-body">
+								<div>
+									<div class="accordion-heading">
+										
+											<div class="accordion-inner nomargin">
+												<form class="inputformPerson" th:object="${consentDto}">
+													<div>
+														<label for="disclose-list">Type or select the person/program for Disclosure:</label>
+														<div id="disclose-list">
+															<div th:each="individualProvider:${individualProvidersDto}">
+												        		<label for="inidividualProvider" th:for="'to'+${individualProvider.npi}" class="checkbox">
+																<input class="isMadeToList" id="inidividualProvider" th:field="*{providersDisclosureIsMadeTo}" th:id="'to'+${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" th:text="${individualProvider.lastName+', '+individualProvider.firstName}" type="checkbox" name="individualConsentMadeTo"> Doe, John</input>
+																</label>
+															</div>
+															<div th:each="organizationalProvider:${organizationalProvidersDto}">
+												        		<label for="organizationalProvider" th:for="'to'+${organizationalProvider.npi}" class="checkbox">
+																<input class="isMadeToList" id="organizationalProvider" th:field="*{organizationalProvidersDisclosureIsMadeTo}" th:id="'to'+${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" th:text="${organizationalProvider.orgName}" type="checkbox" name="organizationalConsentMadeTo">Doe, John</input>
+																</label>
+															</div>
+														</div>
+<!-- 														<select style="z-index: 300"  class="condition-input" id="disclose-list" th:field="*{providersDisclosureIsMadeToNpi}"> -->
+<!-- 																<option value="individualProvider" th:value="${individualProvidersDto.npi}" th:each="individualProvidersDto:${individualProvidersDto}" th:text="${individualProvidersDto.lastName+', '+individualProvidersDto.firstName}">John, Doe</option> -->
+<!-- 																<option value="organizationalProvider" th:value="${organizationalProvidersDto.npi}" th:each="organizationalProvidersDto:${organizationalProvidersDto}" th:text="${organizationalProvidersDto.orgName}">ABC Hospital</option> -->
+<!-- 														</select> -->
+														<span class="btn-left-align"><button id="saveconsentmadeto" class="btn btn-success btn-lrg" data-dismiss="modal" aria-hidden="true"><span class="icon-plus icon-white"></span></button></span>
+													</div>
+												</form>
+											</div>
+										
+									</div><!-- end accordian-heading -->
+								</div><!-- end --> 
+							</div><!-- end modal-body -->
+						</div>
+						<!-- end disclose modal -->
+					
+					</section>
+					
+					<div class="clearfix"></div>
+					
+					<section class="row-fluid bottom-margin10">
+						<div id="share-all-med" class="summary-border top-margin10">
+							<p class="inline-block bottom-margin10"><strong>Share All My Medical Information</strong> is</p>
+							<!-- Button to trigger modal -->
+							<div data-target="#share-settings-modal" role="button" class="modal-toggle-button" data-edit-button="#edit1,#content1" data-toggle="modal" style="vertical-align: middle">
+								<input title="share-settings-toggle" id="mediInfoToggle" type="checkbox" checked="checked"/>
+							</div>
+							
+							
+
+							<div id="content1" class="edit top-margin10">
+								<div class="inline-block">
+									<label for="edit1">I am <strong>NOT</strong> sharing the following information:
+									<a id="edit1" href="#share-settings-modal" role="button" class="btn btn-mini btn-info edit" data-toggle="modal">
+										Edit
+									</a>
+									</label> 
+									<div id="notsharedmainpage">
+									</div>
+								</div>
+							</div>
+							
+						</div><!-- end #share-all-med -->
+						
+						<!-- Modal -->
+						<div id="share-settings-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="share-settings-modal" aria-hidden="true">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+									<p class="h3-style">Share Settings</p>
+								</div>
+								<div class="modal-body">
+									<div>
+										<section class="top-margin10">                   
+							                <fieldset>
+								                    <div class="control-group"> 
+									                    <div class="accordion" id="accordion2">
+										                    <div class="accordion-group">
+											                    <div class="accordion-heading">
+											                    
+												                <div class="accordion-header-style">    
+													                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+													                Sensitivity Categories
+												                    </a>
+																</div>						            	 
+																	<div id="collapseOne" class="accordion-body collapse">
+																      <div class="accordion-inner"> 
+																        <div>
+																	        <div class="alert">
+																	        <!-- <button type="button" class="close" data-dismiss="alert">&times;</button> -->
+																	         Share only the <strong>Selected</strong> categories.
+																		    </div>
+																	        
+<!-- 																	         th:object="${consentDto}" -->
+																	        <form id="sensitivityinfo" class="inputform" th:object="${consentDto}">
+																	        	<div th:each="SensitivityPolicyCode:${sensitivityPolicy}">
+																	        		<label for="Substance-Abuse" th:for="${SensitivityPolicyCode.code}" class="checkbox checkedCheckbox1">
+<!-- 																						 th:field="*{substanceAbuse}" -->
+																						<input id="Substance-Abuse" th:field="*{doNotShareSensitivityPolicyCodes}" th:id="${SensitivityPolicyCode.code}" th:text="${SensitivityPolicyCode.displayName}" type="checkbox" name="sensitivityPolicyInput" checked="checked" th:value="${SensitivityPolicyCode.code}"> Substance Abuse </input>
+																					
+																				<!-- 	<div th:id="${'message-block_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}" class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}"></div></div></div>
+																					<a th:id="${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}"><span style="margin-left: 5px;" class="icon-info-sign"></span>
+																					</a> -->
+																					<a href="#"  th:id="${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
+																					 data-content="icon context" data-title="title" >
+																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
+																					</a>
+																					</label>
+																					<script th:inline="javascript">
+																						    text = /*[[#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
+																						    idicon=/*[[${'i-icon_' +#strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}]]*/ 'Sebastian';
+																						    title=/*[[${SensitivityPolicyCode.displayName}]]*/ 'Sebastian';
+																						    document.getElementById(idicon).setAttribute("data-content", text);
+																						    document.getElementById(idicon).setAttribute("data-title",title );
+ 																					</script>
+ 																					 
+																	        	
+																	        	</div>
+<!-- 																	        	<label for="Substance-Abuse" class="checkbox"> -->
+<!-- 																					<input id="Substance-Abuse" type="checkbox" name="conditions" checked="checked" th:field="*{substanceAbuse}"/> Substance Abuse -->
+<!-- 																				</label> -->
+																			</form>												     	
+																	        </div>
+																        </div>
+																      </div>
+																    </div>
+											                    </div>
+									                         
+										                    <div class="accordion-group">
+											                    <div class="accordion-heading">
+											                    
+												                <div class="accordion-header-style">
+												                	<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" >
+													                Medical Information Categories
+												                    </a>
+												               </div>
+												                    
+												                    <div id="collapseTwo" class="accordion-body collapse">
+																      <div class="accordion-inner">
+																        <div>
+																	        <div class="alert">
+																	         Share only the <strong>Selected</strong> categories.
+																		    </div>
+<!-- 																		     th:object="${consentDto}" -->
+																		    <form class="inputform" th:object="${consentDto}">
+																	        <div id="medicalinfo">
+																				<div th:each="clinicalDocumentSectionTypeCode:${clinicalDocumentSectionType}">
+																	        		<label for="conditions" th:for="${clinicalDocumentSectionTypeCode.code}" class="checkbox checkedCheckbox1">
+<!-- 																						 th:field="*{substanceAbuse}" -->
+																					<input id="conditions" th:field="*{doNotShareClinicalDocumentSectionTypeCodes}" th:id="${clinicalDocumentSectionTypeCode.code}" th:text="${clinicalDocumentSectionTypeCode.displayName}" th:value="${clinicalDocumentSectionTypeCode.code}" type="checkbox" name="clinicalDocumentSectionTypeInput" checked="checked"> Medical Information Categories</input>
+																					
+																					<a href="#"  th:id="${'i-icon_' + #strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
+																					  data-content="icon context" data-title="title" >
+																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
+																					</a>
+																					</label>
+																					<script th:inline="javascript">
+																						    text = /*[[#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
+																						    idicon=/*[[${'i-icon_' +#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')}]]*/ 'Sebastian';
+																						    title=/*[[${clinicalDocumentSectionTypeCode.displayName}]]*/ 'Sebastian';
+																						    document.getElementById(idicon).setAttribute("data-content", text);
+																						    document.getElementById(idicon).setAttribute("data-title",title );
+ 																					</script>
+ 																					
+ 																					
+ 																							
+																																											
+																					<!-- <a href="#" data-trigger="click" data-toggle="popover" data-placement="bottom" 
+																						data-content="Medical Information Item 1 text here." 
+																						title="" data-original-title="Medical Information Item 1"><span style="margin-left: 5px;" class="icon-info-sign"></span>
+																					</a> -->
+																	        	</div>
+<!-- 																				<label for="conditions" class="checkbox"> -->
+<!-- 																					<input id="conditions" type="checkbox" th:field="*{conditions}" checked="checked"/> Conditions -->
+<!-- 																				</label>												     	 -->
+																													     	
+																	        </div>
+																	        </form>
+																        </div>
+							
+																      </div>
+																    </div>
+											                    </div>
+										                    </div> 
+										                    
+										                    <div class="accordion-group">
+											                    <div class="accordion-heading">
+											                    
+												                <div class="accordion-header-style">
+												                	<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree" >
+													                Clinical Document Type
+												                    </a>
+												               </div>
+												                    
+												                    <div id="collapseThree" class="accordion-body collapse">
+																      <div class="accordion-inner">
+																        <div>
+																	        <div class="alert">
+																	         Share only the <strong>Selected</strong> categories.
+																		    </div>
+																		    <form class="inputform" th:object="${consentDto}">
+																	        <div id="clinicalDocumentType">
+																	        
+																				<div th:each="clinicalDocumentTypeCode:${clinicalDocumentType}">
+																	        		<label for="summarizationOfEpisodeNote" th:for="${clinicalDocumentTypeCode.code}" class="checkbox checkedCheckbox1">
+																					<input id="summarizationOfEpisodeNote" th:field="*{doNotShareClinicalDocumentTypeCodes}" th:id="${clinicalDocumentTypeCode.code}" th:text="${clinicalDocumentTypeCode.displayName}" th:value="${clinicalDocumentTypeCode.code}" type="checkbox" name="clinicalDocumentTypeInput" checked="checked"> Summarization of Episode Note</input>
+																					
+																					<a href="#"  th:id="${'i-icon_' + #strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
+																					  data-content="icon context" data-title="title">
+																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
+																					</a>
+																					</label> 
+																					<script th:inline="javascript">
+																						    text = /*[[#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
+																						    idicon=/*[[${'i-icon_' +#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')}]]*/ 'Sebastian';
+																						    title=/*[[${clinicalDocumentTypeCode.displayName}]]*/ 'Sebastian';
+																						    document.getElementById(idicon).setAttribute("data-content", text);
+																						    document.getElementById(idicon).setAttribute("data-title",title );
+ 																					</script>
+ 																					
+ 																					
+ 																				
+																					
+																	        	</div>
+																	        </div>
+																	        </form>
+																        </div>
+							
+																      </div>
+																    </div>
+											                    </div>
+										                    </div> 
+										                    
+										           
+										                    <div class="accordion-group">
+											                    <div class="accordion-heading">
+												                    
+												                    <div class="accordion-header-style">
+												                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour">
+													                    Specific Medical Information
+												                    </a>
+												                    </div>
+												                    <div id="collapseFour" class="accordion-body collapse" >
+																      <div class="accordion-inner">
+																      
+																        
+																        <div  class="ui-widget" id="autocomplete">
+																        	<label for="condition">Enter a condition:</label>
+																 
+																	        <input id="condition" type="text"  class="condition-input"></input>
+																	        <span class="btn-left-align" ><button id="addspecmedi" class="btn btn-success btn-lrg"><span class="icon-plus icon-white"></span></button></span>
+																	        <p style="font-size:small;"><em>If you do not know the correct name of the condition, please leave this field empty.</em></p>
+																	    
+																        </div>
+																        <form>
+																        <hr class="spacing"/>
+																        <div>
+																	        <ul id="specmedinfo">
+																		        <li class="spacing">
+<!-- 																			        <div> -->
+<!-- 																				        <span>Syphillis</span> -->
+<!-- 																				    	<span><button class="btn btn-danger btn-mini list-btn"><span class="icon-minus icon-white"></span></button></span>     -->
+<!-- 																			        </div> -->
+																		        </li>
+																	        </ul>
+																	        <br/><br/><br/>
+																        </div>
+																        </form>
+																      </div>
+																    </div>
+											                    </div>
+										                    </div> 
+										           
+							
+										                </div>                            
+								                    </div>
+							               </fieldset>
+							            </section>		
+									</div>
+								</div>
+								<div class="modal-footer">
+<!-- 									<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button> -->
+									<button id="btn_close_share_settings" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+								</div>
+							</div><!-- end of share-settings-modal -->
+						
+				<!-- felix modal -->
+						<div id="felix" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+								<h3 id="myModalLabel">Substance Abuse</h3>
+							</div>
+							<div class="modal-body">
+								<p>Substance abuse, also known as drug abuse, is a patterned use of a substance (drug) in which the user consumes the substance in amounts or with methods neither approved nor advised by medical professionals. Substance abuse/drug abuse is not limited to mood-altering or psycho-active drugs. If an activity is performed using the objects against the rules and policies of the matter (as in steroids for performance enhancement in sports), it is also called substance abuse.</p>
+							</div>
+							<div class="modal-footer">
+								<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>											    
+							</div>
+						</div>
+				<!-- end felix modal -->    
+					</section>
+					
+					
+					<section class="row-fluid bottom-margin10">
+						<div id="share-for-purpose" class="summary-border">
+							<p class="inline-block bottom-margin10"><strong>Share for All Purposes</strong> is</p>
+							<!-- Button to trigger modal -->
+							<div data-target="#selected-purposes-modal" role="button" class="modal-toggle-button" data-edit-button="#edit2,#content2" data-toggle="modal" style="vertical-align: middle">
+								<input id="selectPurposesToggle" title="selected-purposes-toggle" type="checkbox" />
+							</div> 
+							
+							<div id="content2" class="edit top-margin10">
+								<div class="inline-block">
+									<label for="edit2">I <strong>AM</strong> sharing for the following purposes:
+									<a id="edit2" href="#selected-purposes-modal" role="button" class="btn btn-mini btn-info edit" data-toggle="modal">
+										Edit
+									</a> 
+									</label>
+									<div id="sharedpurpose">
+									</div>
+								</div>
+							</div>
+ 
+					
+							
+						</div><!-- end modal2 -->
+						
+						<!-- Modal2 -->
+							<div id="selected-purposes-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="selected-purposes-modal" aria-hidden="true">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+									<p class="h3-style">Share for selected Purposes only</p>
+								</div>
+								
+								<fieldset>
+								    <div> 
+								    	<div class="accordion-heading">
+								    		<div class="accordion-inner nomargin"> 
+								    			<form class="purposeofshareform" th:object="${consentDto}">
+								    				<div class="alert">Share only the <strong>Selected</strong> categories.</div>
+													<div id="purposeOfSharingInputs">
+								    					<div th:each="purposeOfUseItem:${purposeOfUse}">
+								    						<label for="emergency" th:for="${purposeOfUseItem.code}" class="checkbox checkedCheckbox2">
+															<input id="emergency" th:field="*{shareForPurposeOfUseCodes}" th:id="${purposeOfUseItem.code}" th:text="${purposeOfUseItem.displayName}" th:value="${purposeOfUseItem.code}" type="checkbox" name="purposeOfUseInput" checked="checked"> Emergency</input>
+															</label>
+																					<a href="#"  th:id="${'i-icon_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
+																					  data-content="icon context" data-title="title">
+																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
+																					</a>
+																					<script th:inline="javascript">
+																						    text = /*[[#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}]]*/ 'Sebastian';
+																						    idicon=/*[[${'i-icon_' +#strings.replace(purposeOfUseItem.displayName, ' ', '-')}]]*/ 'Sebastian';
+																						    title=/*[[${purposeOfUseItem.displayName}]]*/ 'Sebastian';
+																						    document.getElementById(idicon).setAttribute("data-content", text);
+																						    document.getElementById(idicon).setAttribute("data-title",title );
+ 																					</script> 
+ 																			
+								    					</div>
+								    				</div>
+<!-- 									    			<label for="emergency" class="checkbox"> -->
+<!-- 										    			<input id="emergency" type="checkbox" name="conditions" th:field="*{emergency}" checked="checked"/> Emergency -->
+<!-- 										    		</label>												     	 -->
+												</form>												     	
+											</div>
+										</div>
+								    </div>
+								</fieldset>
+								<div class="modal-footer">
+									<button id="btn_cancel_selected_purposes" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+									<button id="btn_save_selected_purposes" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save changes</button>
+								</div>
+							</div>
+					</section>
+					
+					
+					<section id="consent-date" class="bottom-margin10">
+						<div>
+							<section id="consent-start-date">
+							<form class="summary-container inputformDate" th:object="${consentDto}">
+								<fieldset>
+									<label for="date-picker-start">Consent Start</label>
+									<div class="input-append datepicker" data-date-format="mm/dd/yyyy">
+										<input class="datepicker" id="date-picker-start" style="z-index: 100;"/>
+									</div>
+								</fieldset>
+							</form>
+							</section>
+							
+							<section id="consent-end-date">
+							<form class="summary-container inputformDate" th:object="${consentDto}">
+								<fieldset>
+									<label for="date-picker-end">Consent End</label>
+									<div class="input-append datepicker date"  data-date-format="mm/dd/yyyy">
+										<input class="datepicker" id="date-picker-end" style="z-index: 100;"/>
+									</div>
+								</fieldset>
+							</form>
+							</section>
+						<div class="clearfix"></div>	
+						</div>
+				</section>
+				
+				<section class="control-group top-margin10">
+					<div class="controls" style="padding-top: 15px">
+						<button type="button" class="btn" style="margin: 0 10px 0 0;">Cancel</button> <button id="consent-add-save" type="submit" class="btn btn-primary">Save</button>
+					</div>         		
+				</section>
+					
+									
+					
+				</div>
+							
+			</div>
+		</div><!--end main.span10-->
+		<!-- START: Footer Region -->		
+	
+		
+		<!-- END: Footer Region -->	
+	
+
+			
+			
+	</div><!-- end content line 96-->
+			
+
+
+	<!-- END: Content Region -->
+
+
+
+	<!-- ELEMENT: Divider -->
+
+		
+	
+
+		</div><!-- end first row-fluid --> 
+		
+	    <ol id="tourtest" class="hidden">
+
+			<li data-id="consent-from" class="user-guide" data-options="tipLocation:bottom; tipTopOffset:0;tipLeftOffset:0;nubPhonePosition:top"><img class="number-icon" src="../../../resources/img/number-01.png" th:src="@{/resources/img/number-01.png}" alt="step-01" width="20" height="20"/>Start by selecting the provider who you authorize to share your health records.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+			<li data-id="consent-to" class="user-guide" data-options="tipLocation:bottom; nubPosition:top; tipTopOffset:0;tipLeftOffset:0;nubPhonePosition:top-right"><img class="number-icon" src="../../../resources/img/number-02.png" th:src="@{/resources/img/number-02.png}" alt="step-02" width="20" height="20"/>This field is for selecting the provider or person with whom you want to share your medical information with, such as your doctor, family member or guardian.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+			<li data-id="share-all-med" class="user-guide show-delayed-next"><img class="number-icon" src="../../../resources/img/number-03.png" th:src="@{/resources/img/number-03.png}" alt="step-03" width="20" height="20"/>This field is for selecting the medical information you wish to share. To configure the settings, slide the button to the "Off" position. <div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+			<li data-id="share-for-purpose" class="user-guide show-delayed-next" data-placement="top"><img class="number-icon" src="../../../resources/img/number-04.png" th:src="@{/resources/img/number-04.png}" alt="step-04" width="20" height="20"/>This field for selecting the circumstances or situations in which your medical information can be shared with other.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+			<li data-id="consent-start-date" class="user-guide show-delayed-next"><img class="number-icon" src="../../../resources/img/number-05.png" th:src="@{/resources/img/number-05.png}" alt="step-05" width="20" height="20"/>This field is for selecting the date you would like this consent to begin on.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+			<li data-id="consent-end-date" class="jerry user-guide show-delayed-next" data-options="nubPhonePosition:top-right"><img class="number-icon" src="../../../resources/img/number-06.png" th:src="@{/resources/img/number-06.png}" alt="step-06" width="20" height="20"/>This field is for selecting the date you wish your consent to end on. Please be aware, when this day arrives, authorized individuals who you have consented to share information with will no longer be able to view your information.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+			<li data-id="consent-add-save" class="klinger user-guide show-delayed-next" data-options="tipLocation:left; tipTopOffset:-20;tipLeftOffset:18;nubPhonePosition:top"><img class="number-icon" src="../../../resources/img/number-07.png" th:src="@{/resources/img/number-07.png}" alt="step-07" width="20" height="20"/>Clicking the "Save" button will save this consent, and return you to your "My Consents" page.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+
+		</ol>
+
+			<div class="clearfix"></div>
+				<footer class="bottom" style="z-index:0">
+					<div>
+					
+						<!-- COMPONENT: Action Buttons -->
+						<!--
+						<a href="#" class="btn pull-left" data-dismiss="modal">Close</a>
+						<a href="#" class="btn btn-primary pull-right">Save changes</a>
+						-->
+						
+						<!-- COMPONENT: Copyright Information -->
+						<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
+				
+					</div>
+				</footer>
+	</div><!-- end Container-fluid -->
+
+
+	<!-- START: JavaScript-->
+		<script src="../../../resources/js/jquery.min.js" 
+				th:src="@{/resources/js/jquery.min.js}" 
+				type="text/javascript">
+		</script>
+		<noscript>Alternate content for script</noscript>
+		
+		<script src="../../../resources/js/jquery.ui.core.min.js" 
+				th:src="@{/resources/js/jquery.ui.core.min.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/jquery.ui.widget.min.js" 
+				th:src="@{/resources/js/jquery.ui.widget.min.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/jquery.ui.menu.min.js" 
+				th:src="@{/resources/js/jquery.ui.menu.min.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/jquery.ui.autocomplete.min.js" 
+				th:src="@{/resources/js/jquery.ui.autocomplete.min.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/bootstrap.min.js"
+				th:src="@{/resources/js/bootstrap.min.js}" 
+				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/jquery.toggle.buttons.js"
+				th:src="@{/resources/js/jquery.toggle.buttons.js}" 
+				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/bootstrap-datepicker.js"
+				th:src="@{/resources/js/bootstrap-datepicker.js}" 
+				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="../../../resources/js/bootstrap-tooltip.js"
+				th:src="@{/resources/js/bootstrap-tooltip.js}"
+				type="text/javascript"></script>
+	 	<script src="../../../resources/js/bootstrap-popover.js"
+				th:src="@{/resources/js/bootstrap-popover.js}"
+				type="text/javascript"></script> 
+		<script src="../../../resources/js/jquery.joyride-2.0.3.js" 
+				th:src="@{/resources/js/jquery.joyride-2.0.3.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/jquery.cookie.js" 
+				th:src="@{/resources/js/jquery.cookie.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/modernizr.mq.js" 
+				th:src="@{/resources/js/modernizr.mq.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/consent/addConsent.js" 
+				th:src="@{/resources/js/consent/addConsent.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/jcookie.js"
+				th:src="@{/resources/js/jcookie.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/jstorage.js"
+				th:src="@{/resources/js/jstorage.js}"
+				type="text/javascript"></script>
+		
+				
+		<script type="text/javascript">
+			
+			$(document).ready(function() {
+				//$('#normal-toggle-button').toggleButtons();
+				//$('#info-toggle-button').toggleButtons();
+
+				$('[data-toggle=popover]').popover();
+				$('html').on('mouseup', function(e) {
+				    if((!$(e.target).closest('.popover').length)) {
+				    	if((!$(e.target).closest('[data-toggle=popover]').length)){
+				        	$('.popover').each(function(){
+				            	$(this.previousSibling).popover('hide');
+				        	});
+						}
+				    }
+				});
+
+
+
+				
+				$('.toggleButton').toggleButtons();
+				$('.modal-toggle-button').toggleButtons(
+				{
+					onChange: function(e,active) {
+					if(!active){
+						$(e.parent().attr('data-edit-button')).show();
+						e.trigger('click');
+						}
+						else{
+						$(e.parent().attr('data-edit-button')).hide();
+							
+						}
+					}
+				});
+
+				$('#edit1').hide();
+				
+				$('.modal-toggle-button span').on('click', function(e){
+					e.preventDefault();
+					e.stopImmediatePropagation();
+				});
+				
+				
+				$('#tourtest').joyride({
+				    tipContainer: '#consent-add-main',
+				    heightPadding: $('footer').outerHeight() + 10,
+				    mode: 'focus',
+				    autoStart: true,
+				    'preStepCallback': function() {
+					    var int_next_index = 0;
+					    try{
+					    	int_next_index = $('#tourtest').joyride('get_next_index');
+					    }catch(e){
+						    int_next_index = 0;
+						}
+					    
+					    var li_field_id = $('#tourtest li').get(int_next_index);
+					    var isShowDelayedNext = $(li_field_id).hasClass('show-delayed-next');
+					    var str_field_id = $(li_field_id).data("id");
+					    var tempVarIconUser = $('div#' + str_field_id).find('.icon-user');
+					    var tempVarBadge = $('div#' + str_field_id).find('.badge');
+					    var isDataPopulated = false;
+
+					    if(tempVarIconUser.length > 0 || tempVarBadge.length > 0){
+						    isDataPopulated = true;
+					    }else{
+					    	isDataPopulated = false;
+						}
+
+					    var obj_next_tip = $('#tourtest').joyride('get_next_tip');
+					    var btn_next_button = $(obj_next_tip).find('.joyride-next-tip');
+
+					    $(btn_next_button).addClass('hidden');
+					    
+					    if(isDataPopulated || isShowDelayedNext){					    	
+					    	setTimeout(function(){
+						    	$(btn_next_button).removeClass('hidden');
+							}, 500);
+					    }
+					},
+					'postRideCallback': function() {
+						if($('#btn_guide_off').hasClass('active') === false){
+							$('#btn_guide_on').removeClass('active');
+							$('#btn_guide_off').addClass('active');
+						}
+
+						jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
+					}
+				});
+				
+				
+
+				if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'on'){
+					turnGuideOn();
+				}else if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'off'){
+					turnGuideOff();
+				}else{
+					if($('#btn_guide_on').hasClass('active')){
+						turnGuideOn();						
+					}else if($('#btn_guide_off').hasClass('active')){
+						turnGuideOff();
+					}else{
+						turnGuideOn();
+					}
+				}
+
+
+				$('#btn_guide_on').click(function() {
+					if($('#btn_guide_on').hasClass('active') === false){
+						turnGuideOn();
+					}
+			    });
+
+				$('#btn_guide_off').click(function() {
+					if($('#btn_guide_off').hasClass('active') === false){
+						turnGuideOff();
+					}
+			    });
+
+				
+				$('#saveauthorizer').click(function() {
+					ifGuideOnGoNext();
+			    });
+
+				$('#saveconsentmadeto').click(function() {
+					ifGuideOnGoNext();
+			    });
+
+			    $('#btn_close_share_settings').click(function() {
+			    	ifGuideOnGoNext();
+				});
+
+			    $('#btn_save_selected_purposes').click(function() {
+			    	ifGuideOnGoNext();
+				});
+
+				$('#mediInfoToggle').change(function() {				    
+				    if($('#mediInfoToggle').prop('checked') == true){
+				    	ifGuideOnGoNext();
+					}
+				});
+
+			    $('#selectPurposesToggle').change(function() {				    
+				    if($('#selectPurposesToggle').prop('checked') == true){
+				    	ifGuideOnGoNext();
+					}
+				});
+			    
+				$("a[id*=i-icon]").bind('click', function() {
+					var id = $(this).attr("id").split('_')[1];
+					$("#message-block_"+id).css("display","block");
+
+				});
+
+				function ifGuideOnGoNext(){
+					if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'on'){
+						$('#tourtest').joyride("go_next");
+					}
+				};
+
+
+
+				$("body").on("closeJoyrideClick", function(e){
+					e.stopImmediatePropagation();
+					
+					$('#tourtest').joyride('end');
+					turnGuideOff();
+				});
+				
+
+
+		 });
+
+		function turnGuideOff(){
+			if($('#btn_guide_off').hasClass('active') === false){
+				$('#btn_guide_on').removeClass('active');
+				$('#btn_guide_off').addClass('active');
+			}
+
+			jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
+			
+			$('#tourtest').joyride('end');
+		};
+
+		function turnGuideOn(){
+			if($('#btn_guide_on').hasClass('active') === false){
+				$('#btn_guide_off').removeClass('active');
+				$('#btn_guide_on').addClass('active');
+			}
+
+			jQuery.storage.setItem('guideStatus', 'on', 'sessionStorage');
+
+			$('#tourtest').joyride('end');
+			$('#tourtest').joyride();
+		};
+
+	
+		</script><noscript>Alternate content for script</noscript>
+	
+	<!-- END: JavaScript-->
+
+
+</body>
+</html>

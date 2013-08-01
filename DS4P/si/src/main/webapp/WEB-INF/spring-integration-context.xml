@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+	xmlns:int-ws="http://www.springframework.org/schema/integration/ws"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd 
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="ampqHandler" class="gov.samhsa.consent2share.si.ConsentSignedMessageHandler" />
+
+	<int-amqp:inbound-channel-adapter
+		channel="amqpInboundChannel" queue-names="${rabbitMQ.queueName}"
+		connection-factory="rabbitConnectionFactory" mapped-request-headers="*" />
+
+	<int:channel id="amqpInboundChannel">
+		<int:interceptors>
+			<int:wire-tap channel="logger" />
+		</int:interceptors>
+	</int:channel>
+
+	<int:header-value-router header-name="messageType" input-channel="amqpInboundChannel" default-output-channel="rejectedMessagesChannel" >
+		<int:mapping value="gov.samhsa.consent2share.domain.consent.event.ConsentSignedEvent" channel="consentSignedEventChannel" />
+		<int:mapping value="gov.samhsa.consent2share.domain.consent.event.ConsentRevokedEvent" channel="consentRevokedEventChannel" />
+	</int:header-value-router>
+	
+	<int:channel id="consentSignedEventChannel">
+		<int:interceptors>
+			<int:wire-tap channel="logger" />
+		</int:interceptors>
+	</int:channel>
+	
+	<int:channel id="consentRevokedEventChannel">
+		<int:interceptors>
+			<int:wire-tap channel="logger" />
+		</int:interceptors>
+	</int:channel>
+
+	<int:service-activator input-channel="consentSignedEventChannel"
+		ref="ampqHandler" method="handleMessage" output-channel="messageChannel" />
+
+	<int:channel id="messageChannel">
+		<int:interceptors>
+			<int:wire-tap channel="logger" />
+		</int:interceptors>
+	</int:channel>
+	
+	<int:publish-subscribe-channel id="rejectedMessagesChannel" />
+
+	<int:logging-channel-adapter id="logger"
+		level="INFO" log-full-message="true" />
+
+	<int-stream:stdout-channel-adapter
+		id="consoleOut" channel="messageChannel" append-newline="true" />
+</beans>

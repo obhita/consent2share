@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.2 (branches/2.2-7015; 2012-02-20T20:31:25+0000) JAXWS-RI/2.2.6 JAXWS/2.2 svn-revision#unknown. --><definitions xmlns:xacmlp="urn:oasis:names:tc:xacml:2.0:policy:schema:os" xmlns:xacmlc="urn:oasis:names:tc:xacml:2.0:context:schema:os" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="urn:com:jerichosystems:services:XACMLPolicyEvaluationService:1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="urn:com:jerichosystems:services:XACMLPolicyEvaluationService:1.0" name="XACMLPolicyEvaluationServiceService">
+    <types>
+        <xsd:schema targetNamespace="urn:com:jerichosystems:services:XACMLPolicyEvaluationService:1.0">
+            <xsd:import namespace="urn:oasis:names:tc:xacml:2.0:context:schema:os" schemaLocation="access_control-xacml-2.0-context-schema-os.xsd"/>
+            <xsd:import namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os" schemaLocation="access_control-xacml-2.0-policy-schema-os.xsd"/>
+            <xsd:element name="evaluatePolicySet">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element ref="xacmlc:Request"/>
+                        <xsd:element ref="xacmlp:PolicySet"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="evaluatePolicySetResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="return" type="xacmlc:ResponseType"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="evaluatePolicy">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element ref="xacmlc:Request"/>
+                        <xsd:element ref="xacmlp:Policy"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="evaluatePolicyResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="return" type="xacmlc:ResponseType"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            
+        </xsd:schema>
+    </types>
+    <message name="evaluatePolicySet">
+        <part name="parameters" element="tns:evaluatePolicySet"/>
+    </message>
+    <message name="evaluatePolicySetResponse">
+        <part name="parameters" element="tns:evaluatePolicySetResponse"/>
+    </message>
+    <message name="evaluatePolicy">
+        <part name="parameters" element="tns:evaluatePolicy"/>
+    </message>
+    <message name="evaluatePolicyResponse">
+        <part name="parameters" element="tns:evaluatePolicyResponse"/>
+    </message>
+    <portType name="XACMLPolicyEvaluationService">
+        <operation name="evaluatePolicySet">
+            <input wsam:Action="urn:com:jerichosystems:services:XACMLPolicyEvaluationService:1.0:XACMLPolicyEvaluationService:evaluatePolicySetRequest" message="tns:evaluatePolicySet"/>
+            <output wsam:Action="urn:com:jerichosystems:services:XACMLPolicyEvaluationService:1.0:XACMLPolicyEvaluationService:evaluatePolicySetResponse" message="tns:evaluatePolicySetResponse"/>
+        </operation>
+        <operation name="evaluatePolicy">
+            <input wsam:Action="urn:com:jerichosystems:services:XACMLPolicyEvaluationService:1.0:XACMLPolicyEvaluationService:evaluatePolicyRequest" message="tns:evaluatePolicy"/>
+            <output wsam:Action="urn:com:jerichosystems:services:XACMLPolicyEvaluationService:1.0:XACMLPolicyEvaluationService:evaluatePolicyResponse" message="tns:evaluatePolicyResponse"/>
+        </operation>
+    </portType>
+    <binding name="XACMLPolicyEvaluationServicePortBinding" type="tns:XACMLPolicyEvaluationService">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="evaluatePolicySet">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="evaluatePolicy">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="XACMLPolicyEvaluationServiceService">
+        <port name="XACMLPolicyEvaluationServicePort" binding="tns:XACMLPolicyEvaluationServicePortBinding">
+            <soap:address location="http://75.145.119.97:80/XACMLPolicyEvaluationService/soap"/>
+        </port>
+    </service>
+</definitions>

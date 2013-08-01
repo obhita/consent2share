@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="XDSDocumentService"
+	targetNamespace="http://www.samhsa.gov/ds4ppilot/contract/orchestrator"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.samhsa.gov/ds4ppilot/contract/orchestrator"
+	xmlns:di="http://www.samhsa.gov/ds4ppilot/schema/orchestrator"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xmime="http://www.w3.org/2005/05/xmlmime">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://www.samhsa.gov/ds4ppilot/schema/orchestrator">
+
+			<xsd:element name="SaveDocumentSetToXdsRepositoryRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="documentSet" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="SaveDocumentSetToXdsRepositoryResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="return" type="xsd:boolean" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="SaveDocumentSetToXdsRepositoryRequest">
+		<wsdl:part element="di:SaveDocumentSetToXdsRepositoryRequest" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="SaveDocumentSetToXdsRepositoryResponse">
+		<wsdl:part element="di:SaveDocumentSetToXdsRepositoryResponse" name="parameters" />
+	</wsdl:message>
+	<wsdl:portType name="XDSDocumentServicePortType">
+		<wsdl:operation name="SaveDocumentSetToXdsRepository">
+			<wsdl:documentation>Store any clinical document set to XDS Repository</wsdl:documentation>
+			<wsdl:input message="tns:SaveDocumentSetToXdsRepositoryRequest" />
+			<wsdl:output message="tns:SaveDocumentSetToXdsRepositoryResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="XDSDocumentServiceBinding" type="tns:XDSDocumentServicePortType">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="SaveDocumentSetToXdsRepository">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="XDSDocumentService">
+		<wsdl:port binding="tns:XDSDocumentServiceBinding" name="XDSDocumentServicePort">
+			<soap:address
+				location="http://xds-demo.feisystems.com/Orchestrator/services/xdsdocumentservice" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

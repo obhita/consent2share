@@ -1,0 +1,436 @@
+/*******************************************************************************
+ * Open Behavioral Health Information Technology Architecture (OBHITA.org)
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the <organization> nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ******************************************************************************/
+package gov.samhsa.consent2share.service.consentexport;
+
+import java.util.Date;
+import java.util.Set;
+
+import javax.persistence.ManyToOne;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+/**
+ * The Class ConsentExportDto.
+ */
+@XmlRootElement(name = "ConsentExport")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class ConsentExportDto {
+	
+	/** The consent referenceid. */
+	@XmlElement(name = "id")
+	private String consentReferenceid;
+
+	/** The patient export dto. */
+	@XmlElement(name = "Patient")
+	private PatientExportDto patientExportDto;
+
+	/** The providers permitted to disclose. */
+	@XmlElementWrapper(name = "IndividualProvidersPermittedToDiscloseList")
+	@XmlElement(name = "IndividualProvidersPermittedToDisclose")
+	private Set<IndividualProviderExportDto> providersPermittedToDisclose;
+
+	/** The providers disclosure is made to. */
+	@XmlElementWrapper(name = "IndividualProvidersDisclosureIsMadeToList")
+	@XmlElement(name = "IndividualProvidersDisclosureIsMadeTo")
+	private Set<IndividualProviderExportDto> providersDisclosureIsMadeTo;
+
+	/** The organizational providers permitted to disclose. */
+	@XmlElementWrapper(name = "OrganizationalProvidersPermittedToDiscloseList")
+	@XmlElement(name = "OrganizationalProvidersPermittedToDisclose")
+	private Set<OrganizationalProviderExportDto> organizationalProvidersPermittedToDisclose;
+
+	/** The organizational providers disclosure is made to. */
+	@XmlElementWrapper(name = "OrganizationalProvidersDisclosureIsMadeToList")
+	@XmlElement(name = "OrganizationalProvidersDisclosureIsMadeTo")
+	private Set<OrganizationalProviderExportDto> organizationalProvidersDisclosureIsMadeTo;
+
+	/** The consent start. */
+	@DateTimeFormat(pattern = "MM/dd/yyyy")
+	private Date consentStart;
+
+	/** The consent end. */
+	@DateTimeFormat(pattern = "MM/dd/yyyy")
+	private Date consentEnd;
+
+	/** The signed date. */
+	@DateTimeFormat(pattern = "MM/dd/yyyy")
+	private Date signedDate;
+
+	/** The revocation date. */
+	@DateTimeFormat(pattern = "MM/dd/yyyy")
+	private Date revocationDate;
+
+	/** The version. */
+	private Integer version;
+
+	/** The legal representative. */
+	@ManyToOne
+	private PatientExportDto legalRepresentative;
+
+	/** The do not share clinical document type codes. */
+	@XmlElementWrapper(name = "doNotShareClinicalDocumentTypeCodesList")
+	private Set<TypeCodesDto> doNotShareClinicalDocumentTypeCodes;
+
+	/** The do not share clinical document section type codes. */
+	@XmlElementWrapper(name = "doNotShareClinicalDocumentSectionTypeCodesList")
+	private Set<TypeCodesDto> doNotShareClinicalDocumentSectionTypeCodes;
+
+	/** The do not share sensitivity policy codes. */
+	@XmlElementWrapper(name = "doNotShareSensitivityPolicyCodesList")
+	private Set<TypeCodesDto> doNotShareSensitivityPolicyCodes;
+
+	/** The do not share for purpose of use codes. */
+	@XmlElementWrapper(name = "shareForPurposeOfUseCodesList")
+	private Set<TypeCodesDto> shareForPurposeOfUseCodes;
+
+	/** The do not share clinical concept codes. */
+	@XmlElementWrapper(name = "doNotShareClinicalConceptCodesList")
+	private Set<TypeCodesDto> doNotShareClinicalConceptCodes;
+
+	/**
+	 * Gets the patient export dto.
+	 *
+	 * @return the patient export dto
+	 */
+	public PatientExportDto getPatientExportDto() {
+		return patientExportDto;
+	}
+
+	/**
+	 * Sets the patient export dto.
+	 *
+	 * @param patientExportDto the new patient export dto
+	 */
+	public void setPatientExportDto(PatientExportDto patientExportDto) {
+		this.patientExportDto = patientExportDto;
+	}
+
+	/**
+	 * Gets the providers permitted to disclose.
+	 *
+	 * @return the providers permitted to disclose
+	 */
+	public Set<IndividualProviderExportDto> getProvidersPermittedToDisclose() {
+		return providersPermittedToDisclose;
+	}
+
+	/**
+	 * Sets the providers permitted to disclose.
+	 *
+	 * @param providersPermittedToDisclose the new providers permitted to disclose
+	 */
+	public void setProvidersPermittedToDisclose(
+			Set<IndividualProviderExportDto> providersPermittedToDisclose) {
+		this.providersPermittedToDisclose = providersPermittedToDisclose;
+	}
+
+	/**
+	 * Gets the providers disclosure is made to.
+	 *
+	 * @return the providers disclosure is made to
+	 */
+	public Set<IndividualProviderExportDto> getProvidersDisclosureIsMadeTo() {
+		return providersDisclosureIsMadeTo;
+	}
+
+	/**
+	 * Sets the providers disclosure is made to.
+	 *
+	 * @param providersDisclosureIsMadeTo the new providers disclosure is made to
+	 */
+	public void setProvidersDisclosureIsMadeTo(
+			Set<IndividualProviderExportDto> providersDisclosureIsMadeTo) {
+		this.providersDisclosureIsMadeTo = providersDisclosureIsMadeTo;
+	}
+
+	/**
+	 * Gets the organizational providers permitted to disclose.
+	 *
+	 * @return the organizational providers permitted to disclose
+	 */
+	public Set<OrganizationalProviderExportDto> getOrganizationalProvidersPermittedToDisclose() {
+		return organizationalProvidersPermittedToDisclose;
+	}
+
+	/**
+	 * Sets the organizational providers permitted to disclose.
+	 *
+	 * @param organizationalProvidersPermittedToDisclose the new organizational providers permitted to disclose
+	 */
+	public void setOrganizationalProvidersPermittedToDisclose(
+			Set<OrganizationalProviderExportDto> organizationalProvidersPermittedToDisclose) {
+		this.organizationalProvidersPermittedToDisclose = organizationalProvidersPermittedToDisclose;
+	}
+
+	/**
+	 * Gets the organizational providers disclosure is made to.
+	 *
+	 * @return the organizational providers disclosure is made to
+	 */
+	public Set<OrganizationalProviderExportDto> getOrganizationalProvidersDisclosureIsMadeTo() {
+		return organizationalProvidersDisclosureIsMadeTo;
+	}
+
+	/**
+	 * Sets the organizational providers disclosure is made to.
+	 *
+	 * @param organizationalProvidersDisclosureIsMadeTo the new organizational providers disclosure is made to
+	 */
+	public void setOrganizationalProvidersDisclosureIsMadeTo(
+			Set<OrganizationalProviderExportDto> organizationalProvidersDisclosureIsMadeTo) {
+		this.organizationalProvidersDisclosureIsMadeTo = organizationalProvidersDisclosureIsMadeTo;
+	}
+
+	/**
+	 * Gets the consent start.
+	 *
+	 * @return the consent start
+	 */
+	public Date getConsentStart() {
+		return consentStart;
+	}
+
+	/**
+	 * Sets the consent start.
+	 *
+	 * @param consentStart the new consent start
+	 */
+	public void setConsentStart(Date consentStart) {
+		this.consentStart = consentStart;
+	}
+
+	/**
+	 * Gets the consent end.
+	 *
+	 * @return the consent end
+	 */
+	public Date getConsentEnd() {
+		return consentEnd;
+	}
+
+	/**
+	 * Sets the consent end.
+	 *
+	 * @param consentEnd the new consent end
+	 */
+	public void setConsentEnd(Date consentEnd) {
+		this.consentEnd = consentEnd;
+	}
+
+	/**
+	 * Gets the do not share clinical document type codes.
+	 *
+	 * @return the do not share clinical document type codes
+	 */
+	public Set<TypeCodesDto> getDoNotShareClinicalDocumentTypeCodes() {
+		return doNotShareClinicalDocumentTypeCodes;
+	}
+
+	/**
+	 * Sets the do not share clinical document type codes.
+	 *
+	 * @param doNotShareClinicalDocumentTypeCodes the new do not share clinical document type codes
+	 */
+	public void setDoNotShareClinicalDocumentTypeCodes(
+			Set<TypeCodesDto> doNotShareClinicalDocumentTypeCodes) {
+		this.doNotShareClinicalDocumentTypeCodes = doNotShareClinicalDocumentTypeCodes;
+	}
+
+	/**
+	 * Gets the do not share clinical document section type codes.
+	 *
+	 * @return the do not share clinical document section type codes
+	 */
+	public Set<TypeCodesDto> getDoNotShareClinicalDocumentSectionTypeCodes() {
+		return doNotShareClinicalDocumentSectionTypeCodes;
+	}
+
+	/**
+	 * Sets the do not share clinical document section type codes.
+	 *
+	 * @param doNotShareClinicalDocumentSectionTypeCodes the new do not share clinical document section type codes
+	 */
+	public void setDoNotShareClinicalDocumentSectionTypeCodes(
+			Set<TypeCodesDto> doNotShareClinicalDocumentSectionTypeCodes) {
+		this.doNotShareClinicalDocumentSectionTypeCodes = doNotShareClinicalDocumentSectionTypeCodes;
+	}
+
+	/**
+	 * Gets the do not share sensitivity policy codes.
+	 *
+	 * @return the do not share sensitivity policy codes
+	 */
+	public Set<TypeCodesDto> getDoNotShareSensitivityPolicyCodes() {
+		return doNotShareSensitivityPolicyCodes;
+	}
+
+	/**
+	 * Sets the do not share sensitivity policy codes.
+	 *
+	 * @param doNotShareSensitivityPolicyCodes the new do not share sensitivity policy codes
+	 */
+	public void setDoNotShareSensitivityPolicyCodes(
+			Set<TypeCodesDto> doNotShareSensitivityPolicyCodes) {
+		this.doNotShareSensitivityPolicyCodes = doNotShareSensitivityPolicyCodes;
+	}
+
+	/**
+	 * Gets the do not share for purpose of use codes.
+	 *
+	 * @return the do not share for purpose of use codes
+	 */
+	public Set<TypeCodesDto> getShareForPurposeOfUseCodes() {
+		return shareForPurposeOfUseCodes;
+	}
+
+	/**
+	 * Sets the do not share for purpose of use codes.
+	 *
+	 * @param doNotShareForPurposeOfUseCodes the new do not share for purpose of use codes
+	 */
+	public void setShareForPurposeOfUseCodes(
+			Set<TypeCodesDto> shareForPurposeOfUseCodes) {
+		this.shareForPurposeOfUseCodes = shareForPurposeOfUseCodes;
+	}
+
+	/**
+	 * Gets the signed date.
+	 *
+	 * @return the signed date
+	 */
+	public Date getSignedDate() {
+		return signedDate;
+	}
+
+	/**
+	 * Sets the signed date.
+	 *
+	 * @param signedDate the new signed date
+	 */
+	public void setSignedDate(Date signedDate) {
+		this.signedDate = signedDate;
+	}
+
+	/**
+	 * Gets the revocation date.
+	 *
+	 * @return the revocation date
+	 */
+	public Date getRevocationDate() {
+		return revocationDate;
+	}
+
+	/**
+	 * Sets the revocation date.
+	 *
+	 * @param revocationDate the new revocation date
+	 */
+	public void setRevocationDate(Date revocationDate) {
+		this.revocationDate = revocationDate;
+	}
+
+	/**
+	 * Gets the version.
+	 *
+	 * @return the version
+	 */
+	public Integer getVersion() {
+		return version;
+	}
+
+	/**
+	 * Sets the version.
+	 *
+	 * @param version the new version
+	 */
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+
+	/**
+	 * Gets the legal representative.
+	 *
+	 * @return the legal representative
+	 */
+	public PatientExportDto getLegalRepresentative() {
+		return legalRepresentative;
+	}
+
+	/**
+	 * Sets the legal representative.
+	 *
+	 * @param legalRepresentative the new legal representative
+	 */
+	public void setLegalRepresentative(PatientExportDto legalRepresentative) {
+		this.legalRepresentative = legalRepresentative;
+	}
+
+	/**
+	 * Gets the do not share clinical concept codes.
+	 *
+	 * @return the do not share clinical concept codes
+	 */
+	public Set<TypeCodesDto> getDoNotShareClinicalConceptCodes() {
+		return doNotShareClinicalConceptCodes;
+	}
+
+	/**
+	 * Sets the do not share clinical concept codes.
+	 *
+	 * @param doNotShareClinicalConceptCodes the new do not share clinical concept codes
+	 */
+	public void setDoNotShareClinicalConceptCodes(
+			Set<TypeCodesDto> doNotShareClinicalConceptCodes) {
+		this.doNotShareClinicalConceptCodes = doNotShareClinicalConceptCodes;
+	}
+
+	/**
+	 * Gets the consent referenceid.
+	 *
+	 * @return the consent referenceid
+	 */
+	public String getConsentReferenceid() {
+		return consentReferenceid;
+	}
+
+	/**
+	 * Sets the consent referenceid.
+	 *
+	 * @param consentReferenceid the new consent referenceid
+	 */
+	public void setConsentReferenceid(String consentReferenceid) {
+		this.consentReferenceid = consentReferenceid;
+	}
+	
+	
+
+
+}

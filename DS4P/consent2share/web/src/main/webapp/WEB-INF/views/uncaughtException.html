@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/common :: headerFragment" />
+<body>
+	<div id="container">
+	
+        
+            <h2 class="error" th:text="#{exception_uncaught_exception_message}">An Uncaught Exception Occurred...</h2>           
+
+		
+	</div>
+	<!-- end of #container -->
+    
+	
+
+  <!-- START: Footer Region -->
+       <div th:include="fragment/common :: [//footer[@id='center-footer']]"></div>
+       <!-- END: Footer Region -->
+      </body>
+</html>

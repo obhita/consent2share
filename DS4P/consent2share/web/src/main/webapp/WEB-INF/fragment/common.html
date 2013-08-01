@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="headerFragment">
+<meta charset="utf-8" />
+<!-- title needs to be dynamic -->
+<title>Consent2Share</title>
+<meta name="description" content="Consent Management System" />
+<meta name="author" content="FEiSystems" />
+<!-- END: Meta -->
+<!-- START: Mobile Specific -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- END: Mobile Specific -->
+<!-- START: CSS -->
+
+
+<link id="bootstrap-style" href="../../resources/css/bootstrap.css"
+	rel="stylesheet" th:href="@{/resources/css/bootstrap.css}" />
+<link href="../../resources/css/bootstrap-responsive.min.css"
+	rel="stylesheet"
+	th:href="@{/resources/css/bootstrap-responsive.min.css}" />
+<link href="../../resources/css/themes-style.css" rel="stylesheet"
+	th:href="@{/resources/css/themes-style.css}" />
+<link href="../../resources/css/sentinel-style.css" rel="stylesheet"
+	th:href="@{/resources/css/sentinel-style.css}" />
+<link href="../../resources/css/bootstrap-toggle-buttons.css"
+	rel="stylesheet"
+	th:href="@{/resources/css/bootstrap-toggle-buttons.css}" />
+<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet"
+	th:href="@{/resources/css/joyride-2.0.3.css}" />
+<!-- END: CSS -->
+<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+<!-- START: Favicon -->
+<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
+<!-- END: Favicon -->
+</head>
+<body>
+	<div class="container"></div>
+		<!-- START: Footer Region -->
+	<footer class="bottom" id="center-footer" th:fragment="footer">
+			
+			<div>	
+				<!-- COMPONENT: Action Buttons -->
+				<!--
+				<a href="#" class="btn pull-left" data-dismiss="modal">Close</a>
+				<a href="#" class="btn btn-primary pull-right">Save changes</a>
+				-->
+				
+				<!-- COMPONENT: Copyright Information -->
+				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
+			</div>
+			
+		</footer>
+	
+	<!-- END: Footer Region -->
+
+</body>
+
+</html>
