@@ -623,6 +623,12 @@ used more than once per page.
 
 	/* Profile */
 	
+	#dob {
+		select {
+			width: auto;
+		}
+	}
+	
 	.required-text {
 		color: red; 
 		line-height: 20px; 
@@ -686,10 +692,17 @@ used more than once per page.
 	
 	.modal {
 		.inputform, form { 
-			label{
-				display: inline-table;
+		    > div{
+		    	padding-left: 25px;
+		    }
+			label {
+				display: inline;
+				padding-left: 0;
+				input {
+					margin-left: -25px
 				}
-			} 		
+				}
+			} 	
 		.collapse.in{
 			overflow: initial;
 			}
@@ -700,6 +713,19 @@ used more than once per page.
 			.arrow {
 				display: none;
 				}
+			}
+			.modal-body{
+				.search-loading{
+					position: absolute;
+					top: 0;
+					bottom: 0;
+					left: 0;
+					right: 0;
+					
+					background-image: url("../img/ajax-loader.gif");
+					background-position: center;
+					background-repeat: no-repeat;
+				}	
 			}
 	}
 	
@@ -920,6 +946,11 @@ since they may be used more than once.
 		margin-right: -10px;
 		margin-bottom: 0px;
 		overflow: visible;
+		#notification_bar {
+			a, a:hover {
+				text-decoration: underline;
+			}
+		}
 	}
 	
 	.navbar .brand {

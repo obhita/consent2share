@@ -218,9 +218,9 @@ public class ConsentServiceImpl implements ConsentService {
 		Patient patient=patientRepository.findByUsername(currentUser.getUsername());
 		String patientEmail=patient.getEmail();
 		
-		//Email hard-coded and to be changed
+		//TODO:Email and Email message hard-coded and to be changed
 		signedPDFConsentRevocation.setDocumentId((echoSignSignatureService.sendDocumentToSign(consentRevokationPdfDto.getContent(), 
-				consentRevokationPdfDto.getFilename()+".pdf", consentRevokationPdfDto.getConsentName(), 
+				consentRevokationPdfDto.getFilename()+".pdf", consentRevokationPdfDto.getConsentName() + " Revocation", 
 				patientEmail,"consent2share@gmail.com")));
 		signedPDFConsentRevocation.setDocumentNameBySender(consentRevokationPdfDto.getConsentName());
 		signedPDFConsentRevocation.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");

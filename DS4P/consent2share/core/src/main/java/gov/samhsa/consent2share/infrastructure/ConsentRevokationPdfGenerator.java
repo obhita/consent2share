@@ -88,7 +88,7 @@ public class ConsentRevokationPdfGenerator {
 			paragraph1.setAlignment(Element.ALIGN_JUSTIFIED);
 			paragraph1.add(new Chunk("I have previously signed a Patient Consent form allowing my Providers to " +
 					"access my electronic health records through the Consent 2 Share system and now want to withdraw" +
-					" that consent if I sign this form as the Patients Legal Representative, I understand that all" +
+					" that consent. If I sign this form as the Patient's Legal Representative, I understand that all" +
 					" references in this form to \"me\" or \"my\" refer to the Patient."));
 			
 			Paragraph paragraph2=new Paragraph();
@@ -111,7 +111,7 @@ public class ConsentRevokationPdfGenerator {
 					"will not be affected based on my Withdrawal of Consent.");
 			paragraph4.add("5) If I wish to reinstate Consent, I may do so by signing and completing a new Patient Consent form and returning" +
 					" it to a participating provider or payer.");
-			paragraph4.add("6) Withdrawing my consent does no prevent my health care provider from submitting claims to my health insurer for " +
+			paragraph4.add("6) Withdrawing my consent does not prevent my health care provider from submitting claims to my health insurer for " +
 					"reimbursement for services rendered to me.");
 			paragraph4.add("7) I understand that I will get a copy of this form after I sign it.");
 			
@@ -155,10 +155,10 @@ public class ConsentRevokationPdfGenerator {
 		Chunk chunk2=new Chunk("NO EXCEPT",fontbold);
 		Chunk chunk3=new Chunk("NO NEVER",fontbold);
 		if(consent.getConsentRevokationType().equals("EMERGENCY ONLY")){
-			chunk2.append("\n(This is the option you choose.)");
+			chunk2.append("\n(This is the option you chose.)");
 		}
 		else if(consent.getConsentRevokationType().equals("NO NEVER")){
-			chunk3.append("\n(This is the option you choose.)");
+			chunk3.append("\n(This is the option you chose.)");
 		}
 		
 		table.addCell(new PdfPCell(new Phrase(chunk2)));

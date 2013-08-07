@@ -103,7 +103,7 @@
 						<!-- COMPONENT: User Dropdown -->
 
 						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-							<span class="icon-user"></span><span
+							<span class="icon-user"></span>&nbsp;<span
 							class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span> <span
 							class="caret"></span>
 						</a>
@@ -120,43 +120,43 @@
 					</div>
 				</div>
 			</div>
-			<div th:switch="${notification}">
+			<div id="notification_bar" th:switch="${notification}">
 					<span th:case="'notification_add_provider'">
 						<div class="alert alert-info rounded">
 							<button type="button" class="close" data-dismiss="alert">&times;</button>
-	  		    			To create and manage your consents, you need to add providers. Please go to <a href="../patients/connectionMain.html"><strong>"My Providers"</strong></a> to begin this process.
+	  		    			To create and manage your consents, you need to add providers. Please go to <a href="../patients/connectionMain.html"><strong>My Providers</strong></a> to begin this process.
 						</div>
 					</span>
 					<span th:case="'notification_add_second_provider'">
 						<div class="alert alert-info rounded">
 							<button type="button" class="close" data-dismiss="alert">&times;</button>
-	  		    			To create and manage your consents, you need to add second providers. Please go to <a href="../patients/connectionMain.html"><strong>"My Providers"</strong></a> to begin this process.
+	  		    			To create and manage your consents, you need to add a second provider. Please go to <a href="../patients/connectionMain.html"><strong>"My Providers"</strong></a> to begin this process.
 						</div>
 					</span>
 					<span th:case="'notification_add_consent'">
 						<div class="alert alert-info rounded">
 							<button type="button" class="close" data-dismiss="alert">&times;</button>
-	  		    			Click the <a href="../consents/addConsent.html"> <strong>'plus'</strong> </a>button to Add a new Consent.
+	  		    			Click the  <strong>( + )</strong> button to add a new consent.
 						</div>
 					</span>
 					<span th:case="'notification_add_consent_successed'">
 					   <div class="alert alert-success rounded">
 							<button type="button" class="close" data-dismiss="alert">&times;</button>
-			  		    	<strong>Congratulations!</strong> You've successfully added a new Consent. You must Click the <strong>'Submit'</strong> button to <strong>Review and Sign</strong> the Consent to complete this process.
+			  		    	<strong>Congratulations!</strong> You've successfully added a new Consent. You may now click on the <strong>'Submit'</strong> button to review and sign your consent.
 						</div>
 				    </span>
 					
 					<span th:case="'notification_review_sign_consent'">
 						<div class="alert alert-info rounded">
 							<button type="button" class="close" data-dismiss="alert">&times;</button>
-			  		    	Click the <strong>'Submit'</strong> button to Review and Sign your Consent.
+			  		    	You may now click the <strong>'Submit'</strong> button to review and sign your Consent.
 						</div>
 					 </span>
 					
 					<span th:case="'notification_sign_consent'">
 				    <div class="alert alert-info rounded">
 							<button type="button" class="close" data-dismiss="alert">&times;</button>
-							You have a unsigned consent. Please go to your mailbox to Sign your Consent.
+							You have a unsigned consent. Please check <a href="../inbox/inboxMain.html"><strong>Message Center</strong></a> or your e-mail client for instruction on signing your consent.
 					</div>
 					</span>
 			</div>
@@ -395,7 +395,7 @@
 											<div style="margin-right: 4px; margin-left: -4px" class="icon-refresh icon-spin"></div><span th:text="#{list_consent_withdrawal_in_progress}">Withdrawal
 													In Progress</span></a>
 											<a th:case="${2}" href="#" class="btn btn-small btn-primary"
-											th:href="@{'javascript:document.' + 'revokation_download_' + ${consentEntry.id} + '.submit()'}" th:text="#{list_consent_view_signed_revocation}">&#x2713;
+											th:href="@{'javascript:document.' + 'revokation_download_' + ${consentEntry.id} + '.submit()'}" th:text="#{list_consent_view_signed_revocation}">
 													View Signed Revocation</a>
 											<a th:case="${4}" href="#"	th:href="@{'deleteConsents/'+ ${consentEntry.id}}"
 												class="btn btn-small btn-danger" th:text="#{list_consent_delete}">Delete</a>
@@ -434,10 +434,10 @@
 
 						<div class="row span11 offset1">
 							<div class="row">
-								<div class="span11">I have previously signed a Patient
-									Consent form allowing my Providers to access my electronic
+								<div class="span11">I have previously signed a patient
+									consent form allowing my providers to access my electronic
 									health records through the Consent 2 Share system and now want
-									to withdraw that consent if I sign this form as the Patients
+									to withdraw that consent. If I sign this form as the Patient's
 									Legal Representative, I understand that all references in this
 									form to "me" or "my" refer to the Patient.</div>
 							</div>
@@ -521,7 +521,7 @@
 							</div>
 							<div class="row">
 								<div class="span11 top-margin10">6) Withdrawing my consent
-									does no prevent my health care provider from submitting claims
+									does not prevent my health care provider from submitting claims
 									to my health insurer for reimbursement for services rendered to
 									me.</div>
 							</div>

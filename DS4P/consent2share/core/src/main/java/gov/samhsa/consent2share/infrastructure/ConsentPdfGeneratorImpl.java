@@ -131,7 +131,11 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 			
 			
 			if (consent.getPatient().getBirthDay()!=null){
-				chunkDob=new Chunk(consent.getPatient().getBirthDay()+"\n");
+				chunkDob=new Chunk(String.format("%tm/%td/%tY",
+						consent.getPatient().getBirthDay(),
+						consent.getPatient().getBirthDay(),
+						consent.getPatient().getBirthDay()
+						) +"\n");
 				chunkDob.setUnderline(1, -2);
 				}
 			if (consent.getPatient().getAddress()!=null){

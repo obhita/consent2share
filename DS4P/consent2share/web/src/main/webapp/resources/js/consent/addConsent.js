@@ -32,50 +32,76 @@ $(document).ready(function() {
 						$("#to"+providerId).parent().removeClass("joe");
 					}
 				});
-
+				
+				function areAnyProvidersSelected(){
+					var flag=0;
+					$(".isMadeToList").each(function(){
+						if($(this).prop("checked")==true){
+							flag++;
+							return false;
+						}
+						return true;
+					});
+					$(".toDiscloseList").each(function(){
+						if($(this).prop("checked")==true){
+							flag++;
+							return false;
+						}
+						return true;
+					});
+					if (flag>1)
+						return true;
+					else
+						return false;
+				}
+				
 				
 				$("#consent-add-save").click(function(){
+					$('div.validation-alert').empty();
 					
-					$(".inputformPerson input").each(function(){
-						if($(this).prop("checked")==true){
-							$(this).not(':submit').clone().hide().appendTo('#formToBeSubmitted');
+					if(areAnyProvidersSelected() === true){
+						$(".inputformPerson input").each(function(){
+							if($(this).prop("checked")==true){
+								$(this).not(':submit').clone().hide().appendTo('#formToBeSubmitted');
+							}
+						});
+						
+						$(".purposeofshareform input").each(function(){
+							if($(this).prop("checked")==true){
+								$(this).not(':submit').clone().hide().appendTo('#formToBeSubmitted');
+							}
+						});
+						
+						$(".inputformDate").each(function(){
+							$(this).find("input").not(':submit').clone().hide().appendTo('#formToBeSubmitted');
+						});
+						
+						$(".inputform input").each(function(){
+							if($(this).prop("checked")==false){
+								$(this).prop("checked",true);
+								$(this).not(':submit').clone().hide().appendTo('#formToBeSubmitted');	
+							}
+						});
+						
+						
+						
+						for (var i=0;i<specmedinfo.length;i++){
+							if(specmedinfo[i]!=undefined){
+								$('#formToBeSubmitted').append('<input type="text" name="'+
+										specmedinfo[i].codeSystem+
+										'" value="'+
+										specmedinfo[i].code+";"+specmedinfo[i].description+
+										'" />');
+							}
 						}
-					});
 					
-					$(".purposeofshareform input").each(function(){
-						if($(this).prop("checked")==true){
-							$(this).not(':submit').clone().hide().appendTo('#formToBeSubmitted');
-						}
-					});
-					
-					$(".inputformDate").each(function(){
-						$(this).find("input").not(':submit').clone().hide().appendTo('#formToBeSubmitted');
-					});
-					
-					$(".inputform input").each(function(){
-						if($(this).prop("checked")==false){
-							$(this).prop("checked",true);
-							$(this).not(':submit').clone().hide().appendTo('#formToBeSubmitted');	
-						}
-					});
-					
-					
-					
-					for (var i=0;i<specmedinfo.length;i++){
-						if(specmedinfo[i]!=undefined){
-							$('#formToBeSubmitted').append('<input type="text" name="'+
-									specmedinfo[i].codeSystem+
-									'" value="'+
-									specmedinfo[i].code+";"+specmedinfo[i].description+
-									'" />');
-						}
+						$('#formToBeSubmitted').submit();
+					}else{
+						$('div.navbar-inner-header').after("<div class='validation-alert'><span><div class='alert alert-error rounded'><button type='button' class='close' data-dismiss='alert'>&times;</button>You must add provider(s).</div></span></div>");
 					}
 					
-					$('#formToBeSubmitted').submit();
 					
 				});
-				
-				
 				
 				$("#addspecmedi").click(function(){
 					$("#specmedinfo").append('<li class="spacing" id="'+'entry'+specmedinfoid+

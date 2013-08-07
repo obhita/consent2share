@@ -266,12 +266,13 @@ public class ConsentController {
 				isMadeTo.addAll(consentDto.getOrganizationalProvidersDisclosureIsMadeTo());
 			if (consentDto.getProvidersDisclosureIsMadeTo()!=null)
 				isMadeTo.addAll(consentDto.getProvidersDisclosureIsMadeTo());
-			if (consentDto.getProvidersPermittedToDisclose()!=null)
-				isMadeFrom.addAll(consentDto.getProvidersPermittedToDisclose());
 			if (consentDto.getOrganizationalProvidersPermittedToDisclose()!=null)
 				isMadeFrom.addAll(consentDto.getOrganizationalProvidersPermittedToDisclose());
-			
-			if (consentService.areThereDuplicatesInTwoSets(isMadeTo,isMadeFrom)==false){
+			if (consentDto.getProvidersPermittedToDisclose()!=null)
+				isMadeFrom.addAll(consentDto.getProvidersPermittedToDisclose());
+			if ((!isMadeTo.isEmpty())
+					&&(!isMadeFrom.isEmpty())
+					&& consentService.areThereDuplicatesInTwoSets(isMadeTo,isMadeFrom)==false){	
 				consentDto.setUsername(currentUser.getUsername());
 				Set<SpecificMedicalInfoDto> doNotShareClinicalConceptCodes=new HashSet<SpecificMedicalInfoDto>();
 				if (icd9!=null)
@@ -289,6 +290,7 @@ public class ConsentController {
 				
 				return "redirect:listConsents.html?notify=add";
 			}
+			
 			
 			return "views/resourceNotFound";
 			

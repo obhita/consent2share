@@ -1477,3 +1477,9 @@ a .icon-flip-vertical:before {
 .icon-renren:before {
   content: "\f18b";
 }
+
+/* The following class was added to the font-awesome.css file */
+.validation-error {
+	border-color: red !important;
+}
+/* End of addition */

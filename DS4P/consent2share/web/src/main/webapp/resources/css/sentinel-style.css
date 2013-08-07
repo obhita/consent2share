@@ -460,6 +460,9 @@ used more than once per page.
   margin-right: .5em; }
 
 /* Profile */
+#dob select {
+  width: auto; }
+
 .required-text {
   color: red;
   line-height: 20px;
@@ -506,8 +509,13 @@ used more than once per page.
 .span3 checkbox {
   margin-left: -20px; }
 
+.modal .inputform > div, .modal form > div {
+  padding-left: 25px; }
 .modal .inputform label, .modal form label {
-  display: inline-table; }
+  display: inline;
+  padding-left: 0; }
+  .modal .inputform label input, .modal form label input {
+    margin-left: -25px; }
 .modal .collapse.in {
   overflow: initial; }
 .modal .popover {
@@ -516,6 +524,15 @@ used more than once per page.
   left: 5% !important; }
   .modal .popover .arrow {
     display: none; }
+.modal .modal-body .search-loading {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-image: url("../img/ajax-loader.gif");
+  background-position: center;
+  background-repeat: no-repeat; }
 
 /* !MODULE RULES */
 /*============================================================
@@ -684,6 +701,8 @@ since they may be used more than once.
   margin-right: -10px;
   margin-bottom: 0px;
   overflow: visible; }
+  .navbar #notification_bar a, .navbar #notification_bar a:hover {
+    text-decoration: underline; }
 
 .navbar .brand {
   padding-right: 10px;

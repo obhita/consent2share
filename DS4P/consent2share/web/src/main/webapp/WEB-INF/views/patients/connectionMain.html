@@ -78,7 +78,7 @@
 				<!-- COMPONENT: User Dropdown -->
 
 					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-						<span class="icon-user"></span><span class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span>
+						<span class="icon-user">&nbsp;</span><span class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span>
 						<span class="caret"></span>
 					</a>
 					
@@ -92,7 +92,7 @@
 			</div>
 		</div>
 		
-		<div th:switch="${notification}">
+		<div id="notification_bar" th:switch="${notification}">
 				<span th:case="'notification_add_provider'">
 				<div class="alert alert-info rounded">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -117,21 +117,21 @@
 				<span th:case="'notification_add_second_provider_successed'">
 				<div class="alert alert-success rounded">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
-  		    	<strong>Congratulations!</strong> You've successfully added second Provider. Now, you may go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to add a new Consent.
+  		    	<strong>Congratulations!</strong> You've successfully added second Provider. Now, you may go to <a href="../consent/listConsents.html"><strong>My Consents</strong></a> to add a new Consent.
 				</div>
 				</span>
 				
 				<span th:case="'notification_add_consent'">
 					<div class="alert alert-success rounded">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
-  		    		Please go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to add a new Consent.
+  		    		Please go to <a href="../consent/listConsents.html"><strong>My Consents</strong></a> to add a new Consent.
 					</div>
 				</span>
 				
 				<span th:case="'notification_review_sign_consent'">
 				<div class="alert alert-info rounded">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
-  		    	You have a unsigned consent.  Please go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to Review and Sign your Consent.
+  		    	You have a unsigned consent.  Please go to <a href="../consent/listConsents.html"><strong>My Consents</strong></a> to Review and Sign your Consent.
 			    </div>
 			    </span>
 			    
@@ -156,7 +156,7 @@
 					<li class="nav-header hidden-tablet" role="menuitem"></li>
 					<li role="menuitem"><a href="home.html"><div class="icon-home"></div><span class="hidden-tablet" th:text="#{sidebar_my_home}"> My Home</span></a></li>
 
-					<li role="menuitem"><a href="../consent/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div><span class="hidden-tablet" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
+					<li role="menuitem"><a href="../consent/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div><span class="hidden-tablet" th:text=" #{sidebar_my_consents}"> My Consents</span></a></li>
 
 					<li class="active" role="menuitem"><a href="#"><div class="icon-random icon-white"></div><span class="hidden-tablet"  th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
 							

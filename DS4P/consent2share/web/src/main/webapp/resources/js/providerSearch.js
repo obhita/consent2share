@@ -124,6 +124,8 @@ function lookup (){
 			$("#searchedby").append('<span class="badge">Last Name/Facility Name</span>');
 		}
 		
+		$("#frankie .search-loading").show();
+		
 		
 		$.getJSON(lookupQueryIndividual+"/entitytype/Individual",function(queryResult){	
 			individualJSON=queryResult;
@@ -145,6 +147,7 @@ function lookup (){
 				showResult();
 			else if (organizationSearchFlag==0)
 				showResult();
+			$("#frankie .search-loading").fadeOut({ duration: 400});
 		});
 		
 		if (organizationSearchFlag==1){
@@ -166,6 +169,7 @@ function lookup (){
 			ajaxFinishedFlag++;
 			if (ajaxFinishedFlag==2)
 				showResult();
+			$("#frankie .search-loading").fadeOut({ duration: 400});
 		});
 		}
 		

@@ -58,32 +58,50 @@
 			
 	
 	<!-- END : Page Header -->	
+	
 
 	<div id="consent-add-main" class="container-fluid" style="overflow:hidden">
 	<!-- START: Page Header -->
 	<div class="navbar" role="navigation">
 		<div class="navbar-inner-header">
+		
 			<div class="container-fluid">
 			
 				<div class="row-fluid">
 				
 					<a id="bread-crumb-btn" href="../consents/listConsents.html" class="btn btn-info" ><span class="icon-chevron-left icon-white"></span></a> 
-					<h1><span class="nav-title">Add a Consent</span></h1>
+					<h1><span class="nav-title" th:text="#{add_a_consent}">Add a Consent</span></h1>
 				
 					<div class="pull-right">
-						<div class="btn-group pull-left" data-toggle="buttons-radio" style="z-index: 101;">
+						<div class="btn-group pull-left" data-toggle="buttons-radio" style="margin-top:10px; z-index: 101;">
 							<button id="btn_guide_on" type="button" class="btn btn-mini active">Guide On</button>
 		  					<button id="btn_guide_off" type="button" class="btn btn-mini">Guide Off</button>
 						</div>
-					
+											
 						<a class="brand" href="../index.html" style="float: right;"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
-					</div>
+
+							<div class="btn-group pull-right">
+								<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+									<span class="icon-flag">&nbsp;</span>
+									<span class="hidden-phone hidden-tablet" th:text="#{language}">Language</span> 
+									<span class="caret"></span>
+								</a>
+
+								<ul class="dropdown-menu" role="menu">
+									<li role="menuitem"><a
+										th:href="@{'/consents/addConsent.html?lang=en'}">English</a></li>
+									<li role="menuitem"><a
+										th:href="@{'/consents/addConsent.html?lang=cn'}">Chinese</a></li>
+								</ul>
+							</div>
+						</div>
 											
 				</div>
 								
 			</div>
 		</div>
 	</div>
+					
 	<div id="under-header"></div>
 		<div class="row-fluid main-content-wrapper">					
 			<div id="content">
@@ -135,7 +153,7 @@
 					<section class="top-margin10">
 						<div class="row-fluid">
 							<fieldset class="control-group">
-							<legend>I, <span th:text="${currentUser.firstName+' '+currentUser.lastName}">John Doe</span>, hereby... </legend>
+							<legend><span  th:text="#{I}">I</span> , <span th:text="${currentUser.firstName+' '+currentUser.lastName}">John Doe</span>, <span  th:text="#{hereby}">hereby</span>... </legend>
 							</fieldset>
 						</div>
 					</section>
@@ -144,7 +162,7 @@
 						<a href="#authorize-modal" role="button" class="consent-authorize-box bottom-margin10" data-edit-button="#edit1,#content1" data-toggle="modal">
 								<div id="consent-from" class="summary-border">
 									<div class="form-inline">
-							        	<p class="no-click">Authorize the following person(s):</p>
+							        	<p class="no-click"><span  th:text="#{Authorize_the_following_person}"> Authorize the following person(s)</span>:</p>
 							        		<ul id="authorizers"></ul>
 <!-- 							        	<li class="uneditable-input" ><span class="icon-user"></span></li> -->
 							        </div>
@@ -197,7 +215,7 @@
 						<a href="#disclose-modal" role="button" class="consent-disclose-box" data-edit-button="#edit1,#content1" data-toggle="modal">
 						   <div id="consent-to" class="summary-border">
 								<div class="form-inline">
-							        	<p>To disclose my information to:</p>
+							        	<p><span  th:text="#{To_disclose_my_information_to}">To disclose my information to</span>:</p>
 							        	<ul id="consentmadetodisplay"></ul>
 <!-- 							        	<li class="uneditable-input"><span class="icon-user"></span> Grant, U S</li> -->
 							   </div>
@@ -250,7 +268,7 @@
 					
 					<section class="row-fluid bottom-margin10">
 						<div id="share-all-med" class="summary-border top-margin10">
-							<p class="inline-block bottom-margin10"><strong>Share All My Medical Information</strong> is</p>
+							<p class="inline-block bottom-margin10"><strong><span  th:text="#{Share_All_My_Medical_Information}">Share All My Medical Information</span></strong>&nbsp;<span  th:text="#{is}"> is </span> </p>
 							<!-- Button to trigger modal -->
 							<div data-target="#share-settings-modal" role="button" class="modal-toggle-button" data-edit-button="#edit1,#content1" data-toggle="modal" style="vertical-align: middle">
 								<input title="share-settings-toggle" id="mediInfoToggle" type="checkbox" checked="checked"/>
@@ -260,7 +278,7 @@
 
 							<div id="content1" class="edit top-margin10">
 								<div class="inline-block">
-									<label for="edit1">I am <strong>NOT</strong> sharing the following information:
+									<label for="edit1"><span  th:text="#{I_am}">I am </span><strong> <span  th:text="#{not}">NOT</span></strong>&nbsp;<span  th:text="#{sharing_the_following_information}"> sharing the following information</span>:
 									<a id="edit1" href="#share-settings-modal" role="button" class="btn btn-mini btn-info edit" data-toggle="modal">
 										Edit
 									</a>
@@ -305,8 +323,8 @@
 																	        	<div th:each="SensitivityPolicyCode:${sensitivityPolicy}">
 																	        		<label for="Substance-Abuse" th:for="${SensitivityPolicyCode.code}" class="checkbox checkedCheckbox1">
 <!-- 																						 th:field="*{substanceAbuse}" -->
-																						<input id="Substance-Abuse" th:field="*{doNotShareSensitivityPolicyCodes}" th:id="${SensitivityPolicyCode.code}" th:text="${SensitivityPolicyCode.displayName}" type="checkbox" name="sensitivityPolicyInput" checked="checked" th:value="${SensitivityPolicyCode.code}"> Substance Abuse </input>
-																					
+																						<input id="Substance-Abuse" th:field="*{doNotShareSensitivityPolicyCodes}" th:id="${SensitivityPolicyCode.code}" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}" type="checkbox" name="sensitivityPolicyInput" checked="checked" th:value="${SensitivityPolicyCode.code}"> Substance Abuse </input>
+																					</label>
 																				<!-- 	<div th:id="${'message-block_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}" class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}"></div></div></div>
 																					<a th:id="${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}"><span style="margin-left: 5px;" class="icon-info-sign"></span>
 																					</a> -->
@@ -314,15 +332,13 @@
 																					 data-content="icon context" data-title="title" >
 																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
 																					</a>
-																					</label>
 																					<script th:inline="javascript">
-																						    text = /*[[#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
+																						    text = /*[[#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')+'_text'}}]]*/ 'Sebastian';
 																						    idicon=/*[[${'i-icon_' +#strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}]]*/ 'Sebastian';
-																						    title=/*[[${SensitivityPolicyCode.displayName}]]*/ 'Sebastian';
+																						    title=/*[[#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
 																						    document.getElementById(idicon).setAttribute("data-content", text);
 																						    document.getElementById(idicon).setAttribute("data-title",title );
- 																					</script>
- 																					 
+ 																					</script> 
 																	        	
 																	        	</div>
 <!-- 																	        	<label for="Substance-Abuse" class="checkbox"> -->
@@ -356,21 +372,19 @@
 																				<div th:each="clinicalDocumentSectionTypeCode:${clinicalDocumentSectionType}">
 																	        		<label for="conditions" th:for="${clinicalDocumentSectionTypeCode.code}" class="checkbox checkedCheckbox1">
 <!-- 																						 th:field="*{substanceAbuse}" -->
-																					<input id="conditions" th:field="*{doNotShareClinicalDocumentSectionTypeCodes}" th:id="${clinicalDocumentSectionTypeCode.code}" th:text="${clinicalDocumentSectionTypeCode.displayName}" th:value="${clinicalDocumentSectionTypeCode.code}" type="checkbox" name="clinicalDocumentSectionTypeInput" checked="checked"> Medical Information Categories</input>
-																					
+																					<input id="conditions" th:field="*{doNotShareClinicalDocumentSectionTypeCodes}" th:id="${clinicalDocumentSectionTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentSectionTypeCode.code}" type="checkbox" name="clinicalDocumentSectionTypeInput" checked="checked"> Medical Information Categories</input>
+																					</label>
 																					<a href="#"  th:id="${'i-icon_' + #strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
 																					  data-content="icon context" data-title="title" >
 																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
 																					</a>
-																					</label>
 																					<script th:inline="javascript">
-																						    text = /*[[#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
+																						    text = /*[[#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')+'_text'}}]]*/ 'Sebastian';
 																						    idicon=/*[[${'i-icon_' +#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')}]]*/ 'Sebastian';
-																						    title=/*[[${clinicalDocumentSectionTypeCode.displayName}]]*/ 'Sebastian';
+																						    title=/*[[#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
 																						    document.getElementById(idicon).setAttribute("data-content", text);
 																						    document.getElementById(idicon).setAttribute("data-title",title );
- 																					</script>
- 																					
+ 																					</script> 
  																					
  																							
 																																											
@@ -412,21 +426,19 @@
 																	        
 																				<div th:each="clinicalDocumentTypeCode:${clinicalDocumentType}">
 																	        		<label for="summarizationOfEpisodeNote" th:for="${clinicalDocumentTypeCode.code}" class="checkbox checkedCheckbox1">
-																					<input id="summarizationOfEpisodeNote" th:field="*{doNotShareClinicalDocumentTypeCodes}" th:id="${clinicalDocumentTypeCode.code}" th:text="${clinicalDocumentTypeCode.displayName}" th:value="${clinicalDocumentTypeCode.code}" type="checkbox" name="clinicalDocumentTypeInput" checked="checked"> Summarization of Episode Note</input>
-																					
+																					<input id="summarizationOfEpisodeNote" th:field="*{doNotShareClinicalDocumentTypeCodes}" th:id="${clinicalDocumentTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentTypeCode.code}" type="checkbox" name="clinicalDocumentTypeInput" checked="checked"> Summarization of Episode Note</input>
+																					</label>
 																					<a href="#"  th:id="${'i-icon_' + #strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
 																					  data-content="icon context" data-title="title">
 																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
 																					</a>
-																					</label> 
 																					<script th:inline="javascript">
-																						    text = /*[[#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
+																						    text = /*[[#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')+'_text'}}]]*/ 'Sebastian';
 																						    idicon=/*[[${'i-icon_' +#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')}]]*/ 'Sebastian';
-																						    title=/*[[${clinicalDocumentTypeCode.displayName}]]*/ 'Sebastian';
+																						    title=/*[[#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
 																						    document.getElementById(idicon).setAttribute("data-content", text);
 																						    document.getElementById(idicon).setAttribute("data-title",title );
- 																					</script>
- 																					
+ 																					</script> 
  																					
  																				
 																					
@@ -512,7 +524,7 @@
 					
 					<section class="row-fluid bottom-margin10">
 						<div id="share-for-purpose" class="summary-border">
-							<p class="inline-block bottom-margin10"><strong>Share for All Purposes</strong> is</p>
+							<p class="inline-block bottom-margin10"><strong><span th:text="#{Share_for_All_Purposes}">Share for All Purposes</span></strong>&nbsp;<span th:text="#{is}"> is</span></p>
 							<!-- Button to trigger modal -->
 							<div data-target="#selected-purposes-modal" role="button" class="modal-toggle-button" data-edit-button="#edit2,#content2" data-toggle="modal" style="vertical-align: middle">
 								<input id="selectPurposesToggle" title="selected-purposes-toggle" type="checkbox" />
@@ -520,7 +532,7 @@
 							
 							<div id="content2" class="edit top-margin10">
 								<div class="inline-block">
-									<label for="edit2">I <strong>AM</strong> sharing for the following purposes:
+									<label for="edit2"><span th:text="#{I}">I </span>&nbsp;<strong> <span th:text="#{AM}">AM</span></strong> <span th:text="#{sharing_for_the_following_purposes}">sharing for the following purposes</span>:
 									<a id="edit2" href="#selected-purposes-modal" role="button" class="btn btn-mini btn-info edit" data-toggle="modal">
 										Edit
 									</a> 
@@ -550,16 +562,16 @@
 													<div id="purposeOfSharingInputs">
 								    					<div th:each="purposeOfUseItem:${purposeOfUse}">
 								    						<label for="emergency" th:for="${purposeOfUseItem.code}" class="checkbox checkedCheckbox2">
-															<input id="emergency" th:field="*{shareForPurposeOfUseCodes}" th:id="${purposeOfUseItem.code}" th:text="${purposeOfUseItem.displayName}" th:value="${purposeOfUseItem.code}" type="checkbox" name="purposeOfUseInput" checked="checked"> Emergency</input>
+															<input id="emergency" th:field="*{shareForPurposeOfUseCodes}" th:id="${purposeOfUseItem.code}" th:text="#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}" th:value="${purposeOfUseItem.code}" type="checkbox" name="purposeOfUseInput" checked="checked"> Emergency</input>
 															</label>
 																					<a href="#"  th:id="${'i-icon_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
 																					  data-content="icon context" data-title="title">
 																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
 																					</a>
 																					<script th:inline="javascript">
-																						    text = /*[[#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}]]*/ 'Sebastian';
+																						    text = /*[[#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')+'_text'}}]]*/ 'Sebastian';
 																						    idicon=/*[[${'i-icon_' +#strings.replace(purposeOfUseItem.displayName, ' ', '-')}]]*/ 'Sebastian';
-																						    title=/*[[${purposeOfUseItem.displayName}]]*/ 'Sebastian';
+																						    title=/*[[#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}]]*/ 'Sebastian';
 																						    document.getElementById(idicon).setAttribute("data-content", text);
 																						    document.getElementById(idicon).setAttribute("data-title",title );
  																					</script> 
@@ -587,7 +599,7 @@
 							<section id="consent-start-date">
 							<form class="summary-container inputformDate" th:object="${consentDto}">
 								<fieldset>
-									<label for="date-picker-start">Consent Start</label>
+									<label for="date-picker-start"><span th:text="#{start}">Consent Start</span></label>
 									<div class="input-append datepicker" data-date-format="mm/dd/yyyy">
 										<input class="datepicker" id="date-picker-start" style="z-index: 100;"/>
 									</div>
@@ -598,7 +610,7 @@
 							<section id="consent-end-date">
 							<form class="summary-container inputformDate" th:object="${consentDto}">
 								<fieldset>
-									<label for="date-picker-end">Consent End</label>
+									<label for="date-picker-end"><span th:text="#{end}">Consent End</span></label>
 									<div class="input-append datepicker date"  data-date-format="mm/dd/yyyy">
 										<input class="datepicker" id="date-picker-end" style="z-index: 100;"/>
 									</div>
@@ -611,7 +623,7 @@
 				
 				<section class="control-group top-margin10">
 					<div class="controls" style="padding-top: 15px">
-						<button type="button" class="btn" style="margin: 0 10px 0 0;">Cancel</button> <button id="consent-add-save" type="submit" class="btn btn-primary">Save</button>
+						<button type="button" class="btn" style="margin: 0 10px 0 0;"><span th:text="#{cancel}">Cancel</span></button> <button id="consent-add-save" type="submit" class="btn btn-primary"><span th:text="#{save}">Save</span></button>
 					</div>         		
 				</section>
 					
@@ -916,6 +928,7 @@
 			if($('#btn_guide_on').hasClass('active') === false){
 				$('#btn_guide_off').removeClass('active');
 				$('#btn_guide_on').addClass('active');
+			
 			}
 
 			jQuery.storage.setItem('guideStatus', 'on', 'sessionStorage');

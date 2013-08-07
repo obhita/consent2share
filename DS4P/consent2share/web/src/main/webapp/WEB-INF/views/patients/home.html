@@ -102,38 +102,38 @@
 			</div>
 
 			
-			<div th:switch="${notification}">
+			<div id="notification_bar" th:switch="${notification}">
 				<span th:case="'notification_add_provider'">
 					<div class="alert alert-info rounded">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
-  		    			<strong>Welcome <span th:object="${currentUser}" th:text="*{firstName + ' ' + lastName}"></span> to Consent2Share!</strong> To create and manage your consents, you need to add providers. Please go to <a href="connectionMain.html"><strong>"My Providers"</strong></a> to begin this process.
+  		    			<strong>Welcome <span th:object="${currentUser}" th:text="*{firstName + ' ' + lastName}"></span> to Consent2Share!</strong> To create and manage your consents, you must add at least two providers. Please go to <a href="connectionMain.html"><strong>My Providers</strong></a> to begin this process.
 					</div>
 				</span>
 				
 				<span th:case="'notification_add_second_provider'">
 						<div class="alert alert-info rounded">
 							<button type="button" class="close" data-dismiss="alert">&times;</button>
-	  		    			To create and manage your consents, you need to add second providers. Please go to <a href="../patients/connectionMain.html"><strong>"My Providers"</strong></a> to begin this process.
+	  		    			Before you can create consents, you need to add a second provider. Please go to <a href="../patients/connectionMain.html"><strong>My Providers</strong></a> to begin this process.
 						</div>
 				</span>
 				
 				<span th:case="'notification_add_consent'">
 					<div class="alert alert-success rounded">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
-  		    		To create your consent, go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to add a new Consent.
+  		    		To create your consent, go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to add a new consent.
 					</div>
 				</span>
 				<span th:case="'notification_review_sign_consent'">
 					<div class="alert alert-success rounded">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
-	  		    	You have a unsigned consent.  Please go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to Review and Sign your Consent.
+	  		    	You have a unsigned consent.  Please go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to review and sign your consent.
 				    </div>
 				</span>
 			    
 			    <span th:case="'notification_sign_consent'">
 				<div class="alert alert-info rounded">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
-  		    	You have a unsigned consent.  Please go to your mailbox to Sign your Consent.
+  		    	You have a unsigned consent. Please check <a href="../patients/connectionMain.html"><strong>Message Center</strong></a> or your e-mail client to sign your consent.
 			    </div>
 			    </span>
       
