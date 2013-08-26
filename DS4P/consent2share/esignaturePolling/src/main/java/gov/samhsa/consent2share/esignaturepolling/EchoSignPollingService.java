@@ -30,6 +30,7 @@ import gov.samhsa.consent2share.domain.consent.AbstractSignedPDFDocument;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.ConsentRepository;
 import gov.samhsa.consent2share.infrastructure.EchoSignSignatureService;
+import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -41,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class EchoSignPollingService.
  */
@@ -59,6 +61,9 @@ public class EchoSignPollingService implements EsignaturePollingService {
 	
 	/** The signature service. */
 	private EchoSignSignatureService signatureService;
+	
+	/** The consent export service. */
+	private ConsentExportService consentExportService;
 
 	/**
 	 * Instantiates a new echo sign polling service.

@@ -104,17 +104,8 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 	/**
 	 * Creates the stateful knowledge session.
 	 * 
-	 * @param purposeOfUse
-	 *            the purpose of use
-	 * @param pdpObligations
-	 *            the PDP obligations
-	 * @param communityId
-	 *            the community id
-	 * @param messageId
-	 *            the message id
 	 */
-	private void createStatefulKnowledgeSession(String purposeOfUse,
-			List<String> pdpObligations, String communityId, String messageId) {
+	private void createStatefulKnowledgeSession() {
 
 		try {
 			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
@@ -163,11 +154,7 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 			factModel = unmarshallFromXml(
 					FactModel.class, factModelXmlString);
 
-			createStatefulKnowledgeSession(factModel.getXacmlResult()
-					.getSubjectPurposeOfUse().getPurpose(), factModel
-					.getXacmlResult().getPdpObligations(), factModel
-					.getXacmlResult().getHomeCommunityId(), factModel
-					.getXacmlResult().getMessageId());
+			createStatefulKnowledgeSession();
 
 			session.insert(factModel.getXacmlResult());
 			for (ClinicalFact clinicalFact : factModel.getClinicalFactList()) {

@@ -25,6 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.ds4ppilot.orchestrator.contexthandler;
 
+import gov.samhsa.ds4ppilot.orchestrator.dto.XacmlRequest;
+import gov.samhsa.ds4ppilot.orchestrator.dto.XacmlResponse;
 import gov.va.ehtac.ds4p.ws.EnforcePolicyResponse.Return;
 import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xspasubject;
 import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource;
@@ -42,4 +44,12 @@ public interface ContextHandler {
 	 * @return the result of the enforce policy request
 	 */
 	public Return enforcePolicy(Xspasubject xspasubject, Xsparesource xsparesource);
+	
+	/**
+	 * Enforce policy.
+	 *
+	 * @param xacmlRequest the xacml request
+	 * @return the xacml response
+	 */
+	public XacmlResponse enforcePolicy(XacmlRequest xacmlRequest);
 }

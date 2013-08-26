@@ -48,7 +48,7 @@ public class ProviderServiceTest extends ProviderServiceTestBase {
 		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
 		when(mockProviderRepository.findOne(anyString())).thenReturn(new Provider("9999", "Individual",formatter.format(d), formatter.format(d)));
 		when(mockProviderRepository.findAllByProviderGenderCodeLikeAndProviderBusinessPracticeLocationAddressPostalCodeLikeAndTaxonomyLikeAndProviderBusinessPracticeLocationAddressTelephoneNumberLikeAndProviderLastNameLikeAndProviderFirstNameLikeAndEntityTypeLikeAndProviderOrganizationNameLike("m", "12345%", "general%", "%", "%", "%", "%", "%")).thenReturn(postalCodeReturn());		
-		when(mockProviderRepository.findAllByProviderGenderCodeLikeAndProviderBusinessPracticeLocationAddressStateNameAndProviderBusinessPracticeLocationAddressCityNameAndTaxonomyLikeAndProviderBusinessPracticeLocationAddressTelephoneNumberLikeAndProviderLastNameLikeAndProviderFirstNameLikeAndEntityTypeLikeAndProviderOrganizationNameLike("f", "pa", "york", "substance abuse%", "%", "%", "%", "%", "%")).thenReturn(cityStateReturn());
+		when(mockProviderRepository.findAllByProviderGenderCodeLikeAndProviderBusinessPracticeLocationAddressStateNameAndProviderBusinessPracticeLocationAddressCityNameLikeAndTaxonomyLikeAndProviderBusinessPracticeLocationAddressTelephoneNumberLikeAndProviderLastNameLikeAndProviderFirstNameLikeAndEntityTypeLikeAndProviderOrganizationNameLike("f", "pa", "york", "substance abuse%", "%", "%", "%", "%", "%")).thenReturn(cityStateReturn());
 		
 		when(mockProviderMapper.map(any(Provider.class))).thenReturn(new ProviderDto("9999", "Individual", d, d));
 		when(mockProviderMapper.mapToProviderDtoList(any(List.class))).thenReturn(cityStateDtoReturn());

@@ -31,12 +31,16 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class ProviderDto.
  */
 public abstract class ProviderDto {
-	 
-    /** The npi. */
+	
+	/** The id. */
+	private long id;
+
+	/** The npi. */
     @Size(min = 3, max = 30)
     private String npi;
 
@@ -149,7 +153,54 @@ public abstract class ProviderDto {
     @Size(max = 15)
     private String username;
     
+    
+    /** The deletable. */
+    private boolean deletable;
+    
+    
+    
     /**
+     * Checks if is deletable.
+     *
+     * @return true, if is deletable
+     */
+    public boolean isDeletable() {
+		return deletable;
+	}
+
+
+	/**
+	 * Sets the deletable.
+	 *
+	 * @param deletable the new deletable
+	 */
+	public void setDeletable(boolean deletable) {
+		this.deletable = deletable;
+	}
+
+	
+	 
+    /**
+     * Gets the id.
+     *
+     * @return the id
+     */
+    public long getId() {
+		return id;
+	}
+
+
+	/**
+	 * Sets the id.
+	 *
+	 * @param id the new id
+	 */
+	public void setId(long id) {
+		this.id = id;
+	}
+
+
+	/**
      * Gets the npi.
      *
      * @return the npi

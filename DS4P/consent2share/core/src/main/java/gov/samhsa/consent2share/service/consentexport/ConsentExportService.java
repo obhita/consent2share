@@ -55,6 +55,14 @@ public abstract interface ConsentExportService {
 	String exportXACMLConsent(Long consentId);
 	
 	/**
+	 * Export xacml consent.
+	 *
+	 * @param consent the consent
+	 * @return the string
+	 */
+	String exportXACMLConsent(Consent consent);
+	
+	/**
 	 * Jaxb marshall.
 	 *
 	 * @param consentExportDto the consent export dto

@@ -61,7 +61,6 @@ public class ContextHandlerWebServiceClient {
 	public static void main(String[] args) {	
 		final EnforcePolicy.Xspasubject xspasubject = new EnforcePolicy.Xspasubject();
 		final EnforcePolicy.Xsparesource xsparesource = new EnforcePolicy.Xsparesource();
-
 		xspasubject.setSubjectPurposeOfUse("TREAT");
 		xspasubject.setSubjectLocality("2.16.840.1.113883.3.467");
 		xspasubject.setSubjectEmailAddress("leo.smith@direct.obhita-stage.org");

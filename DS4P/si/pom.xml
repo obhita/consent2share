@@ -375,6 +375,10 @@
 					<artifactId>xfire-core</artifactId>
 					<groupId>org.codehaus.xfire</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>xmlsec</artifactId>
+					<groupId>xml-security</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 

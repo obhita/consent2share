@@ -39,17 +39,17 @@ public class PatientConnectionDto {
 	private String username;
 
 	/** The individual providers. */
-	private Set<IndividualProvider> individualProviders;
+	private Set<IndividualProviderDto> individualProviders;
 	
 	/** The organizational providers. */
-	private Set<OrganizationalProvider> organizationalProviders;
+	private Set<OrganizationalProviderDto> organizationalProviders;
 
 	/**
 	 * Gets the individual providers.
 	 *
 	 * @return the individual providers
 	 */
-	public Set<IndividualProvider> getIndividualProviders() {
+	public Set<IndividualProviderDto> getIndividualProviders() {
 		return individualProviders;
 	}
 
@@ -59,7 +59,7 @@ public class PatientConnectionDto {
 	 * @param invividualProviders the new individual providers
 	 */
 	public void setIndividualProviders(
-			Set<IndividualProvider> invividualProviders) {
+			Set<IndividualProviderDto> invividualProviders) {
 		this.individualProviders = invividualProviders;
 	}
 
@@ -68,7 +68,7 @@ public class PatientConnectionDto {
 	 *
 	 * @return the organizational providers
 	 */
-	public Set<OrganizationalProvider> getOrganizationalProviders() {
+	public Set<OrganizationalProviderDto> getOrganizationalProviders() {
 		return organizationalProviders;
 	}
 
@@ -78,7 +78,7 @@ public class PatientConnectionDto {
 	 * @param organizationalProviders the new organizational providers
 	 */
 	public void setOrganizationalProviders(
-			Set<OrganizationalProvider> organizationalProviders) {
+			Set<OrganizationalProviderDto> organizationalProviders) {
 		this.organizationalProviders = organizationalProviders;
 	}
 

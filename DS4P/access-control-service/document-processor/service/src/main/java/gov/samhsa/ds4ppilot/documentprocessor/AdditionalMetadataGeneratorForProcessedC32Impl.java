@@ -40,11 +40,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The Class XdsbMetadataGeneratorImpl.
  */
 public class AdditionalMetadataGeneratorForProcessedC32Impl implements
 		AdditionalMetadataGeneratorForProcessedC32 {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AdditionalMetadataGeneratorForProcessedC32Impl.class);
 
 	/** The Constant AdditonalMetadataStylesheetForProcessedC32_Xsl_File_Name. */
 	private static final String AdditonalMetadataStylesheetForProcessedC32_Xsl_File_Name = "AdditonalMetadataStylesheetForProcessedC32.xsl";
@@ -106,7 +111,7 @@ public class AdditionalMetadataGeneratorForProcessedC32Impl implements
 					stringWriter));
 
 			String metadataXml = stringWriter.toString();
-			//System.out.println(metadataXml);
+			//LOGGER.debug(metadataXml);
 
 			inputStream.close();
 			stringWriter.close();

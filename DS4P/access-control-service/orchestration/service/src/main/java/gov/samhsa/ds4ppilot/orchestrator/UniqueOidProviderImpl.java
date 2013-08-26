@@ -2,11 +2,15 @@ package gov.samhsa.ds4ppilot.orchestrator;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The Class UniqueOidProviderImpl.
  */
 public class UniqueOidProviderImpl implements UniqueOidProvider {
-
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UniqueOidProviderImpl.class);
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -42,6 +46,6 @@ public class UniqueOidProviderImpl implements UniqueOidProvider {
 		UniqueOidProviderImpl provider = new UniqueOidProviderImpl();
 		String oid = provider.getOid();
 
-		System.out.println(oid);
+		LOGGER.debug(oid);
 	}
 }

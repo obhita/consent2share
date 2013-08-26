@@ -19,7 +19,6 @@ create unique index ix_auth_username on authorities
 
 # Section two: The following is generated from domain using JPA mapping and JSR303 validation annotations
 
-
     create table address_use_code (
         id bigint not null auto_increment,
         code varchar(250) not null,
@@ -220,6 +219,7 @@ create unique index ix_auth_username on authorities
         unsigned_pdf_consent longblob not null,
         unsigned_pdf_consent_revoke longblob,
         version integer,
+        xacml_policy_file longblob,
         legal_representative bigint,
         patient bigint,
         signed_pdf_consent bigint,
@@ -245,6 +245,7 @@ create unique index ix_auth_username on authorities
         start_date datetime,
         unsigned_pdf_consent longblob,
         unsigned_pdf_consent_revoke longblob,
+        xacml_policy_file longblob,
         legal_representative bigint,
         patient bigint,
         primary key (id, rev)
@@ -1622,4 +1623,3 @@ create unique index ix_auth_username on authorities
         foreign key (social_history_status_code) 
         references social_history_status_code (id)
 ;
-

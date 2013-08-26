@@ -1,52 +1,20 @@
 package gov.samhsa.ds4ppilot.orchestrator;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.orchestrator.audit.AuditServiceImpl;
-import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32Getter;
 import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32GetterImpl;
-import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandler;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandlerImpl;
-import gov.samhsa.ds4ppilot.orchestrator.documentprocessor.DocumentProcessor;
 import gov.samhsa.ds4ppilot.orchestrator.documentprocessor.DocumentProcessorImpl;
-import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistry;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistryImpl;
-import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepository;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepositoryImpl;
-import gov.samhsa.ds4ppilot.schema.documentprocessor.ProcessDocumentResponse;
-import gov.samhsa.ds4ppilot.schema.orchestrator.FilterC32Response;
-import gov.samhsa.ds4ppilot.schema.orchestrator.RegisteryStoredQueryResponse;
-import gov.samhsa.ds4ppilot.ws.client.XdsbRegistryWebServiceClient;
-import gov.va.ehtac.ds4p.ws.EnforcePolicy;
-import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource;
-import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xspasubject;
-import gov.va.ehtac.ds4p.ws.EnforcePolicyResponse.Return;
-
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
-import javax.activation.DataHandler;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
@@ -57,55 +25,31 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import junit.framework.Assert;
-
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.utils.EncryptionConstants;
-import org.hl7.v3.Device;
-import org.hl7.v3.Id;
-import org.hl7.v3.PRPAIN201301UV02;
-import org.hl7.v3.PRPAIN201302UV;
-import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess;
-import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject;
-import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent;
-import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent.Subject1;
-import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent.Subject1.Patient;
-import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent.Subject1.Patient.PatientPerson;
-import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent.Subject1.Patient.PatientPerson.Addr;
-import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent.Subject1.Patient.PatientPerson.BirthTime;
-import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent.Subject1.Patient.PatientPerson.Name;
-import org.hl7.v3.PatientIdentityFeedRequestType.Receiver;
-import org.hl7.v3.PatientIdentityFeedRequestType.Sender;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 public class SecuredOrchestratorImplTest {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SecuredOrchestratorImplTest.class);
 
-	private static boolean packageXdm;
-	private static String patientIdDeny;
-	private static String patientIdPermit;
-	private static String senderEmailAddress;
 	private static String reciepientEmailAddress;
-
-	private final static String PERMIT = "Permit";
 
 	@Before
 	public void setUp() {
-		patientIdPermit = "PUI100010060001";
-		patientIdDeny = "PUI100010060006";
-		packageXdm = true;
-		senderEmailAddress = "leo.smith@direct.obhita-stage.org";
 		reciepientEmailAddress = "Duane_Decouteau@direct.healthvault-stage.com";
 	}
 
@@ -225,92 +169,7 @@ public class SecuredOrchestratorImplTest {
 		assertNotNull(response);
 
 	}
-
-	@SuppressWarnings("unused")
-	private static void displayC32(String xml) {
-		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer transformer = null;
-		try {
-			transformer = tf.newTransformer();
-		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-		transformer.setOutputProperty(
-				"{http://xml.apache.org/xslt}indent-amount", "4");
-
-		Document xmlDocument = null;
-		try {
-			xmlDocument = loadXmlFrom(xml);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		try {
-			transformer.transform(new DOMSource(xmlDocument), new StreamResult(
-					new OutputStreamWriter(System.out, "UTF-8")));
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("\n\n\r");
-	}
-
-	/**
-	 * @param c32Response
-	 * @throws IOException
-	 * @throws FileNotFoundException
-	 */
-	private void writePackageToFile(FilterC32Response c32Response)
-			throws IOException, FileNotFoundException {
-
-		byte[] bytes = c32Response.getFilteredStreamBody();
-
-		FileOutputStream fos = new FileOutputStream("xdm.zip");
-		try {
-			fos.write(bytes);
-		} finally {
-			fos.close();
-		}
-	}
-
-	private String getXmlFromXmlFile(String xmlFileNameInResources) {
-		InputStream in = null;
-		BufferedReader br = null;
-		StringBuilder c32Document = new StringBuilder();
-
-		try {
-			in = Thread.currentThread().getContextClassLoader()
-					.getResourceAsStream(xmlFileNameInResources);
-
-			br = new BufferedReader(new InputStreamReader(in));
-
-			String line;
-			while ((line = br.readLine()) != null) {
-				c32Document.append(line);
-			}
-		} catch (IOException e) {
-			throw new DS4PException(e.toString(), e);
-		} finally {
-			try {
-				br.close();
-				in.close();
-			} catch (IOException e) {
-				// do nothing here
-			}
-		}
-
-		return c32Document.toString();
-	}
-
+	
 	private String decryptDocument(byte[] processDocBytes,
 			byte[] kekEncryptionKeyBytes, byte[] kekMaskingKeyBytes) {
 
@@ -387,8 +246,7 @@ public class SecuredOrchestratorImplTest {
 			processedDocString = converXmlDocToString(processedDoc);
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.debug(e.toString(),e);
 		}
 
 		return processedDocString;
@@ -424,6 +282,7 @@ public class SecuredOrchestratorImplTest {
 		return xmlString;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T> T unmarshallFromXml(Class<T> clazz, String xml)
 			throws JAXBException {
 		JAXBContext context = JAXBContext.newInstance(clazz);

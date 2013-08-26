@@ -52,7 +52,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hl7.v3.Device;
 import org.hl7.v3.Id;
@@ -72,10 +72,14 @@ import org.hl7.v3.PatientIdentityFeedRequestType.Sender;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 public class OrchestratorImplTest {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorImplTest.class);
 
 	private static boolean packageXdm;
 	private static String patientIdDeny;
@@ -390,7 +394,7 @@ public class OrchestratorImplTest {
 		try {
 			addPatientResponse = xdsService
 					.addPatientRegistryRecord(prpain201301uv02);
-			System.out.println("Run patientRegistryRecordRevised");
+			LOGGER.debug("Run patientRegistryRecordRevised");
 
 			addr.setCity("DC");
 
@@ -555,7 +559,7 @@ public class OrchestratorImplTest {
 		// Act
 		boolean result = sut.saveDocumentSetToXdsRepository(c32Xml);
 
-		System.out.println(result);
+		LOGGER.debug(Boolean.toString(result));
 	}
 
 	@Test
@@ -578,8 +582,7 @@ public class OrchestratorImplTest {
 		try {
 			transformer = tf.newTransformer();
 		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.debug(e.toString(),e);
 		}
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
 		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -592,21 +595,18 @@ public class OrchestratorImplTest {
 		try {
 			xmlDocument = loadXmlFrom(xml);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.debug(e.toString(),e);
 		}
 
 		try {
 			transformer.transform(new DOMSource(xmlDocument), new StreamResult(
 					new OutputStreamWriter(System.out, "UTF-8")));
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.debug(e.toString(),e);
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.debug(e.toString(),e);
 		}
-		System.out.println("\n\n\r");
+		LOGGER.debug("\n\n\r");
 	}
 
 	private static Document loadXmlFrom(String xml) throws Exception {

@@ -1,45 +1,162 @@
 <!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"	xmlns:th="http://www.thymeleaf.org">
 
-<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/common :: headerFragment">
+	<!-- title needs to be dynamic -->
+	<title>Resource Not Found</title>
+	
+	<!-- START: Meta -->
+	<meta charset="utf-8" />
+	<meta name="description" content="Consent Management System" />
+	<meta name="author" content="FEiSystems" />
+	<!-- END: Meta -->
+	
+	<!-- START: Mobile Specific -->
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- END: Mobile Specific -->
+	
+	<!-- START: CSS -->
+	<link id="bootstrap-style" href="../../resources/css/bootstrap.css" rel="stylesheet"/>
+	<link href="../../resources/css/bootstrap-responsive.min.css" rel="stylesheet"/>
+	<link href="../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
+	<link href="../../resources/css/sentinel-style.css" rel="stylesheet"/>
+	<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
+	<link href="../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+	<!-- END: CSS -->
 
-<head>
-<meta charset="utf-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-
-<title>HTML5 Spring Roo Thymeleaf Demo</title>
-<meta name="description" content="HTML5 Spring Roo Thymeleaf Demo Contact Form" />
-<meta name="author" content="see humans.txt"/>
-
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-
-<link rel="stylesheet" href="../../css/style.css" th:href="@{/css/style.css}"/>
-
-<script src="../../js/libs/modernizr-2.0.6.min.js" th:src="@{/js/libs/modernizr-2.0.6.min.js}"></script>
 </head>
 
 <body>
-	<div id="container">
-		<header>
-            <h1>HTML5 Spring Roo Thymeleaf Demo</h1>
-            <hr />
-		</header>
-        
-            <h2 class="error" th:text="#{exception_resource_not_found_message}">Resource Not Found...</h2>           
-
-		<footer>
-            <hr />
-            <h2>Footer</h2>
+	
+<div id="connections-main" class="container-fluid">
+	
+	<!-- START: header Region -->
+		<div class="navbar" role="navigation">
+			<div class="navbar-inner-header">
+				<div class="container-fluid">
+					<a class="btn btn-navbar" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</a>
+					
+					<h1><span class="nav-title">Resource Not Found</span></h1>
+					
+					<a class="brand" th:href="@{/index.html}"  href="index.html"> 
+						<span id="brand-gray"></span>
+						<div id="brand-circle"><span id="brand-blue-2"></span></div>
+						<span id="brand-blue"></span>
+					</a>
+					
+					<!-- if session is still valid, show links on header region -->
+			
+					<div th:if="${currentUser}" class="btn-group pull-right" > <!-- session.user -->
+						<a class="btn" href="#">
+							<span class="icon-envelope"></span>
+							<span class="hidden-phone hidden-tablet"> Message Center</span> 
+							<span class="label label-warning hidden-phone">3</span> 
+						</a>
+	
+						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+							<span class="icon-user"></span>
+							<span class="hidden-phone hidden-tablet"> My Account</span>
+							<span class="caret"></span>
+						</a>
+						
+						<ul role="menu" class="dropdown-menu">
+							<li role="menuitem"><a href="#">My Profile</a></li>
+							<li role="menuitem" aria-disabled="true" class="divider"></li>
+							<li role="menuitem"><a href="login.html">Logout</a></li>
+						</ul>
+					</div>		
+							
+				</div>
+			</div>
+		</div>
+	<!-- end: header Region -->
+		
+	<!-- show side menu, msg and link for previous page if session is still valid, else show msg and link to login page -->
+	<div>			
+        <!--  
+            <h2 class="error" th:text="#{exception_uncaught_exception_message}">An Uncaught Exception Occurred...</h2>           
+		-->
+		<!-- <div th switch=" {#authentication}?  {#authorization.expression('isAuthenticated()')} :  {false}"> --> <!-- session.user currentUser -->
+		<div th:switch="${true}"> 
+		<span th:case="${true}">   <!-- session.user currentUser -->
+			<!-- START: Side Nav Menu -->
+				<div class="span2 main-menu-span">
+					<div class="nav-collapse sidebar-nav">
+						<ul role="menu" class="nav nav-tabs nav-stacked main-menu">
+							<li role="menuitem" class="nav-header hidden-tablet"></li>
+							<li role="menuitem"><a th:href="@{/index.html}"><div class="icon-home"></div><span class="hidden-tablet"> My Home</span></a></li>
+							<li role="menuitem"><a th:href="@{/consents/listConsents.html}"><div class="icon-file"></div><span class="hidden-tablet"> My Consents</span></a></li>
+							<li role="menuitem"><a th:href="@{/patients/connectionMain.html}"><div class="icon-random "></div><span class="hidden-tablet"> My Providers </span></a></li>
+							<li role="menuitem"><a th:href="@{/patients/profile.html}"><div class="icon-user"></div><span class="hidden-tablet"> My Profile</span></a></li>
+							<li role="menuitem"><a th:href="@{/inbox/inboxMain.html}"><div class="icon-inbox"></div><span class="hidden-tablet"> Message Center</span></a></li>
+							<li role="menuitem"><a th:href="@{/patients/activityHistory.html}"><div class="icon-time"></div><span class="hidden-tablet"> Activity History</span></a></li>
+							<li role="menuitem"><a th:href="@{/patients/medicalinfo.html}"><div class="icon-folder-open"></div><span class="hidden-tablet"> My Medical Information</span></a></li>
+						</ul>
+					</div>
+				</div>
+			<!-- END: Side Nav Menu -->
+	
+			<div role="main" class="span10">			
+			<div class="row-fluid">
+			<div id="tour-trigger-area" class="span10">
+				<section class="top-margin10">
+                    <fieldset class="row-fluid">
+					    <legend> Resource Not Found! </legend> 
+					    <label> Please try again later ...... </label> 
+						<button class="btn btn-primary" onClick="javascript:history.go(-1);" style="margin: 0 10px 10px 0;">Back to previous Page</button>
+						<p th:if="${error}" th:text="${error}">No error</p>
+			        	<p th:if="${errorMessage}" th:utext="${errorMessage}">No Error Message</p>
+			    	</fieldset>
+		    	</section>
+	    	</div>
+	    	</div>
+	    	</div>
+	    </span>
+	    
+	    <span th:case="*"> 
+			<div class="row-fluid main-content-wrapper"> 
+				<table align="center" width="%100">
+				<tr>
+				<td>
+				    <legend> Resource Not Found! </legend> 
+				    <label> Please try again later...... </label> 
+					<p th:if="${error}" th:text="${error}">No error</p>
+		        	<p th:if="${errorMessage}" th:utext="${errorMessage}">No Error Message</p>
+			    </td>
+			    </tr>
+			    </table>
+			</div>
+		</span>
+		</div>
+		    
+	</div> 
+	
+	<!-- START: Footer Region -->
+		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
+			<!-- COMPONENT: Copyright Information -->
+			<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
 		</footer>
-	</div>
-	<!-- end of #container -->
-    
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-	<script>
-		/*<![CDATA[*/
-		      window.jQuery || 
-		          document.write('<script src="../../js/libs/jquery-1.6.2.min.js th:src="@{/js/libs/jquery-1.6.2.min.js}"><\/script>')   
-		/*]]>*/
-	</script>
+    <!-- END: Footer Region -->
 
+</div> <!-- end connections-main -->
+    
+<!-- START: JavaScript-->
+	<script type="text/javascript" th:src="@{/resources/js/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/resources/js/jquery.toggle.buttons.js}"></script>
+	<script type="text/javascript" th:src="@{/resources/js/jquery.joyride-2.0.3.js}"></script>
+	<script type="text/javascript" th:src="@{/resources/js/jquery.cookie.js}"></script>
+	<script type="text/javascript" th:src="@{/resources/js/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/resources/js/bootstrap-datepicker.js}"></script>
+	<script type="text/javascript" th:src="@{/resources/js/bootstrap-popover.js}"></script>
+	<script type="text/javascript" th:src="@{/resources/js/bootstrap-tooltip.js}"></script>
+	<script type="text/javascript" th:src="@{/resources/js/modernizr.mq.js}"></script>
+	<script type="text/javascript" th:src="@{/resources/js/formatParser.js}"></script>
+<!-- end JavaScript -->
+		
 </body>
 </html>

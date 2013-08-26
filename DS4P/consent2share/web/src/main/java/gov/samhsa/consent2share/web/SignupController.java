@@ -26,9 +26,11 @@
 package gov.samhsa.consent2share.web;
 
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
+import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.TokenExpiredException;
 import gov.samhsa.consent2share.infrastructure.security.TokenNotExistException;
+import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
 import gov.samhsa.consent2share.service.account.AccountService;
 import gov.samhsa.consent2share.service.account.AccountVerificationService;
@@ -45,6 +47,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -72,6 +76,10 @@ public class SignupController extends AbstractController {
 	
 	/** The field validator. */
 	private FieldValidator fieldValidator;
+	
+	/** The user context. */
+	@Autowired
+	UserContext userContext;
 
 	/**
 	 * Instantiates a new signup controller.
@@ -159,6 +167,7 @@ public class SignupController extends AbstractController {
 
 		String linkUrl = getServletUrl(request);
 		accountService.signup(signupDto, linkUrl.toString());
+		SecurityContextHolder.clearContext();
 		
 		model.addAttribute("tokenSuccess", true);
 		return "views/signupVerification";

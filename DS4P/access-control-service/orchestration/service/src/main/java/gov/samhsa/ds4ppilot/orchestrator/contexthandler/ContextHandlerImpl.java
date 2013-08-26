@@ -25,6 +25,17 @@
  ******************************************************************************/
 package gov.samhsa.ds4ppilot.orchestrator.contexthandler;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.List;
+
+import org.herasaf.xacml.core.context.impl.RequestType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import gov.samhsa.ds4ppilot.orchestrator.dto.XacmlRequest;
+import gov.samhsa.ds4ppilot.orchestrator.dto.XacmlResponse;
 import gov.samhsa.schemas.client.ContextHandlerWebServiceClient;
 import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource;
 import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xspasubject;
@@ -38,6 +49,16 @@ public class ContextHandlerImpl implements ContextHandler {
 	/** The endpoint address. */
 	private String endpointAddress;
 	
+	/** The request generator. */
+	private RequestGenerator requestGenerator;
+	
+	/** The policy desicion point. */
+	@Autowired
+	private PolicyDecisionPoint policyDesicionPoint;
+	
+	/** The Constant LOGGER. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(ContextHandlerImpl.class);
+	
 	/**
 	 * Instantiates a new context handler implementation.
 	 *
@@ -47,6 +68,17 @@ public class ContextHandlerImpl implements ContextHandler {
 		this.endpointAddress = endpointAddress;
 	}
 	
+	/**
+	 * Instantiates a new context handler impl.
+	 *
+	 * @param policyDesicionPoint the policy desicion point
+	 * @param requestGenerator the request generator
+	 */
+	public ContextHandlerImpl(PolicyDecisionPoint policyDesicionPoint, RequestGenerator requestGenerator) {
+		this.policyDesicionPoint = policyDesicionPoint;
+		this.requestGenerator = requestGenerator;
+	}
+	
 	/* (non-Javadoc)
 	 * @see gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandler#enforcePolicy(gov.va.ehtac.ds4p.ws.EnforcePolicy.Xspasubject, gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource)
 	 */
@@ -54,10 +86,92 @@ public class ContextHandlerImpl implements ContextHandler {
 	public Return enforcePolicy(Xspasubject xspasubject,
 			Xsparesource xsparesource) {
 		
-		ContextHandlerWebServiceClient contextHandlerWebServiceClient = new ContextHandlerWebServiceClient(endpointAddress);
-        
-        Return result = contextHandlerWebServiceClient.enforcePolicy(xspasubject, xsparesource);
-        
+//		TODO Below is existing code, disabled for demo
+//		ContextHandlerWebServiceClient contextHandlerWebServiceClient = new ContextHandlerWebServiceClient(endpointAddress);
+//        
+//        Return result = contextHandlerWebServiceClient.enforcePolicy(xspasubject, xsparesource);
+//        
+//		return result;
+		
+		/////////////////////////////////////////////////////////////
+		// TODO The code below is written for demo
+		// map recepientSubjectNPI
+		String recepientSubjectNPI = xspasubject.getSubjectId();
+		if(recepientSubjectNPI.equals("Tao.Lin@direct.healthvault-stage.com") || recepientSubjectNPI.equals("joel_amoussou@direct.healthvault-stage.com"))
+		{
+			recepientSubjectNPI = "1083949036";
+		}		
+		// map intermediarySubjectNPI
+		String intermediarySubjectNPI = "1174858088";		
+		// map purposeOfUse
+		String purposeOfUse = "TREAT";		
+		// map resourceId
+		String resourceId = xsparesource.getResourceId();
+		if(xsparesource.getResourceId().equals("PUI100010060001"))
+		{
+			resourceId = "consent2share@outlook.com";
+		}
+		RequestType req = requestGenerator.generateRequest(recepientSubjectNPI, intermediarySubjectNPI, purposeOfUse, resourceId);
+		policyDesicionPoint.deployPolicies(resourceId);
+		XacmlResponse xacmlResponse = policyDesicionPoint.evaluateRequest(req);
+		Return result = new Return();
+		String pdpDecision = xacmlResponse.getPdpDecision();
+		pdpDecision = pdpDecision.substring(0, 1).toUpperCase() + pdpDecision.substring(1).toLowerCase();
+		result.setPdpDecision(pdpDecision);
+		result.setPurposeOfUse(purposeOfUse);
+		result.setResourceId(resourceId);
+		setObligations(result, xacmlResponse.getPdpObligation());
 		return result;
+		/////////////////////////////////////////////////////////////
 	}
+	
+	/////////////////////////////////////////////////////////////
+	// TODO The code below is written for demo	
+	private void setObligations(Return result, List<String> obligations)
+	{
+		Field field = null;
+		try {
+			field = result.getClass().getDeclaredField("pdpObligation");
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		makeAccessible(field);
+		try {
+			field.set(result,obligations);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+    private void makeAccessible(Field field) {
+        if (!Modifier.isPublic(field.getModifiers()) ||
+            !Modifier.isPublic(field.getDeclaringClass().getModifiers()))
+        {
+            field.setAccessible(true);
+        }
+    }
+	/////////////////////////////////////////////////////////////
+	
+	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandler#enforcePolicy(gov.samhsa.ds4ppilot.orchestrator.dto.XacmlRequest)
+	 */
+	@Override
+	public XacmlResponse enforcePolicy(XacmlRequest xacmlRequest) {
+		policyDesicionPoint.deployPolicies(xacmlRequest.getResourceId());
+		RequestType req = requestGenerator.generateRequest(xacmlRequest.getRecepientSubjectNPI(), xacmlRequest.getIntermediarySubjectNPI(), xacmlRequest.getPurposeOfUse(), xacmlRequest.getResourceId());
+		LOGGER.debug("policyDesicionPoint.evaluateRequest(req) is getting invoked");
+		return policyDesicionPoint.evaluateRequest(req);
+	}
+	
+
+	
+
 }

@@ -5,9 +5,12 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.ws.security.WSPasswordCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerPasswordCallback implements CallbackHandler {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ServerPasswordCallback.class);
 	public void handle(Callback[] callbacks) throws IOException,
 			UnsupportedCallbackException {
 
@@ -15,8 +18,8 @@ public class ServerPasswordCallback implements CallbackHandler {
 
 			WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
 			
-			System.out.println("pc.getUsage(): " + pc.getUsage());
-			System.out.println("pc.getIdentifier(): " + pc.getIdentifier());
+			LOGGER.debug("pc.getUsage(): " + pc.getUsage());
+			LOGGER.debug("pc.getIdentifier(): " + pc.getIdentifier());
 			if (pc.getUsage() == WSPasswordCallback.SIGNATURE
 					|| pc.getUsage() == WSPasswordCallback.DECRYPT)
 				

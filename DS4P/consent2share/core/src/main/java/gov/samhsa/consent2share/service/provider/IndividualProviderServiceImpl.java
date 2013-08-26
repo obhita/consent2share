@@ -120,8 +120,11 @@ public class IndividualProviderServiceImpl implements IndividualProviderService 
 	 * @see gov.samhsa.consent2share.service.provider.IndividualProviderService#deleteIndividualProviderDto(gov.samhsa.consent2share.service.dto.IndividualProviderDto)
 	 */
 	public void deleteIndividualProviderDto(IndividualProviderDto individualProviderDto) {
+		
 		IndividualProvider individualProvider=findIndividualProviderByPatientAndNpi(patientRepository.findByUsername(individualProviderDto.getUsername()),individualProviderDto.getNpi());
+		if(individualProvider!=null)
 		individualProviderRepository.delete(individualProvider);
+		
     }
 	
 	/**

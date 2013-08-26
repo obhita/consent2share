@@ -30,6 +30,8 @@ import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32Getter;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandler;
 import gov.samhsa.ds4ppilot.orchestrator.documentprocessor.DocumentProcessor;
+import gov.samhsa.ds4ppilot.orchestrator.dto.XacmlRequest;
+import gov.samhsa.ds4ppilot.orchestrator.dto.XacmlResponse;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistry;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepository;
 import gov.samhsa.ds4ppilot.schema.documentprocessor.ProcessDocumentResponse;
@@ -96,6 +98,8 @@ import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.Regis
 import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent.Subject1.Patient.PatientPerson.Name;
 import org.hl7.v3.PatientIdentityFeedRequestType.Receiver;
 import org.hl7.v3.PatientIdentityFeedRequestType.Sender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 /**
@@ -144,18 +148,22 @@ public class OrchestratorImpl implements Orchestrator {
 
 	/** The resource action. */
 	private String resourceAction; // = "Execute";
+	
+	/** The home community id. */
+	private String homeCommunityId;
+	
+	/** The Constant LOGGER. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorImpl.class);
 
 	/**
 	 * Instantiates a new orchestrator impl.
-	 * 
-	 * @param contextHandler
-	 *            the context handler
-	 * @param c32Getter
-	 *            the C32 getter
-	 * @param documentProcessor
-	 *            the document processor
-	 * @param dataHandlerToBytesConverter
-	 *            the data handler to bytes converter
+	 *
+	 * @param contextHandler the context handler
+	 * @param c32Getter the C32 getter
+	 * @param documentProcessor the document processor
+	 * @param dataHandlerToBytesConverter the data handler to bytes converter
+	 * @param xdsbRepository the xdsb repository
+	 * @param xdsbRegistry the xdsb registry
 	 */
 	public OrchestratorImpl(ContextHandler contextHandler, C32Getter c32Getter,
 			DocumentProcessor documentProcessor,
@@ -235,7 +243,77 @@ public class OrchestratorImpl implements Orchestrator {
 
 		return c32Response;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.ds4ppilot.orchestrator.Orchestrator#handleC32Request(java.
+	 * lang.String, boolean, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public FilterC32Response handleC32Request(String recepientSubjectNPI,
+			String intermediarySubjectNPI,
+			String resourceId, boolean packageAsXdm, String senderEmailAddress, String recipientEmailAddress, String xdsDocumentEntryUniqueId) {
+		StringWriter xacmlResponseXml = new StringWriter();
+		byte[] processedPayload;
+		FilterC32Response c32Response = new FilterC32Response();
+		c32Response.setPatientId(resourceId);
 
+		XacmlResponse xacmlResponse = null;
+		XacmlRequest xacmlRequest = null;
+		try {
+			
+			xacmlRequest = setXacmlRequest(recepientSubjectNPI, intermediarySubjectNPI, subjectPurposeOfUse, resourceId, UUID.randomUUID().toString());
+			xacmlResponse = contextHandler.enforcePolicy(xacmlRequest);
+			
+		} catch (Exception e) {
+			throw new DS4PException(e.toString(), e);
+		}
+
+		c32Response.setPdpDecision(xacmlResponse.getPdpDecision());
+
+		if (xacmlResponse.getPdpDecision().toLowerCase().equals(PERMIT.toLowerCase())) {
+			
+			String originalC32 = c32Getter.getC32(resourceId);
+
+			try {
+				XacmlResult xacmlResult = getXacmlResponse(xacmlRequest, xacmlResponse);
+
+				JAXBContext jaxbContext = JAXBContext
+						.newInstance(XacmlResult.class);
+				Marshaller marshaller = jaxbContext.createMarshaller();
+				marshaller.setProperty("com.sun.xml.bind.xmlDeclaration",
+						Boolean.FALSE);
+				marshaller.marshal(xacmlResult, xacmlResponseXml);
+
+				ProcessDocumentResponse processDocumentResponse = documentProcessor
+						.processDocument(originalC32,
+								xacmlResponseXml.toString(), packageAsXdm,
+								true, senderEmailAddress, recipientEmailAddress, xdsDocumentEntryUniqueId);
+
+				processedPayload = dataHandlerToBytesConverter
+						.toByteArray(processDocumentResponse
+								.getProcessedDocument());
+
+				c32Response.setMaskedDocument(processDocumentResponse
+						.getMaskedDocument());
+				c32Response.setFilteredStreamBody(processedPayload);
+			} catch (PropertyException e) {
+				throw new DS4PException(e.toString(), e);
+			} catch (JAXBException e) {
+				throw new DS4PException(e.toString(), e);
+			} catch (IOException e) {
+				throw new DS4PException(e.toString(), e);
+			}
+		}
+
+		return c32Response;
+	}
+
+	/* (non-Javadoc)
+	 * @see gov.samhsa.ds4ppilot.orchestrator.Orchestrator#saveDocumentSetToXdsRepository(java.lang.String)
+	 */
 	@Override
 	public boolean saveDocumentSetToXdsRepository(String documentSet) {
 
@@ -403,7 +481,7 @@ public class OrchestratorImpl implements Orchestrator {
 
 			// TODO: Check the result here to see if the CA code is return. If
 			// not throws exception
-			//System.out.println(result);
+			//LOGGER.debug(result);
 		}
 
 		String metadataString = new XdsbMetadataGeneratorImpl(
@@ -417,11 +495,10 @@ public class OrchestratorImpl implements Orchestrator {
 			submitObjectRequest = unmarshallFromXml(SubmitObjectsRequest.class,
 					metadataString);
 		} catch (JAXBException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOGGER.debug(e1.toString(),e1);
 		}
 
-		//System.out.println(metadataString);
+		//LOGGER.debug(metadataString);
 
 		String documentId = null;
 
@@ -461,8 +538,7 @@ public class OrchestratorImpl implements Orchestrator {
 			documentId = xpath.evaluate(xpathForDocumentId, document);
 
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOGGER.debug(e1.toString(),e1);
 		}
 
 		Document document = new Document();
@@ -479,10 +555,9 @@ public class OrchestratorImpl implements Orchestrator {
 					.provideAndRegisterDocumentSetRequest(request);
 
 			/*try {
-				System.out.println(marshall(registryResponse));
+				LOGGER.debug(marshall(registryResponse));
 			} catch (Throwable e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.debug(e.toString(),e);
 			}*/
 
 			RegistryErrorList registryErrorList = registryResponse
@@ -500,6 +575,9 @@ public class OrchestratorImpl implements Orchestrator {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see gov.samhsa.ds4ppilot.orchestrator.Orchestrator#retrieveDocumentSetRequest(java.lang.String, java.lang.String, java.lang.String, java.lang.String, gov.va.ehtac.ds4p.ws.EnforcePolicy)
+	 */
 	@Override
 	public RetrieveDocumentSetResponse retrieveDocumentSetRequest(
 			String homeCommunityId, String repositoryUniqueId,
@@ -543,7 +621,7 @@ public class OrchestratorImpl implements Orchestrator {
 						.getDocumentResponse().get(0);
 				byte[] rawDocument = documentResponse.getDocument();
 				String originalDocument = new String(rawDocument);
-				// System.out.println(originalC32);
+				// LOGGER.debug(originalC32);
 
 				if (!isConsentDocument(originalDocument)) {
 					ProcessDocumentResponse processDocumentResponse = documentProcessor
@@ -558,7 +636,7 @@ public class OrchestratorImpl implements Orchestrator {
 									.getProcessedDocument());
 					// get processed document
 					String processedDocument = new String(processedPayload);
-					// System.out.println("processedDoc: " + processedDocument);					
+					// LOGGER.debug("processedDoc: " + processedDocument);					
 					// set processed document in payload
 					DocumentResponse document = new DocumentResponse();
 					document.setDocument(processedDocument.getBytes());
@@ -602,6 +680,9 @@ public class OrchestratorImpl implements Orchestrator {
 		return retrieveDocumentSetResponse;
 	}
 
+	/* (non-Javadoc)
+	 * @see gov.samhsa.ds4ppilot.orchestrator.Orchestrator#registeryStoredQueryRequest(java.lang.String, gov.va.ehtac.ds4p.ws.EnforcePolicy)
+	 */
 	@Override
 	public RegisteryStoredQueryResponse registeryStoredQueryRequest(
 			String patientId, EnforcePolicy enforcePolicy) {
@@ -796,10 +877,31 @@ public class OrchestratorImpl implements Orchestrator {
 	 */
 	public void setResourceAction(String resourceAction) {
 		this.resourceAction = resourceAction;
+	}	
+
+	/**
+	 * Gets the home community id.
+	 *
+	 * @return the home community id
+	 */
+	public String getHomeCommunityId() {
+		return homeCommunityId;
 	}
 
 	/**
-	 * @return
+	 * Sets the home community id.
+	 *
+	 * @param homeCommunityId the new home community id
+	 */
+	public void setHomeCommunityId(String homeCommunityId) {
+		this.homeCommunityId = homeCommunityId;
+	}
+
+	/**
+	 * Sets the xspa resource.
+	 *
+	 * @param patientId the patient id
+	 * @return the enforce policy. xsparesource
 	 */
 	public EnforcePolicy.Xsparesource setXspaResource(String patientId) {
 		EnforcePolicy.Xsparesource xsparesource = new EnforcePolicy.Xsparesource();
@@ -811,7 +913,11 @@ public class OrchestratorImpl implements Orchestrator {
 	}
 
 	/**
-	 * @return
+	 * Sets the xspa subject.
+	 *
+	 * @param recipientEmailAddress the recipient email address
+	 * @param messageId the message id
+	 * @return the enforce policy. xspasubject
 	 */
 	public EnforcePolicy.Xspasubject setXspaSubject(
 			String recipientEmailAddress, String messageId) {
@@ -824,6 +930,30 @@ public class OrchestratorImpl implements Orchestrator {
 		xspasubject.setOrganizationId(organizationId);
 		xspasubject.setMessageId(messageId);
 		return xspasubject;
+	}
+	
+	/**
+	 * Sets the xacml request.
+	 *
+	 * @param recepientSubjectNPI the recepient subject npi
+	 * @param intermediarySubjectNPI the intermediary subject npi
+	 * @param purposeOfUse the purpose of use
+	 * @param resourceId the resource id
+	 * @param messageId the message id
+	 * @return the xacml request
+	 */
+	public XacmlRequest setXacmlRequest(String recepientSubjectNPI,
+			String intermediarySubjectNPI, String purposeOfUse,
+			String resourceId, String messageId)
+	{
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
+		xacmlRequest.setPurposeOfUse(purposeOfUse);
+		xacmlRequest.setRecepientSubjectNPI(recepientSubjectNPI);
+		xacmlRequest.setResourceId(resourceId);
+		xacmlRequest.setMessageId(messageId);
+		xacmlRequest.setHomeCommunityId(homeCommunityId);
+		return xacmlRequest;
 	}
 
 	/**
@@ -842,7 +972,31 @@ public class OrchestratorImpl implements Orchestrator {
 		xacmlResult.setSubjectPurposeOfUse(result.getPurposeOfUse());
 		return xacmlResult;
 	}
+	
+	/**
+	 * Gets the xacml response.
+	 *
+	 * @param xacmlRequest the xacml request
+	 * @param xacmlResponse the xacml response
+	 * @return the xacml response
+	 */
+	private XacmlResult getXacmlResponse(XacmlRequest xacmlRequest, XacmlResponse xacmlResponse) {
+		XacmlResult xacmlResult = new XacmlResult();
+		xacmlResult.setHomeCommunityId(xacmlRequest.getHomeCommunityId());
+		xacmlResult.setMessageId(xacmlRequest.getMessageId());
+		xacmlResult.setPdpDecision(xacmlResponse.getPdpDecision());
+		xacmlResult.setPdpObligations(xacmlResponse.getPdpObligation());
+		xacmlResult.setSubjectPurposeOfUse(xacmlRequest.getPurposeOfUse());
+		return xacmlResult;
+	}
 
+	/**
+	 * Marshall.
+	 *
+	 * @param obj the obj
+	 * @return the string
+	 * @throws Throwable the throwable
+	 */
 	private static String marshall(Object obj) throws Throwable {
 		final JAXBContext context = JAXBContext.newInstance(obj.getClass());
 		Marshaller marshaller = context.createMarshaller();
@@ -853,6 +1007,16 @@ public class OrchestratorImpl implements Orchestrator {
 		return stringWriter.toString();
 	}
 
+	/**
+	 * Unmarshall from xml.
+	 *
+	 * @param <T> the generic type
+	 * @param clazz the clazz
+	 * @param xml the xml
+	 * @return the t
+	 * @throws JAXBException the jAXB exception
+	 */
+	@SuppressWarnings("unchecked")
 	private static <T> T unmarshallFromXml(Class<T> clazz, String xml)
 			throws JAXBException {
 		JAXBContext context = JAXBContext.newInstance(clazz);
@@ -861,6 +1025,13 @@ public class OrchestratorImpl implements Orchestrator {
 		return (T) um.unmarshal(input);
 	}
 
+	/**
+	 * Load xml from.
+	 *
+	 * @param xml the xml
+	 * @return the org.w3c.dom. document
+	 * @throws Exception the exception
+	 */
 	private static org.w3c.dom.Document loadXmlFrom(String xml)
 			throws Exception {
 		InputSource is = new InputSource(new StringReader(xml));
@@ -872,6 +1043,12 @@ public class OrchestratorImpl implements Orchestrator {
 		return document;
 	}
 
+	/**
+	 * Gets the response with latest document entries for consent and nonconsent.
+	 *
+	 * @param adhocQueryResponse the adhoc query response
+	 * @return the response with latest document entries for consent and nonconsent
+	 */
 	private static AdhocQueryResponse getResponseWithLatestDocumentEntriesForConsentAndNonconsent(
 			AdhocQueryResponse adhocQueryResponse) {
 		int documentEntryCount = adhocQueryResponse.getRegistryObjectList()
@@ -985,15 +1162,20 @@ public class OrchestratorImpl implements Orchestrator {
 		}
 
 		/*try {
-			System.out.println(marshall(adhocQueryResponse));
+			LOGGER.debug(marshall(adhocQueryResponse));
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.debug(e.toString(),e);
 		}*/
 
 		return adhocQueryResponse;
 	}
 
+	/**
+	 * Checks if is consent document.
+	 *
+	 * @param originalDocument the original document
+	 * @return true, if is consent document
+	 */
 	private boolean isConsentDocument(String originalDocument) {
 		boolean consentDocumentExists = false;
 
@@ -1043,6 +1225,12 @@ public class OrchestratorImpl implements Orchestrator {
 		return consentDocumentExists;
 	}
 
+	/**
+	 * Patient exists in registy before adding.
+	 *
+	 * @param responseOfAddPatient the response of add patient
+	 * @return true, if successful
+	 */
 	public static boolean patientExistsInRegistyBeforeAdding(
 			String responseOfAddPatient) {
 

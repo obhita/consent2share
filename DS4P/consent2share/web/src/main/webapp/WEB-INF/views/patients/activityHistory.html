@@ -4,7 +4,7 @@
 <head th:include="fragment/common :: headerFragment">
 <meta charset="utf-8" />
 <!-- title needs to be dynamic -->
-<title>My Connections</title>
+<title>Activity History</title>
 <meta name="description" content="Consent Management System" />
 <meta name="author" content="FEiSystems" />
 <!-- END: Meta -->
@@ -54,7 +54,6 @@
 				<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
 
 				<!-- COMPONENT: Header Menu-->
-
 				<div class="btn-group pull-right" >
 					<a class="btn" href="#">
 						<span class="icon-envelope"></span><span class="hidden-phone hidden-tablet"> Message Center</span> 
@@ -66,17 +65,17 @@
 				<!-- COMPONENT: User Dropdown -->
 
 					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-						<span class="icon-user"></span><span class="hidden-phone hidden-tablet"> My Account</span>
+						<span class="icon-user">&nbsp;</span><span class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span>
 						<span class="caret"></span>
 					</a>
 					
 					<ul role="menu" class="dropdown-menu">
-						<li role="menuitem"><a href="#">My Profile</a></li>
+						<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_my_profile}">My Profile</a></li>
 						<li role="menuitem" aria-disabled="true" class="divider"></li>
-						<li role="menuitem"><a href="login.html">Logout</a></li>
+						<li role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" th:text="#{header_logout}">Logout</a></li>
 					</ul>
 		
-				</div>				
+				</div>	
 			</div>
 		</div>
 	</div>
@@ -92,7 +91,7 @@
 					<li class="nav-header hidden-tablet" role="menuitem"></li>
 					<li role="menuitem"><a href="home.html"><div class="icon-home"></div><span class="hidden-tablet"> My Home</span></a></li>
 
-					<li role="menuitem"><a href="../consent/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div><span class="hidden-tablet"> My Consents</span></a></li>
+					<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div><span class="hidden-tablet"> My Consents</span></a></li>
 							
 					<li  role="menuitem"><a href="connectionMain.html"><div class="icon-random "></div><span class="hidden-tablet"> My Providers </span></a></li>
 							
@@ -219,12 +218,13 @@
 
 	<!-- START: JavaScript-->
 
+				
 		<script src="../../../resources/js/jquery.min.js" 
 				th:src="@{/resources/js/jquery.min.js}" 
 				type="text/javascript">
 		</script><noscript>Alternate content for script</noscript>
 		<script src="../../../resources/js/bootstrap.min.js"
-				th:src="@{/resources/js/jquery.min.js}" 
+				th:src="@{/resources/js/bootstrap.min.js}" 
 				type="text/javascript"></script><noscript>Alternate content for script</noscript>
 		<script src="../../../resources/js/jquery.toggle.buttons.js"
 				th:src="@{/resources/js/jquery.toggle.buttons.js}" 

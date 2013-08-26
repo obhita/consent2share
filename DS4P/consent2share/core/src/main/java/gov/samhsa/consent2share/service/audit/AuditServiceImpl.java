@@ -130,10 +130,12 @@ public class AuditServiceImpl implements AuditService {
 
 		if (patientRevisionEntity.getUsername() != null) {
 			String username1 = patientRevisionEntity.getUsername();
+			if(patientRepository.findByUsername(username1)!=null){
 			Patient patientA1 = patientRepository.findByUsername(username1);
 			String changedBy = patientA1.getLastName() + ",   "
 					+ patientA1.getFirstName();
 			hd.setChangedBy(changedBy);
+			}
 		}
 
 		Long timestamp = patientRevisionEntity.getTimestamp();

@@ -1,5 +1,6 @@
 package gov.samhsa.consent2share.web;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -38,6 +39,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +53,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 /**
@@ -136,7 +143,7 @@ public class ConsentControllerTest {
 		 mockMvc.perform(get("/consents/listConsents.html?emailsent=true"))
          	.andExpect(status().isOk())
          	.andExpect(model().attribute("emailSent","true"))
-         	.andExpect(view().name("views/consent/listConsents"));
+         	.andExpect(view().name("views/consents/listConsents"));
 	}
 	
 	@Test
@@ -144,7 +151,7 @@ public class ConsentControllerTest {
 		mockMvc.perform(get("/consents/listConsents.html"))
      	.andExpect(status().isOk())
      	.andExpect(model().attribute("emailSent","false"))
-     	.andExpect(view().name("views/consent/listConsents"));
+     	.andExpect(view().name("views/consents/listConsents"));
 	}
 	
 	/**
@@ -224,7 +231,7 @@ public class ConsentControllerTest {
 	public void testDeleteConsent_when_authentication_fails() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(false);
 		mockMvc.perform(get("/consents/deleteConsents/2"))
-			.andExpect(view().name("views/resourceNotFound"));
+			.andExpect(view().name("redirect:/consents/listConsents.html"));
 		verify(consentService,never()).deleteConsent(anyLong());
 	}
 	
@@ -303,7 +310,7 @@ public class ConsentControllerTest {
 			.andExpect(model().attribute("sensitivityPolicy", sensitivityPolicyDto))
 			.andExpect(model().attribute("purposeOfUse", purposeOfUseDto))
 			.andExpect(model().attribute("organizationalProvidersDto", organizationalProvidersDto))
-			.andExpect(view().name("views/consent/addConsent"));
+			.andExpect(view().name("views/consents/addConsent"));
 		
 	}
 	
@@ -397,5 +404,35 @@ public class ConsentControllerTest {
 		.andExpect(status().isOk());
 		
 		verify(consentExportService,never()).exportCDAR2Consent((long)1);
+	}
+	
+	@Test
+	public void testAjaxCheckConsentStatus_when_consent_was_signed() throws Exception{
+				
+		List<ConsentListDto> consentListDtos=new ArrayList<ConsentListDto>();
+		ConsentListDto consentListDto=mock(ConsentListDto.class);
+		consentListDtos.add(consentListDto);
+		
+		when(consentListDto.getId()).thenReturn((long)2);
+		when(consentListDto.getConsentStage()).thenReturn(2);
+		
+		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreSignList=2"))
+		.andExpect(status().isOk());	
+			
+	}
+	
+	@Test
+	public void testAjaxCheckConsentStatus_when_consent_not_signed() throws Exception{
+				
+		List<ConsentListDto> consentListDtos=new ArrayList<ConsentListDto>();
+		ConsentListDto consentListDto=mock(ConsentListDto.class);
+		consentListDtos.add(consentListDto);
+		
+		when(consentListDto.getId()).thenReturn((long)2);
+		when(consentListDto.getConsentStage()).thenReturn(1);
+		
+		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreSignList=2"))
+		.andExpect(status().isOk());	
+			
 	}
 }

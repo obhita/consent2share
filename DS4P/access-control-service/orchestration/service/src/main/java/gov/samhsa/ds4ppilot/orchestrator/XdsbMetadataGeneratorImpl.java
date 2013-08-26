@@ -157,6 +157,7 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 		return (T) um.unmarshal(input);
 	}
 
+	@SuppressWarnings("unused")
 	private static String marshall(Object obj) throws Throwable {
 		final JAXBContext context = JAXBContext.newInstance(obj.getClass());
 

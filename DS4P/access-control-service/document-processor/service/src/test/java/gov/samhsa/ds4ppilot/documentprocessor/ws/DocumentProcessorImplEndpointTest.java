@@ -19,8 +19,11 @@ import junit.framework.Assert;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DocumentProcessorImplEndpointTest {
+	private static final Logger LOGGER = LoggerFactory.getLogger(DocumentProcessorImplEndpointTest.class);
 	private static Endpoint ep;
 
 	private static ProcessDocumentResponse processDocumentResponse;
@@ -55,7 +58,7 @@ public class DocumentProcessorImplEndpointTest {
 		try {
 			ep.stop();
 		} catch (Throwable t) {
-			System.out.println("Error thrown: " + t.getMessage());
+			LOGGER.debug("Error thrown: " + t.getMessage());
 		}
 	}
 
@@ -76,7 +79,7 @@ public class DocumentProcessorImplEndpointTest {
 	}
 
 	private void validateResponse(ProcessDocumentResponse resp) {
-		System.out.println("resp.getMaskedDocument(): "
+		LOGGER.debug("resp.getMaskedDocument(): "
 				+ resp.getMaskedDocument());
 		Assert.assertEquals("<ClinicalDocument></ClinicalDocument>",
 				processDocumentResponse.getMaskedDocument(),

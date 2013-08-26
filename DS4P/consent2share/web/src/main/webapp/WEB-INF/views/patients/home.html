@@ -126,16 +126,16 @@
 				<span th:case="'notification_review_sign_consent'">
 					<div class="alert alert-success rounded">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
-	  		    	You have a unsigned consent.  Please go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to review and sign your consent.
+	  		    	You have an unsigned consent.  Please go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to review and sign your consent.
 				    </div>
 				</span>
 			    
-			    <span th:case="'notification_sign_consent'">
-				<div class="alert alert-info rounded">
-				<button type="button" class="close" data-dismiss="alert">&times;</button>
-  		    	You have a unsigned consent. Please check <a href="../patients/connectionMain.html"><strong>Message Center</strong></a> or your e-mail client to sign your consent.
-			    </div>
-			    </span>
+					<span th:case="'notification_sign_consent'">
+				    <div class="alert alert-info rounded">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							You have an unsigned consent. To sign your consent, Please check your <a href="../inbox/inboxMain.html"><strong>Message Center</strong></a> or the e-sign email sent to your email account.
+					</div>
+					</span>
       
 
 			</div>
@@ -173,7 +173,7 @@
 					<div class="nav-collapse sidebar-nav">
 						<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
 							<li class="nav-header hidden-tablet" role="menuitem"></li>
-							<li role="menuitem"><a href="../consent/listConsents.html" th:href="@{/consents/listConsents.html}"><div
+							<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div
 										class="icon-file"></div>
 									<span class="hidden-tablet" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
 
@@ -235,13 +235,13 @@
 								<ul class="dashboard-list">
 									<li><a href="#">
 											<div class="icon-envelope" style="margin-right: 12px;"></div><span class="icon-paper-clip" style="width: 18px; margin-right: 1px;"></span>
-											mastercareinc@consent2share.direct
+											mastercareinc@consent2share.com
 										</a> 
 										<span style="font-size: small; font-weight: bold; color: #3e3e3e;"><span style="margin: 0 15px;">Subject: Please review</span><span>Fri 7/26/2013 1:12 PM</span>
 										<div style="margin-left: 30px; font-weight: normal;"><em>Dear Albert Smith, Please review your medical information and sign when ready.</em></div></span></li>
 									<li><a href="#">
 											<div class="icon-envelope" style="margin-right: 12px;"></div>
-											michaelgrimes@consent2share.direct
+											michaelgrimes@consent2share.com
 										</a> 
 										<span style="font-size: small; font-weight: bold; color: #3e3e3e;"><span style="margin: 0 15px;">Subject: Please review</span><span>Fri 7/21/2013 4:37 PM</span>
 										<div style="margin-left: 30px; font-weight: normal;"><em>Dear Albert Smith, Please review your medical information and sign when ready.</em></div></span></li>
@@ -280,7 +280,7 @@
 			<div class="row-fluid">
 				<div class="box span12">
 				<div class="box-header">
-					<h2><span class="icon-bookmark"></span><span class="break"></span>Educational Content</h2>
+					<h2><span class="icon-bookmark"></span><span class="break"></span>Learn about Privacy and Consent</h2>
 					</div>
 						<div class="box-content">
 							<ul class="dashboard-list">
@@ -317,7 +317,7 @@
 			<div id="what-is-a-consent-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="What is a Consent?" aria-hidden="true">
 				  <div class="modal-header">
 				    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-				    <h3 id="myModalLabel">What is a Consent 2 Share technology?</h3>
+				    <h3 id="myModalLabel">What is Consent 2 Share technology?</h3>
 				  </div>
 				  <div class="modal-body">
 				    <p><iframe src="http://www.youtube.com/embed/M7ttn21jVfI?feature=player_detailpage" frameborder="0" allowfullscreen="true"></iframe>

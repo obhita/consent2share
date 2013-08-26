@@ -28,6 +28,13 @@ import gov.samhsa.consent2share.domain.reference.ClinicalDocumentSectionTypeCode
 import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCode;
 import gov.samhsa.consent2share.domain.reference.PurposeOfUseCode;
 import gov.samhsa.consent2share.domain.reference.SensitivityPolicyCode;
+import gov.samhsa.consent2share.service.consentexport.ConsentExportDto;
+import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
+import gov.samhsa.consent2share.service.consentexport.ConsentExportServiceImpl;
+import gov.samhsa.consent2share.service.consentexport.IndividualProviderExportDto;
+import gov.samhsa.consent2share.service.consentexport.OrganizationalProviderExportDto;
+import gov.samhsa.consent2share.service.consentexport.PatientExportDto;
+import gov.samhsa.consent2share.service.consentexport.TypeCodesDto;
 
 import org.junit.Assert;
 import org.junit.Before;

@@ -46,14 +46,15 @@
 	<session-config>
 		<session-timeout>10</session-timeout>
 	</session-config>
+	
 	<error-page>
 		<exception-type>java.lang.Exception</exception-type>
-		<location>/uncaughtException</location>
+		<location>/views/uncaughtException.html</location>
 	</error-page>
 	
 	<error-page>
 		<error-code>404</error-code>
-		<location>/resourceNotFound</location>
+		<location>/views/error404.html</location>
 	</error-page>
 	<error-page>
 		<!-- Missing login -->
@@ -65,15 +66,16 @@
 		<error-code>403</error-code>
 		<location>/error.html</location>
 	</error-page>
+
 	<error-page>
-		<!-- Uncaught exception -->
 		<error-code>500</error-code>
-		<location>/uncaughtException</location>
+		<location>/views/uncaughtException.html</location>
 	</error-page>
-	<error-page>
+
+ 	<error-page>
 		<!-- Unsupported servlet method -->
 		<error-code>503</error-code>
-		<location>/error.html</location>
+		<location>/views/error404.html</location>
 	</error-page>
 
 

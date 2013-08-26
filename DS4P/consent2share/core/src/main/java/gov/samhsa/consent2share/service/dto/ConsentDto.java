@@ -35,17 +35,32 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class ConsentDto {
 	
+	/** The id. */
+	private Long id;
+	
 	/** The organizational providers permitted to disclose. */
 	private Set<String> organizationalProvidersPermittedToDisclose;
 	
+	/** The organizational providers permitted to disclose npi. */
+	private Set<String> organizationalProvidersPermittedToDiscloseNpi;
+	
 	/** The organizational providers disclosure is made to. */
 	private Set<String> organizationalProvidersDisclosureIsMadeTo;
+
+	/** The organizational providers disclosure is made to npi. */
+	private Set<String> organizationalProvidersDisclosureIsMadeToNpi;
 	
 	/** The providers permitted to disclose. */
 	private Set<String> providersPermittedToDisclose;
 	
+	/** The providers permitted to disclose npi. */
+	private Set<String> providersPermittedToDiscloseNpi;
+	
 	/** The providers disclosure is made to. */
 	private Set<String> providersDisclosureIsMadeTo;
+	
+	/** The providers disclosure is made to npi. */
+	private Set<String> providersDisclosureIsMadeToNpi;	
 
 	// Consent Sharing date
 	/** The consent start. */
@@ -73,6 +88,26 @@ public class ConsentDto {
 	
 	/** The do not share clinical concept codes. */
 	private Set<SpecificMedicalInfoDto> doNotShareClinicalConceptCodes;
+	
+	
+	/**
+	 * Gets the id.
+	 * 
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * Sets the id.
+	 * 
+	 * @param id
+	 *            the new id
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	/**
 	 * Gets the organizational providers permitted to disclose.
@@ -148,6 +183,38 @@ public class ConsentDto {
 	public void setProvidersDisclosureIsMadeTo(
 			Set<String> providersDisclosureIsMadeTo) {
 		this.providersDisclosureIsMadeTo = providersDisclosureIsMadeTo;
+	}
+
+	public Set<String> getOrganizationalProvidersPermittedToDiscloseNpi() {
+	    return organizationalProvidersPermittedToDiscloseNpi;
+	}
+
+	public void setOrganizationalProvidersPermittedToDiscloseNpi(Set<String> organizationalProvidersPermittedToDiscloseNpi) {
+	    this.organizationalProvidersPermittedToDiscloseNpi = organizationalProvidersPermittedToDiscloseNpi;
+	}
+
+	public Set<String> getOrganizationalProvidersDisclosureIsMadeToNpi() {
+	    return organizationalProvidersDisclosureIsMadeToNpi;
+	}
+
+	public void setOrganizationalProvidersDisclosureIsMadeToNpi(Set<String> organizationalProvidersDisclosureIsMadeToNpi) {
+	    this.organizationalProvidersDisclosureIsMadeToNpi = organizationalProvidersDisclosureIsMadeToNpi;
+	}
+
+	public Set<String> getProvidersPermittedToDiscloseNpi() {
+	    return providersPermittedToDiscloseNpi;
+	}
+
+	public void setProvidersPermittedToDiscloseNpi(Set<String> providersPermittedToDiscloseNpi) {
+	    this.providersPermittedToDiscloseNpi = providersPermittedToDiscloseNpi;
+	}
+
+	public Set<String> getProvidersDisclosureIsMadeToNpi() {
+	    return providersDisclosureIsMadeToNpi;
+	}
+
+	public void setProvidersDisclosureIsMadeToNpi(Set<String> providersDisclosureIsMadeToNpi) {
+	    this.providersDisclosureIsMadeToNpi = providersDisclosureIsMadeToNpi;
 	}
 
 	/**
@@ -324,5 +391,4 @@ public class ConsentDto {
 				+ ", doNotShareClinicalConceptCodes="
 				+ doNotShareClinicalConceptCodes + "]";
 	}
-
 }

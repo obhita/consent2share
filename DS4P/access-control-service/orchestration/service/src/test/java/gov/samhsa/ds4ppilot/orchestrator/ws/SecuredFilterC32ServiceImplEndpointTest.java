@@ -1,44 +1,34 @@
 package gov.samhsa.ds4ppilot.orchestrator.ws;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import gov.samhsa.ds4ppilot.contract.securedorchestrator.SecuredFilterC32ServicePortType;
 import gov.samhsa.ds4ppilot.orchestrator.SecuredOrchestrator;
-import gov.samhsa.ds4ppilot.schema.securedorchestrator.RetrieveDocumentSetRequest;
 import gov.samhsa.ds4ppilot.schema.securedorchestrator.RetrieveDocumentSetResponse;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mvel2.ast.AssertNode;
-import org.w3c.dom.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SecuredFilterC32ServiceImplEndpointTest {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SecuredFilterC32ServiceImplEndpointTest.class);
 
 	private static URL wsdlURL;
 	private static String address;
@@ -48,8 +38,8 @@ public class SecuredFilterC32ServiceImplEndpointTest {
 	private static Endpoint ep;
 	
 	private static gov.samhsa.ds4ppilot.schema.securedorchestrator.RetrieveDocumentSetResponse retrieveDocumentSetResponse;
-	private static String retrieveDocumentSetMessageString;
-	private static String documentUniqueId = "16807046.11206.4380.81335.421575012145604";
+//	private static String retrieveDocumentSetMessageString;
+//	private static String documentUniqueId = "16807046.11206.4380.81335.421575012145604";
 
 
 	private static SecuredOrchestrator securedOrchrstratorMock = mock(SecuredOrchestrator.class);
@@ -82,7 +72,7 @@ public class SecuredFilterC32ServiceImplEndpointTest {
 		try {
 			ep.stop();
 		} catch (Throwable t) {
-			System.out.println("Error thrown: " + t.getMessage());
+			LOGGER.debug("Error thrown: " + t.getMessage());
 		}
 	}
 

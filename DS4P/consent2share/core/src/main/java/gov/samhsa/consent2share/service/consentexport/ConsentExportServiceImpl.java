@@ -112,7 +112,20 @@ public class ConsentExportServiceImpl implements ConsentExportService {
 		
 		return xacml;
 	}
-
+	
+	public String exportXACMLConsent(Consent consent) {
+		ConsentExportDto consentExportDto = consentExportMap(consent);
+		ByteArrayOutputStream sr1 = jaxbMarshall(consentExportDto);
+		StreamSource bais = new StreamSource(new ByteArrayInputStream(
+				sr1.toByteArray()));
+		URL cd2 = this.getClass().getClassLoader().getResource("c2xacml.xsl");
+		String xslID = cd2.toString();
+		StreamResult srcdar = saxonTransform(xslID, bais);
+		String xacml = srcdar.getOutputStream().toString();
+		
+		return xacml;
+	}
+	
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.consentexport.ConsentExportService#makeConsentExportDto()
 	 */

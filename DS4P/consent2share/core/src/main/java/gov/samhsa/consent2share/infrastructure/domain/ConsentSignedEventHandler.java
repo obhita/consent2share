@@ -28,6 +28,8 @@ package gov.samhsa.consent2share.infrastructure.domain;
 import gov.samhsa.consent2share.domain.AbstractDomainEventHandler;
 import gov.samhsa.consent2share.domain.consent.event.ConsentSignedEvent;
 import gov.samhsa.consent2share.infrastructure.rabbit.MessageSender;
+import gov.samhsa.consent2share.service.consent.ConsentService;
+import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +41,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConsentSignedEventHandler extends
 		AbstractDomainEventHandler<ConsentSignedEvent> {
-
-	/** The message sender. */
+	
 	@Autowired
 	private MessageSender messageSender;
 

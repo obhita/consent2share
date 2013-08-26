@@ -14,8 +14,12 @@ import javax.xml.bind.Marshaller;
 import oasis.names.tc.ebxml_regrep.xsd.lcm._3.SubmitObjectsRequest;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XdsbMetadataGeneratorImplTest {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(XdsbMetadataGeneratorImplTest.class);
 
 	@Test
 	public void testgenerateMetadataXml_C32() {
@@ -51,18 +55,17 @@ public class XdsbMetadataGeneratorImplTest {
 		String meta = xdsbMetadataGeneratorImpl.generateMetadataXml(
 				c32Document.toString(), "1.1.1.1.1");
 
-		System.out.println(meta);
+		LOGGER.debug(meta);
 
 		SubmitObjectsRequest submitObjectsRequest = xdsbMetadataGeneratorImpl
 				.generateMetadata(c32Document.toString(), "1.1.1.1.1");
 
-		System.out.println("Generated SubmitObjectsRequest");
+		LOGGER.debug("Generated SubmitObjectsRequest");
 
 		try {
-			System.out.println(marshall(submitObjectsRequest));
+			LOGGER.debug(marshall(submitObjectsRequest));
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.debug(e.toString(),e);
 		}
 	}
 

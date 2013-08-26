@@ -153,7 +153,14 @@ public interface ConsentService {
 	 */
 	boolean isConsentBelongToThisUser(Long consentId, Long patient);
 
-	
+	/**
+	 * Find consent by id.
+	 *
+	 * @param consentId the consent id
+	 * @return the consent dto
+	 */
+	ConsentDto findConsentById (Long consentId);
+
 	/**
 	 * Sign consent.
 	 *

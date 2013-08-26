@@ -50,7 +50,9 @@ import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeServic
 import gov.samhsa.consent2share.service.reference.StateCodeService;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -167,11 +169,25 @@ public class ProviderController {
 			 AuthenticatedUser currentUser = userContext.getCurrentUser();
 			 PatientConnectionDto patientConnectionDto=patientService.findPatientConnectionByUsername(currentUser
 						.getUsername());
-			 model.addAttribute("patientConnectionDto", patientConnectionDto);
-		     IndividualProviderDto individualProviderDto=individualProviderService.findIndividualProviderDto(individualProviderid);
-		     individualProviderDto.setUsername(currentUser.getUsername());
-		     individualProviderService.deleteIndividualProviderDto(individualProviderDto);
-		   return "redirect:/patients/connectionMain.html";
+			for (IndividualProviderDto individualProviderDto: patientConnectionDto.getIndividualProviders())
+				{
+					if(individualProviderDto.getId()==individualProviderid)
+					{  
+						if(individualProviderDto.isDeletable()==false)
+						return "redirect:/patients/connectionMain.html";
+					}
+				}
+				
+		    if(individualProviderService
+					.findIndividualProvider(individualProviderid)!=null){
+			IndividualProviderDto individualProviderDto = individualProviderService
+					.findIndividualProviderDto(individualProviderid);
+			individualProviderDto.setUsername(currentUser.getUsername());
+			individualProviderService
+					.deleteIndividualProviderDto(individualProviderDto);
+		    }
+			return "redirect:/patients/connectionMain.html";
+		    
 	
 	}
 	
@@ -190,11 +206,23 @@ public class ProviderController {
 			AuthenticatedUser currentUser = userContext.getCurrentUser();
 			PatientConnectionDto patientConnectionDto=patientService.findPatientConnectionByUsername(currentUser
 						.getUsername());
-			model.addAttribute("patientConnectionDto", patientConnectionDto);
-		    OrganizationalProviderDto organizationalProviderDto=organizationalProviderService.findOrganizationalProviderDto(organizationalProviderid);
+			
+			for (OrganizationalProviderDto organizationalProviderDto: patientConnectionDto.getOrganizationalProviders())
+			{
+				if(organizationalProviderDto.getId()==organizationalProviderid)
+				{   
+					if(organizationalProviderDto.isDeletable()==false)
+					return "redirect:/patients/connectionMain.html";
+				}
+			}
+			 if(organizationalProviderService
+						.findOrganizationalProvider(organizationalProviderid)!=null){
+			OrganizationalProviderDto organizationalProviderDto=organizationalProviderService.findOrganizationalProviderDto(organizationalProviderid);
 		    organizationalProviderDto.setUsername(currentUser.getUsername());
 		    organizationalProviderService.deleteOrganizationalProviderDto(organizationalProviderDto);
+			 }
   		   return "redirect:/patients/connectionMain.html";
+			
 	
 	}
 
@@ -210,8 +238,20 @@ public class ProviderController {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		PatientProfileDto patientProfileDto = patientService.findPatientProfileByUsername(currentUser
 				.getUsername());
+		PatientConnectionDto patientConnectionDto=patientService.findPatientConnectionByUsername(currentUser
+				.getUsername());
+		Set<String> npiList=new HashSet<String>();
+		for(IndividualProviderDto individualProviderDto:patientConnectionDto.getIndividualProviders())
+		{
+			npiList.add(individualProviderDto.getNpi());
+		}
+		for(OrganizationalProviderDto organizationalProviderDto:patientConnectionDto.getOrganizationalProviders())
+		{
+			npiList.add(organizationalProviderDto.getNpi());
+		}
+				
 		model.addAttribute("currentUser", currentUser);
-		model.addAttribute("patientProfileDto", patientProfileDto);
+		model.addAttribute("npiList", npiList);
 		populateLookupCodes(model);
 		return "views/patients/connectionProviderAdd";
 	}
@@ -225,9 +265,10 @@ public class ProviderController {
 	@RequestMapping(value = "connectionProviderAdd.html", method = RequestMethod.POST )
 	public String providerSearch(@RequestParam("querySent") String providerDtoJSON) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
-
-		HashMap<String,String> Result=deserializeResult(providerDtoJSON);
 		
+		HashMap<String,String> Result=deserializeResult(providerDtoJSON);
+	
+	
 		if ((EntityType.valueOf(Result.get("entityType"))==EntityType.Organization)){
 			OrganizationalProviderDto providerDto=new OrganizationalProviderDto();
 			setProviderDto(providerDto,Result);

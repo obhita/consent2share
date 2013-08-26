@@ -51,7 +51,7 @@ public class ProviderServiceImpl implements ProviderService {
 				calculateGenderCode(genderCode),
 				calculateZipcode(postalCode),
 				calculateSearchString(taxonomy), calculateSearchString(phone),
-				lastName, firstName, calculateSearchString(entityType), calculateSearchString(providerOrganizationName));
+				searchPartialString(lastName), searchPartialString(firstName), calculateSearchString(entityType), calculateSearchString(providerOrganizationName));
 		List<ProviderDto> map =  providerMapper
 				.mapToProviderDtoList(repositoryList);
 		return map;
@@ -62,11 +62,11 @@ public class ProviderServiceImpl implements ProviderService {
 			String genderCode, String usStateAbbreviation, String city,
 			String taxonomy, String phone, String lastName, String firstName, String entityType, String providerOrganizationName) {
 		List<ProviderDto> map = providerMapper.mapToProviderDtoList(providerRepository
-				.findAllByProviderGenderCodeLikeAndProviderBusinessPracticeLocationAddressStateNameAndProviderBusinessPracticeLocationAddressCityNameAndTaxonomyLikeAndProviderBusinessPracticeLocationAddressTelephoneNumberLikeAndProviderLastNameLikeAndProviderFirstNameLikeAndEntityTypeLikeAndProviderOrganizationNameLike(
+				.findAllByProviderGenderCodeLikeAndProviderBusinessPracticeLocationAddressStateNameAndProviderBusinessPracticeLocationAddressCityNameLikeAndTaxonomyLikeAndProviderBusinessPracticeLocationAddressTelephoneNumberLikeAndProviderLastNameLikeAndProviderFirstNameLikeAndEntityTypeLikeAndProviderOrganizationNameLike(
 						calculateGenderCode(genderCode),
 						usStateAbbreviation, calculateCity(city),
 						calculateSearchString(taxonomy), calculateSearchString(phone),
-						lastName, firstName, calculateSearchString(entityType), calculateSearchString(providerOrganizationName)));
+						searchPartialString(lastName), searchPartialString(firstName), calculateSearchString(entityType), calculateSearchString(providerOrganizationName)));
 		return map;
 	}
 
@@ -127,7 +127,20 @@ public class ProviderServiceImpl implements ProviderService {
 			}
 			result = original.replaceAll("_", " ");
 		}
-		return result;
+		
+		return searchPartialString(result);
+	}
+	
+	
+	/**
+	 * Allows partial searches for provider search. Used by jpa repository findByFIELD_NAMELike method 
+	 * Ex: "Balt" returns "Baltimore"
+	 *
+	 * @param searchField the search field
+	 * @return the string
+	 */
+	private String searchPartialString(String searchField) {
+		return new StringBuilder().append(SEARCH_STRING).append(searchField).append(SEARCH_STRING).toString();
 	}
 
 }

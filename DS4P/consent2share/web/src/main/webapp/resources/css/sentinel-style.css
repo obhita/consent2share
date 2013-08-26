@@ -323,7 +323,6 @@ used more than once per page.
 #bread-crumb-btn {
   float: left; }
 
-/* Consent */
 .fred {
   display: inline; }
   .fred ul {
@@ -339,29 +338,40 @@ used more than once per page.
     .fred ul:hover {
       background-color: beige; }
 
-#share-all-med, #share-for-purpose {
+#share-all-med, #share-for-purpose, #consent-date-fill {
   background-color: rgba(210, 210, 210, 0.1);
   border-color: lightgrey; }
-  #share-all-med p, #share-for-purpose p {
+  #share-all-med p, #share-for-purpose p, #consent-date-fill p {
     color: #8f8f8f; }
-  #share-all-med:hover, #share-for-purpose:hover {
+  #share-all-med:hover, #share-for-purpose:hover, #consent-date-fill:hover {
     background-color: rgba(210, 210, 210, 0.2);
     border-color: #0088cc; }
-    #share-all-med:hover p, #share-for-purpose:hover p {
+    #share-all-med:hover p, #share-for-purpose:hover p, #consent-date-fill:hover p {
       color: #0088cc; }
+  #share-all-med ul, #share-for-purpose ul, #consent-date-fill ul {
+    margin-bottom: 26px; }
+
+.radio-label-align {
+  display: inline; }
+  .radio-label-align div:first-child {
+    float: left; }
+    .radio-label-align div:first-child label {
+      min-width: 550px; }
 
 #consent-main-div-position {
   position: relative;
-  margin-bottom: 10px; }
+  margin-bottom: 0px; }
 
 #consent-main-h4 {
   margin-right: 35px; }
 
+/*
 #consent-main-plus-span {
-  position: absolute;
-  top: 0;
-  right: 0; }
-
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+*/
 #consent-3buttons {
   margin: 0px; }
 
@@ -382,6 +392,8 @@ used more than once per page.
   color: Black; }
   #consent-container #disclose-list label.joe, #consent-container #authorize-list label.joe {
     color: #BABABA !important; }
+#consent-container #disclose-list input, #consent-container #authorize-list input {
+  margin-right: 12px; }
 #consent-container div.form-inline {
   margin: 10px 8px; }
 #consent-container input {
@@ -433,10 +445,16 @@ used more than once per page.
     margin-top: -2px; }
 
 /*connectionMain*/
+#add-provider-btn {
+  margin-bottom: 0px; }
+
 #legal-rep-fieldset span.btn {
   margin-top: 2px; }
   #legal-rep-fieldset span.btn.btn-danger {
     padding: 1px 7px 0 6px; }
+
+#current-providers-table [class^="icon-"], #current-providers-table [class*=" icon-"] {
+  width: auto; }
 
 /* Login */
 #login-navbar .container-fluid {
@@ -507,6 +525,7 @@ used more than once per page.
 
 /*   Modal Layout 	*/
 .span3 checkbox {
+  margin-right: 12px;
   margin-left: -20px; }
 
 .modal .inputform > div, .modal form > div {
@@ -542,6 +561,24 @@ these modules live within major layout components of the page
 such as headers or footers. Modules should use class selectors
 since they may be used more than once.
 ============================================================*/
+/* Consent */
+.consent-select {
+  display: inline-block; }
+  .consent-select div {
+    margin-right: 8px;
+    float: left; }
+
+.consent-add-header {
+  display: inline; }
+
+.float-left {
+  margin-right: 12px;
+  float: left;
+  vertical-align: middle; }
+
+.consent-sub-hdr {
+  margin-top: -12px; }
+
 #add-legal-form.modal-body, [id*='edit-legal-form'].modal-body {
   max-height: 400px; }
 
@@ -716,14 +753,22 @@ since they may be used more than once.
 td.contacts-td {
   width: 80%; }
 
-.minus-btn span, .add-btn span {
-  opacity: .5; }
-  .minus-btn span:hover, .add-btn span:hover {
+.btn-cannot-delete-text .popover {
+  left: 2%; }
+  .btn-cannot-delete-text .popover .popover-content {
+    color: #D51818;
+    font-weight: 600; }
+  .btn-cannot-delete-text .popover .popover-title, .btn-cannot-delete-text .popover .arrow {
+    display: none; }
+
+.minus-btn, .add-btn {
+  color: rgba(255, 255, 255, 0.65); }
+  .minus-btn:hover, .add-btn:hover {
+    color: white;
     opacity: 1; }
-.minus-btn a span, .add-btn a span {
-  color: white;
-  opacity: .5; }
-  .minus-btn a span:hover, .add-btn a span:hover {
+  .minus-btn a, .add-btn a {
+    color: inherit; }
+  .minus-btn [class*=" icon-white"], .add-btn [class*=" icon-white"] {
     opacity: 1; }
 
 .top-margin10 {

@@ -43,7 +43,6 @@
 				be used by the SOAP client. More info: http://maven.apache.org/plugins/maven-assembly-plugin/ -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
 				<configuration>
 					<descriptors>
 						<descriptor>src/main/assembly/jaxws-jar.xml</descriptor>

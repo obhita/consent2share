@@ -37,6 +37,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class SignedPDFConsent.
  */
@@ -108,4 +109,6 @@ public class SignedPDFConsent extends AbstractSignedPDFDocument{
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+
 }

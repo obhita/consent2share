@@ -111,6 +111,11 @@ public class Consent {
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
 	private byte[] exportedXACMLConsent;
+	
+	/** The xacml policy file. */
+	@Lob
+	@Basic(fetch = FetchType.LAZY)
+    private byte[] xacmlPolicyFile;
 
 	/** The providers permitted to disclose. */
 	@ElementCollection
@@ -746,6 +751,19 @@ public class Consent {
 	 */
 	public void setConsentReferenceId(String consentReferenceId) {
 		this.consentReferenceId = consentReferenceId;
+	}
+	
+	/**
+	 * Gets the xacml policy file.
+	 *
+	 * @return the xacml policy file
+	 */
+	public byte[] getXacmlPolicyFile() {
+		return xacmlPolicyFile;
+	}
+
+	public void setXacmlPolicyFile(byte[] xacmlPolicyFile) {
+		this.xacmlPolicyFile = xacmlPolicyFile;
 	}
 	
 	

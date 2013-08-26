@@ -22,6 +22,7 @@ import gov.samhsa.consent2share.domain.reference.SensitivityPolicyCodeRepository
 import gov.samhsa.consent2share.infrastructure.EchoSignSignatureService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
+import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
@@ -91,6 +92,9 @@ public class ConsentServiceImplTest {
 	/** The user context. */
 	@Mock
 	UserContext userContext;
+	
+	@Mock
+	ConsentExportService consentExportService;
 	
 	/**
 	 * Sets the up.
@@ -376,6 +380,7 @@ public class ConsentServiceImplTest {
 		ConsentService cstSpy=spy(cst);
 		Consent consent=mock(Consent.class);
 		when(cstSpy.makeConsent()).thenReturn(consent);
+		when(consentExportService.exportXACMLConsent(any(Consent.class))).thenReturn("mockXACML");
 		ConsentDto consentDto=mock(ConsentDto.class);
 		cstSpy.saveConsent(consentDto);
 		verify(consentRepository).save(consent);

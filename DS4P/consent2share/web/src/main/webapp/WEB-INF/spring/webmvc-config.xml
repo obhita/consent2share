@@ -85,10 +85,11 @@
 		/> <mvc:view-controller path="///embed/privacy_video_game_part_2" /> <mvc:view-controller 
 		path="///embed/privacy_video_game_part_1" /> <mvc:view-controller path="/" 
 		view-name="index" /> -->
-	<mvc:view-controller path="views/uncaughtException" />
-	<mvc:view-controller path="views/resourceNotFound" />
-	<mvc:view-controller path="views/underConstruction" />
-	<!-- <mvc:view-controller path="/dataAccessFailure" /> -->
+	<mvc:view-controller path="views/uncaughtException.html" />
+	<mvc:view-controller path="views/resourceNotFound.html" />
+	<mvc:view-controller path="views/underConstruction.html" />
+	<mvc:view-controller path="views/dataAccessFailure.html" />
+	<mvc:view-controller path="views/error404.html" />
 
 	<!-- Register "global" interceptor beans to apply to all registered HandlerMappings -->
 	<mvc:interceptors> <bean class="org.springframework.web.servlet.theme.ThemeChangeInterceptor" 

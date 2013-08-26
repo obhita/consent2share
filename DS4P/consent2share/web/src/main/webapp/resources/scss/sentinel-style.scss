@@ -408,12 +408,12 @@ used more than once per page.
 			float: left;
 		}
 
+
 	
-	/* Consent */
 	
 	
 	.fred {
-		display: inline;
+			display: inline;
 		ul {
 			width: 44%;
 			margin: 0 0 15px;
@@ -434,7 +434,7 @@ used more than once per page.
 		
 	}
 	
-	#share-all-med, #share-for-purpose {
+	#share-all-med, #share-for-purpose, #consent-date-fill {
 		background-color: rgba(210, 210, 210, .1);
 		border-color: lightgrey;
 		p{
@@ -447,22 +447,38 @@ used more than once per page.
 					color: #0088cc;
 				}
 			}
+		ul{
+			margin-bottom: 26px;
+		}
 	}
+	
+		
+	.radio-label-align {
+		display: inline;
+		 div:first-child {
+			float: left;
+			label { 
+				min-width: 550px; //this needs to be moved to media query
+			}	
+		}
+	}	
 		
 	#consent-main-div-position {
 		position: relative;
-		margin-bottom: 10px;
+		margin-bottom: 0px;
 	}
 	
 	#consent-main-h4 {
 		margin-right: 35px;
 	}
 	
+	/*
 	#consent-main-plus-span {
 		position: absolute;
 		top: 0;
 		right: 0;
 	}
+	*/
 	
 	#consent-3buttons {
 		margin: 0px;
@@ -494,6 +510,9 @@ used more than once per page.
 				&.joe {
 					color: #BABABA !important;
 				}
+			}
+			input {
+				margin-right: 12px;
 			}
 		}
 		div.form-inline {
@@ -573,6 +592,11 @@ used more than once per page.
 	
 	
 	/*connectionMain*/
+	
+	#add-provider-btn {
+		margin-bottom: 0px;
+	}
+	
 	#legal-rep-fieldset {
 		span.btn {
 			margin-top: 2px;
@@ -582,7 +606,11 @@ used more than once per page.
 		}
 	}
 
-	
+	#current-providers-table {
+		[class^="icon-"], [class*=" icon-"] {
+			width: auto;
+		}
+	}
 	
 
 	/* Login */
@@ -685,6 +713,7 @@ used more than once per page.
 /*   Modal Layout 	*/
 	.span3 {
 		checkbox {
+		margin-right: 12px;
 		margin-left: -20px;	
 		}
 		
@@ -739,7 +768,32 @@ these modules live within major layout components of the page
 such as headers or footers. Modules should use class selectors
 since they may be used more than once.
 ============================================================*/	
-
+	
+	/* Consent */
+	
+	
+	.consent-select{ 
+		display: inline-block;
+		div {
+			margin-right: 8px;
+			float: left;
+			}
+	}
+	
+	.consent-add-header{
+			display: inline;
+		}
+		
+	.float-left {
+			margin-right: 12px;
+			float: left;
+			vertical-align: middle;
+			}
+					
+	.consent-sub-hdr {
+			margin-top: -12px;
+						}
+	
 	
 	#add-legal-form, [id*='edit-legal-form'] {
 		&.modal-body {
@@ -971,21 +1025,32 @@ since they may be used more than once.
 		}
 	}
 	
+	.btn-cannot-delete-text {
+		.popover {
+			left: 2%;
+			.popover-content {
+				color: #D51818;
+				font-weight: 600;
+			}
+			.popover-title, .arrow {
+				display: none;
+			}
+		}
+	}
+	
 	.minus-btn, .add-btn {
-			span {
-			opacity: .5;
-				&:hover {
-					opacity: 1;
-				}
+			color: rgba(255,255,255,.65);
+			&:hover{
+				color: rgba(255,255,255, 1);
+				opacity: 1;
 			}
 			
-			a span {
-				color: white;
-				opacity: .5;
-					&:hover {
-						opacity: 1;
-					}
+			a {
+				color: inherit;
 			}
+		[class*=" icon-white"]{
+			opacity: 1;
+		}
 
 	}
 	

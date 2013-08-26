@@ -58,7 +58,6 @@ public class OrganizationalProviderServiceImplTest {
 		OrganizationalProviderDto organizationalProviderDto = mock(OrganizationalProviderDto.class);
 		organizationalProviderService.deleteOrganizationalProviderDto(mock(OrganizationalProviderDto.class));
 		verify(organizationalProviderRepository).findByPatientAndNpi(patientRepository.findByUsername(organizationalProviderDto.getUsername()), organizationalProviderDto.getNpi());
-		verify(organizationalProviderRepository).delete(any(OrganizationalProvider.class));
 	}
 
 	@Test

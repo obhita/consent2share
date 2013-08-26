@@ -82,11 +82,12 @@ import org.w3c.dom.Node;
  */
 public class DocumentProcessorImpl implements DocumentProcessor {
 	
-	/** The pdp obligation prefix for redact. */
-	private final String PDP_OBLIGATION_PREFIX_REDACT = "urn:oasis:names:tc:xspa:2.0:resource:patient:redact:";
-	
-	/** The pdp obligation prefix for mask. */
-	private final String PDP_OBLIGATION_PREFIX_MASK = "urn:oasis:names:tc:xspa:2.0:resource:patient:mask:";
+//	commented out for redact-only application	
+//	/** The pdp obligation prefix for redact. */
+//	private final String PDP_OBLIGATION_PREFIX_REDACT = "urn:oasis:names:tc:xspa:2.0:resource:patient:redact:";
+//	
+//	/** The pdp obligation prefix for mask. */
+//	private final String PDP_OBLIGATION_PREFIX_MASK = "urn:oasis:names:tc:xspa:2.0:resource:patient:mask:";
 
 	/** The rule execution web service client. */
 	private final RuleExecutionServiceClient ruleExecutionWebServiceClient;
@@ -207,6 +208,7 @@ public class DocumentProcessorImpl implements DocumentProcessor {
 					xacmlResult.getMessageId(), document);
 			FileHelper.writeStringToFile(document, "Tagged_C32.xml");
 
+			
 			// mask element
 			document = maskElement(document, ruleExecutionContainer,xacmlResult);
 			processDocumentResponse.setMaskedDocument(document);
@@ -494,7 +496,8 @@ public class DocumentProcessorImpl implements DocumentProcessor {
 		}
 		return xmlString;
 	}
-
+	
+		
 	/**
 	 * ***************************************** Mask element
 	 * ******************************************.
@@ -524,44 +527,46 @@ public class DocumentProcessorImpl implements DocumentProcessor {
 			 * are generating a DESede key.
 			 */
 			deSedeMaskKey = EncryptTool.generateKeyEncryptionKey();
-			byte[] keyBytes = deSedeMaskKey.getEncoded();
-
-			String algorithmURI = XMLCipher.TRIPLEDES_KeyWrap;
-
-			XMLCipher keyCipher = XMLCipher.getInstance(algorithmURI);
-			keyCipher.init(XMLCipher.WRAP_MODE, deSedeMaskKey);
-			EncryptedKey encryptedKey = keyCipher.encryptKey(xmlDocument,
-					aesSymmetricKey);
-
-			for (RuleExecutionResponse response : ruleExecutionContainer
-					.getExecutionResponseList()) {
-				if (containsMaskObligation(xacmlResult, response)) {
-					String observationId = response.getObservationId();
-					String displayName = response.getDisplayName();
-
-					// mask display Name
-					String xPathExprDisplayName = "//hl7:td[.='%']/parent::hl7:tr";
-					xPathExprDisplayName = xPathExprDisplayName.replace("%",
-							displayName);
-
-					Element elementToBeEncrypted = getElement(xmlDocument,
-							xPathExprDisplayName);
-
-					encryptElement(xmlDocument, aesSymmetricKey, encryptedKey,
-							elementToBeEncrypted);
-
-					// mask element contents
-					String xPathExprObservationId = "//hl7:id[@root='%']/ancestor::hl7:entry";
-					xPathExprObservationId = xPathExprObservationId.replace(
-							"%", observationId);
-
-					elementToBeEncrypted = getElement(xmlDocument,
-							xPathExprObservationId);
-
-					encryptElement(xmlDocument, aesSymmetricKey, encryptedKey,
-							elementToBeEncrypted);
-				}
-			}
+//			commented out for redact-only application			
+//			byte[] keyBytes = deSedeMaskKey.getEncoded();
+//
+//			String algorithmURI = XMLCipher.TRIPLEDES_KeyWrap;
+//
+//			XMLCipher keyCipher = XMLCipher.getInstance(algorithmURI);
+//			keyCipher.init(XMLCipher.WRAP_MODE, deSedeMaskKey);
+//			EncryptedKey encryptedKey = keyCipher.encryptKey(xmlDocument,
+//					aesSymmetricKey);
+//
+//			commented out for redact-only application				
+//			for (RuleExecutionResponse response : ruleExecutionContainer
+//					.getExecutionResponseList()) {
+//				if (containsMaskObligation(xacmlResult, response)) {
+//					String observationId = response.getObservationId();
+//					String displayName = response.getDisplayName();
+//
+//					// mask display Name
+//					String xPathExprDisplayName = "//hl7:td[.='%']/parent::hl7:tr";
+//					xPathExprDisplayName = xPathExprDisplayName.replace("%",
+//							displayName);
+//
+//					Element elementToBeEncrypted = getElement(xmlDocument,
+//							xPathExprDisplayName);
+//
+//					encryptElement(xmlDocument, aesSymmetricKey, encryptedKey,
+//							elementToBeEncrypted);
+//
+//					// mask element contents
+//					String xPathExprObservationId = "//hl7:id[@root='%']/ancestor::hl7:entry";
+//					xPathExprObservationId = xPathExprObservationId.replace(
+//							"%", observationId);
+//
+//					elementToBeEncrypted = getElement(xmlDocument,
+//							xPathExprObservationId);
+//
+//					encryptElement(xmlDocument, aesSymmetricKey, encryptedKey,
+//							elementToBeEncrypted);
+//				}
+//			}
 
 			FileHelper.writeDocToFile(xmlDocument, "Masked_C32.xml");
 			xmlString = XmlHelper.converXmlDocToString(xmlDocument);
@@ -658,20 +663,23 @@ public class DocumentProcessorImpl implements DocumentProcessor {
 	 */
 	private boolean containsRedactObligation(XacmlResult xacmlResult, RuleExecutionResponse response)
 	{
-		return xacmlResult.getPdpObligations().contains(PDP_OBLIGATION_PREFIX_REDACT+response.getSensitivity());
+//		commented out for redact-only application		
+//		return xacmlResult.getPdpObligations().contains(PDP_OBLIGATION_PREFIX_REDACT+response.getSensitivity());
+		return xacmlResult.getPdpObligations().contains(response.getSensitivity());
 	}
 	
-	/**
-	 * Checks if the xacmlResult has any mask obligations for a single executionResonse's sensitivity value.
-	 *
-	 * @param xacmlResult the xacml result
-	 * @param response the response
-	 * @return true, if successful
-	 */
-	private boolean containsMaskObligation(XacmlResult xacmlResult, RuleExecutionResponse response)
-	{
-		return xacmlResult.getPdpObligations().contains(PDP_OBLIGATION_PREFIX_MASK+response.getSensitivity());
-	}
+//		commented out for redact-only application
+//	/**
+//	 * Checks if the xacmlResult has any mask obligations for a single executionResonse's sensitivity value.
+//	 *
+//	 * @param xacmlResult the xacml result
+//	 * @param response the response
+//	 * @return true, if successful
+//	 */
+//	private boolean containsMaskObligation(XacmlResult xacmlResult, RuleExecutionResponse response)
+//	{
+//		return xacmlResult.getPdpObligations().contains(PDP_OBLIGATION_PREFIX_MASK+response.getSensitivity());
+//	}
 
 	/**
 	 * ********************************************************************* Get

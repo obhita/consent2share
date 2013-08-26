@@ -27,13 +27,13 @@ public class HomeControllerTest {
 	@Test
 	public void testHome() throws Exception {
 		mockMvc.perform(get("/"))
-			.andExpect(view().name("views/index"));
+			.andExpect(view().name("redirect:/patients/home.html"));
 	}
 
 	@Test
 	public void testIndex() throws Exception {
 		mockMvc.perform(get("/index.html"))
-			.andExpect(view().name("views/index"));
+			.andExpect(view().name("redirect:/patients/home.html"));
 	}
 
 	@Test

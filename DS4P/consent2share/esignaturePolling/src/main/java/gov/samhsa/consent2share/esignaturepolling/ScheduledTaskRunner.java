@@ -42,13 +42,15 @@ public class ScheduledTaskRunner {
 
 	/**
 	 * The main method.
-	 *
-	 * @param args the arguments
-	 * @throws Exception the exception
+	 * 
+	 * @param args
+	 *            the arguments
+	 * @throws Exception
+	 *             the exception
 	 */
 	public static void main(String[] args) throws Exception {
 		logger.info("Starting at {}...", new Date().toString());
-		
+
 		try {
 			GenericXmlApplicationContext context = new GenericXmlApplicationContext();
 			context.load("classpath:/META-INF/spring/applicationContext*.xml");

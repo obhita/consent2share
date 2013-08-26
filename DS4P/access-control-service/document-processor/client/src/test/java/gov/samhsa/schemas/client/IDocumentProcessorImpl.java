@@ -35,7 +35,7 @@ public class IDocumentProcessorImpl implements ProcessDocumentServicePortType {
     @Override
 	public gov.samhsa.ds4ppilot.schema.documentprocessor.ProcessDocumentResponse processDocument(gov.samhsa.ds4ppilot.schema.documentprocessor.ProcessDocumentRequest parameters) { 
         LOG.info("Executing operation processDocument");
-        System.out.println(parameters);
+        LOG.info(parameters.toString());
         try {
             gov.samhsa.ds4ppilot.schema.documentprocessor.ProcessDocumentResponse _return = returnedValueOfProcessDocument;
             return _return;

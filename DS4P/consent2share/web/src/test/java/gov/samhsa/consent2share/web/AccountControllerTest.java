@@ -498,7 +498,7 @@ public class AccountControllerTest {
 	public void tesCcreatePasswordk_When_HttpPost_With_Valid_Param_Password_And_RepeatPassword()
 			throws Exception {
 
-		final String password = "Aa2345678";
+		final String password = "Aa2345678$";
 
 		mockMvc.perform(
 				post("/createPassword.html").param("password", password).param(
@@ -511,7 +511,7 @@ public class AccountControllerTest {
 	public void tesCcreatePasswordk_When_HttpPost_With_Valid_Param_Password_And_RepeatPassword_And_Token_Expired()
 			throws Exception {
 
-		final String password = "Aa2345678";
+		final String password = "Aa2345678$";
 
 		doThrow(new TokenExpiredException(""))
 				.when(passwordResetService)

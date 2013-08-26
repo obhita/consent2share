@@ -104,11 +104,11 @@ public class ProviderControllerTest {
 	public void before() {
 		mockMvc = MockMvcBuilders.standaloneSetup(this.providerController).build();
 		PatientConnectionDto patientConnectionDto = mock(PatientConnectionDto.class);
-		Set<IndividualProvider> individualProviders = new HashSet<IndividualProvider>();
-		Set<OrganizationalProvider> organizationalProviders = new HashSet<OrganizationalProvider>();
+		Set<IndividualProviderDto> individualProviders = new HashSet<IndividualProviderDto>();
+		Set<OrganizationalProviderDto> organizationalProviders = new HashSet<OrganizationalProviderDto>();
 		for(int i=0;i<3;i++) {
-			individualProviders.add(mock(IndividualProvider.class));
-			organizationalProviders.add(mock(OrganizationalProvider.class));
+			individualProviders.add(mock(IndividualProviderDto.class));
+			organizationalProviders.add(mock(OrganizationalProviderDto.class));
 			
 		}
 		when(userContext.getCurrentUser()).thenReturn(authenticatedUser);

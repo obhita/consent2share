@@ -77,10 +77,12 @@ public class OrganizationalProviderServiceImpl implements OrganizationalProvider
 	 * @see gov.samhsa.consent2share.service.provider.OrganizationalProviderService#deleteOrganizationalProviderDto(gov.samhsa.consent2share.service.dto.OrganizationalProviderDto)
 	 */
 	public void deleteOrganizationalProviderDto(OrganizationalProviderDto organizationalProviderDto){
-		OrganizationalProvider organizationalProvider=findOrganizationalProviderByPatientAndNpi(
-				patientRepository.findByUsername(organizationalProviderDto.getUsername()),
-				organizationalProviderDto.getNpi());
+		OrganizationalProvider organizationalProvider = findOrganizationalProviderByPatientAndNpi(
+				patientRepository.findByUsername(organizationalProviderDto
+						.getUsername()), organizationalProviderDto.getNpi());
+		if(organizationalProvider!=null)
 		organizationalProviderRepository.delete(organizationalProvider);
+
     }
 	
 

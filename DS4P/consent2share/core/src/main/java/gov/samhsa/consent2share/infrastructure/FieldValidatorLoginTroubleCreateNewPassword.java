@@ -94,6 +94,12 @@ public class FieldValidatorLoginTroubleCreateNewPassword implements Validator {
 							+ ".password");
 				}
 				
+				if (StringUtils.hasText(password)
+						&& (!password.matches(".*[,~,!,@,#,$,%,^,&,*,(,),-,_,=,+,[,{,],},|,;,:,<,>,/,?].*$"))) {
+					errors.rejectValue("password", "Specialchar." + targetDtoName
+							+ ".password");
+				}
+				
 				// Repeat Password
 				String repeatPassword = (String) PropertyUtils.getProperty(target,
 						"repeatPassword");

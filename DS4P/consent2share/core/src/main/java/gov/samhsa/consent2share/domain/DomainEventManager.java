@@ -29,7 +29,6 @@ import gov.samhsa.consent2share.infrastructure.SpringContext;
 
 import org.springframework.context.ApplicationContext;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class DomainEventManager.
  */
