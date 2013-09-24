@@ -1,6 +1,5 @@
 package gov.samhsa.consent2share.web;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -39,11 +38,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +47,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 /**
@@ -376,7 +369,7 @@ public class ConsentControllerTest {
 		mockMvc.perform(get("/consents/exportXACMLConsents/1"))
 		.andExpect(status().isOk());
 		
-		verify(consentExportService).exportXACMLConsent((long)1);
+		verify(consentExportService).exportConsent2XACML((long)1);
 	}
 	
 	@Test
@@ -385,7 +378,7 @@ public class ConsentControllerTest {
 		mockMvc.perform(get("/consents/exportCDAR2Consents/1"))
 		.andExpect(status().isOk());
 		
-		verify(consentExportService).exportCDAR2Consent((long)1);
+		verify(consentExportService).exportConsent2CDAR2((long)1);
 	}
 	
 	@Test
@@ -394,7 +387,7 @@ public class ConsentControllerTest {
 		mockMvc.perform(get("/consents/exportXACMLConsents/1"))
 		.andExpect(status().isOk());
 		
-		verify(consentExportService,never()).exportXACMLConsent((long)1);
+		verify(consentExportService,never()).exportConsent2XACML((long)1);
 	}
 	
 	@Test
@@ -403,7 +396,7 @@ public class ConsentControllerTest {
 		mockMvc.perform(get("/consents/exportCDAR2Consents/1"))
 		.andExpect(status().isOk());
 		
-		verify(consentExportService,never()).exportCDAR2Consent((long)1);
+		verify(consentExportService,never()).exportConsent2CDAR2((long)1);
 	}
 	
 	@Test

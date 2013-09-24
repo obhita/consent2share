@@ -92,8 +92,8 @@ public class XACMLContextHandler {
 	/*  Modified by Burak Tasel 2/4/2013 - Added needed endpoints */
 	/* begin */
 	private String auditEndpoint = "http://174.78.146.228:8080/DS4PACSServices/DS4PAuditService?wsdl";
-	private String xdsbRepositoryEndpoint = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";	 
-	private String xdsbRegistryEndpoint = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+	private String xdsbRepositoryEndpoint = "http://feijboss01:8080/axis2/services/xdsrepositoryb";	 
+	private String xdsbRegistryEndpoint = "http://feijboss01:8080/axis2/services/xdsregistryb";
 	/* end */
 	
 	private String homeCommunityId = "2.16.840.1.113883.3.467";

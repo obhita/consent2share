@@ -25,6 +25,11 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.consentexport;
 
+import gov.samhsa.consent.IndividualProviderDto;
+import gov.samhsa.consent.OrganizationalProviderDto;
+import gov.samhsa.consent.PatientDto;
+import gov.samhsa.consent.TypeCodesDto;
+
 import java.util.Date;
 import java.util.Set;
 
@@ -50,27 +55,27 @@ public class ConsentExportDto {
 
 	/** The patient export dto. */
 	@XmlElement(name = "Patient")
-	private PatientExportDto patientExportDto;
+	private PatientDto patientExportDto;
 
 	/** The providers permitted to disclose. */
 	@XmlElementWrapper(name = "IndividualProvidersPermittedToDiscloseList")
 	@XmlElement(name = "IndividualProvidersPermittedToDisclose")
-	private Set<IndividualProviderExportDto> providersPermittedToDisclose;
+	private Set<IndividualProviderDto> providersPermittedToDisclose;
 
 	/** The providers disclosure is made to. */
 	@XmlElementWrapper(name = "IndividualProvidersDisclosureIsMadeToList")
 	@XmlElement(name = "IndividualProvidersDisclosureIsMadeTo")
-	private Set<IndividualProviderExportDto> providersDisclosureIsMadeTo;
+	private Set<IndividualProviderDto> providersDisclosureIsMadeTo;
 
 	/** The organizational providers permitted to disclose. */
 	@XmlElementWrapper(name = "OrganizationalProvidersPermittedToDiscloseList")
 	@XmlElement(name = "OrganizationalProvidersPermittedToDisclose")
-	private Set<OrganizationalProviderExportDto> organizationalProvidersPermittedToDisclose;
+	private Set<OrganizationalProviderDto> organizationalProvidersPermittedToDisclose;
 
 	/** The organizational providers disclosure is made to. */
 	@XmlElementWrapper(name = "OrganizationalProvidersDisclosureIsMadeToList")
 	@XmlElement(name = "OrganizationalProvidersDisclosureIsMadeTo")
-	private Set<OrganizationalProviderExportDto> organizationalProvidersDisclosureIsMadeTo;
+	private Set<OrganizationalProviderDto> organizationalProvidersDisclosureIsMadeTo;
 
 	/** The consent start. */
 	@DateTimeFormat(pattern = "MM/dd/yyyy")
@@ -93,7 +98,7 @@ public class ConsentExportDto {
 
 	/** The legal representative. */
 	@ManyToOne
-	private PatientExportDto legalRepresentative;
+	private PatientDto legalRepresentative;
 
 	/** The do not share clinical document type codes. */
 	@XmlElementWrapper(name = "doNotShareClinicalDocumentTypeCodesList")
@@ -120,7 +125,7 @@ public class ConsentExportDto {
 	 *
 	 * @return the patient export dto
 	 */
-	public PatientExportDto getPatientExportDto() {
+	public PatientDto getPatientExportDto() {
 		return patientExportDto;
 	}
 
@@ -129,7 +134,7 @@ public class ConsentExportDto {
 	 *
 	 * @param patientExportDto the new patient export dto
 	 */
-	public void setPatientExportDto(PatientExportDto patientExportDto) {
+	public void setPatientExportDto(PatientDto patientExportDto) {
 		this.patientExportDto = patientExportDto;
 	}
 
@@ -138,7 +143,7 @@ public class ConsentExportDto {
 	 *
 	 * @return the providers permitted to disclose
 	 */
-	public Set<IndividualProviderExportDto> getProvidersPermittedToDisclose() {
+	public Set<IndividualProviderDto> getProvidersPermittedToDisclose() {
 		return providersPermittedToDisclose;
 	}
 
@@ -148,7 +153,7 @@ public class ConsentExportDto {
 	 * @param providersPermittedToDisclose the new providers permitted to disclose
 	 */
 	public void setProvidersPermittedToDisclose(
-			Set<IndividualProviderExportDto> providersPermittedToDisclose) {
+			Set<IndividualProviderDto> providersPermittedToDisclose) {
 		this.providersPermittedToDisclose = providersPermittedToDisclose;
 	}
 
@@ -157,7 +162,7 @@ public class ConsentExportDto {
 	 *
 	 * @return the providers disclosure is made to
 	 */
-	public Set<IndividualProviderExportDto> getProvidersDisclosureIsMadeTo() {
+	public Set<IndividualProviderDto> getProvidersDisclosureIsMadeTo() {
 		return providersDisclosureIsMadeTo;
 	}
 
@@ -167,7 +172,7 @@ public class ConsentExportDto {
 	 * @param providersDisclosureIsMadeTo the new providers disclosure is made to
 	 */
 	public void setProvidersDisclosureIsMadeTo(
-			Set<IndividualProviderExportDto> providersDisclosureIsMadeTo) {
+			Set<IndividualProviderDto> providersDisclosureIsMadeTo) {
 		this.providersDisclosureIsMadeTo = providersDisclosureIsMadeTo;
 	}
 
@@ -176,7 +181,7 @@ public class ConsentExportDto {
 	 *
 	 * @return the organizational providers permitted to disclose
 	 */
-	public Set<OrganizationalProviderExportDto> getOrganizationalProvidersPermittedToDisclose() {
+	public Set<OrganizationalProviderDto> getOrganizationalProvidersPermittedToDisclose() {
 		return organizationalProvidersPermittedToDisclose;
 	}
 
@@ -186,7 +191,7 @@ public class ConsentExportDto {
 	 * @param organizationalProvidersPermittedToDisclose the new organizational providers permitted to disclose
 	 */
 	public void setOrganizationalProvidersPermittedToDisclose(
-			Set<OrganizationalProviderExportDto> organizationalProvidersPermittedToDisclose) {
+			Set<OrganizationalProviderDto> organizationalProvidersPermittedToDisclose) {
 		this.organizationalProvidersPermittedToDisclose = organizationalProvidersPermittedToDisclose;
 	}
 
@@ -195,7 +200,7 @@ public class ConsentExportDto {
 	 *
 	 * @return the organizational providers disclosure is made to
 	 */
-	public Set<OrganizationalProviderExportDto> getOrganizationalProvidersDisclosureIsMadeTo() {
+	public Set<OrganizationalProviderDto> getOrganizationalProvidersDisclosureIsMadeTo() {
 		return organizationalProvidersDisclosureIsMadeTo;
 	}
 
@@ -205,7 +210,7 @@ public class ConsentExportDto {
 	 * @param organizationalProvidersDisclosureIsMadeTo the new organizational providers disclosure is made to
 	 */
 	public void setOrganizationalProvidersDisclosureIsMadeTo(
-			Set<OrganizationalProviderExportDto> organizationalProvidersDisclosureIsMadeTo) {
+			Set<OrganizationalProviderDto> organizationalProvidersDisclosureIsMadeTo) {
 		this.organizationalProvidersDisclosureIsMadeTo = organizationalProvidersDisclosureIsMadeTo;
 	}
 
@@ -380,7 +385,7 @@ public class ConsentExportDto {
 	 *
 	 * @return the legal representative
 	 */
-	public PatientExportDto getLegalRepresentative() {
+	public PatientDto getLegalRepresentative() {
 		return legalRepresentative;
 	}
 
@@ -389,7 +394,7 @@ public class ConsentExportDto {
 	 *
 	 * @param legalRepresentative the new legal representative
 	 */
-	public void setLegalRepresentative(PatientExportDto legalRepresentative) {
+	public void setLegalRepresentative(PatientDto legalRepresentative) {
 		this.legalRepresentative = legalRepresentative;
 	}
 

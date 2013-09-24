@@ -25,15 +25,15 @@
  ******************************************************************************/
 package gov.samhsa.ds4ppilot.orchestrator;
 
+import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.orchestrator.audit.AuditService;
 import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32Getter;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandler;
-import gov.samhsa.ds4ppilot.orchestrator.documentprocessor.DocumentProcessor;
+import gov.samhsa.ds4ppilot.orchestrator.documentsegmentation.DocumentSegmentation;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistry;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepository;
-import gov.samhsa.ds4ppilot.schema.documentprocessor.ProcessDocumentResponse;
 import gov.samhsa.ds4ppilot.schema.securedorchestrator.RegisteryStoredQueryResponse;
 import gov.samhsa.ds4ppilot.schema.securedorchestrator.RetrieveDocumentSetResponse;
 
@@ -114,8 +114,8 @@ public class SecuredOrchestratorImpl implements SecuredOrchestrator {
 	/** The C32 getter. */
 	private final C32Getter c32Getter;
 
-	/** The document processor. */
-	private final DocumentProcessor documentProcessor;
+	/** The document segmentation service. */
+	private final DocumentSegmentation documentSegmentation;
 
 	/** The data handler to bytes converter. */
 	private final DataHandlerToBytesConverter dataHandlerToBytesConverter;
@@ -167,21 +167,21 @@ public class SecuredOrchestratorImpl implements SecuredOrchestrator {
 	 *
 	 * @param contextHandler the context handler
 	 * @param c32Getter the C32 getter
-	 * @param documentProcessor the document processor
+	 * @param documentSegmentation the document segmentation
 	 * @param auditService the audit service
 	 * @param dataHandlerToBytesConverter the data handler to bytes converter
 	 * @param xdsbRepository the xdsb repository
 	 * @param xdsbRegistry the xdsb registry
 	 */
 	public SecuredOrchestratorImpl(ContextHandler contextHandler,
-			C32Getter c32Getter, DocumentProcessor documentProcessor,
+			C32Getter c32Getter, DocumentSegmentation documentSegmentation,
 			AuditService auditService,
 			DataHandlerToBytesConverter dataHandlerToBytesConverter,
 			XdsbRepository xdsbRepository, XdsbRegistry xdsbRegistry) {
 		super();
 		this.contextHandler = contextHandler;
 		this.c32Getter = c32Getter;
-		this.documentProcessor = documentProcessor;
+		this.documentSegmentation = documentSegmentation;
 		this.dataHandlerToBytesConverter = dataHandlerToBytesConverter;
 		this.xdsbRepository = xdsbRepository;
 		this.xdsbRegistry = xdsbRegistry;
@@ -238,13 +238,13 @@ public class SecuredOrchestratorImpl implements SecuredOrchestrator {
 			// LOGGER.debug(originalC32);
 
 			if (!isConsentDocument(originalDocument)) {
-				ProcessDocumentResponse processDocumentResponse = documentProcessor
-						.processDocument(originalDocument,
+				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
+						.segmentDocument(originalDocument,
 								xacmlResponseXml.toString(), false, true,
 								"leo.smith@direct.obhita-stage.org",
 								intendedRecipient, documentUniqueId);
 				processedPayload = dataHandlerToBytesConverter
-						.toByteArray(processDocumentResponse
+						.toByteArray(segmentDocumentResponse
 								.getProcessedDocument());
 				// get processed document
 				String processedDocument = new String(processedPayload);
@@ -258,12 +258,12 @@ public class SecuredOrchestratorImpl implements SecuredOrchestrator {
 				retrieveDocumentSetResponse
 						.setReturn(marshall(xdsbRetrieveDocumentSetResponse));
 				retrieveDocumentSetResponse
-						.setKekEncryptionKey(processDocumentResponse
+						.setKekEncryptionKey(segmentDocumentResponse
 								.getKekEncryptionKey());
 				retrieveDocumentSetResponse
-						.setKekMaskingKey(processDocumentResponse
+						.setKekMaskingKey(segmentDocumentResponse
 								.getKekMaskingKey());
-				retrieveDocumentSetResponse.setMetadata(processDocumentResponse
+				retrieveDocumentSetResponse.setMetadata(segmentDocumentResponse
 						.getPostProcessingMetadata());
 			} else {
 				DocumentResponse document = new DocumentResponse();

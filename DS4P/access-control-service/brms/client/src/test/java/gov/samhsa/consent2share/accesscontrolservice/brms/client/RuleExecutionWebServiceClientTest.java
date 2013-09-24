@@ -21,15 +21,18 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RuleExecutionWebServiceClientTest {
 	protected static Endpoint ep;
 	protected static String address;
+	private static final Logger LOGGER = LoggerFactory.getLogger(RuleExecutionWebServiceClientTest.class);
 
 	private static final AssertAndExecuteClinicalFactsResponse returnedValueOfAssertAndExecuteClinicalFacts = new AssertAndExecuteClinicalFactsResponse();
 	private static final String ruleExecutionResponseContaine = "RuleExecutionResponseContaine";
@@ -50,7 +53,7 @@ public class RuleExecutionWebServiceClientTest {
 		try {
 			ep.stop();
 		} catch (Throwable t) {
-			System.out.println("Error thrown: " + t.getMessage());
+			LOGGER.debug("Error thrown: " + t.getMessage());
 		}
 	}
 

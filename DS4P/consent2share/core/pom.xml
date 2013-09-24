@@ -54,12 +54,6 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<!-- Persistence -->
@@ -74,21 +68,11 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>cglib</groupId>
-					<artifactId>cglib</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>dom4j</groupId>
-					<artifactId>dom4j</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-envers</artifactId>
-        </dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-envers</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
@@ -104,16 +88,14 @@
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
-			<version>2.2.7</version>
 		</dependency>
-		
+
 		<!-- Saxon-HE dependencies -->
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-			<version>9.4</version>
 		</dependency>
-            
+
 
 		<!-- iText -->
 		<dependency>
@@ -132,7 +114,7 @@
 			<groupId>org.thymeleaf</groupId>
 			<artifactId>thymeleaf</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.amqp</groupId>
 			<artifactId>spring-rabbit</artifactId>
@@ -183,27 +165,11 @@
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-digester</groupId>
 			<artifactId>commons-digester</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-fileupload</groupId>
@@ -260,34 +226,18 @@
 			<artifactId>adobe-ecosign</artifactId>
 		</dependency>
 
-	<dependency>
-		<groupId>edu.vt.middleware</groupId>
-		<artifactId>vt-password</artifactId>
-		<version>3.1.2</version>
-	</dependency>
-
+		<dependency>
+			<groupId>edu.vt.middleware</groupId>
+			<artifactId>vt-password</artifactId>
+		</dependency>
+		<!-- Our own projects Start -->
+		<dependency>
+			<groupId>gov.samhsa.consent</groupId>
+			<artifactId>consent-gen</artifactId>
+		</dependency>
+		<!-- Our own projects End -->
 
 	</dependencies>
-	
-		<repositories>
-		<repository>
-			<id>wso2-maven2-repository</id>
-			<url>http://dist.wso2.org/maven2</url>
-		</repository>
-	</repositories>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>tlc</id>
-			<name>TLC Repository</name>
-
-			<url>http://commons.ucalgary.ca/pub/m2</url>
-		</pluginRepository>
-
-		<pluginRepository>
-			<id>wso2-maven2-repository</id>
-			<url>http://dist.wso2.org/maven2</url>
-		</pluginRepository>
-	</pluginRepositories>
 
 </project>

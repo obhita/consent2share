@@ -242,6 +242,12 @@ used more than once per page.
 			
 	}
 	
+	.btn {
+		[class^="icon-"] + span, [class*=" icon-"] + span {			
+			margin-left: 3px;			
+		}
+	}
+	
 	/* 	Footer Features */
 	#footer-features{
 		@extend #body-features;
@@ -371,19 +377,30 @@ used more than once per page.
 
 
 	/* Brand Logo  */
-		#brand-gray:before {
+		
+		
+		#logoFragment img {
+			height: 38px;
+			margin: -10px 0 -11px 0;
+			}
+
+
+		#brand-blue:before {
+			content: "consent2share";
+			font-weight:200px;
+			margin-right: 10px;
+			background-color:transparent;
+			color:#13aaea;	
+			}
+
+
+	/*	#brand-gray:before {
 			content: "consent";
 			font-weight:200;
 			background-color:transparent;
 			color:gray;
 		}
 		
-		#brand-blue:before {
-			content: "share";
-			font-weight:200px;
-			background-color:transparent;
-			color:#13aaea;	
-			}
 			
 		#brand-blue-2:before { 
 			content: "2";
@@ -403,7 +420,9 @@ used more than once per page.
 			display: inline; 
 			@include border-radius(25px)
 			}
-
+	*/
+	
+	
 	#bread-crumb-btn {
 			float: left;
 		}
@@ -412,7 +431,7 @@ used more than once per page.
 	
 	
 	
-	.fred {
+	.summary-record-details-container {
 			display: inline;
 		ul {
 			width: 44%;
@@ -849,6 +868,11 @@ since they may be used more than once.
 	line-height: 18px;
 	}
 	
+	/*  SideBar Pulldown Tab  */
+	.guide-pulldown-tab {
+		z-index: 200;
+	}
+	
 	/* Disclaimer */
 	.disclaimer{
 	font-size: .8em;
@@ -1160,9 +1184,13 @@ since they may be used more than once.
 		box-shadow:inset 0 1px 2px rgba(0,0,0,0.1),0 1px 0 rgba(255,255,255,0.15);
 	}
 	
+	.btn-mainmenu {
+		display: none;
+	}
+	
 	.navbar .btn, .navbar .btn-group {
-	margin-top: 5px;
-	margin-bottom: 2px;
+		margin-top: 5px;
+		margin-bottom: 2px;
 	}
 	
 	.nav-popdown form {
@@ -1208,6 +1236,14 @@ since they may be used more than once.
 		margin-bottom:10px;
 		&:hover {
 			border-color: #0088cc;
+		}
+		
+		ul.provider-ul {
+			li {
+				overflow: auto !important;
+				white-space: normal !important;
+				height: auto;
+			}
 		}
 	}
 	
@@ -1268,11 +1304,26 @@ since they may be used more than once.
 		padding: 10px 22px 15px 15px;
 	}
 	
+	
+@media only screen and (max-width: 979px) {
+	
+	.btn-mainmenu {
+		display: block;
+  		float: right;
+		}	
+	}
+	
 	/*
 @media only screen and (max-width: 979px) {
 	.myhome-tourbox2a	 {
 		display: none !important;  
 		}
+	
+	.btn-mainmenu {
+		display: block;
+  		float: right;
+	}
+	
 	}
 	
 	@media only screen and (min-width: 980px) {
@@ -1365,7 +1416,13 @@ class selector.
 		display: inline;
 	}
 	
-
+	/*  This class is used to fix the Flash of Unstyled Content (FOUC) issue  */
+	
+	body.fouc_loading {
+		display: none !important;
+	}
+	
+	
 
 /* !CHANGING STATE RULES */
 /*============================================================
@@ -1401,13 +1458,31 @@ Media Query - defines how things should be styles under defined criteria
 }
 
 
+/* Max-width 979px Wide 
+====================================================================== */
+
+@media only screen and (max-width: 979px) {
+	
+/* Brand Logo  */
+	
+	.myaccount-buttons {
+			display: none !important;
+			}
+		
+	}
+
 
 /* 768px Wide - MOBILE - Landscape, Tablet Portrait (devices and browsers)
 ====================================================================== */
 
 @media only screen and (min-width: 480px) and (max-width: 768px) {
 
-
+	
+	#logoFragment img {
+			height: 30px;
+			margin: -10px 0 -11px 0;
+			}
+	
 	#home-login-container {
 		max-width: none;
 			width: 90%;
@@ -1453,6 +1528,10 @@ Media Query - defines how things should be styles under defined criteria
 		width:auto;
 		display:inherit;
 	}	
+	
+	.btn-group {
+		margin-right: 10px !important;
+	}
 	
 	.nav-popdown, #topnavbar {
 		margin-left:20px;
@@ -1565,13 +1644,21 @@ Media Query - defines how things should be styles under defined criteria
 			width: 100%;
 		}
 		
-		/* Brand Logo  */
+/* Brand Logo  */
+		
+		
+		#logoFragment img {
+			height: 30px;
+			margin: -10px 0 -11px 0;
+			}
+		
 		#brand-gray:before {
 			font-size: 16px;
 		}
 		
 		#brand-blue:before {
 			font-size: 16px;
+			display: none;
 			}
 			
 		#brand-blue-2:before { 
@@ -1627,7 +1714,7 @@ Media Query - defines how things should be styles under defined criteria
 		margin-left: .5%;
 	}
 	
-	.fred {
+	.summary-record-details-container {
 		#consent-right-arrow-container {
 		margin-left: 2%;
 		}
@@ -1680,8 +1767,6 @@ Media Query - defines how things should be styles under defined criteria
 		font-size:16px;
 	}
 	
-	
-
 
 .navbar .btn-navbar {
   display: block;
@@ -1710,6 +1795,10 @@ Media Query - defines how things should be styles under defined criteria
 	.navbar .btn, .navbar .btn-group {
 	margin-top: 8px;
 	margin-bottom: 2px;
+	}
+	
+	.btn-group {
+		margin-right: 0 !important;
 	}
 
 	#connections-content legend {

@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 import gov.samhsa.consent2share.domain.account.TroubleType;
+import gov.samhsa.consent2share.infrastructure.FieldValidatorChangePassword;
 import gov.samhsa.consent2share.infrastructure.FieldValidatorLoginTroubleCreateNewPassword;
 import gov.samhsa.consent2share.infrastructure.FieldValidatorLoginTroublePassword;
 import gov.samhsa.consent2share.infrastructure.FieldValidatorLoginTroubleSelection;
@@ -45,6 +46,7 @@ public class AccountControllerTest {
 	private FieldValidatorLoginTroubleSelection fieldValidatorTroubleSelection;
 	private FieldValidatorLoginTroubleCreateNewPassword fieldValidatorLoginTroubleCreateNewPassword;
 	private PasswordResetService passwordResetService;
+	private FieldValidatorChangePassword fieldValidatorChangePassword;
 
 	private MockMvc mockMvc;
 
@@ -62,7 +64,7 @@ public class AccountControllerTest {
 
 		sut = new AccountController(fieldValidatorPassword,
 				fieldValidatorLoginTroubleCreateNewPassword,
-				fieldValidatorTroubleSelection, passwordResetService);
+				fieldValidatorTroubleSelection, fieldValidatorChangePassword, passwordResetService);
 
 		mockMvc = standaloneSetup(this.sut).build();
 	}

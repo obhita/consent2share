@@ -34,13 +34,13 @@ import gov.samhsa.consent2share.service.dto.LegalRepresentativeDto;
 import gov.samhsa.consent2share.service.dto.LookupDto;
 import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
-import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.ProviderDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
 import gov.samhsa.consent2share.service.patient.PatientLegalRepresentativeAssociationService;
 import gov.samhsa.consent2share.service.patient.PatientService;
 import gov.samhsa.consent2share.service.provider.IndividualProviderService;
 import gov.samhsa.consent2share.service.provider.OrganizationalProviderService;
+import gov.samhsa.consent2share.service.provider.ProviderSearchLookupService;
 import gov.samhsa.consent2share.service.reference.AdministrativeGenderCodeService;
 import gov.samhsa.consent2share.service.reference.LanguageCodeService;
 import gov.samhsa.consent2share.service.reference.LegalRepresentativeTypeCodeService;
@@ -49,13 +49,20 @@ import gov.samhsa.consent2share.service.reference.RaceCodeService;
 import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -122,6 +129,12 @@ public class ProviderController {
 	/** The user context. */
 	@Autowired
 	UserContext userContext;
+	
+	@Autowired
+	ProviderSearchLookupService providerSearchLookupService;
+	
+	/** The logger. */
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
 	/**
@@ -236,8 +249,6 @@ public class ProviderController {
 	@RequestMapping(value = "connectionProviderAdd.html")
 	public String providerSearch(Model model) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
-		PatientProfileDto patientProfileDto = patientService.findPatientProfileByUsername(currentUser
-				.getUsername());
 		PatientConnectionDto patientConnectionDto=patientService.findPatientConnectionByUsername(currentUser
 				.getUsername());
 		Set<String> npiList=new HashSet<String>();
@@ -255,6 +266,39 @@ public class ProviderController {
 		populateLookupCodes(model);
 		return "views/patients/connectionProviderAdd";
 	}
+	
+	
+	@RequestMapping(value = "providerSearch.html",  method = RequestMethod.GET)
+	public String ajaxProviderSearch(HttpServletRequest request,
+			HttpServletResponse response)
+	{
+		try {
+			response.setHeader("Content-Type", "application/json");
+			OutputStream out = response.getOutputStream();
+			String usstate=request.getParameter("usstate");
+			String city=request.getParameter("city");
+			String zipcode=request.getParameter("zipcode");
+			String gender=request.getParameter("gender");
+			String specialty=request.getParameter("specialty");
+			String phone=request.getParameter("phone");
+			String firstname=request.getParameter("firstname");
+			String lastname=request.getParameter("lastname");
+			
+			if(providerSearchLookupService.isValidatedSearch(usstate,city,zipcode,gender,specialty,phone,firstname,lastname)==true)
+			{IOUtils.copy(
+					new ByteArrayInputStream(
+							providerSearchLookupService.providerSearch(usstate,city,zipcode,gender,specialty,phone,firstname,lastname).getBytes()), out);
+			out.flush();
+			out.close();
+			}
+
+		} catch (IOException e) {
+			logger.error("Error when calling provider search. The exception is:", e);
+		}
+
+		return null;
+		
+		}
 	
 	/**
 	 * Provider search.

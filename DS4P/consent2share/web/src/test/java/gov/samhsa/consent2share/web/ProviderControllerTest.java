@@ -1,5 +1,6 @@
 package gov.samhsa.consent2share.web;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -8,8 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import gov.samhsa.consent2share.domain.provider.IndividualProvider;
-import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
@@ -22,6 +21,7 @@ import gov.samhsa.consent2share.service.patient.PatientLegalRepresentativeAssoci
 import gov.samhsa.consent2share.service.patient.PatientService;
 import gov.samhsa.consent2share.service.provider.IndividualProviderService;
 import gov.samhsa.consent2share.service.provider.OrganizationalProviderService;
+import gov.samhsa.consent2share.service.provider.ProviderSearchLookupService;
 import gov.samhsa.consent2share.service.reference.AdministrativeGenderCodeService;
 import gov.samhsa.consent2share.service.reference.LanguageCodeService;
 import gov.samhsa.consent2share.service.reference.LegalRepresentativeTypeCodeService;
@@ -37,6 +37,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.MessageSource;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -81,6 +82,9 @@ public class ProviderControllerTest {
 	
 	@Mock
 	PatientLegalRepresentativeAssociationService patientLegalRepresentativeAssociationService;
+	
+	@Mock
+	ProviderSearchLookupService providerSearchLookupService;
 
 	@Mock
 	UserContext userContext;
@@ -122,6 +126,16 @@ public class ProviderControllerTest {
 	public void testConnectionMain() throws Exception {
 		mockMvc.perform(get("/patients/connectionMain.html"))
 			.andExpect(view().name("views/patients/connectionMain"));
+	}
+	
+	
+	@Test
+	public void testAjaxProviderSearch_Checked_Status_Is_OK() throws Exception {
+		 when(providerSearchLookupService.isValidatedSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(true);
+		 when(providerSearchLookupService.providerSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn("artifitial JSON");
+		 mockMvc.perform(get("/patients/providerSearch.html"))
+         	.andExpect(status().isOk())
+         	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 
 	@Test

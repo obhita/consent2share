@@ -17,21 +17,9 @@
 	width: 250px;
 }
 	
-
-.alert {
-	margin-bottom: 15px;
-	&.rounded {
-	padding: 8px 35px 8px 14px;
-	margin-bottom: 0px;
-	text-align: center; 
-	text-shadow: 0 1px 0
-	rgba(255, 255, 255, 0.5);
-	/*
-	background-color: 
-	#fcf8e3;
-	border: 1px solid 
-	#fbeed5;
-	*/
+span:last-child{
+	.alert.rounded{
+			margin-bottom: 5px;
 	-webkit-border-bottom-right-radius: 9px;
 	-webkit-border-bottom-left-radius: 9px;
 	-webkit-border-top-left-radius: 0px;
@@ -44,9 +32,24 @@
 			border-bottom-left-radius: 9px;
 			border-top-right-radius: 0px;
 			border-top-left-radius: 0px;
-		&:last-child {
-			margin-bottom: 5px;
-		}
+	}
+}
+
+.alert {
+	margin-bottom: 15px;
+	&.rounded {
+	padding: 8px 35px 8px 14px;
+	margin-bottom: 1px;
+	text-align: center; 
+	text-shadow: 0 1px 0
+	rgba(255, 255, 255, 0.5);
+	border-radius: 0;
+	/*
+	background-color: 
+	#fcf8e3;
+	border: 1px solid 
+	#fbeed5;
+	*/
 	}
 	.alert-box {
 			.alert-warning{
@@ -110,7 +113,7 @@
 		 -webkit-border-radius: 1px;
      		-moz-border-radius: 1px;
           		 border-radius: 1px;
-          background-color: #9BCC84;
+          background-color: #fffef2;
           background-image: linear-gradient(to bottom, #fffff2, #fffff2);
           border-style: solid;
           border-color: #3F913F;
@@ -145,7 +148,7 @@
   line-height: 14px;
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  white-space: nowrap;
+  white-space: normal;
   vertical-align: baseline;
   background-color: #999999;
 }
@@ -583,6 +586,22 @@ ul.dashboard-list li a span {
 
 	/*=== Navigation Section ===*/
 
+@media only screen and (min-width: 980px) {
+	.nav-tabs.nav-stacked > li.shortcut-button {
+		display: none !important;
+	}
+}
+
+/*.nav-tabs.nav-stacked > li.shortcut-button {
+			 margin-top: 10px !important;
+}*/
+
+.nav-tabs.nav-stacked > li:nth-child(9) {
+			a {margin-top: 13px !important;}
+}
+
+	
+
 .nav-tabs.nav-stacked > li > a {
   	margin: 2px;
 	color: #646464;
@@ -605,6 +624,9 @@ ul.dashboard-list li a span {
 	}
 	.icon-white {
 		opacity: 1;
+	}
+	& [class^="icon-"] {
+		line-height: 16px !important;
 	}
 }
 

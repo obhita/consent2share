@@ -59,10 +59,10 @@ public class RequestGenerator {
 		
 		String request="<Request xmlns=\"urn:oasis:names:tc:xacml:2.0:context:schema:os\"     " +
 				"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">     <Subject>      " +
-				"<Attribute AttributeId=\"urn:samhsa:names:tc:consent2share:1.0:subject:accessor-provider-npi\"       " +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject\"       " +
 				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       " +
 				"<AttributeValue>"+accessorNPI+"</AttributeValue>      </Attribute>      " +
-				"<Attribute AttributeId=\"urn:samhsa:names:tc:consent2share:1.0:subject:receiver-provider-npi\"       " +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject\"       " +
 				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>"+receiverNPI+"</AttributeValue>      " +
 				"</Attribute>	  <Attribute AttributeId=\"gov.samhsa.consent2share.purpose-of-use-code\"       " +
 				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>"+purposeOfUse+"</AttributeValue>      " +

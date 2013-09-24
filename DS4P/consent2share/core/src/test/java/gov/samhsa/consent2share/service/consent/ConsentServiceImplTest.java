@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.ConsentPdfGenerator;
 import gov.samhsa.consent2share.domain.consent.ConsentRepository;
@@ -374,13 +375,14 @@ public class ConsentServiceImplTest {
 	
 	/**
 	 * Test save consent.
+	 * @throws ConsentGenException 
 	 */
 	@Test
-	public void testSaveConsent(){
+	public void testSaveConsent() throws ConsentGenException{
 		ConsentService cstSpy=spy(cst);
 		Consent consent=mock(Consent.class);
 		when(cstSpy.makeConsent()).thenReturn(consent);
-		when(consentExportService.exportXACMLConsent(any(Consent.class))).thenReturn("mockXACML");
+		when(consentExportService.exportConsent2XACML(any(Consent.class))).thenReturn("mockXACML");
 		ConsentDto consentDto=mock(ConsentDto.class);
 		cstSpy.saveConsent(consentDto);
 		verify(consentRepository).save(consent);

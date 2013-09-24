@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.consent;
 
+import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.ConsentDoNotShareClinicalDocumentSectionTypeCode;
 import gov.samhsa.consent2share.domain.consent.ConsentDoNotShareClinicalDocumentTypeCode;
@@ -59,10 +60,14 @@ import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 import gov.samhsa.consent2share.service.dto.ConsentDto;
-import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
+import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -70,8 +75,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -133,6 +139,9 @@ public class ConsentServiceImpl implements ConsentService {
 	/** The consent export service. */
 	@Autowired
 	private ConsentExportService consentExportService;
+	
+	/** The logger. */
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	/**
 	 * Count all consents.
@@ -502,8 +511,9 @@ public class ConsentServiceImpl implements ConsentService {
      * 
      * @param consentDto
      *            the consent dto
+     * @throws ConsentGenException 
      */
-    public void saveConsent(ConsentDto consentDto) {
+    public void saveConsent(ConsentDto consentDto) throws ConsentGenException {
 	Consent consent = makeConsent();
 	Patient patient = patientRepository.findByUsername(consentDto.getUsername());
 
@@ -623,6 +633,7 @@ public class ConsentServiceImpl implements ConsentService {
 	    for (SpecificMedicalInfoDto item : consentDto.getDoNotShareClinicalConceptCodes()) {
 		ClinicalConceptCode clinicalConceptCode = new ClinicalConceptCode();
 		clinicalConceptCode.setCode(item.getCode());
+		clinicalConceptCode.setCodeSystem(item.getCodeSystem());
 		clinicalConceptCode.setCodeSystemName(item.getCodeSystem());
 		clinicalConceptCode.setDisplayName(item.getDisplayName());
 		doNotShareClinicalConceptCodes.add(clinicalConceptCode);
@@ -632,7 +643,7 @@ public class ConsentServiceImpl implements ConsentService {
 	else
 	    consent.setDoNotShareClinicalConceptCodes(new HashSet<ClinicalConceptCode>());
 
-	// Set Dates
+	// Set Dates	
 	consent.setStartDate(consentDto.getConsentStart());
 	consent.setEndDate(consentDto.getConsentEnd());
 
@@ -640,7 +651,12 @@ public class ConsentServiceImpl implements ConsentService {
 	consent.setName("Consent");
 	consent.setDescription("This is a consent made by " + patient.getFirstName() + " " + patient.getLastName());
 	consent.setUnsignedPdfConsent(consentPdfGenerator.generate42CfrPart2Pdf(consent));
-	consent.setXacmlPolicyFile(consentExportService.exportXACMLConsent(consent).getBytes());
+	try {
+		consent.setXacmlPolicyFile(consentExportService.exportConsent2XACML(consent).getBytes());
+	} catch (ConsentGenException e) {
+		logger.error("Error in saving consent in xacml format",e);
+		throw new ConsentGenException(e.getMessage());
+	}
 	consentRepository.save(consent);
 
     }
@@ -783,10 +799,27 @@ public class ConsentServiceImpl implements ConsentService {
 //			toDiscloseName.addAll(toDiscloseOrgName);
 			consentDto.setDoNotShareClinicalConceptCodes(consentDoNotShareClinicalConceptCodes);
 			consentDto.setId(consent.getId());
-			
-			consentDto.setConsentEnd(consent.getEndDate());
-			//consentDto.setConsentEnd(new Date("08/16/2013"));
-			consentDto.setConsentStart(consent.getStartDate());		
+
+			//
+		    // Converting timestamp to Date to resolve
+			// rendering the values in IE
+		    //
+		    DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+		    String today = "" ;			
+		    try {
+				today = formatter.format(consent.getStartDate());
+				consentDto.setConsentStart(formatter.parse(today));
+			} catch (ParseException e) {
+				consentDto.setConsentStart(consent.getStartDate());
+				e.printStackTrace();
+			}		
+			try {
+				today = formatter.format(consent.getEndDate());
+				consentDto.setConsentEnd(formatter.parse(today));
+			} catch (ParseException e) {
+				consentDto.setConsentEnd(consent.getEndDate());
+				e.printStackTrace();
+			}	
 			
 			// TODO: Cleanup: combine name and npi into one object
 			// populate consent dto with selected options
@@ -829,5 +862,7 @@ public class ConsentServiceImpl implements ConsentService {
 		}
 		return true;
 	}
+	
+
 
 }

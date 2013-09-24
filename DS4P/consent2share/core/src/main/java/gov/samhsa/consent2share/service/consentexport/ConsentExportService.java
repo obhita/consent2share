@@ -25,12 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.consentexport;
 
+import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.consent.Consent;
-
-import java.io.ByteArrayOutputStream;
-
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.springframework.security.access.annotation.Secured;
 
@@ -41,63 +37,25 @@ import org.springframework.security.access.annotation.Secured;
 public abstract interface ConsentExportService {
 	
 	/**
-	 * Export cda r2 consent.
+	 * Export consent to CDAR2 format.
 	 *
 	 * @param consentId the consent id
 	 */
-	String  exportCDAR2Consent(Long consentId);
+	String  exportConsent2CDAR2(Long consentId) throws ConsentGenException;
 	
 	/**
-	 * Export xacml consent.
+	 * Export consent to xacml format.
 	 *
 	 * @param consentId the consent id
 	 */
-	String exportXACMLConsent(Long consentId);
+	String exportConsent2XACML(Long consentId) throws ConsentGenException;
 	
 	/**
-	 * Export xacml consent.
+	 * Export consent to xacml format.
 	 *
 	 * @param consent the consent
 	 * @return the string
 	 */
-	String exportXACMLConsent(Consent consent);
-	
-	/**
-	 * Jaxb marshall.
-	 *
-	 * @param consentExportDto the consent export dto
-	 * @return the byte array output stream
-	 */
-	ByteArrayOutputStream jaxbMarshall(ConsentExportDto consentExportDto);
-	
-	/**
-	 * Saxon transform.
-	 *
-	 * @param xslID the xsl id
-	 * @param streamSource the stream source
-	 * @return the stream result
-	 */
-	StreamResult saxonTransform(String xslID, StreamSource streamSource );
-	
-	/**
-	 * Make consent export dto.
-	 *
-	 * @return the consent export dto
-	 */
-	ConsentExportDto makeConsentExportDto();
-	
-	/**
-	 * Consent export map.
-	 *
-	 * @param consent the consent
-	 * @return the consent export dto
-	 */
-	ConsentExportDto consentExportMap(Consent consent);
-	
-	/**
-	 * Make type codes dto.
-	 *
-	 * @return the type codes dto
-	 */
-	TypeCodesDto makeTypeCodesDto();
+	String exportConsent2XACML(Consent consent) throws ConsentGenException;
+
 }

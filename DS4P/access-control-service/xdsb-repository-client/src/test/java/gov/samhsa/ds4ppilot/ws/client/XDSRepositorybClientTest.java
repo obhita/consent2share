@@ -103,7 +103,7 @@ public class XDSRepositorybClientTest {
 	/*
 	 * @Test public void testProvideAndRegisterDocumentSetRequest() throws
 	 * JAXBException { final String demoEndpoint =
-	 * "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
+	 * "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 	 * final String javaVmEndpoint =
 	 * "http://192.168.223.134:8080/axis2/services/xdsrepositoryb"; final String
 	 * dotnetVmEndpoint =

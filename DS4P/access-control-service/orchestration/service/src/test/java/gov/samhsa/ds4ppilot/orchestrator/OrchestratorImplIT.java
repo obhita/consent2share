@@ -9,9 +9,8 @@ import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32GetterImpl;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandlerImpl;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.PolicyDecisionPoint;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.PolicyDecisionPointImpl;
-import gov.samhsa.ds4ppilot.orchestrator.contexthandler.PolicyDecisionPointImpl;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.RequestGenerator;
-import gov.samhsa.ds4ppilot.orchestrator.documentprocessor.DocumentProcessorImpl;
+import gov.samhsa.ds4ppilot.orchestrator.documentsegmentation.DocumentSegmentationImpl;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistryImpl;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepositoryImpl;
 import gov.samhsa.ds4ppilot.schema.orchestrator.FilterC32Response;
@@ -121,28 +120,28 @@ public class OrchestratorImplIT {
 		String c32String = loadXMLAsString("c32.xml");
 		when(c32Getter.getC32(resourceId)).thenReturn(c32String);
 		
-		// document processor
-		final String documentProcessorEndpointAddress = "http://localhost:90/DocumentProcessor/services/processdocumentservice";
-		DocumentProcessorImpl documentProcessor = new DocumentProcessorImpl(
-				documentProcessorEndpointAddress);
+		// document segmentation
+		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
+				documentSegmentationEndpointAddress);
 
 		// dataHandlerToBytesConverter
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
 		
 		// xdsbRepository
-		final String xdsbRepositoryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
+		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
 				xdsbRepositoryEndpointAddress);
 		
 		// xdsbRegistry
-		final String xdsbRegistryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
 				xdsbRegistryEndpointAddress);
 
 		
 		// orchestrator
 		OrchestratorImpl orchestrator = new OrchestratorImpl(contextHandler,
-				c32Getter, documentProcessor, dataHandlerToBytesConverter,
+				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
 				xdsbRepository, xdsbRegistry);		
 //		orchestrator.setSubjectPurposeOfUse("TREAT");
 		orchestrator.setSubjectPurposeOfUse(purposeOfUse);
@@ -245,27 +244,27 @@ public class OrchestratorImplIT {
 		String c32String = loadXMLAsString("c32.xml");
 		when(c32Getter.getC32(resourceId)).thenReturn(c32String);
 
-		// document processor
-		final String documentProcessorEndpointAddress = "http://localhost:90/DocumentProcessor/services/processdocumentservice";
-		DocumentProcessorImpl documentProcessor = new DocumentProcessorImpl(
-				documentProcessorEndpointAddress);
+		// document segmentation
+		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
+				documentSegmentationEndpointAddress);
 
 		// dataHandlerToBytesConverter
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
 		
 		// xdsbRepository
-		final String xdsbRepositoryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
+		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
 				xdsbRepositoryEndpointAddress);
 
 		// xdsbRegistry
-		final String xdsbRegistryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
 				xdsbRegistryEndpointAddress);
 
 		// orchestrator
 		OrchestratorImpl orchestrator = new OrchestratorImpl(contextHandler,
-				c32Getter, documentProcessor, dataHandlerToBytesConverter,
+				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
 				xdsbRepository, xdsbRegistry);
 //		orchestrator.setSubjectPurposeOfUse("TREAT");
 		orchestrator.setSubjectPurposeOfUse(purposeOfUse);
@@ -559,27 +558,27 @@ public class OrchestratorImplIT {
 		String c32String = loadXMLAsString("c32.xml");
 		when(c32Getter.getC32(resourceId)).thenReturn(c32String);
 
-		// document processor
-		final String documentProcessorEndpointAddress = "http://localhost:90/DocumentProcessor/services/processdocumentservice";
-		DocumentProcessorImpl documentProcessor = new DocumentProcessorImpl(
-				documentProcessorEndpointAddress);
+		// document segmentation
+		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
+				documentSegmentationEndpointAddress);
 
 		// dataHandlerToBytesConverter
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
 		
 		// xdsbRepository
-		final String xdsbRepositoryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
+		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
 				xdsbRepositoryEndpointAddress);
 
 		// xdsbRegistry
-		final String xdsbRegistryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
 				xdsbRegistryEndpointAddress);
 
 		// orchestrator
 		OrchestratorImpl orchestrator = new OrchestratorImpl(contextHandler,
-				c32Getter, documentProcessor, dataHandlerToBytesConverter,
+				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
 				xdsbRepository, xdsbRegistry);
 //		orchestrator.setSubjectPurposeOfUse("TREAT");
 		orchestrator.setSubjectPurposeOfUse(purposeOfUse);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml"	xmlns:th="http://www.thymeleaf.org">
 <head>
 	
 	<!-- start: Meta -->
@@ -62,11 +62,10 @@
 						<i class="icon-user"></i><span class="hidden-phone hidden-tablet"> admin</span>
 						<span class="caret"></span>
 					</a>
-					<ul class="dropdown-menu">
-						<li><a href="#">Profile</a></li>
-						<li class="divider"></li>
-						<li><a href="login.html">Logout</a></li>
+					
+					<ul th:include="fragment/myaccount_menu :: myaccountMenuFragment" role="menu" class="dropdown-menu">
 					</ul>
+					
 					<!-- end: User Dropdown -->
 				</div>
 				<!-- end: Header Menu -->

@@ -45,13 +45,14 @@
 	<div class="navbar" role="navigation">
 		<div class="navbar-inner-header">
 			<div class="container-fluid">
-				<a class="btn btn-navbar" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
+				<a class="btn btn-info btn-mainmenu" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
+					<span class="icon-reorder"></span>
 				</a>
 				<h1><span class="nav-title">Activity History</span></h1>
-				<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+				
+				<span th:include="fragment/common :: logoFragment">
+					<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+				</span>
 
 				<!-- COMPONENT: Header Menu-->
 				<div class="btn-group pull-right" >
@@ -64,13 +65,14 @@
 
 				<!-- COMPONENT: User Dropdown -->
 
-					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+					<a class="btn dropdown-toggle" data-toggle="dropdown" href="../home.html">
 						<span class="icon-user">&nbsp;</span><span class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span>
 						<span class="caret"></span>
 					</a>
 					
 					<ul role="menu" class="dropdown-menu">
 						<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_my_profile}">My Profile</a></li>
+						<li role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}" th:text="#{header_change_password}">Change Password</a></li>
 						<li role="menuitem" aria-disabled="true" class="divider"></li>
 						<li role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" th:text="#{header_logout}">Logout</a></li>
 					</ul>
@@ -85,27 +87,47 @@
 
 	<!-- START: Side Nav Menu -->
 
-		<div class="span2 main-menu-span">
-			<div class="nav-collapse sidebar-nav">
-				<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
-					<li class="nav-header hidden-tablet" role="menuitem"></li>
-					<li role="menuitem"><a href="home.html"><div class="icon-home"></div><span class="hidden-tablet"> My Home</span></a></li>
+	<div th:include="fragment/common :: sideNavMenuFragment" class="span2 main-menu-span">
+	<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE sideNavMenuFragment -->
+		<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
+		
+		<div class="nav-collapse sidebar-nav">
+			<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
+				<li class="nav-header hidden-tablet" role="menuitem"></li>
+				
+				<li class="active" role="menuitem"><a href="#">
+					<div class="icon-home icon-large"></div>
+						<span class="hidden-tablet" th:text="#{sidebar_my_home}"> My Home</span></a></li>
+						
+				<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div>
+						<span class="hidden-tablet" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
 
-					<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div><span class="hidden-tablet"> My Consents</span></a></li>
+				<li role="menuitem"><a href="connectionMain.html"><div class="icon-random"></div>
+						<span class="hidden-tablet" th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
+
+				<li role="menuitem"><a href="profile.html"><div class="icon-user"></div>
+						<span class="hidden-tablet" th:text="#{sidebar_my_profile}"> My Profile</span></a></li>
+
+				<li role="menuitem"><a href="../inbox/inboxMain.html" th:href="@{/inbox/inboxMain.html}"><div class="icon-inbox"></div>
+						<span class="hidden-tablet" th:text="#{sidebar_in_box}"> Message Center</span></a></li>
+
+
+				<li role="menuitem"><a href="activityHistory.html"><div class="icon-time"></div>
+						<span class="hidden-tablet" th:text="#{sidebar_activity_history}"> Activity History</span></a></li>
+
+				<li role="menuitem"><a href="../clinicaldocuments/mymedicalinfo.html" th:href="@{/patients/medicalinfo.html}"><div class="icon-folder-open"></div>
+						<span class="hidden-tablet" th:text="#{sidebar_medical_documents}"> Medical Documents</span></a></li>
+				
+				<li class="shortcut-button" role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}"><div class="icon-unlock-alt"></div>
+						<span class="hidden-tablet" th:text="#{sidebar_change_password}"> Change Password</span></a></li>
 							
-					<li  role="menuitem"><a href="connectionMain.html"><div class="icon-random "></div><span class="hidden-tablet"> My Providers </span></a></li>
-							
-					<li role="menuitem"><a href="profile.html"><div class="icon-user"></div><span class="hidden-tablet"> My Profile</span></a></li>
-							
-					<li role="menuitem"><a href="../inbox/inboxMain.html" th:href="@{/inbox/inboxMain.html}"><div class="icon-inbox"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_in_box}"> Message Center</span></a></li>
-							
-					<li class="active" role="menuitem"><a href="#"><div class="icon-time icon-white"></div><span class="hidden-tablet"> Activity History</span></a></li>
-							
-					<li role="menuitem"><a href="../clinicaldocuments/clinicalDocuments.html" th:href="@{/patients/medicalinfo.html}"><div class="icon-folder-open"></div><span class="hidden-tablet"> My Medical Information</span></a></li>
-				</ul>
-			</div>
+				<li class="shortcut-button" role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}"><div class="icon-off"></div>
+						<span class="hidden-tablet" th:text="#{sidebar_logout}"> Logout</span></a></li>
+			</ul>
 		</div>
+		
+	<!-- END OF SECTION REPLACED BY THYMELEAF -->
+	</div>
 
 	<!-- END: Side Nav Menu -->
 	

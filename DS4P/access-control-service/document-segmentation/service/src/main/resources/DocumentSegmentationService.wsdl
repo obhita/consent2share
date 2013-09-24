@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DocumentSegmentationService"
+	targetNamespace="http://www.samhsa.gov/consent2share/contract/documentsegmentation"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.samhsa.gov/consent2share/contract/documentsegmentation"
+	xmlns:di="http://www.samhsa.gov/consent2share/schema/documentsegmentation"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://www.samhsa.gov/consent2share/schema/documentsegmentation">
+
+			<xsd:element name="SegmentDocumentRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="document" type="xsd:string" />
+						<xsd:element name="enforcementPolicies" type="xsd:string"/>
+						<xsd:element name="packageAsXdm" type="xsd:boolean" />
+						<xsd:element name="encryptDocument" type="xsd:boolean" />
+						<xsd:element name="senderEmailAddress" type="xsd:string"/>
+						<xsd:element name="recipientEmailAddress" type="xsd:string"/>
+						<xsd:element name="xdsDocumentEntryUniqueId" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="SegmentDocumentResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="processedDocument" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
+						<xsd:element name="maskedDocument" type="xsd:string"/>
+						<xsd:element name="postProcessingMetadata" type="xsd:string"/>
+						<xsd:element name="kekMaskingKey" type="xsd:base64Binary"/>
+						<xsd:element name="kekEncryptionKey" type="xsd:base64Binary"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="SegmentDocumentRequest">
+		<wsdl:part element="di:SegmentDocumentRequest" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="SegmentDocumentResponse">
+		<wsdl:part element="di:SegmentDocumentResponse" name="parameters" />
+	</wsdl:message>
+	<wsdl:portType name="DocumentSegmentationServicePortType">
+		<wsdl:operation name="SegmentDocument">
+			<wsdl:documentation>Takes a C32 document and a list of obligations, returns a processed C32 in a format
+				specified by the privacy policies.
+			</wsdl:documentation>
+			<wsdl:input message="tns:SegmentDocumentRequest" />
+			<wsdl:output message="tns:SegmentDocumentResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="DocumentSegmentationServiceBinding" type="tns:DocumentSegmentationServicePortType">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="SegmentDocument">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="DocumentSegmentationService">
+		<wsdl:port binding="tns:DocumentSegmentationServiceBinding" name="DocumentSegmentationServicePort">
+			<soap:address
+				location="http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

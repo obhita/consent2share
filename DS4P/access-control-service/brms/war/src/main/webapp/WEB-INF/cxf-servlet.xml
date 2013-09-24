@@ -29,12 +29,12 @@
 		scope="prototype" autowire="byType" />
 		
 		<bean id="ruleExecutionServiceImpl"
-		class="gov.samhsa.consent2share.accesscontrolservices.brms.service.RuleExecutionServiceImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionServiceImpl"
 		scope="prototype" autowire="constructor" > 
 	</bean>
 	
 		<bean id="guvnorServiceImpl"
-		class="gov.samhsa.consent2share.accesscontrolservices.brms.guvnor.GuvnorServiceImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.GuvnorServiceImpl"
 		scope="prototype"> 
 		<constructor-arg value="#{endpointAddressProperties.guvnorService}"  />
 	</bean>

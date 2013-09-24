@@ -41,18 +41,10 @@
 				<h1>
 					<span class="nav-title">Share with confidence.</span>
 				</h1>
-
-				<!--
-        <div id="nav-container" class="span8">
-	            	<ul class="nav nav-pills">
-		            	<li><a href="#">Learn About Us</a></li>
-		            	<li><a href="#">Your Privacy</a></li>
-		            	<li><a href="#">Name of pill</a></li>
-	            	</ul>
-            	</div>
--->
-
-				<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+				
+				<span th:include="fragment/common :: logoFragment">
+					<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+				</span>
 			</div>
 		</div>
 	</div>
@@ -90,6 +82,7 @@
 								</div>
 							</div>
 						</section>
+						
 						<div id="home-login-container" class="offset6 span5 overlay">
 
 							<fieldset class="login-section">
@@ -236,27 +229,6 @@
 				</ul>
 			</div>
 
-			<div class="span4">
-				<h3>SAMHSA Resources</h3>
-				<ul class="nav nav-pills">
-					<li><a href="#">The White House</a></li>
-					<li><a href="#">HHS.gov</a></li>
-					<li><a href="#">USA.gov</a></li>
-					<li><a href="#">Grants.gov</a></li>
-				</ul>
-			</div>
-
-
-			<div class="span4">
-				<h3>A Public Service of:</h3>
-				<p>U.S. DEPARTMENT OF HEALTH AND HUMAN SERVICES Substance Abuse
-					and Mental Health Services Administration www.samhsa.gov</p>
-				<div>
-					<img src="../../resources/img/HealthandHumanServicesLogo.png"
-						th:src="@{/resources/img/HealthandHumanServicesLogo.png}"
-						alt="Department of Health and Humand Services Logo" width="107" />
-				</div>
-			</div>
 		</div>
 
 	</footer>
@@ -278,7 +250,7 @@
 	<noscript>Javascript must be enabled in your browswer for this features in this website to fucntion properly</noscript>
 	
 	<script src="../../resources/js/jquery.validate.min.js"  
-	th:src="@{/resources/js/bootstrap.js}" type="text/javascript">
+	th:src="@{/resources/js/jquery.validate.min.js}" type="text/javascript">
 	</script>
 	<noscript>Javascript must be enabled in your browswer for this features in this website to fucntion properly</noscript>
 	

@@ -8,6 +8,9 @@ images_dir = "web/src/main/webapp/resources/img"
 javascripts_dir = "web/src/main/webapp/resources/js"
 fonts_dir = "web/src/main/webapp/resources/fonts"
 
+
+
+
 output_style = :nested
 environment = :development
 
@@ -15,7 +18,7 @@ environment = :development
 # relative_assets = true
 
 # To disable debugging comments that display the original location of your selectors. Uncomment:
-# line_comments = false
+line_comments = false
 color_output = false
 
 

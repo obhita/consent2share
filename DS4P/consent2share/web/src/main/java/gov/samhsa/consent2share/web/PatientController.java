@@ -38,6 +38,7 @@ import gov.samhsa.consent2share.service.reference.RaceCodeService;
 import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,12 +103,18 @@ public class PatientController extends AbstractController{
 	 * @return the string
 	 */
 	@RequestMapping(value = "home.html") 
-	public String home(Model model) {
+	public String home(Model model, HttpServletRequest request) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
+		
 		String username=currentUser.getUsername();
+		String notify = request.getParameter("notify");
+		
+		model.addAttribute("notifyevent", notify);
+		
 		String notification=notificationService.notificationStage(username,null);
 		model.addAttribute("currentUser", currentUser);
 		model.addAttribute("notification", notification);
+		
 		return "views/patients/home";
 	}
 	

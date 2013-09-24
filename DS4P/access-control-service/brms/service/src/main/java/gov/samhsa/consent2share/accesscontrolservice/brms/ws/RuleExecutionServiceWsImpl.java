@@ -43,7 +43,7 @@ endpointInterface="gov.samhsa.consent2share.contract.ruleexecutionservice.RuleEx
 public class RuleExecutionServiceWsImpl implements RuleExecutionServicePortType {	
 	
 	/** The rule execution service. */
-	private gov.samhsa.consent2share.accesscontrolservices.brms.service.RuleExecutionService ruleExecutionService;
+	private gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionService ruleExecutionService;
 	
 	/**
 	 * Instantiates a new rule execution service ws impl.
@@ -56,7 +56,7 @@ public class RuleExecutionServiceWsImpl implements RuleExecutionServicePortType 
 	 *
 	 * @param ruleExecutionService the rule execution service
 	 */
-	public RuleExecutionServiceWsImpl(gov.samhsa.consent2share.accesscontrolservices.brms.service.RuleExecutionService ruleExecutionService)
+	public RuleExecutionServiceWsImpl(gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionService ruleExecutionService)
 	{
 		this.ruleExecutionService = ruleExecutionService;
 	}	
@@ -78,7 +78,7 @@ public class RuleExecutionServiceWsImpl implements RuleExecutionServicePortType 
 	 *
 	 * @return the rule execution service
 	 */
-	public gov.samhsa.consent2share.accesscontrolservices.brms.service.RuleExecutionService getRuleExecutionService() {
+	public gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionService getRuleExecutionService() {
 		return ruleExecutionService;
 	}
 
@@ -88,7 +88,7 @@ public class RuleExecutionServiceWsImpl implements RuleExecutionServicePortType 
 	 * @param ruleExecutionService the new rule execution service
 	 */
 	public void setRuleExecutionService(
-			gov.samhsa.consent2share.accesscontrolservices.brms.service.RuleExecutionService ruleExecutionService) {
+			gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionService ruleExecutionService) {
 		this.ruleExecutionService = ruleExecutionService;
 	}	
 }

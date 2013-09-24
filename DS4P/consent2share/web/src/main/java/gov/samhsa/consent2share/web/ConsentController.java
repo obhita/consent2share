@@ -25,8 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.web;
 
-import gov.samhsa.consent2share.domain.consent.Consent;
-import gov.samhsa.consent2share.domain.patient.Patient;
+import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.infrastructure.CodedConceptLookupService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
@@ -40,8 +39,8 @@ import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
-import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
+import gov.samhsa.consent2share.service.dto.SpecificMedicalInfosSetDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
 import gov.samhsa.consent2share.service.patient.PatientService;
 import gov.samhsa.consent2share.service.reference.ClinicalDocumentSectionTypeCodeService;
@@ -54,7 +53,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -75,7 +73,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * The Class ConsentController.
@@ -322,6 +319,12 @@ public class ConsentController {
 				.findAllClinicalDocumentSectionTypeCodesAddConsentFieldsDto();
 		List<AddConsentFieldsDto> clinicalDocumentTypeDto = clinicalDocumentTypeCodeService
 				.findAllClinicalDocumentTypeCodesAddConsentFieldsDto();
+		
+		Set<SpecificMedicalInfoDto> clinicalConceptCodes = consentDto.getDoNotShareClinicalConceptCodes();
+		
+		SpecificMedicalInfosSetDto clinicalConceptCodesSet = new SpecificMedicalInfosSetDto(clinicalConceptCodes);
+		
+		model.addAttribute("DoNotShareClinicalConceptCodesSet", clinicalConceptCodesSet);
 
 		model.addAttribute("defaultStartDate",
 				dateFormat.format(today.getTime()));
@@ -355,11 +358,12 @@ public class ConsentController {
 	 * @param icd9
 	 *            the icd9
 	 * @return the string
+	 * @throws ConsentGenException 
 	 */
 	@RequestMapping(value = "addConsent.html", method = RequestMethod.POST)
 	public String consentAddPost(@Valid ConsentDto consentDto,
 			BindingResult bindingResult, Model model,
-			@RequestParam(value = "ICD9", required = false) HashSet<String> icd9) {
+			@RequestParam(value = "ICD9", required = false) HashSet<String> icd9) throws ConsentGenException {
 
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		model.addAttribute("currentUser", currentUser);
@@ -383,10 +387,11 @@ public class ConsentController {
 			consentDto.setUsername(currentUser.getUsername());
 			Set<SpecificMedicalInfoDto> doNotShareClinicalConceptCodes = new HashSet<SpecificMedicalInfoDto>();
 			if (icd9 != null)
-				for (String item : icd9) {
+				for (String item : icd9) {					
 					String icd9Item = item.replace("^^^", ",");
 					SpecificMedicalInfoDto specificMedicalInfoDto = new SpecificMedicalInfoDto();
 					specificMedicalInfoDto.setCodeSystem("ICD9");
+					
 					specificMedicalInfoDto.setCode(icd9Item.substring(0,
 							icd9Item.indexOf(";")));
 					specificMedicalInfoDto.setDisplayName(icd9Item
@@ -395,7 +400,7 @@ public class ConsentController {
 				}
 			consentDto
 					.setDoNotShareClinicalConceptCodes(doNotShareClinicalConceptCodes);
-
+			
 			consentService.saveConsent(consentDto);
 
 			return "redirect:listConsents.html?notify=add";
@@ -517,17 +522,18 @@ public class ConsentController {
 	 * @param consentId
 	 *            the consent id
 	 * @return the string
+	 * @throws ConsentGenException 
 	 */
 	@RequestMapping("exportCDAR2Consents/{consentId}")
 	public String exportCDAR2Consents(HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable("consentId") Long consentId) {
+			@PathVariable("consentId") Long consentId) throws ConsentGenException {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());
 
 		if (consentService.isConsentBelongToThisUser(consentId, patientId)) {
-			String cdar2 = consentExportService.exportCDAR2Consent(consentId);
+			String cdar2 = consentExportService.exportConsent2CDAR2(consentId);
 			response.setContentType("application/xml");
 			response.setHeader("Content-Disposition",
 					"attachment;filename=CDAR2consent" + consentId);
@@ -555,13 +561,13 @@ public class ConsentController {
 	@RequestMapping("exportXACMLConsents/{consentId}")
 	public String exportXACMLConsents(HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable("consentId") Long consentId) {
+			@PathVariable("consentId") Long consentId) throws ConsentGenException {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());
 
 		if (consentService.isConsentBelongToThisUser(consentId, patientId)) {
-			String xacmal = consentExportService.exportXACMLConsent(consentId);
+			String xacmal = consentExportService.exportConsent2XACML(consentId);
 			response.setContentType("application/xml");
 			response.setHeader("Content-Disposition",
 					"attachment;filename=XACMLconsent" + consentId);

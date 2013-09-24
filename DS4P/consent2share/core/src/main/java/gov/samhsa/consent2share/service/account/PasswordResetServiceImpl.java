@@ -54,6 +54,7 @@ import gov.samhsa.consent2share.infrastructure.security.TokenExpiredException;
 import gov.samhsa.consent2share.infrastructure.security.TokenNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
 import gov.samhsa.consent2share.service.dto.PasswordResetDto;
+import gov.samhsa.consent2share.service.dto.PasswordChangeDto;
 
 /**
  * The Class PasswordResetServiceImpl.
@@ -239,6 +240,37 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 				patient.getFirstName() + " " + patient.getLastName(),
 				patient.getEmail(), EmailType.PASSWORD_CONFIRMATION, linkUrl, null);
 	}
+	
+	@Override
+	public boolean changePassword(PasswordChangeDto passwordChangeDto)
+			throws UsernameNotExistException, MessagingException {
+		if (passwordChangeDto == null) {
+			throw new IllegalArgumentException(
+					"Password change dto is required.");
+		}
+
+		String username = passwordChangeDto.getUsername();
+		
+		UserDetails userDetails = null;
+		try {
+			userDetails = userDetailsManager.loadUserByUsername(username);
+		} catch (UsernameNotFoundException e) {
+			// TODO: Log here
+			throw new UsernameNotExistException(e.getMessage());
+		}
+	
+		String encodedOldPassword = passwordEncoder.encode(passwordChangeDto.getOldPassword());
+		String encodedNewPassword = passwordEncoder.encode(passwordChangeDto.getNewPassword());
+		
+		if(passwordEncoder.matches(passwordChangeDto.getOldPassword(), userDetails.getPassword()) == true){
+			userDetailsManager.changePassword(encodedOldPassword, encodedNewPassword);
+			return true;
+		}else{
+			return false;
+		}
+		
+	}
+
 
 	/**
 	 * Find password reset token.

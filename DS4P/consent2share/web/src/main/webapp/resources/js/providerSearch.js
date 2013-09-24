@@ -1,5 +1,5 @@
-var individualJSON;
-var organizationalJSON;
+var result4ajaxJSON;
+
 npiLists=new Array();
 
 
@@ -31,7 +31,7 @@ $(function(){
 	
 	$(".addIndividualProviderButton").live("click",function(){
 		var entryId=$(this).attr("id").substr(27,$(this).attr("id").length-27);
-		var serializedQueryResult=JSON.stringify(individualJSON["providers"][entryId]);
+		var serializedQueryResult=JSON.stringify(result4ajaxJSON["providers"][entryId]);
 		$.ajax({
 			  url: "connectionProviderAdd.html",
 			  type: "POST",
@@ -48,7 +48,7 @@ $(function(){
 	
 	$(".addOrganizationalProviderButton").live("click",function(){
 		var entryId=$(this).attr("id").substr(31,$(this).attr("id").length-31);
-		var serializedQueryResult=JSON.stringify(organizationalJSON["providers"][entryId]);
+		var serializedQueryResult=JSON.stringify(result4ajaxJSON["providers"][entryId]);
 		$.ajax({
 			  url: "connectionProviderAdd.html",
 			  type: "POST",
@@ -60,25 +60,108 @@ $(function(){
 	});
 });
 
+jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage )
+{
+	//alert( 'items_per_page = '+ items_per_page );
+	var lnkCnt4most = 8 ;
+	var lnkCnt4short = 2 ;
+	var currentPage = 0 ;
+	var txt_prev = "Prev" ;
+	var txt_next = "Next" ;
+	var ellipsis = "<span>......</span>" ;
+	
+	return this.each( function() 
+	{
+		var pageLinksBar = jQuery(this);	
+		
+		function pageLinkClicked( pageNo, evt ) // event handler for the pagination links
+		{
+			currentPage = pageNo;
+			buildPagingLinks();
+			func2showPage( arrHtmlStr, pageNo, items_per_page );
+		}
+		
+		function buildPagingLinks() {	
+			pageLinksBar.empty();
+			var pageCnt = Math.ceil( arrHtmlStr.length / items_per_page );	
+			var halfLinkCnt = Math.ceil(lnkCnt4most/2);
+			var startPageLink = currentPage > halfLinkCnt ? Math.max( Math.min( currentPage-halfLinkCnt, pageCnt-lnkCnt4most), 0) : 0 ;
+			var endPageLink = currentPage > halfLinkCnt ? Math.min(currentPage+halfLinkCnt, pageCnt) : Math.min( lnkCnt4most, pageCnt );
+			
+			var pgClickHandler = function( pageNo ) {	return function( evt ) { return pageLinkClicked( pageNo, evt ); }	}
+			var addPageLink = function( pageNo, appendopts )
+			{
+				pageNo = pageNo<0 ? 0 : (pageNo<pageCnt?pageNo:pageCnt-1) ; 
+				appendopts = jQuery.extend( {text:pageNo+1, classes:""}, appendopts||{} );
+				
+				var lnk = ( pageNo == currentPage )
+					? jQuery("<span class='currentpage'>"+(appendopts.text)+"</span>")
+					: jQuery("<a>"+(appendopts.text)+"</a>").bind("click", pgClickHandler(pageNo) ).attr('href', "#".replace(/__id__/,pageNo)) ; 
+				
+				if( appendopts.classes)
+					lnk.addClass( appendopts.classes );
+					
+				pageLinksBar.append( lnk );
+			}
+			
+			if( txt_prev && (currentPage > 0 ) )				// add "Previous" link
+				addPageLink( currentPage-1, {text:txt_prev, classes:"prev"} );
+			
+			if (startPageLink > 0 && lnkCnt4short > 0 )			// add starting link
+			{
+				var end = Math.min( lnkCnt4short, startPageLink );
+				for(var i=0; i<end; i++) 
+					addPageLink(i);
+				
+				if( lnkCnt4short < startPageLink )				// add ellipsis
+					jQuery( ellipsis ).appendTo( pageLinksBar );
+			}
+			
+			for( var i=startPageLink; i<endPageLink; i++) 		// add interval links
+				addPageLink(i);
+			
+			if (endPageLink < pageCnt && lnkCnt4short > 0)		// add ending link
+			{
+				if( pageCnt-lnkCnt4short > endPageLink )		// add ellipsis
+					jQuery( ellipsis ).appendTo( pageLinksBar );
+				
+				var begin = Math.max( pageCnt-lnkCnt4short, endPageLink );
+				
+				for(var i=begin; i<pageCnt; i++) 
+					addPageLink(i);
+			}
+			
+			if( txt_next && (currentPage < pageCnt-1 ))			// add "Next" link
+				addPageLink( currentPage+1, {text:txt_next, classes:"next"} );
+		}
+		
+		buildPagingLinks();
+        func2showPage( arrHtmlStr, currentPage, items_per_page );
+	});
+}
 
 function lookup (){
-		
-		var lookupQueryIndividual = location.protocol + '//' +location.host+"/provider-web/providers"; 
-		var organizationSearchFlag=1;
-		var ajaxFinishedFlag=0;
+	    var providerSearchForm="";
+	    var ajaxFinishedFlag=0;
+
+        var arrProviderHtmStr = new Array();
+    	var items_per_page = 10 ;
+        var rsHtmStrDeli = "<rsHtmStrDeli>" ;
+		$("#Pagination").empty();
+	    
 		$("#resultList").hide();
 		$("#noResult").hide();
 		$("#noResponse").hide();
 		$("#resultList").empty();
 
 		if ($("#city_name").val() != ""){
-			lookupQueryIndividual+="/city/"+$("#city_name").val();
+			providerSearchForm+="&city="+$("#city_name").val();
 		}
 		if ($("#state_name").val() != ""){
-			lookupQueryIndividual+="/usstate/"+$("#state_name").val();
+			providerSearchForm+="&usstate="+$("#state_name").val();
 		}
 		if ($("#zip_code").val() != ""){
-			lookupQueryIndividual+="/zipcode/"+$("#zip_code").val();
+			providerSearchForm+="&zipcode="+$("#zip_code").val();
 		}
 		if ($("#gender").val() != ""){
 			var gender=null;
@@ -86,142 +169,127 @@ function lookup (){
 				gender='MALE';
 			if ($("#gender").val()=="F")
 				gender="FEMALE";
-			lookupQueryIndividual+="/gender/"+gender;
-			organizationSearchFlag=0;
+			providerSearchForm+="&gender="+gender;
 		}
 		if ($("#specialty").val() != ""){
-			lookupQueryIndividual+="/specialty/"+$("#specialty").val();
+			providerSearchForm+="&specialty="+$("#specialty").val();
 		}
 		if ($("#phone1").val() != ""){
-			lookupQueryIndividual+="/phone/"+$("#phone1").val()+$("#phone2").val()+$("#phone3").val();
+			providerSearchForm+="&phone="+$("#phone1").val()+$("#phone2").val()+$("#phone3").val();
 		}
 		if ($("#first_name").val() != ""){
-			lookupQueryIndividual+="/firstname/"+$("#first_name").val();
-			organizationSearchFlag=0;
+			providerSearchForm+="&firstname="+$("#first_name").val();
 		}
-		
-		var lookupQueryOrg=lookupQueryIndividual;
 		
 		if ($("#last_name").val() != ""){
-			lookupQueryIndividual+="/lastname/"+$("#last_name").val();
-			lookupQueryOrg+="/orgname/"+$("#last_name").val();
+			providerSearchForm+="&lastname="+$("#last_name").val();
 		}
-		
 		$("#provider_search_modal .search-loading").show();
+	    //alert( providerSearchForm );
 		
-        setTimeout( killAjaxCall, 20000); // if no response in 20 seconds, abort both getJson requests                 
-		
-		var myAjaxCall1 = jQuery.getJSON(lookupQueryIndividual+"/entitytype/Individual",function(queryResult){	
-			individualJSON=queryResult;
-			for (var i=0;i<queryResult["providers"].length;i++)
-				{addable="true";
+		setTimeout( killAjaxCall, 10000); 
+	    
+		var myAjaxCall= $.ajax({
+        	dataType: "json",
+			url: "providerSearch.html",
+			type:"GET",
+			async:true, 
+			data: providerSearchForm,
+			success: function (queryResult) { 
+				ajaxFinishedFlag++;
+				if(queryResult==null) 
+				{
+					showResult( queryResult, items_per_page );
+					return;
+				}
+				
+				result4ajaxJSON=queryResult;
+				
+				for (var i=0;i<queryResult["providers"].length;i++) {
+					addable="true";
 					for(var j=0;j<npiLists.length;j++)
 						{
+
 						if(queryResult["providers"][i]["npi"]==npiLists[j])
 							addable="false";
 						}
-					if(addable=="true"){
-						$("#resultList").append("<div class='provider_record_space'><div class='provider_record_box'><div class='provider_record_header'>"+"" +
-							'<p class="result_row"><span class="result_field provider_name_field">' + queryResult["providers"][i]["providerLastName"] + ", " + queryResult["providers"][i]["providerFirstName"] + "</span>" +
-							'<span class="result_field">[NPI:' + queryResult["providers"][i]["npi"] + ']</span></p>' + 
-							'<p class="result_row add_button_space"><span class="result_field"><button class="addIndividualProviderButton btn btn-mini btn-success" id="addIndividualProviderButton'+i+'"><span class="icon-plus icon-white"></span></button></span> Add this provider.</p></div>' + 
-							'<p class="result_row"><span class="result_field provider_specialty_field">' + queryResult["providers"][i]["healthcareProviderTaxonomy_1"] + '</span></p>' + 
-							'<p class="result_row"><span class="result_field">' + queryResult["providers"][i]["providerFirstLineBusinessPracticeLocationAddress"] + ', ' +
-								(queryResult["providers"][i]["providerSecondLineBusinessPracticeLocationAddress"]==""?(queryResult["providers"][i]["providerSecondLineBusinessPracticeLocationAddress"]):"") + 
-								queryResult["providers"][i]["providerBusinessPracticeLocationAddressCityName"] + ", " +
-								queryResult["providers"][i]["providerBusinessPracticeLocationAddressStateName"] + ", " + 
-								zipCodeParser(queryResult["providers"][i]["providerBusinessPracticeLocationAddressPostalCode"]) + '</span></p>' + 
-							'<p class="result_row"><span class="result_field">' + phoneNumberParser(queryResult["providers"][i]["providerBusinessPracticeLocationAddressTelephoneNumber"]) + "</span></p></div></div>");
-					}else{
-						$("#resultList").append("<div class='provider_record_space'><div class='provider_record_box'><div class='provider_record_header'>"+"" +
-								'<p class="result_row"><span class="result_field provider_name_field">' + queryResult["providers"][i]["providerLastName"] + ", " + queryResult["providers"][i]["providerFirstName"] + "</span>" +
-								'<span class="result_field">[NPI:' + queryResult["providers"][i]["npi"] + ']</span></p>' + 
-								'<p class="result_row add_button_space" style="color: black;"><span class="result_field"><button class="btn btn-mini" disabled="true"><span class="icon-plus icon-white"></span></button></span> Provider already added.</p></div>' + 
-								'<p class="result_row"><span class="result_field provider_specialty_field">' + queryResult["providers"][i]["healthcareProviderTaxonomy_1"] + '</span></p>' + 
-								'<p class="result_row"><span class="result_field">' + queryResult["providers"][i]["providerFirstLineBusinessPracticeLocationAddress"] + ', ' +
-									(queryResult["providers"][i]["providerSecondLineBusinessPracticeLocationAddress"]==""?(queryResult["providers"][i]["providerSecondLineBusinessPracticeLocationAddress"]):"") + 
-									queryResult["providers"][i]["providerBusinessPracticeLocationAddressCityName"] + ", " +
-									queryResult["providers"][i]["providerBusinessPracticeLocationAddressStateName"] + ", " + 
-									zipCodeParser(queryResult["providers"][i]["providerBusinessPracticeLocationAddressPostalCode"]) + '</span></p>' + 
-								'<p class="result_row"><span class="result_field">' + phoneNumberParser(queryResult["providers"][i]["providerBusinessPracticeLocationAddressTelephoneNumber"]) + "</span></p></div></div>");
-					}
+					arrProviderHtmStr[i] = getResultRowHtmStr( i, queryResult["providers"][i], addable );
 				}
-				ajaxFinishedFlag++;
-			if (ajaxFinishedFlag==2 || organizationSearchFlag==0 )
-				showResult();
-
+				
+				showResult( arrProviderHtmStr, items_per_page );
+			}
+        
 			});
 		
-		var myAjaxCall2 = null ;
-		
-		if (organizationSearchFlag==1){
-			myAjaxCall2 = jQuery.getJSON(lookupQueryOrg+"/entitytype/Organization",function(queryResult){
-			organizationalJSON=queryResult;
-			for (var i=0;i<queryResult["providers"].length;i++) {
-				addable="true";
-				for(var j=0;j<npiLists.length;j++)
-					{
-					
-					if(queryResult["providers"][i]["npi"]==npiLists[j])
-						addable="false";
-					}
-				if(addable=="true"){
-					$("#resultList").append("<div class='provider_record_space'><div class='provider_record_box'><div class='provider_record_header'>"+"" +
-							'<p class="result_row"><span class="result_field  provider_name_field">' + queryResult["providers"][i]["providerOrganizationName"] + "</span>" +
-							'<span class="result_field">[NPI:' + queryResult["providers"][i]["npi"] + ']</span></p>' + 
-							'<p class="result_row add_button_space"><span class="result_field"><button class="addOrganizationalProviderButton btn btn-mini btn-success" id="addOrganizationalProviderButton'+i+'"><span class="icon-plus icon-white"></span></button></span> Add this provider.</p></div>' + 
-							'<p class="result_row"><span class="result_field provider_specialty_field">' + queryResult["providers"][i]["healthcareProviderTaxonomy_1"] + '</span></p>' + 
-							'<p class="result_row"><span class="result_field">' + queryResult["providers"][i]["providerFirstLineBusinessPracticeLocationAddress"] + ', ' +
-								(queryResult["providers"][i]["providerSecondLineBusinessPracticeLocationAddress"]==""?(queryResult["providers"][i]["providerSecondLineBusinessPracticeLocationAddress"]):"") + 
-								queryResult["providers"][i]["providerBusinessPracticeLocationAddressCityName"] + ", " +
-								queryResult["providers"][i]["providerBusinessPracticeLocationAddressStateName"] + ", " + 
-								zipCodeParser(queryResult["providers"][i]["providerBusinessPracticeLocationAddressPostalCode"]) + '</span></p>' + 
-							'<p class="result_row"><span class="result_field">' + phoneNumberParser(queryResult["providers"][i]["providerBusinessPracticeLocationAddressTelephoneNumber"]) + "</span></p></div></div>");
-				}else{
-					$("#resultList").append("<div class='provider_record_space'><div class='provider_record_box'><div class='provider_record_header'>"+"" +
-							'<p class="result_row"><span class="result_field provider_name_field">' + queryResult["providers"][i]["providerOrganizationName"] + "</span>" +
-							'<span class="result_field">[NPI:' + queryResult["providers"][i]["npi"] + ']</span></p>' + 
-							'<p class="result_row add_button_space" style="color: black;"><span class="result_field"><button class="btn btn-mini" disabled="true"><span class="icon-plus icon-white"></span></button></span> Provider already added.</p></div>' + 
-							'<p class="result_row"><span class="result_field provider_specialty_field">' + queryResult["providers"][i]["healthcareProviderTaxonomy_1"] + '</span></p>' + 
-							'<p class="result_row"><span class="result_field">' + queryResult["providers"][i]["providerFirstLineBusinessPracticeLocationAddress"] + ', ' +
-								(queryResult["providers"][i]["providerSecondLineBusinessPracticeLocationAddress"]==""?(queryResult["providers"][i]["providerSecondLineBusinessPracticeLocationAddress"]):"") + 
-								queryResult["providers"][i]["providerBusinessPracticeLocationAddressCityName"] + ", " +
-								queryResult["providers"][i]["providerBusinessPracticeLocationAddressStateName"] + ", " + 
-								zipCodeParser(queryResult["providers"][i]["providerBusinessPracticeLocationAddressPostalCode"]) + '</span></p>' + 
-							'<p class="result_row"><span class="result_field">' + phoneNumberParser(queryResult["providers"][i]["providerBusinessPracticeLocationAddressTelephoneNumber"]) + "</span></p></div></div>");
-				}
-			}
-			ajaxFinishedFlag++;
-			if (ajaxFinishedFlag==2)
-				showResult();
-			
-		});
-		}
-		
-	    function killAjaxCall(){  // if no response, abort both getJson requests
-            if( ajaxFinishedFlag == 0 ){
-                myAjaxCall1.abort();
-                if( myAjaxCall2 ) 
-                	myAjaxCall2.abort();
-              $("#noResponse").show();
-            }
-            $("#provider_search_modal .search-loading").fadeOut({ duration: 400});
-            }
-	 
-	
-	}
-
-	function showResult(){
-		setTimeout( function() { $("#provider_search_modal .search-loading").fadeOut({ duration: 400}); }, 200 );
-
-		if ($("#resultList div.provider_record_space").length > 0){
-			$("#resultList").show();
-		}
-		else{
-			$("#noResult").show();
-		}
+		function killAjaxCall(){  // if no response, abort both getJson requests
+		    if(ajaxFinishedFlag==0){
+		    myAjaxCall.abort();
+		    setTimeout( function() { $("#provider_search_modal .search-loading").fadeOut({ duration: 400}); }, 200 );
+		    $("#noResponse").show();
+		    }
 		
 	}
+
+
+}
+
+function getResultRowHtmStr( i, rs, addable )
+{
+	var showOrg = ( rs["entityType"] == "Organization" );
+	var ret = 
+	"<div class='provider_record_space'><div class='provider_record_box'><div class='provider_record_header'><p class='result_row'><span class='result_field provider_name_field'>"+
+	( showOrg== true  ? rs["providerOrganizationName"] : rs["providerLastName"] +", "+ rs["providerFirstName"] ) +
+	'</span><span class="result_field">[NPI:' + rs["npi"] + ']</span></p>'+
+	(
+		addable=="true" ?	
+			(
+				showOrg== true  ?	
+					'<p class="result_row add_button_space"><span class="result_field"><button class="addOrganizationalProviderButton btn btn-mini btn-success" id="addOrganizationalProviderButton'+i+'"><span class="icon-plus icon-white"></span></button></span> Add this provider.</p></div>'
+				:
+					'<p class="result_row add_button_space"><span class="result_field"><button class="addIndividualProviderButton btn btn-mini btn-success" id="addIndividualProviderButton'+i+'"><span class="icon-plus icon-white"></span></button></span> Add this provider.</p></div>'  
+			)
+		:
+					'<p class="result_row add_button_space" style="color: black;"><span class="result_field"><button class="btn btn-mini" disabled="true"><span class="icon-plus icon-white"></span></button></span> Provider already added.</p></div>'  
+	) +	
+	'<p class="result_row"><span class="result_field provider_specialty_field">' + rs["healthcareProviderTaxonomy_1"] + '</span></p>' + 
+	'<p class="result_row"><span class="result_field">' + rs["providerFirstLineBusinessPracticeLocationAddress"] + ', ' +
+		( rs["providerSecondLineBusinessPracticeLocationAddress"]==""?( rs["providerSecondLineBusinessPracticeLocationAddress"]):"") + 
+		rs["providerBusinessPracticeLocationAddressCityName"] + ", " +
+		rs["providerBusinessPracticeLocationAddressStateName"] + ", " + 
+		zipCodeParser( rs["providerBusinessPracticeLocationAddressPostalCode"]) +'</span></p>'+
+	'<p class="result_row"><span class="result_field">' + phoneNumberParser( rs["providerBusinessPracticeLocationAddressTelephoneNumber"]) + "</span></p></div></div>" ;
+	return ret ;
+}
+
+function showResult( arrHtmlStr, items_per_page )
+{
+	//if( arrHtmlStr ) alert( 'arrHtmlStr.length = '+ arrHtmlStr.length );
+	setTimeout( function() { $("#provider_search_modal .search-loading").fadeOut({ duration: 400}); }, 200 );
+
+    if( arrHtmlStr != null && arrHtmlStr.length > 0)
+    {
+		$("#Pagination").buildPagingBar( arrHtmlStr, items_per_page, showCurrentPage ); 
+		//alert( 'b4 Pagination.show/hide' );
+		( arrHtmlStr.length > items_per_page ) ? $("#Pagination").show() : $("#Pagination").hide() ; 
+    	$("#resultList").show();
+	}
+	else{
+		$("#Pagination").hide(); 
+		$("#noResult").show();
+	}
+}
+
+function showCurrentPage( arrHtmlStr, page_index, items_per_page )
+{
+	//alert( 'page_index = '+ page_index );
+    var max_elem = Math.min((page_index+1) * items_per_page, arrHtmlStr.length );
+    var newcontent = '';
+ 
+    for(var i=page_index*items_per_page; i<max_elem; i++)
+        newcontent += ( arrHtmlStr[i] ) ;
+ 
+    $('#resultList').html( newcontent );
+}
 
 	
 	function clearLocation(){
@@ -239,6 +307,7 @@ function lookup (){
 		clearZip();
 		//trigger change event handler for zip_code
 		$("#zip_code").triggerHandler("propertychange");
+		$('#empty_client_error_text').attr('style', "display: none;");
 	}
 	
 	function clearName(){
@@ -247,22 +316,28 @@ function lookup (){
 		$("#specialty").val('');
 		$("#gender").val('');
 		clearPhone();
+		$('#lname_client_error_text').attr('style', "display: none;");
+		$('#fname_client_error_text').attr('style', "display: none;");
+		$('#empty_client_error_text').attr('style', "display: none;");
 	}
 	
 	function clearPhone(){
 		$("#phone1").val('');
 		$("#phone2").val('');
 		$("#phone3").val('');
+		$('#phone_client_error_text').attr('style', "display: none;");
 	}
 	
 	function clearAll(){
 		clearLocation();
 		clearName();
 		clearPhone();
+		$('#empty_client_error_text').attr('style', "display: none;");
 	}
 	
 	function clearCity(){
 		$("#city_name").val('');
+		$('#city_client_error_text').attr('style', "display: none;");
 	}
 	
 	function clearState(){
@@ -271,6 +346,7 @@ function lookup (){
 	
 	function clearZip(){
 		$("#zip_code").val('');
+		$('#zip_client_error_text').attr('style', "display: none;");
 	}
 	
 	//enables or disables the state_name & city_name input boxes based on the current value of zip_code input box

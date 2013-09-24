@@ -25,16 +25,16 @@
  ******************************************************************************/
 package gov.samhsa.ds4ppilot.orchestrator;
 
+import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32Getter;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandler;
-import gov.samhsa.ds4ppilot.orchestrator.documentprocessor.DocumentProcessor;
+import gov.samhsa.ds4ppilot.orchestrator.documentsegmentation.DocumentSegmentation;
 import gov.samhsa.ds4ppilot.orchestrator.dto.XacmlRequest;
 import gov.samhsa.ds4ppilot.orchestrator.dto.XacmlResponse;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistry;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepository;
-import gov.samhsa.ds4ppilot.schema.documentprocessor.ProcessDocumentResponse;
 import gov.samhsa.ds4ppilot.schema.orchestrator.FilterC32Response;
 import gov.samhsa.ds4ppilot.schema.orchestrator.RegisteryStoredQueryResponse;
 import gov.samhsa.ds4ppilot.schema.orchestrator.RetrieveDocumentSetResponse;
@@ -116,8 +116,8 @@ public class OrchestratorImpl implements Orchestrator {
 	/** The C32 getter. */
 	private final C32Getter c32Getter;
 
-	/** The document processor. */
-	private final DocumentProcessor documentProcessor;
+	/** The document segmentation service. */
+	private final DocumentSegmentation documentSegmentation;
 
 	/** The data handler to bytes converter. */
 	private final DataHandlerToBytesConverter dataHandlerToBytesConverter;
@@ -160,19 +160,19 @@ public class OrchestratorImpl implements Orchestrator {
 	 *
 	 * @param contextHandler the context handler
 	 * @param c32Getter the C32 getter
-	 * @param documentProcessor the document processor
+	 * @param documentSegmentation the document segmentation
 	 * @param dataHandlerToBytesConverter the data handler to bytes converter
 	 * @param xdsbRepository the xdsb repository
 	 * @param xdsbRegistry the xdsb registry
 	 */
 	public OrchestratorImpl(ContextHandler contextHandler, C32Getter c32Getter,
-			DocumentProcessor documentProcessor,
+			DocumentSegmentation documentSegmentation,
 			DataHandlerToBytesConverter dataHandlerToBytesConverter,
 			XdsbRepository xdsbRepository, XdsbRegistry xdsbRegistry) {
 		super();
 		this.contextHandler = contextHandler;
 		this.c32Getter = c32Getter;
-		this.documentProcessor = documentProcessor;
+		this.documentSegmentation = documentSegmentation;
 		this.dataHandlerToBytesConverter = dataHandlerToBytesConverter;
 		this.xdsbRepository = xdsbRepository;
 		this.xdsbRegistry = xdsbRegistry;
@@ -220,16 +220,16 @@ public class OrchestratorImpl implements Orchestrator {
 						Boolean.FALSE);
 				marshaller.marshal(xacmlResult, xacmlResponseXml);
 
-				ProcessDocumentResponse processDocumentResponse = documentProcessor
-						.processDocument(originalC32,
+				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
+						.segmentDocument(originalC32,
 								xacmlResponseXml.toString(), packageAsXdm,
 								true, senderEmailAddress, recipientEmailAddress, "");
 
 				processedPayload = dataHandlerToBytesConverter
-						.toByteArray(processDocumentResponse
+						.toByteArray(segmentDocumentResponse
 								.getProcessedDocument());
 
-				c32Response.setMaskedDocument(processDocumentResponse
+				c32Response.setMaskedDocument(segmentDocumentResponse
 						.getMaskedDocument());
 				c32Response.setFilteredStreamBody(processedPayload);
 			} catch (PropertyException e) {
@@ -287,16 +287,16 @@ public class OrchestratorImpl implements Orchestrator {
 						Boolean.FALSE);
 				marshaller.marshal(xacmlResult, xacmlResponseXml);
 
-				ProcessDocumentResponse processDocumentResponse = documentProcessor
-						.processDocument(originalC32,
+				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
+						.segmentDocument(originalC32,
 								xacmlResponseXml.toString(), packageAsXdm,
 								true, senderEmailAddress, recipientEmailAddress, xdsDocumentEntryUniqueId);
 
 				processedPayload = dataHandlerToBytesConverter
-						.toByteArray(processDocumentResponse
+						.toByteArray(segmentDocumentResponse
 								.getProcessedDocument());
 
-				c32Response.setMaskedDocument(processDocumentResponse
+				c32Response.setMaskedDocument(segmentDocumentResponse
 						.getMaskedDocument());
 				c32Response.setFilteredStreamBody(processedPayload);
 			} catch (PropertyException e) {
@@ -624,15 +624,15 @@ public class OrchestratorImpl implements Orchestrator {
 				// LOGGER.debug(originalC32);
 
 				if (!isConsentDocument(originalDocument)) {
-					ProcessDocumentResponse processDocumentResponse = documentProcessor
-							.processDocument(originalDocument, xacmlResponseXml
+					SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
+							.segmentDocument(originalDocument, xacmlResponseXml
 									.toString(), /* "<xacmlResult><pdpDecision>Permit</pdpDecision><purposeOfUse>TREAT</purposeOfUse><messageId>4617a579-1881-4e40-9f98-f85bd81d6502</messageId><homeCommunityId>2.16.840.1.113883.3.467</homeCommunityId><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:org:us-privacy-law:42CFRPart2</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:org:refrain-policy:NORDSLCD</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:redact:ETH</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:redact:PSY</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:mask:HIV</pdpObligation></xacmlResult>" */
 									false, true,
 									"leo.smith@direct.obhita-stage.org",
 									enforcePolicy.getXspasubject()
 									.getSubjectEmailAddress(), "");
 					processedPayload = dataHandlerToBytesConverter
-							.toByteArray(processDocumentResponse
+							.toByteArray(segmentDocumentResponse
 									.getProcessedDocument());
 					// get processed document
 					String processedDocument = new String(processedPayload);
@@ -646,13 +646,13 @@ public class OrchestratorImpl implements Orchestrator {
 					retrieveDocumentSetResponse
 					.setReturn(marshall(xdsbRetrieveDocumentSetResponse));
 					retrieveDocumentSetResponse
-					.setKekEncryptionKey(processDocumentResponse
+					.setKekEncryptionKey(segmentDocumentResponse
 							.getKekEncryptionKey());
 					retrieveDocumentSetResponse
-					.setKekMaskingKey(processDocumentResponse
+					.setKekMaskingKey(segmentDocumentResponse
 							.getKekMaskingKey());
 					retrieveDocumentSetResponse
-					.setMetadata(processDocumentResponse
+					.setMetadata(segmentDocumentResponse
 							.getPostProcessingMetadata());
 				}
 				else

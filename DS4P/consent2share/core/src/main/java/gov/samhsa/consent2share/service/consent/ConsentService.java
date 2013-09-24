@@ -25,12 +25,13 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.consent;
 
+import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.SignedPDFConsent;
 import gov.samhsa.consent2share.domain.consent.SignedPDFConsentRevocation;
 import gov.samhsa.consent2share.service.dto.ConsentDto;
-import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
+import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 
 import java.util.ArrayList;
@@ -38,7 +39,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -127,14 +127,14 @@ public interface ConsentService {
 	 *
 	 * @param consent the consent
 	 */
-	void saveConsent(Consent consent);
+	void saveConsent(Consent consent) ;
 	
 	/**
 	 * Save consent.
 	 *
 	 * @param consentDto the consent dto
 	 */
-	void saveConsent(ConsentDto consentDto);
+	void saveConsent(ConsentDto consentDto) throws ConsentGenException;
 	
 	/**
 	 * Update consent.

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="myaccountMenuFragment">
+	
+	<a class="btn myaccount-buttons" href="#">
+		<span class="icon-envelope"></span><span class="hidden-phone hidden-tablet"> Message Center</span> 
+		<span class="label label-warning hidden-phone">3</span> 
+		<!-- <span class="label label-success hidden-phone">1</span>
+		<span class="label label-important hidden-phone">2</span> -->
+	</a>
+
+	<!-- COMPONENT: User Dropdown -->
+
+	<a class="btn myaccount-buttons dropdown-toggle" data-toggle="dropdown" href="#">
+		<span class="icon-user">&nbsp;</span><span class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span>
+		<span class="caret"></span>
+	</a>
+	
+	<ul role="menu" class="dropdown-menu">
+		<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_my_profile}">My Profile</a></li>
+		<li role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}" th:text="#{header_change_password}">Change Password</a></li>
+		<li role="menuitem" aria-disabled="true" class="divider"></li>
+		<li role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" th:text="#{header_logout}">Logout</a></li>
+	</ul>
+
+</div>
+
+</html>

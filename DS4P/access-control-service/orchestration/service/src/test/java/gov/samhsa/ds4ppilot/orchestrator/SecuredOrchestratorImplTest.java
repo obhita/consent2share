@@ -4,7 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import gov.samhsa.ds4ppilot.orchestrator.audit.AuditServiceImpl;
 import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32GetterImpl;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandlerImpl;
-import gov.samhsa.ds4ppilot.orchestrator.documentprocessor.DocumentProcessorImpl;
+import gov.samhsa.ds4ppilot.orchestrator.documentsegmentation.DocumentSegmentationImpl;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistryImpl;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepositoryImpl;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
@@ -56,7 +56,7 @@ public class SecuredOrchestratorImplTest {
 	@Ignore("This test should be configured to run as an integration test.") 
 	@Test
 	public void testSamlRetrieveDocumentSetRequest() throws JAXBException {
-		final String xdsbRepositoryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
+		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 
 		final String contextHandlerEndpointAddress = "http://174.78.146.228:8080/DS4PACSServices/DS4PContextHandler";
 		ContextHandlerImpl contextHandler = new ContextHandlerImpl(
@@ -69,21 +69,21 @@ public class SecuredOrchestratorImplTest {
 		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
 		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
 
-		final String documentProcessorEndpointAddress = "http://xds-demo.feisystems.com:80/DocumentProcessor/services/processdocumentservice";
-		DocumentProcessorImpl documentProcessor = new DocumentProcessorImpl(
-				documentProcessorEndpointAddress);
+		final String documentSegmentationEndpointAddress = "http://xds-demo.feisystems.com:80/DocumentSegmentation/services/DocumentSegmentationService";
+		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
+				documentSegmentationEndpointAddress);
 
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
 
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
 				xdsbRepositoryEndpointAddress);
 
-		final String xdsbRegistryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
 				xdsbRegistryEndpointAddress);
 
 		SecuredOrchestratorImpl securedOrchestrator = new SecuredOrchestratorImpl(
-				contextHandler, c32Getter, documentProcessor, auditService,
+				contextHandler, c32Getter, documentSegmentation, auditService,
 				dataHandlerToBytesConverter, xdsbRepository, xdsbRegistry);
 
 		securedOrchestrator.setSubjectPurposeOfUse("TREAT");
@@ -113,8 +113,7 @@ public class SecuredOrchestratorImplTest {
 		String processedDocumentString = decryptDocument(processDocBytes,
 				response.getKekEncryptionKey(), response.getKekMaskingKey());
 
-		System.out
-				.println("Processed C32 document: " + processedDocumentString);
+		LOGGER.debug("Processed C32 document: " + processedDocumentString);
 
 		assertNotNull(response);
 	}
@@ -122,7 +121,7 @@ public class SecuredOrchestratorImplTest {
 	@Ignore("This test should be configured to run as an integration test.")
 	@Test
 	public void testSamlRegisteryStoredQueryRequest() {
-		final String xdsbRepositoryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
+		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 
 		final String endpointAddressForAuditServcie = "http://174.78.146.228:8080/DS4PACSServices/DS4PAuditService";
 		gov.samhsa.ds4ppilot.orchestrator.audit.AuditServiceImpl auditService = new AuditServiceImpl(
@@ -135,21 +134,21 @@ public class SecuredOrchestratorImplTest {
 		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
 		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
 
-		final String documentProcessorEndpointAddress = "http://localhost:90/DocumentProcessor/services/processdocumentservice";
-		DocumentProcessorImpl documentProcessor = new DocumentProcessorImpl(
-				documentProcessorEndpointAddress);
+		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
+				documentSegmentationEndpointAddress);
 
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
 
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
 				xdsbRepositoryEndpointAddress);
 
-		final String xdsbRegistryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
 				xdsbRegistryEndpointAddress);
 
 		SecuredOrchestratorImpl securedOrchestrator = new SecuredOrchestratorImpl(
-				contextHandler, c32Getter, documentProcessor, auditService,
+				contextHandler, c32Getter, documentSegmentation, auditService,
 				dataHandlerToBytesConverter, xdsbRepository, xdsbRegistry);
 
 		securedOrchestrator.setSubjectPurposeOfUse("TREAT");

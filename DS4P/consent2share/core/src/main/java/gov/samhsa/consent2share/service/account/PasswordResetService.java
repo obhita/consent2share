@@ -32,6 +32,7 @@ import gov.samhsa.consent2share.infrastructure.security.TokenExpiredException;
 import gov.samhsa.consent2share.infrastructure.security.TokenNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
 import gov.samhsa.consent2share.service.dto.PasswordResetDto;
+import gov.samhsa.consent2share.service.dto.PasswordChangeDto;
 
 /**
  * The Interface PasswordResetService.
@@ -76,4 +77,16 @@ public interface PasswordResetService {
 	public abstract void resetPassword(PasswordResetDto passwordResetDto, String linkUrl)
 			throws TokenNotExistException,
 			TokenExpiredException, UsernameNotExistException, MessagingException;
+	
+	/**
+	 * Change password.
+	 *
+	 * @param passwordChangeDto the password change dto
+	 * @return 
+	 * @throws UsernameNotExistException the username not exist exception
+	 * @throws MessagingException the messaging exception
+	 */
+	public abstract boolean changePassword(PasswordChangeDto passwordChangeDto)
+			throws UsernameNotExistException, MessagingException;
+	
 }

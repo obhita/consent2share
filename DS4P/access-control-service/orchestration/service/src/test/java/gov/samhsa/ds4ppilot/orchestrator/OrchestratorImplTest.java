@@ -10,18 +10,18 @@ import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32Getter;
 import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32GetterImpl;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandler;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandlerImpl;
-import gov.samhsa.ds4ppilot.orchestrator.documentprocessor.DocumentProcessor;
-import gov.samhsa.ds4ppilot.orchestrator.documentprocessor.DocumentProcessorImpl;
+import gov.samhsa.ds4ppilot.orchestrator.documentsegmentation.DocumentSegmentation;
+import gov.samhsa.ds4ppilot.orchestrator.documentsegmentation.DocumentSegmentationImpl;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistry;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistryImpl;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepository;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepositoryImpl;
-import gov.samhsa.ds4ppilot.schema.documentprocessor.ProcessDocumentResponse;
 import gov.samhsa.ds4ppilot.schema.orchestrator.FilterC32Response;
 import gov.samhsa.ds4ppilot.schema.orchestrator.RegisteryStoredQueryResponse;
 import gov.samhsa.ds4ppilot.ws.client.XdsbRegistryWebServiceClient;
@@ -110,22 +110,22 @@ public class OrchestratorImplTest {
 		final String c32ServiceEndpointAddress = "http://localhost/Rem.Web/C32Service.svc";
 		C32Getter c32Getter = new C32GetterImpl(c32ServiceEndpointAddress);
 
-		final String documentProcessorEndpointAddress = "http://localhost:90/DocumentProcessor/services/processdocumentservice";
-		DocumentProcessor documentProcessor = new DocumentProcessorImpl(
-				documentProcessorEndpointAddress);
+		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+		DocumentSegmentation documentSegmentation = new DocumentSegmentationImpl(
+				documentSegmentationEndpointAddress);
 
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
 
-		final String xdsbRepositoryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
+		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
 				xdsbRepositoryEndpointAddress);
 
-		final String xdsbRegistryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
 				xdsbRegistryEndpointAddress);
 
 		OrchestratorImpl orchestrator = new OrchestratorImpl(contextHandler,
-				c32Getter, documentProcessor, dataHandlerToBytesConverter,
+				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
 				xdsbRepository, xdsbRegistry);
 
 		orchestrator.setSubjectPurposeOfUse("TREAT");
@@ -155,22 +155,22 @@ public class OrchestratorImplTest {
 		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
 		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
 
-		final String documentProcessorEndpointAddress = "http://localhost:90/DocumentProcessor/services/processdocumentservice";
-		DocumentProcessorImpl documentProcessor = new DocumentProcessorImpl(
-				documentProcessorEndpointAddress);
+		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
+				documentSegmentationEndpointAddress);
 
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
 
-		final String xdsbRepositoryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
+		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
 				xdsbRepositoryEndpointAddress);
 
-		final String xdsbRegistryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
 				xdsbRegistryEndpointAddress);
 
 		OrchestratorImpl orchestrator = new OrchestratorImpl(contextHandler,
-				c32Getter, documentProcessor, dataHandlerToBytesConverter,
+				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
 				xdsbRepository, xdsbRegistry);
 
 		orchestrator.setSubjectPurposeOfUse("TREAT");
@@ -193,7 +193,7 @@ public class OrchestratorImplTest {
 	@Ignore("This test should be configured to run as an integration test.")
 	@Test
 	public void testRetrieveDocumentSetRequest() {
-		final String xdsbRepositoryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
+		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 
 		final String contextHandlerEndpointAddress = "http://174.78.146.228:8080/DS4PACSServices/DS4PContextHandler";
 		ContextHandlerImpl contextHandler = new ContextHandlerImpl(
@@ -202,21 +202,21 @@ public class OrchestratorImplTest {
 		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
 		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
 
-		final String documentProcessorEndpointAddress = "http://localhost:90/DocumentProcessor/services/processdocumentservice";
-		DocumentProcessorImpl documentProcessor = new DocumentProcessorImpl(
-				documentProcessorEndpointAddress);
+		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
+				documentSegmentationEndpointAddress);
 
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
 
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
 				xdsbRepositoryEndpointAddress);
 
-		final String xdsbRegistryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
 				xdsbRegistryEndpointAddress);
 
 		OrchestratorImpl orchestrator = new OrchestratorImpl(contextHandler,
-				c32Getter, documentProcessor, dataHandlerToBytesConverter,
+				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
 				xdsbRepository, xdsbRegistry);
 
 		orchestrator.setSubjectPurposeOfUse("TREAT");
@@ -249,7 +249,7 @@ public class OrchestratorImplTest {
 	@Ignore("This test should be configured to run as an integration test.")
 	@Test
 	public void testRegisteryStoredQueryRequest() {
-		final String xdsbRepositoryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
+		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 
 		final String contextHandlerEndpointAddress = "http://174.78.146.228:8080/DS4PACSServices/DS4PContextHandler";
 		ContextHandlerImpl contextHandler = new ContextHandlerImpl(
@@ -258,21 +258,21 @@ public class OrchestratorImplTest {
 		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
 		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
 
-		final String documentProcessorEndpointAddress = "http://localhost:90/DocumentProcessor/services/processdocumentservice";
-		DocumentProcessorImpl documentProcessor = new DocumentProcessorImpl(
-				documentProcessorEndpointAddress);
+		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
+				documentSegmentationEndpointAddress);
 
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
 
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
 				xdsbRepositoryEndpointAddress);
 
-		final String xdsbRegistryEndpointAddress = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
 				xdsbRegistryEndpointAddress);
 
 		OrchestratorImpl orchestrator = new OrchestratorImpl(contextHandler,
-				c32Getter, documentProcessor, dataHandlerToBytesConverter,
+				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
 				xdsbRepository, xdsbRegistry);
 
 		orchestrator.setSubjectPurposeOfUse("TREAT");
@@ -305,7 +305,7 @@ public class OrchestratorImplTest {
 	@Ignore("This test should be configured to run as an integration test.")
 	@Test
 	public void testAddAndRevisePatientRegistryRecord() throws Throwable {
-		final String demoEndpoint = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String demoEndpoint = "http://feijboss01:8080/axis2/services/xdsregistryb";
 
 		XdsbRegistryWebServiceClient xdsService = new XdsbRegistryWebServiceClient(
 				demoEndpoint);
@@ -413,12 +413,12 @@ public class OrchestratorImplTest {
 		// Arrange
 		ContextHandler contextHandlerMock = mock(ContextHandler.class);
 		C32Getter c32GetterMock = mock(C32Getter.class);
-		DocumentProcessor documentProcessorMock = mock(DocumentProcessor.class);
+		DocumentSegmentation documentSegmentationMock = mock(DocumentSegmentation.class);
 		DataHandlerToBytesConverter dataHandlerToBytesConverterMock = mock(DataHandlerToBytesConverter.class);
 		XdsbRepository xdsbRepositoryMock = mock(XdsbRepository.class);
 		XdsbRegistry xdsbRegistryMock = mock(XdsbRegistry.class);
 		OrchestratorImpl sut = new OrchestratorImpl(contextHandlerMock,
-				c32GetterMock, documentProcessorMock,
+				c32GetterMock, documentSegmentationMock,
 				dataHandlerToBytesConverterMock, xdsbRepositoryMock,
 				xdsbRegistryMock);
 
@@ -440,12 +440,12 @@ public class OrchestratorImplTest {
 		// Arrange
 		ContextHandler contextHandlerMock = mock(ContextHandler.class);
 		C32Getter c32GetterMock = mock(C32Getter.class);
-		DocumentProcessor documentProcessorMock = mock(DocumentProcessor.class);
+		DocumentSegmentation documentSegmentationMock = mock(DocumentSegmentation.class);
 		DataHandlerToBytesConverter dataHandlerToBytesConverterMock = mock(DataHandlerToBytesConverter.class);
 		XdsbRepository xdsbRepositoryMock = mock(XdsbRepository.class);
 		XdsbRegistry xdsbRegistryMock = mock(XdsbRegistry.class);
 		OrchestratorImpl sut = new OrchestratorImpl(contextHandlerMock,
-				c32GetterMock, documentProcessorMock,
+				c32GetterMock, documentSegmentationMock,
 				dataHandlerToBytesConverterMock, xdsbRepositoryMock,
 				xdsbRegistryMock);
 
@@ -475,12 +475,12 @@ public class OrchestratorImplTest {
 		// Arrange
 		ContextHandler contextHandlerMock = mock(ContextHandler.class);
 		C32Getter c32GetterMock = mock(C32Getter.class);
-		DocumentProcessor documentProcessorMock = mock(DocumentProcessor.class);
+		DocumentSegmentation documentSegmentationMock = mock(DocumentSegmentation.class);
 		DataHandlerToBytesConverter dataHandlerToBytesConverterMock = mock(DataHandlerToBytesConverter.class);
 		XdsbRepository xdsbRepositoryMock = mock(XdsbRepository.class);
 		XdsbRegistry xdsbRegistryMock = mock(XdsbRegistry.class);
 		OrchestratorImpl sut = new OrchestratorImpl(contextHandlerMock,
-				c32GetterMock, documentProcessorMock,
+				c32GetterMock, documentSegmentationMock,
 				dataHandlerToBytesConverterMock, xdsbRepositoryMock,
 				xdsbRegistryMock);
 
@@ -502,19 +502,19 @@ public class OrchestratorImplTest {
 
 		when(c32GetterMock.getC32(patientId)).thenReturn(c32);
 
-		ProcessDocumentResponse processDocumentResponseMock = mock(ProcessDocumentResponse.class);
-		when(processDocumentResponseMock.getMaskedDocument()).thenReturn(
+		SegmentDocumentResponse segmentDocumentResponseMock = mock(SegmentDocumentResponse.class);
+		when(segmentDocumentResponseMock.getMaskedDocument()).thenReturn(
 				maskedDocument);
 
 		DataHandler dataHandlerMock = mock(DataHandler.class);
-		when(processDocumentResponseMock.getProcessedDocument()).thenReturn(
+		when(segmentDocumentResponseMock.getProcessedDocument()).thenReturn(
 				dataHandlerMock);
 
 		when(
-				documentProcessorMock.processDocument(eq(c32), anyString(),
+				documentSegmentationMock.segmentDocument(eq(c32), anyString(),
 						eq(packageAsXdm), eq(encryptDocument),
 						eq(senderEmailAddress), eq(recipientEmailAddress), anyString()))
-						.thenReturn(processDocumentResponseMock);
+						.thenReturn(segmentDocumentResponseMock);
 
 		when(
 				dataHandlerToBytesConverterMock
@@ -540,18 +540,18 @@ public class OrchestratorImplTest {
 
 		ContextHandler contextHandlerMock = mock(ContextHandler.class);
 		C32Getter c32GetterMock = mock(C32Getter.class);
-		DocumentProcessor documentProcessorMock = mock(DocumentProcessor.class);
+		DocumentSegmentation documentSegmentationMock = mock(DocumentSegmentation.class);
 		DataHandlerToBytesConverter dataHandlerToBytesConverterMock = mock(DataHandlerToBytesConverter.class);
 
-		final String demoRespositoryEndpoint = "http://xds-demo.feisystems.com:8080/axis2/services/xdsrepositoryb";
-		final String demoRegistryEndpoint = "http://xds-demo.feisystems.com:8080/axis2/services/xdsregistryb";
+		final String demoRespositoryEndpoint = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
+		final String demoRegistryEndpoint = "http://feijboss01:8080/axis2/services/xdsregistryb";
 
 		XdsbRepository xdsbRepository = new XdsbRepositoryImpl(
 				demoRespositoryEndpoint);
 		XdsbRegistry xdsbRegistry = new XdsbRegistryImpl(demoRegistryEndpoint);
 
 		OrchestratorImpl sut = new OrchestratorImpl(contextHandlerMock,
-				c32GetterMock, documentProcessorMock,
+				c32GetterMock, documentSegmentationMock,
 				dataHandlerToBytesConverterMock, xdsbRepository, xdsbRegistry);
 
 		sut.setSubjectLocality("1.1.1.1");

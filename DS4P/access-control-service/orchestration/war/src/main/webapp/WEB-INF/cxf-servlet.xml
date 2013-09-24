@@ -79,7 +79,7 @@
 		scope="prototype">
 		<constructor-arg ref="c32GetterImpl" />
 		<constructor-arg ref="contextHandlerImpl" />
-		<constructor-arg ref="documentProcessorImpl" />
+		<constructor-arg ref="documentSegmentationImpl" />
 		<constructor-arg ref="dataHandlerToBytesConverterImpl" />
 		<constructor-arg ref="xdsbRepositoryImpl" />
 		<constructor-arg ref="xdsbRegistryImpl" />
@@ -98,7 +98,7 @@
 		scope="prototype">
 		<constructor-arg ref="c32GetterImpl" />
 		<constructor-arg ref="contextHandlerImpl" />
-		<constructor-arg ref="documentProcessorImpl" />
+		<constructor-arg ref="documentSegmentationImpl" />
 		<constructor-arg ref="dataHandlerToBytesConverterImpl" />
 		<constructor-arg ref="xdsbRepositoryImpl" />
 		<constructor-arg ref="xdsbRegistryImpl" />
@@ -134,10 +134,10 @@
 		<constructor-arg value="#{endpointAddressProperties.auditService}" />
 	</bean>
 
-	<bean id="documentProcessorImpl"
-		class="gov.samhsa.ds4ppilot.orchestrator.documentprocessor.DocumentProcessorImpl"
+	<bean id="documentSegmentationImpl"
+		class="gov.samhsa.ds4ppilot.orchestrator.documentsegmentation.DocumentSegmentationImpl"
 		scope="prototype">
-		<constructor-arg value="#{endpointAddressProperties.documentProcessor}" />
+		<constructor-arg value="#{endpointAddressProperties.documentSegmentation}" />
 	</bean>
 
 	<bean id="dataHandlerToBytesConverterImpl"

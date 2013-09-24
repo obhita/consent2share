@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:cxf="http://cxf.apache.org/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:soap="http://cxf.apache.org/bindings/soap"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+         http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://cxf.apache.org/jaxws
+         http://cxf.apache.org/schemas/jaxws.xsd
+         http://www.springframework.org/schema/util
+         http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <!-- Import statement optional but often required if you're declaring 
+         other CXF beans in this file such as CXF's JMX MBeans -->
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    
+    <util:properties id="endpointAddressProperties"
+		location="/WEB-INF/endpointAddress.properties" />
+
+    <jaxws:endpoint 
+        id="documentsegmentationservice"
+        implementor="#documentSegmentationServiceImpl"
+        wsdlLocation="classpath:DocumentSegmentationService.wsdl"
+        address="/DocumentSegmentationService">
+        <jaxws:properties>
+			<entry key="mtom-enabled" value="true" />
+		</jaxws:properties>
+    </jaxws:endpoint>
+    
+    <bean id="documentSegmentationServiceImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.ws.DocumentSegmentationServiceImpl"
+		scope="prototype" autowire="byType" />
+
+	<bean id="documentSegmentationImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.DocumentSegmentationImpl"
+		scope="prototype" autowire="constructor" />
+		
+	<bean id="ruleExecutionServiceClientImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.brms.RuleExecutionServiceClientImpl"
+		scope="prototype">
+		<constructor-arg value="#{endpointAddressProperties.ruleExecutionService}" />
+	</bean>
+
+	<bean id="auditServiceImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditServiceImpl"
+		scope="prototype">
+		<constructor-arg value="#{endpointAddressProperties.auditService}" />
+	</bean>
+	
+	<!-- Tools for Document Segmentation Service -->
+	<bean id="documentEditorImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEditorImpl"
+		scope="prototype" autowire="byType"/>
+	<bean id="documentEncrypterImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEncrypterImpl"
+		scope="prototype"/>
+	<bean id="documentMaskerImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentMaskerImpl"
+		scope="prototype"/>
+	<bean id="documentRedactorImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentRedactorImpl"
+		scope="prototype" autowire="byType"/>
+	<bean id="documentTaggerImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentTaggerImpl"
+		scope="prototype"/>
+	<bean id="fileReaderImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.FileReaderImpl"
+		scope="prototype"/>
+	<bean id="marshallerImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MarshallerImpl"
+		scope="prototype"/>
+	<bean id="metadataGeneratorImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MetadataGeneratorImpl"
+		scope="prototype"/>
+	<bean id="documentXmlConverterImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentXmlConverterImpl"
+		scope="prototype"/>
+	<bean id="documentFactModelExtractorImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentFactModelExtractorImpl"
+		scope="prototype"/>
+	<bean id="additionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
+		scope="prototype"/>
+    
+</beans>

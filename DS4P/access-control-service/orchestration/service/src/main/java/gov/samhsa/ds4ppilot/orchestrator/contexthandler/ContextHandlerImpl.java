@@ -133,21 +133,17 @@ public class ContextHandlerImpl implements ContextHandler {
 		try {
 			field = result.getClass().getDeclaredField("pdpObligation");
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 		makeAccessible(field);
 		try {
 			field.set(result,obligations);
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 	}
     private void makeAccessible(Field field) {

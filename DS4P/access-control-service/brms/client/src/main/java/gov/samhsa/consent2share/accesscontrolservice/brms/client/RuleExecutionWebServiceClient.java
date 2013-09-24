@@ -36,6 +36,8 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 
@@ -46,6 +48,9 @@ public class RuleExecutionWebServiceClient {
 	
 	/** The endpoint address. */
 	private String endpointAddress;
+	
+	/** The Constant LOGGER. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(RuleExecutionWebServiceClient.class);
 
 	/**
 	 * Instantiates a new rule execution web service client.
@@ -151,22 +156,22 @@ public class RuleExecutionWebServiceClient {
 					wsdlURL = new URL(args[0]);
 				}
 			} catch (MalformedURLException e) {
-				e.printStackTrace();
+				LOGGER.error(e.getMessage(),e);
 			}
 		}
 		
 		RuleExecutionService ruleExecutionService = new RuleExecutionService(wsdlURL, SERVICE_NAME);
 		RuleExecutionServicePortType port = ruleExecutionService.getRuleExecutionServicePort();
 		
-		System.out.println("Invoking RuleExecutionService...");
+		LOGGER.debug("Invoking RuleExecutionService...");
 		
 		AssertAndExecuteClinicalFactsRequest parameters =  new AssertAndExecuteClinicalFactsRequest();
 		parameters.setClinicalFactXmlString(clinicalFacts);
 		
 		AssertAndExecuteClinicalFactsResponse response = port.assertAndExecuteClinicalFacts(parameters);
 		
-		System.out.println("RuleExecutionResponseContainer returned...");
-		System.out.println(response.getRuleExecutionResponseContainer());
+		LOGGER.debug("RuleExecutionResponseContainer returned...");
+		LOGGER.debug(response.getRuleExecutionResponseContainer());
 		
 		System.exit(0);
 	}

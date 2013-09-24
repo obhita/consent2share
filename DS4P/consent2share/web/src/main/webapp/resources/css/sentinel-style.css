@@ -175,6 +175,9 @@ used more than once per page.
     font-weight: 400;
     padding: 10px 20px 0 0; }
 
+.btn [class^="icon-"] + span, .btn [class*=" icon-"] + span {
+  margin-left: 3px; }
+
 /* 	Footer Features */
 #footer-features {
   width: 100%; }
@@ -286,56 +289,60 @@ used more than once per page.
   line-height: 42px; }
 
 /* Brand Logo  */
-#brand-gray:before {
-  content: "consent";
-  font-weight: 200;
-  background-color: transparent;
-  color: gray; }
+#logoFragment img {
+  height: 38px;
+  margin: -10px 0 -11px 0; }
 
 #brand-blue:before {
-  content: "share";
+  content: "consent2share";
   font-weight: 200px;
+  margin-right: 10px;
   background-color: transparent;
   color: #13aaea; }
 
-#brand-blue-2:before {
-  content: "2";
-  font-weight: 200;
-  font-size: larger;
-  background-color: transparent;
-  color: white;
-  text-align: center;
-  margin: 5px; }
-
-#brand-circle {
-  width: 25px;
-  height: 25px;
-  background: #0ca3e8;
-  margin: 2px;
-  padding: 4px;
-  display: inline;
-  -webkit-border-radius: 25px;
-  -moz-border-radius: 25px;
-  -ms-border-radius: 25px;
-  -o-border-radius: 25px;
-  border-radius: 25px; }
-
+/*	#brand-gray:before {
+		content: "consent";
+		font-weight:200;
+		background-color:transparent;
+		color:gray;
+	}
+	
+		
+	#brand-blue-2:before { 
+		content: "2";
+		font-weight:200;
+		font-size: larger;
+		background-color:transparent;
+		color:white;
+		text-align: center;
+		margin:5px;
+		}	
+	#brand-circle {
+		width: 25px;
+		height: 25px;
+		background: $ux-blue;
+		margin: 2px;
+		padding: 4px;
+		display: inline; 
+		@include border-radius(25px)
+		}
+*/
 #bread-crumb-btn {
   float: left; }
 
-.fred {
+.summary-record-details-container {
   display: inline; }
-  .fred ul {
+  .summary-record-details-container ul {
     width: 44%;
     margin: 0 0 15px;
     display: inline-block;
     vertical-align: top;
     background-color: #f8f8f8; }
-    .fred ul.summary-border {
+    .summary-record-details-container ul.summary-border {
       padding: 8px 1% 4px; }
-    .fred ul.right {
+    .summary-record-details-container ul.right {
       float: right; }
-    .fred ul:hover {
+    .summary-record-details-container ul:hover {
       background-color: beige; }
 
 #share-all-med, #share-for-purpose, #consent-date-fill {
@@ -624,6 +631,10 @@ since they may be used more than once.
   font-size: 13px;
   line-height: 18px; }
 
+/*  SideBar Pulldown Tab  */
+.guide-pulldown-tab {
+  z-index: 200; }
+
 /* Disclaimer */
 .disclaimer {
   font-size: .8em;
@@ -851,6 +862,9 @@ a:hover.footer-link {
   -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.15);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.15); }
 
+.btn-mainmenu {
+  display: none; }
+
 .navbar .btn, .navbar .btn-group {
   margin-top: 5px;
   margin-bottom: 2px; }
@@ -894,6 +908,10 @@ a:hover.footer-link {
   margin-bottom: 10px; }
   .summary-border:hover {
     border-color: #0088cc; }
+  .summary-border ul.provider-ul li {
+    overflow: auto !important;
+    white-space: normal !important;
+    height: auto; }
 
 #add-legal-modal .summary-container div.datepicker:after {
   content: ""; }
@@ -932,11 +950,21 @@ This section contains edits and additions to the original Joyride-2.0.3.css file
 .joyride-content-wrapper {
   padding: 10px 22px 15px 15px; }
 
+@media only screen and (max-width: 979px) {
+  .btn-mainmenu {
+    display: block;
+    float: right; } }
 	/*
 @media only screen and (max-width: 979px) {
 	.myhome-tourbox2a	 {
 		display: none !important;  
 		}
+	
+	.btn-mainmenu {
+		display: block;
+  		float: right;
+	}
+	
 	}
 	
 	@media only screen and (min-width: 980px) {
@@ -1001,6 +1029,10 @@ a.btn-right {
   text-align: center;
   display: inline; }
 
+/*  This class is used to fix the Flash of Unstyled Content (FOUC) issue  */
+body.fouc_loading {
+  display: none !important; }
+
 /* !CHANGING STATE RULES */
 /*============================================================
 State Changes can be implemented in three different ways:
@@ -1018,9 +1050,19 @@ Media Query - defines how things should be styles under defined criteria
 @media only screen and (max-height: 480px) {
   [id*='edit-legal-form'].modal-body, [id*='add-legal-form'].modal-body {
     max-height: 160px !important; } }
+/* Max-width 979px Wide 
+====================================================================== */
+@media only screen and (max-width: 979px) {
+  /* Brand Logo  */
+  .myaccount-buttons {
+    display: none !important; } }
 /* 768px Wide - MOBILE - Landscape, Tablet Portrait (devices and browsers)
 ====================================================================== */
 @media only screen and (min-width: 480px) and (max-width: 768px) {
+  #logoFragment img {
+    height: 30px;
+    margin: -10px 0 -11px 0; }
+
   #home-login-container {
     max-width: none;
     width: 90%; }
@@ -1057,6 +1099,9 @@ Media Query - defines how things should be styles under defined criteria
   #consent-3buttons {
     width: auto;
     display: inherit; }
+
+  .btn-group {
+    margin-right: 10px !important; }
 
   .nav-popdown, #topnavbar {
     margin-left: 20px;
@@ -1140,11 +1185,16 @@ Media Query - defines how things should be styles under defined criteria
     width: 100%; }
 
   /* Brand Logo  */
+  #logoFragment img {
+    height: 30px;
+    margin: -10px 0 -11px 0; }
+
   #brand-gray:before {
     font-size: 16px; }
 
   #brand-blue:before {
-    font-size: 16px; }
+    font-size: 16px;
+    display: none; }
 
   #brand-blue-2:before {
     font-size: 20px;
@@ -1186,11 +1236,11 @@ Media Query - defines how things should be styles under defined criteria
   #consent-right-arrow-container {
     margin-left: .5%; }
 
-  .fred #consent-right-arrow-container {
+  .summary-record-details-container #consent-right-arrow-container {
     margin-left: 2%; }
-  .fred ul {
+  .summary-record-details-container ul {
     width: 42%; }
-    .fred ul.summary-border {
+    .summary-record-details-container ul.summary-border {
       padding: 8px 1% 4px; }
 
   #consent-3buttons {
@@ -1249,6 +1299,9 @@ Media Query - defines how things should be styles under defined criteria
   .navbar .btn, .navbar .btn-group {
     margin-top: 8px;
     margin-bottom: 2px; }
+
+  .btn-group {
+    margin-right: 0 !important; }
 
   #connections-content legend {
     font-size: 16px;

@@ -58,7 +58,7 @@
 		<wsdl:port binding="tns:RuleExecutionServiceBinding"
 			name="RuleExecutionServicePort">
 			<soap:address
-				location="http://obhitaqaapp01/RuleExecutionService/services/RuleExecutionService" />
+				location="http://localhost:90/RuleExecutionService/services/RuleExecutionService" />
 		</wsdl:port>
 	</wsdl:service>
 </wsdl:definitions>

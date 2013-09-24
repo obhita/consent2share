@@ -9,7 +9,7 @@
 	</context-param>
 	<context-param>
 		<param-name>spring.profiles.default</param-name>
-		<param-value>runtime</param-value>
+		<param-value>test</param-value>
 	</context-param>
 	<filter>
 		<filter-name>httpMethodFilter</filter-name>

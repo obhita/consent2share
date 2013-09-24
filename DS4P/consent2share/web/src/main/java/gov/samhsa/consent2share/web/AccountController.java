@@ -26,15 +26,19 @@
 package gov.samhsa.consent2share.web;
 
 import gov.samhsa.consent2share.domain.account.TroubleType;
+import gov.samhsa.consent2share.infrastructure.FieldValidatorChangePassword;
 import gov.samhsa.consent2share.infrastructure.FieldValidatorLoginTroubleCreateNewPassword;
 import gov.samhsa.consent2share.infrastructure.FieldValidatorLoginTroublePassword;
 import gov.samhsa.consent2share.infrastructure.FieldValidatorLoginTroubleSelection;
+import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.TokenExpiredException;
 import gov.samhsa.consent2share.infrastructure.security.TokenNotExistException;
+import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
 import gov.samhsa.consent2share.service.account.PasswordResetService;
 import gov.samhsa.consent2share.service.dto.LoginTroubleDto;
+import gov.samhsa.consent2share.service.dto.PasswordChangeDto;
 import gov.samhsa.consent2share.service.dto.PasswordResetDto;
 
 import javax.mail.MessagingException;
@@ -66,9 +70,16 @@ public class AccountController extends AbstractController {
 
 	/** The field validator login trouble create new password. */
 	private FieldValidatorLoginTroubleCreateNewPassword fieldValidatorLoginTroubleCreateNewPassword;
+	
+	/** The field validator change password. */
+	private FieldValidatorChangePassword fieldValidatorChangePassword;
 
 	/** The password reset service. */
 	private PasswordResetService passwordResetService;
+	
+	/** The user context. */
+	@Autowired
+	UserContext userContext;
 
 	/**
 	 * Instantiates a new account controller.
@@ -79,6 +90,8 @@ public class AccountController extends AbstractController {
 	 *            the field validator login trouble create new password
 	 * @param fieldValidatorTroubleSelection
 	 *            the field validator trouble selection
+	 * @param fieldValidatorChangePassword            
+	 * 			  the field validator change password
 	 * @param passwordResetService
 	 *            the password reset service
 	 */
@@ -87,11 +100,13 @@ public class AccountController extends AbstractController {
 			FieldValidatorLoginTroublePassword fieldValidatorPassword,
 			FieldValidatorLoginTroubleCreateNewPassword fieldValidatorLoginTroubleCreateNewPassword,
 			FieldValidatorLoginTroubleSelection fieldValidatorTroubleSelection,
+			FieldValidatorChangePassword fieldValidatorChangePassword,
 			PasswordResetService passwordResetService) {
 		this.fieldValidatorPassword = fieldValidatorPassword;
 		this.fieldValidatorTroubleSelection = fieldValidatorTroubleSelection;
 		this.passwordResetService = passwordResetService;
 		this.fieldValidatorLoginTroubleCreateNewPassword = fieldValidatorLoginTroubleCreateNewPassword;
+		this.fieldValidatorChangePassword = fieldValidatorChangePassword;
 	}
 
 	/**
@@ -374,6 +389,70 @@ public class AccountController extends AbstractController {
 
 		hostName.append(contextPath);
 		return hostName.toString();
+	}
+	
+	
+	
+	/**
+	 * Change Password.
+	 *
+	 * @param model the model
+	 * @return the string
+	 */
+	@RequestMapping(value = "changePassword.html")
+	public String changePassword(Model model) {
+		AuthenticatedUser currentUser = userContext.getCurrentUser();
+		String username=currentUser.getUsername();
+		
+		PasswordChangeDto passwordChangeDto = new PasswordChangeDto();
+		passwordChangeDto.setUsername(username);
+		
+		
+		model.addAttribute(passwordChangeDto);
+		return "views/changePassword";
+	}
+	
+	/**
+	 * Change Password.
+	 *
+	 * @param model the model
+	 * @return the string
+	 * @throws MessagingException 
+	 * @throws UsernameNotExistException 
+	 */
+	@RequestMapping(value = "changePassword.html", method = RequestMethod.POST)
+	public String changePassword(PasswordChangeDto passwordChangeDto,
+			BindingResult result, Model model) throws UsernameNotExistException, MessagingException {
+		AuthenticatedUser currentUser = userContext.getCurrentUser();
+		String username=currentUser.getUsername();
+		passwordChangeDto.setUsername(username);
+		
+		fieldValidatorChangePassword.validate(passwordChangeDto, result);
+		
+		if(result.hasErrors()){
+			return "views/changePassword";
+		}
+		
+		String passwordChangeDtoObjectName = StringUtils.uncapitalize(PasswordChangeDto.class.getSimpleName());
+		boolean isChangeSuccess = false;
+		
+		try{
+			isChangeSuccess = passwordResetService.changePassword(passwordChangeDto);
+		}catch(UsernameNotExistException ex){
+			FieldError error = new FieldError(passwordChangeDtoObjectName, "username", "Username does not exist");
+			result.addError(error);
+			model.addAttribute("generalErrorMessage", "An unknown error has occurred");
+			return "views/changePassword";
+		}
+		
+		
+		if(isChangeSuccess == true){
+			return "redirect:patients/home.html?notify=passChangeSuccess";
+		}else{
+			FieldError error = new FieldError(passwordChangeDtoObjectName, "oldPassword", "Wrong password");
+			result.addError(error);
+			return "views/changePassword";
+		}
 	}
 
 }

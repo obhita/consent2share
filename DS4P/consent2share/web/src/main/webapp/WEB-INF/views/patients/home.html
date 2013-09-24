@@ -41,27 +41,22 @@
 
 				<!-- COMPONENT: Main Menu Dropdown-->
 				<div class="container-fluid">
-					<a class="btn btn-navbar" data-toggle="collapse"
+					<a class="btn btn-info btn-mainmenu" data-toggle="collapse"
 						data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
-						<span class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
+						<span class="icon-reorder"></span>
 					</a>
 
 					<h1>
 						<span class="nav-title">My Home</span>
 					</h1>
-					<!-- <a class="brand" href="../index.html"> <img alt="Logo Goes Here" src="" />
-						<span id="brand-gray"></span>
-					<div id="brand-circle">
-							<span id="brand-blue-2"></span>
-						</div>
-						<span id="brand-blue"></span></a> -->
-						
-					<a class="brand" th:href="@{/index.html}"  href="../index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+					
+					<span th:include="fragment/common :: logoFragment">
+						<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+					</span>
 
 					<!-- COMPONENT: Header Menu-->
-					<div class="btn-group pull-right">
-					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+					<div class="btn-group btn-right-align">
+						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
 							<span class="icon-flag"></span><span
 							class="hidden-phone hidden-tablet"> Language</span> <span
 							class="caret"></span>
@@ -76,29 +71,46 @@
 					
 					<!-- COMPONENT: Header Menu-->
 
-					<div class="btn-group pull-right">
-						<a class="btn" href="#"> <span class="icon-envelope"></span>
-							<span class="hidden-phone hidden-tablet"> Message Center</span> 
+					<div th:include="fragment/myaccount_menu :: myaccountMenuFragment" class="btn-group pull-right">
+					<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE myaccountMenuFragment -->
+					<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
+						<div>
+						<a class="btn" href="#">
+							<span class="icon-envelope"></span><span class="hidden-phone hidden-tablet"> Message Center</span> 
 							<span class="label label-warning hidden-phone">3</span> 
-							<!-- <span class="label label-success hidden-phone">1</span> 
+							<!-- <span class="label label-success hidden-phone">1</span>
 							<span class="label label-important hidden-phone">2</span> -->
 						</a>
-
+					
 						<!-- COMPONENT: User Dropdown -->
-
+					
 						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-							<span class="icon-user" style="margin-right: 5px;"></span><span
-							class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span> <span
-							class="caret"></span>
+							<span class="icon-user">&nbsp;</span><span class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span>
+							<span class="caret"></span>
 						</a>
+						
 						<ul role="menu" class="dropdown-menu">
 							<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_my_profile}">My Profile</a></li>
+							<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_change_password}">Change Password</a></li>
 							<li role="menuitem" aria-disabled="true" class="divider"></li>
 							<li role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" th:text="#{header_logout}">Logout</a></li>
 						</ul>
-
+						</div>
+						
+					<!-- END OF SECTION REPLACED BY THYMELEAF -->
 					</div>
+					
 				</div>
+			</div>
+			
+			
+			<div id="event_notification_bar" th:switch="${notifyevent}">
+				<span th:case="'passChangeSuccess'">
+					<div class="alert alert-success rounded">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    			You have successfully changed your password!
+					</div>
+				</span>
 			</div>
 
 			
@@ -169,35 +181,46 @@
 
 				<!-- START: Side Nav Menu -->
 
-				<div class="span2 main-menu-span">
+				<div th:include="fragment/common :: sideNavMenuFragment" class="span2 main-menu-span">
+				<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE sideNavMenuFragment -->
+					<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
+					
 					<div class="nav-collapse sidebar-nav">
 						<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
 							<li class="nav-header hidden-tablet" role="menuitem"></li>
-							<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div
-										class="icon-file"></div>
+							
+							<li class="active" role="menuitem"><a href="#">
+								<div class="icon-home icon-large"></div>
+									<span class="hidden-tablet" th:text="#{sidebar_my_home}"> My Home</span></a></li>
+									
+							<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div>
 									<span class="hidden-tablet" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
-
-							<li role="menuitem"><a href="connectionMain.html"><div
-										class="icon-random"></div>
+			
+							<li role="menuitem"><a href="connectionMain.html"><div class="icon-random"></div>
 									<span class="hidden-tablet" th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
-
-							<li role="menuitem"><a href="profile.html"><div
-										class="icon-user"></div>
+			
+							<li role="menuitem"><a href="profile.html"><div class="icon-user"></div>
 									<span class="hidden-tablet" th:text="#{sidebar_my_profile}"> My Profile</span></a></li>
-
+			
 							<li role="menuitem"><a href="../inbox/inboxMain.html" th:href="@{/inbox/inboxMain.html}"><div class="icon-inbox"></div>
-
 									<span class="hidden-tablet" th:text="#{sidebar_in_box}"> Message Center</span></a></li>
-
-
+			
+			
 							<li role="menuitem"><a href="activityHistory.html"><div class="icon-time"></div>
 									<span class="hidden-tablet" th:text="#{sidebar_activity_history}"> Activity History</span></a></li>
-
-							<li role="menuitem"><a href="../clinicaldocuments/mymedicalinfo.html" th:href="@{/patients/medicalinfo.html}"><div
-										class="icon-folder-open"></div>
+			
+							<li role="menuitem"><a href="../clinicaldocuments/mymedicalinfo.html" th:href="@{/patients/medicalinfo.html}"><div class="icon-folder-open"></div>
 									<span class="hidden-tablet" th:text="#{sidebar_medical_documents}"> Medical Documents</span></a></li>
+							
+							<li class="shortcut-button" role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}"><div class="icon-unlock-alt"></div>
+									<span class="hidden-tablet" th:text="#{sidebar_change_password}"> Change Password</span></a></li>
+							
+							<li class="shortcut-button" role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}"><div class="icon-off"></div>
+									<span class="hidden-tablet" th:text="#{sidebar_logout}"> Logout</span></a></li>
 						</ul>
 					</div>
+					
+				<!-- END OF SECTION REPLACED BY THYMELEAF -->
 				</div>
 
 				<!-- END: Side Nav Menu -->
@@ -366,13 +389,9 @@
 			<noscript>Alternate content for script</noscript>
 
 		<!-- JavaScript Functions -->
-		<script type="text/javascript">	
 		
-			$(document).ready(function(){
-			
-			});			
 		
-		</script><noscript>Alternate content for script</noscript>
+		<noscript>Alternate content for script</noscript>
 	
 	<!-- END: JavaScript-->
 </body>
