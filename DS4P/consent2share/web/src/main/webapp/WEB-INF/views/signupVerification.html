@@ -144,33 +144,28 @@
 	<!-- END: Footer Region --> 
 	</div>
 
-
-
 	<!-- START: JavaScript-->
 
-		<script src="js/jquery-1.7.2.min.js"></script><noscript>Alternate content for script</noscript>
-		<script src="js/bootstrap.js"></script><noscript>Alternate content for script</noscript>
-		<script src="js/bootstrap-popover.js" type="text/javascript"></script>
-		<script src="js/bootstrap-modal.js" type="text/javascript"></script>
-		<script src="js/modernizr.mq.js" type="text/javascript"></script>
-
-		<!-- JavaScript Functions -->
-				
-		<script type="text/javascript">	
+		<script src="js/jquery-1.7.2.min.js"
+			th:src="@{/resources/js/jquery-1.7.2.min.js}"
+			type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="js/bootstrap.js"
+			th:src="@{/resources/js/bootstrap.js}"
+			type="text/javascript"></script><noscript>Alternate content for script</noscript>
+		<script src="js/bootstrap-popover.js"
+			th:src="@{/resources/js/bootstrap-popover.js}"
+			type="text/javascript"></script>
+		<script src="js/bootstrap-modal.js"
+			th:src="@{/resources/js/bootstrap-modal.js}"
+			type="text/javascript"></script>
+		<script src="js/modernizr.mq.js"
+			th:src="@{/resources/js/modernizr.mq.js}"
+			type="text/javascript"></script>
 		
-			$(document).ready(function(){ 
-			
-			$("#mybutton").click(function(){
-				var selectedRadioButton = $("#trouble input[name='optionRadio']:checked");
-				window.location.href = selectedRadioButton.val();
-			});
-			
-				
-							
-			});			
+		<script src="js/webpage-js/signupVerification.js"
+			th:src="@{/resources/js/webpage-js/signupVerification.js}"
+			type="text/javascript"></script>
 		
-		</script><noscript>Alternate content for script</noscript>
-	
 	<!-- END: JavaScript-->
 	
 </body>

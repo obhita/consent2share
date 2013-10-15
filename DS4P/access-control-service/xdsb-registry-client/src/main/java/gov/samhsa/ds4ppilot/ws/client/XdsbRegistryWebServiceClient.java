@@ -238,8 +238,8 @@ public class XdsbRegistryWebServiceClient {
 	 */
 	public static void main(String[] args) throws Throwable {
 		final String demoEndpoint = "http://feijboss01:8080/axis2/services/xdsregistryb";
-		final String javaVmEndpoint = "http://192.168.223.134:8080/axis2/services/xdsregistryb";
-		final String dotnetVmEndpoint = "http://192.168.223.138:8080/xdsservice/xdsregistry";
+		//final String javaVmEndpoint = "http://192.168.223.134:8080/axis2/services/xdsregistryb";
+		//final String dotnetVmEndpoint = "http://192.168.223.138:8080/xdsservice/xdsregistry";
 
 		XdsbRegistryWebServiceClient xdsService = new XdsbRegistryWebServiceClient(
 				demoEndpoint);

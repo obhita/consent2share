@@ -1,6 +1,9 @@
 package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.ws;
 
 import static org.junit.Assert.assertTrue;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverterImpl;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.DocumentSegmentationImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditServiceImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.brms.RuleExecutionServiceClientImpl;
@@ -11,9 +14,6 @@ import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentMaskerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentRedactorImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentTaggerImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentXmlConverterImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.FileReaderImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MarshallerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MetadataGeneratorImpl;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationService;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationServicePortType;
@@ -49,7 +49,7 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 	private static String endpointAddressForAuditService;
 
 	private static DocumentEditorImpl documentEditor;
-	private static MarshallerImpl marshaller;
+	private static SimpleMarshallerImpl marshaller;
 	private static DocumentEncrypterImpl documentEncrypter;
 	private static DocumentRedactorImpl documentRedactor;
 	private static DocumentMaskerImpl documentMasker;
@@ -83,7 +83,7 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 		documentEditor = new DocumentEditorImpl();
 		documentEditor.setFileReader(fileReader);
 		documentEditor.setMetadataGenerator(metadataGenerator);
-		marshaller = new MarshallerImpl();
+		marshaller = new SimpleMarshallerImpl();
 		documentEncrypter = new DocumentEncrypterImpl();
 		documentRedactor = new DocumentRedactorImpl();
 		documentRedactor.setDocumentEditor(documentEditor);

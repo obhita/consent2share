@@ -64,17 +64,8 @@
 	<bean id="documentTaggerImpl"
 		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentTaggerImpl"
 		scope="prototype"/>
-	<bean id="fileReaderImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.FileReaderImpl"
-		scope="prototype"/>
-	<bean id="marshallerImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MarshallerImpl"
-		scope="prototype"/>
 	<bean id="metadataGeneratorImpl"
 		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MetadataGeneratorImpl"
-		scope="prototype"/>
-	<bean id="documentXmlConverterImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentXmlConverterImpl"
 		scope="prototype"/>
 	<bean id="documentFactModelExtractorImpl"
 		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentFactModelExtractorImpl"
@@ -82,5 +73,16 @@
 	<bean id="additionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
 		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
 		scope="prototype"/>
+	
+	<!-- Tools used from common-library -->
+	<bean id="documentXmlConverterImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverterImpl"
+		scope="prototype"/>
+	<bean id="fileReaderImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl"
+		scope="prototype"/>
+	<bean id="marshallerImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl"
+		scope="prototype"/>		
     
 </beans>

@@ -13,22 +13,31 @@
 <!-- END: Mobile Specific -->
 <!-- START: CSS -->
 
-
+<!-- Bootstrap related CSS files -->
 <link id="bootstrap-style" href="../../resources/css/bootstrap.css"
 	rel="stylesheet" th:href="@{/resources/css/bootstrap.css}" />
 <link href="../../resources/css/bootstrap-responsive.min.css"
 	rel="stylesheet"
 	th:href="@{/resources/css/bootstrap-responsive.min.css}" />
+<link href="../../resources/css/bootstrap-toggle-buttons.css"
+	rel="stylesheet"
+	th:href="@{/resources/css/bootstrap-toggle-buttons.css}" />
+<link href="../../resources/css/font-awesome.css"
+	th:href="@{/resources/css/font-awesome.css}"
+	rel="stylesheet"/>
+
+<!-- Plug-in Stylesheets -->	
+<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet"
+	th:href="@{/resources/css/joyride-2.0.3.css}" />
+
+<!-- Custom CSS Files -->
 <link href="../../resources/css/themes-style.css" rel="stylesheet"
 	th:href="@{/resources/css/themes-style.css}" />
 <link href="../../resources/css/sentinel-style.css" rel="stylesheet"
 	th:href="@{/resources/css/sentinel-style.css}" />
-<link href="../../resources/css/bootstrap-toggle-buttons.css"
-	rel="stylesheet"
-	th:href="@{/resources/css/bootstrap-toggle-buttons.css}" />
-<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet"
-	th:href="@{/resources/css/joyride-2.0.3.css}" />
+	
 <!-- END: CSS -->
+
 <!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -36,12 +45,16 @@
 <!-- START: Favicon -->
 <!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
 <!-- END: Favicon -->
+
 </head>
 <body>
 
 	<!-- START: Logo Fragment -->
 	<span th:fragment="logoFragment">
+		<div style="position: relative;">
 		<a id="logoFragment" class="brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+		<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
+		</div>
 	</span>
 	<!-- END: Logo Fragment -->
 	
@@ -105,6 +118,7 @@
 				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
 			</div>
 			
+			<!-- FIXME: Move internal javascript code to external .js file -->
 			<script type="text/javascript">
 				var tempDiv = document.getElementById("sidenavMenu");
 				if(document.getElementById("sidenavMenu")){

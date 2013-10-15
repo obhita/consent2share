@@ -1,8 +1,31 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	  xmlns:th="http://www.thymeleaf.org">
-<head >
-<!-- 	th:include="fragment/common :: headerFragment" -->
+
+<head th:include="fragment/common :: headerFragment">
+
+<meta charset="utf-8" />
+<!-- title needs to be dynamic -->
+<title>Consent2Share</title>
+<meta name="description" content="Consent Management System" />
+<meta name="author" content="FEiSystems" />
+<!-- END: Meta -->
+<!-- START: Mobile Specific -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- END: Mobile Specific -->
+	<!-- START: CSS -->
+	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css" rel="stylesheet"/>
+	<link href="../../../resources/css/bootstrap-responsive.min.css" rel="stylesheet"/>
+	<link href="../../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
+	<link href="../../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
+	<link href="../../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+	
+	<link href="../../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../../resources/css/sentinel-style.css" rel="stylesheet"/>
+	<!-- END: CSS -->
+</head>
+
+<head>
 	<!-- START: Meta -->
 
 	<meta charset="utf-8"/>
@@ -12,27 +35,15 @@
 
 	<!-- END: Meta -->
 
-
-	
 	<!-- START: Mobile Specific -->
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	
 	<!-- END: Mobile Specific -->
 
-
-
 	<!-- START: CSS -->
-	
-	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css" th:href="@{/resources/css/bootstrap.css}" rel="stylesheet"/>
-	<link href="../../../resources/css/bootstrap-responsive.min.css" th:href="@{/resources/css/bootstrap-responsive.min.css}" rel="stylesheet"/>
-	<link href="../../../resources/css/themes-style.css" th:href="@{/resources/css/themes-style.css}" rel="stylesheet"/>
 	<link href="../../../resources/css/aero.css" th:href="@{/resources/css/aero.css}" rel="stylesheet"/>
 	<link href="../../../resources/css/blue.css" th:href="@{/resources/css/blue.css}" rel="stylesheet"/>
-	<link href="../../../resources/css/bootstrap-toggle-buttons.css" th:href="@{/resources/css/bootstrap-toggle-buttons.css}" rel="stylesheet"/>
-	<link href="../../../resources/css/sentinel-style.css" th:href="@{/resources/css/sentinel-style.css}" rel="stylesheet"/>
-	<link href="../../../resources/css/joyride-2.0.3.css" th:href="@{/resources/css/joyride-2.0.3.css}" rel="stylesheet" />
-	<link href="../../../resources/css/font-awesome.css" th:href="@{/resources/css/font-awesome.css}" rel="stylesheet"/>
 	<link href="../../../resources/css/sidebar.css" rel="stylesheet" th:href="@{/resources/css/sidebar.css}"/>
 	<link href="../../../resources/css/jquery-ui.css" rel="stylesheet" th:href="@{/resources/css/jquery-ui.css}"/>
 	
@@ -47,7 +58,7 @@
 
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 		<!--[if lt IE 9]>
-		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 
 
@@ -87,13 +98,13 @@
 					</span>
 					</h1>
 				
-					<div class="pull-right">
+					<div>
 											
 						<span th:include="fragment/common :: logoFragment">
 							<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
 						</span>
 
-							<div class="btn-group pull-right">
+							<div class="btn-group btn-right-align">
 								<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
 									<span class="icon-flag"></span>
 									<span class="hidden-phone hidden-tablet" th:text="#{language}">Language</span> 
@@ -123,7 +134,7 @@
 			<noscript>
 				<div class="alert alert-block span10">
 					<p class="h4-style alert-heading">Warning!</p>
-					<p>You need to have <a href="http://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a> enabled to use this site.</p>
+					<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a> enabled to use this site.</p>
 				</div>
 			</noscript>
 			
@@ -172,7 +183,7 @@
 											<div class="accordion-inner nomargin">
 												<form class="inputformPerson" th:object="${consentDto}">
 													<div>
-														<label for="authorize-list">Type or select the individual(s) and or organization(s) authorized to share your information:</label>
+														<label for="authorize-list">Select the individual(s) and or organization(s) authorized to share your information:</label>
 															
 															<div id="authorize-list" class="modal_checkbox_list">
 																<!-- adding new consent -->
@@ -196,6 +207,7 @@
 																		<input class="toDiscloseList" id="inidividualProvider" th:field="*{providersPermittedToDisclose}" th:id="'from'+${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" type="checkbox" name="individualConsentAuthorizedFrom" style="float: none;"/><span th:text="${individualProvider.lastName+', '+individualProvider.firstName}"> Doe, John</span>
 																		</label>
 																		<div th:if="${consentDto.providersPermittedToDiscloseNpi.contains(individualProvider.npi)}">
+																			<!-- FIXME: Move internal javascript code to external .js file -->
 																			<script th:inline="javascript">
 																				var prov =/*[[${individualProvider.npi}]]*/ 'Sebastian';
 																				document.getElementById('from'+prov).checked = true;	
@@ -207,6 +219,7 @@
 																		<input class="toDiscloseList" id="organizationalProvider" th:field="*{organizationalProvidersPermittedToDisclose}" th:id="'from'+${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" type="checkbox" name="organizationalConsentAuthorizedFrom"  style="float: none;"/><span th:text="${organizationalProvider.orgName}"> Doe, John</span>
 																		</label>
 																		<div th:if="${consentDto.organizationalProvidersPermittedToDiscloseNpi.contains(organizationalProvider.npi)}">
+																			<!-- FIXME: Move internal javascript code to external .js file -->
 																			<script th:inline="javascript">
 																				var prov =/*[[${organizationalProvider.npi}]]*/ 'Sebastian';
 																				document.getElementById('from'+prov).checked = true;	
@@ -292,6 +305,7 @@
 																	<input class="isMadeToList" id="inidividualProvider" th:field="*{providersDisclosureIsMadeTo}" th:id="'to'+${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" type="checkbox" name="individualConsentMadeTo"  style="float: none;"/><span th:text="${individualProvider.lastName+', '+individualProvider.firstName}"> Doe, John</span>
 																	</label>
 																		<div th:if="${consentDto.providersDisclosureIsMadeToNpi.contains(individualProvider.npi)}">
+																			<!-- FIXME: Move internal javascript code to external .js file -->
 																			<script th:inline="javascript">
 																				var prov =/*[[${individualProvider.npi}]]*/ 'Sebastian';
 																				document.getElementById('to'+prov).checked = true;	
@@ -303,6 +317,7 @@
 																	<input class="isMadeToList" id="organizationalProvider" th:field="*{organizationalProvidersDisclosureIsMadeTo}" th:id="'to'+${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" type="checkbox" name="organizationalConsentMadeTo" style="float: none;"/><span th:text="${organizationalProvider.orgName}"> Doe, John</span>
 																	</label>
 																	<div th:if="${consentDto.organizationalProvidersDisclosureIsMadeToNpi.contains(organizationalProvider.npi)}">
+																		<!-- FIXME: Move internal javascript code to external .js file -->
 																		<script th:inline="javascript">
 																			var prov =/*[[${organizationalProvider.npi}]]*/ 'Sebastian';
 																			document.getElementById('to'+prov).checked = true;	
@@ -427,6 +442,7 @@
 																							<input id="Substance-Abuse" class="checkBoxClass1" th:field="*{doNotShareSensitivityPolicyCodes}" th:id="${SensitivityPolicyCode.code}" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}" type="checkbox" name="sensitivityPolicyInput" th:value="${SensitivityPolicyCode.code}"> Substance Abuse </input>
 																						</label>																					
 																						<span th:if="${consentDto.doNotShareSensitivityPolicyCodes.contains(SensitivityPolicyCode.displayName)}">
+																							<!-- FIXME: Move internal javascript code to external .js file -->
 																							<script th:inline="javascript">
 																								var code  =/*[[${SensitivityPolicyCode.code}]]*/ 'Sebastian';
 																								document.getElementById(code).checked = true;	
@@ -440,14 +456,9 @@
 																					 data-content="icon context" data-title="title" >
 																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
 																					</a>
-																					<script th:inline="javascript">
-																						    text = /*[[#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')+'_text'}}]]*/ 'Sebastian';
-																						    idicon=/*[[${'i-icon_' +#strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}]]*/ 'Sebastian';
-																						    title=/*[[#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
-																						    document.getElementById(idicon).setAttribute("data-content", text);
-																						    document.getElementById(idicon).setAttribute("data-title",title );
-																					</script>
-																	        	
+																					<input th:attr="data-linkid=${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')},data-intitle=#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}"
+																					    class="input_i-text" th:id="${'i-text_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}" type="hidden"
+																					    th:value="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')+'_text'}}" />
 																	        	</div>
 <!-- 																	        	<label for="Substance-Abuse" class="checkbox"> -->
 <!-- 																					<input id="Substance-Abuse" type="checkbox" name="conditions" checked="checked" th:field="*{substanceAbuse}"/> Substance Abuse -->
@@ -500,6 +511,7 @@
 																						<input id="conditions" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentSectionTypeCodes}" th:id="${clinicalDocumentSectionTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentSectionTypeCode.code}" type="checkbox" name="clinicalDocumentSectionTypeInput"> Medical Information Categories</input>
 																						</label>
 																						<span th:if="${consentDto.doNotShareClinicalDocumentSectionTypeCodes.contains(clinicalDocumentSectionTypeCode.displayName)}">
+																							<!-- FIXME: Move internal javascript code to external .js file -->
 																							<script th:inline="javascript">
 																								var code  =/*[[${clinicalDocumentSectionTypeCode.code}]]*/ 'Sebastian';
 																								document.getElementById(code).checked = true;	
@@ -508,18 +520,12 @@
 																					</span>	
 																																									
 																					<a href="#"  th:id="${'i-icon_' + #strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
-																					  data-content="icon context" data-title="title" >
+																					  data-content="icon content" data-title="title" >
 																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
 																					</a>
-																					<script th:inline="javascript">
-																						    text = /*[[#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')+'_text'}}]]*/ 'Sebastian';
-																						    idicon=/*[[${'i-icon_' +#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')}]]*/ 'Sebastian';
-																						    title=/*[[#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
-																						    document.getElementById(idicon).setAttribute("data-content", text);
-																						    document.getElementById(idicon).setAttribute("data-title",title );
- 																					</script> 
- 																					
- 																							
+																					<input th:attr="data-linkid=${'i-icon_' + #strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')},data-intitle=#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}"
+																					    class="input_i-text" th:id="${'i-text_' + #strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')}" type="hidden"
+																					    th:value="#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')+'_text'}}" />
 																																											
 																					<!-- <a href="#" data-trigger="click" data-toggle="popover" data-placement="bottom" 
 																						data-content="Medical Information Item 1 text here." 
@@ -578,6 +584,7 @@
 																						<input id="summarizationOfEpisodeNote" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentTypeCodes}" th:id="${clinicalDocumentTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentTypeCode.code}" type="checkbox" name="clinicalDocumentTypeInput"> Summarization of Episode Note</input>
 																						</label>
 																						<span th:if="${consentDto.doNotShareClinicalDocumentTypeCodes.contains(clinicalDocumentTypeCode.displayName)}">
+																							<!-- FIXME: Move internal javascript code to external .js file -->
 																							<script th:inline="javascript">
 																								var code  =/*[[${clinicalDocumentTypeCode.code}]]*/ 'Sebastian';
 																								document.getElementById(code).checked = true;	
@@ -588,13 +595,9 @@
 																					  data-content="icon context" data-title="title">
 																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
 																					</a>
-																					<script th:inline="javascript">
-																						    text = /*[[#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')+'_text'}}]]*/ 'Sebastian';
-																						    idicon=/*[[${'i-icon_' +#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')}]]*/ 'Sebastian';
-																						    title=/*[[#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}]]*/ 'Sebastian';
-																						    document.getElementById(idicon).setAttribute("data-content", text);
-																						    document.getElementById(idicon).setAttribute("data-title",title );
- 																					</script> 
+																					<input th:attr="data-linkid=${'i-icon_' +#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')},data-intitle=#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}"
+																					    class="input_i-text" th:id="${'i-text_' + #strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')}" type="hidden"
+																					    th:value="#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')+'_text'}}" />
 																	        	</div>
 																	        </div>
 																	        </form>
@@ -644,13 +647,11 @@
 																      </div>
 																    </div>
 											                    </div>
-										                    </div> 
-										           
-							
-										                </div>                            
+										                    </div>
+										                </div>
 								                    </div>
 							               </fieldset>
-							            </section>		
+							            </section>
 									</div>
 								</div>
 								<div class="modal-footer">
@@ -753,6 +754,7 @@
 																<input id="emergency" th:field="*{shareForPurposeOfUseCodes}" th:id="${purposeOfUseItem.code}" th:text="#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}" th:value="${purposeOfUseItem.code}" type="checkbox" name="purposeOfUseInput" checked="checked"> Emergency</input>
 																</label>
 																<span th:if="${consentDto.shareForPurposeOfUseCodes.contains(purposeOfUseItem.displayName)}">
+																	<!-- FIXME: Move internal javascript code to external .js file -->
 																	<script th:inline="javascript">
 																		var code  =/*[[${purposeOfUseItem.code}]]*/ 'Sebastian';
 																		document.getElementById(code).checked = true;	
@@ -763,14 +765,9 @@
 																					  data-content="icon context" data-title="title">
 																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
 																					</a>
-																					<script th:inline="javascript">
-																						    text = /*[[#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')+'_text'}}]]*/ 'Sebastian';
-																						    idicon=/*[[${'i-icon_' +#strings.replace(purposeOfUseItem.displayName, ' ', '-')}]]*/ 'Sebastian';
-																						    title=/*[[#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}]]*/ 'Sebastian';
-																						    document.getElementById(idicon).setAttribute("data-content", text);
-																						    document.getElementById(idicon).setAttribute("data-title",title );
- 																					</script> 
- 																			
+																					<input th:attr="data-linkid=${'i-icon_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')},data-intitle=#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}"
+																					    class="input_i-text" th:id="${'i-text_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')}" type="hidden"
+																					    th:value="#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')+'_text'}}" />
 								    					</div>
 								    				</div>
 <!-- 									    			<label for="emergency" class="checkbox"> -->
@@ -906,46 +903,32 @@
 					</div>
 				</footer>
 	</div><!-- end Container-fluid -->
-
-
+	
+	<input type="hidden" class="input_hidden" id="input_isAddConsent" th:value="${addConsent}" value="" />
+	<input type="hidden" class="input_hidden" id="input_doNotShareClinicalConceptCodesSet" th:value="${DoNotShareClinicalConceptCodesSet}" value="" />
+	
+	
 	<!-- START: JavaScript-->
 		<script src="../../../resources/js/jquery.min.js" 
 				th:src="@{/resources/js/jquery.min.js}" 
 				type="text/javascript">
-		</script>
-		<noscript>Alternate content for script</noscript>
-		
+		</script>		
 		
 		<script src="../../../resources/js/jquery-ui.min.js"
 				th:src="@{/resources/js/jquery-ui.min.js}"
 				type="text/javascript"></script>
-		
-		
-		<!--  <script src="../../../resources/js/jquery.ui.core.min.js" 
-				th:src="@{/resources/js/jquery.ui.core.min.js}"
-				type="text/javascript"></script>
-		<script src="../../../resources/js/jquery.ui.widget.min.js" 
-				th:src="@{/resources/js/jquery.ui.widget.min.js}"
-				type="text/javascript"></script>
-		<script src="../../../resources/js/jquery.ui.menu.min.js" 
-				th:src="@{/resources/js/jquery.ui.menu.min.js}"
-				type="text/javascript"></script>
-		<script src="../../../resources/js/jquery.ui.autocomplete.min.js" 
-				th:src="@{/resources/js/jquery.ui.autocomplete.min.js}"
-				type="text/javascript"></script>
-				-->
 		<script src="../../../resources/js/bootstrap.min.js"
 				th:src="@{/resources/js/bootstrap.min.js}" 
-				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+				type="text/javascript"></script>
 		<script src="../../../resources/js/jquery.icheck.js"
 				th:src="@{/resources/js/jquery.icheck.js}" 
-				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+				type="text/javascript"></script>
 		<script src="../../../resources/js/jquery.toggle.buttons.js"
 				th:src="@{/resources/js/jquery.toggle.buttons.js}" 
-				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+				type="text/javascript"></script>
 		<script src="../../../resources/js/bootstrap-datepicker.js"
 				th:src="@{/resources/js/bootstrap-datepicker.js}" 
-				type="text/javascript"></script><noscript>Alternate content for script</noscript>
+				type="text/javascript"></script>
 		<script src="../../../resources/js/bootstrap-tooltip.js"
 				th:src="@{/resources/js/bootstrap-tooltip.js}"
 				type="text/javascript"></script>
@@ -961,306 +944,56 @@
 		<script src="../../../resources/js/modernizr.mq.js" 
 				th:src="@{/resources/js/modernizr.mq.js}"
 				type="text/javascript"></script>
-		<script src="../../../resources/js/consent/addConsent.js" 
-				th:src="@{/resources/js/consent/addConsent.js}"
-				type="text/javascript" th:inline="javascript"></script>
 		<script src="../../../resources/js/jcookie.js"
 				th:src="@{/resources/js/jcookie.js}"
 				type="text/javascript"></script>
 		<script src="../../../resources/js/jstorage.js"
 				th:src="@{/resources/js/jstorage.js}"
 				type="text/javascript"></script>
-				
-		<!-- <script src="../../../resources/js/jquery-ui-1.8.21.custom.min.js"
-				th:src="@{/resources/js/jquery-ui-1.8.21.custom.min.js}"
-				type="text/javascript"></script>  -->
-		
-				
 		<script src="../../../resources/js/jquery.sidebar.js"
 				th:src="@{/resources/js/jquery.sidebar.js}"
 				type="text/javascript"></script>
-		
 				
-		<script th:inline="javascript">
-				/*<![CDATA[*/
 		
-				    var addConsent = /*[[${addConsent}]]*/ null;
-				    if((addConsent !== true) && (addConsent !== false)){
-					    throw new ReferenceError("addConsent variable is not a valid boolean value");
-				    }
-				    
-				/*]]>*/
-		</script>
+		<!-- Custom JS Script -->
+		<script src="../../../resources/js/consent/addConsent.js" 
+				th:src="@{/resources/js/consent/addConsent.js}"
+				type="text/javascript" th:inline="javascript"></script>
 		
-		<script th:inline="javascript">
-				/*<![CDATA[*/
-					var specMedSetObj = null;
-					var specMedSet = null;
+		
+		<!-- FIXME: Move internal javascript code to external .js file -->
+		<script th:inline="javascript" type="text/javascript">
+			//<![CDATA[
+				$(document).ready(function() {
+					var addConsent_tmp = null;
+					var in_addConsent_tmp = $('#input_isAddConsent').val();
 					
-					if(addConsent === false){
-					    specMedSetObj = /*[[${DoNotShareClinicalConceptCodesSet}]]*/ null;
-					    
-					    try{
-					    	specMedSet = specMedSetObj.clinicalConceptCodesSet;
-				    	}catch(e){
-						    if(e.name == "TypeError"){
-						    	specMedSet = null;
-							}else{
-								throw e;
-							}
-						}
-					}
-				/*]]>*/
-		</script>
-				
-		<script type="text/javascript">
-
-		
-
-			function showShareSettingsModal(){
-				$("#share-settings-modal").modal({
-					  keyboard: false,
-					  backdrop: 'static'
-				});
-			}
-
-			$(document).ready(function() {
-				$('input').iCheck({
-				    checkboxClass: 'icheckbox_square-blue',
-				    radioClass: 'iradio_square-blue',
-				    increaseArea: '20%' // optional
-				  });
-
-
-				initAddConsent();
-				  
-				  
-				//$('#normal-toggle-button').toggleButtons();
-				//$('#info-toggle-button').toggleButtons();
-
-				$('[data-toggle=popover]').popover();
-				$('html').on('mouseup', function(e) {
-				    if((!$(e.target).closest('.popover').length)) {
-				    	if((!$(e.target).closest('[data-toggle=popover]').length)){
-				        	$('.popover').each(function(){
-				            	$(this.previousSibling).popover('hide');
-				        	});
-						}
-				    }
-				});
-
-				// populate for edit consent page
-				$("#authorizers").empty();
-				$("#authorize-list input").each(function() {
-					if($(this).attr("checked")=="checked"){
-						$("#authorizers").append('<li class="uneditable-input"><span class="icon-user"></span>'
-	 							+$(this).parent().parent().children("span").text()
-	 							+'</li>');
-					}
-				});
-				$("#consentmadetodisplay").empty();
-				$("#disclose-list input").each(function() {
-					if($(this).attr("checked")=="checked"){
-						$("#consentmadetodisplay").append('<li class="uneditable-input" ><span class="icon-user"></span>'
-	 							+$(this).parent().parent().children("span").text()
-	 							+'</li>');
-					}
-				});
-				
-				//
-				
-				$('.toggleButton').toggleButtons();
-				$('.modal-toggle-button').toggleButtons(
-				{
-					onChange: function(e,active) {
-					if(!active){
-						$(e.parent().attr('data-edit-button')).show();
-						e.trigger('click');
-						}
-						else{
-						$(e.parent().attr('data-edit-button')).hide();
-							
-						}
-					}
-				});
-
-				$('.modal-toggle-button span').on('click', function(e){
-					e.preventDefault();
-					e.stopImmediatePropagation();
-				});
-
-				$("body").removeClass('fouc_loading');
-
-				$("ul#pulldown_menu").sidebar({
-					position:"top",
-					open:"click",
-					close:"click",
-					//labelText:"GUIDE",
-					callback: {
-                    	item : {
-                        	enter : function(){},
-        	                leave : function(){}
-                    	},
-                    	sidebar : {
-                        	open : function(){},
-    	                    close : function(){}
-                    	}	
-                	},
-                	inject : $("<div><span>GUIDE</span></div>")
-				});
-
-
-				$("div.sidebar-container").addClass("guide-pulldown-tab");
-				$("div.sidebar-inject.top > span").addClass("sidebar-label");
-				
-				$('#tourtest').joyride({
-				    tipContainer: '#consent-add-main',
-				    heightPadding: $('footer').outerHeight() + 10,
-				    mode: 'focus',
-				    autoStart: true,
-				    'preStepCallback': function() {
-					    var int_next_index = 0;
-					    try{
-					    	int_next_index = $('#tourtest').joyride('get_next_index');
-					    }catch(e){
-						    int_next_index = 0;
-						}
-					    
-					    var li_field_id = $('#tourtest li').get(int_next_index);
-					    var isShowDelayedNext = $(li_field_id).hasClass('show-delayed-next');
-					    var str_field_id = $(li_field_id).data("id");
-					    var tempVarIconUser = $('div#' + str_field_id).find('.icon-user');
-					    var tempVarBadge = $('div#' + str_field_id).find('.badge');
-					    var isDataPopulated = false;
-
-					    if(tempVarIconUser.length > 0 || tempVarBadge.length > 0){
-						    isDataPopulated = true;
-					    }else{
-					    	isDataPopulated = false;
-						}
-
-					    var obj_next_tip = $('#tourtest').joyride('get_next_tip');
-					    var btn_next_button = $(obj_next_tip).find('.joyride-next-tip');
-
-					    $(btn_next_button).addClass('hidden');
-					    
-					    if(isDataPopulated || isShowDelayedNext){					    	
-					    	setTimeout(function(){
-						    	$(btn_next_button).removeClass('hidden');
-							}, 500);
-					    }
-					},
-					'postRideCallback': function() {
-						if($('#btn_guide_off').hasClass('active') === false){
-							$('#btn_guide_on').removeClass('active');
-							$('#btn_guide_off').addClass('active');
-						}
-
-						jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
-					}
-				});
-				
-				
-
-				if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'on'){
-					turnGuideOn();
-				}else if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'off'){
-					turnGuideOff();
-				}else{
-					if($('#btn_guide_OnOff').hasClass('guide-off-flag') === false){
-						turnGuideOn();
+					if(in_addConsent_tmp === "true"){
+						addConsent_tmp = true;
+					}else if(in_addConsent_tmp === "false"){
+						addConsent_tmp = false;
 					}else{
-						turnGuideOff();
+						addConsent_tmp = null;
 					}
-				}
-
-
-				$('#btn_guide_OnOff').click(function() {
-					if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
-						turnGuideOn();
-					}else{
-						turnGuideOff();
-					}
-			    });
-			    
-				$('#saveauthorizer').click(function() {
-					ifGuideOnGoNext();
-			    });
-
-				$('#saveconsentmadeto').click(function() {
-					ifGuideOnGoNext();
-			    });
-
-			    $('#btn_close_share_settings').click(function() {
-			    	ifGuideOnGoNext();
-				});
-
-			    $('#btn_save_selected_purposes').click(function() {
-			    	ifGuideOnGoNext();
-				});
-
-				$('#selectInfo').change(function() {				    
-				    if($('#selectInfo').prop('checked') == true){
-				    	ifGuideOnGoNext();
-					}
-				});
-
-			    $('#selectPurposesToggle').change(function() {				    
-				    if($('#selectPurposesToggle').prop('checked') == true){
-				    	ifGuideOnGoNext();
-					}
-				});
-			    
-				$("a[id*=i-icon]").bind('click', function() {
-					var id = $(this).attr("id").split('_')[1];
-					$("#message-block_"+id).css("display","block");
-
-				});
-				
-				$("body").on("closeJoyrideClick", function(e){
-					e.stopImmediatePropagation();
-					
-					$('#tourtest').joyride('end');
-					turnGuideOff();
-				});
-
-
-				function ifGuideOnGoNext(){
-					if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'on'){
-						$('#tourtest').joyride("go_next");
-					}
-				};
-
-		 });
-
-		function turnGuideOff(){
-			$('#btn_guide_OnOff').addClass('guide-off-flag');
-			
-			jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
-
-			$('#btn_guide_OnOff').text("Guide On");
-			
-			$('#tourtest').joyride('end');
-		};
-
-		function turnGuideOn(){
-			if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
-				$('#btn_guide_OnOff').removeClass('guide-off-flag');
-			}
-
-			jQuery.storage.setItem('guideStatus', 'on', 'sessionStorage');
-			
-			$('#btn_guide_OnOff').text("Guide Off");
-			
-			$('#tourtest').joyride('end');
-			$('#tourtest').joyride();
-		};
-
 	
-		</script><noscript>Alternate content for script</noscript>
+					//Check if addConsent is a valid boolean value
+					if((addConsent_tmp !== true) && (addConsent_tmp !== false)){
+						console.log(addConsent_tmp);
+						addConsent_tmp = null;
+					    throw new ReferenceError("addConsent_tmp variable is not a valid boolean value");
+				    }
+	
+					var specMedSetObj_tmp = null;
+	
+					if(addConsent_tmp === false){
+					    specMedSetObj_tmp = /*[[${DoNotShareClinicalConceptCodesSet}]]*/ null;
+					}
+					
+					setupPage(addConsent_tmp, specMedSetObj_tmp);
+				});
+			//]]>
+		</script>	
 	
 	<!-- END: JavaScript-->
-
-
 </body>
 </html>

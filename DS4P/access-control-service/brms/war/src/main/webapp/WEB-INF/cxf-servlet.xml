@@ -28,15 +28,20 @@
 		class="gov.samhsa.consent2share.accesscontrolservice.brms.ws.RuleExecutionServiceWsImpl"
 		scope="prototype" autowire="byType" />
 		
-		<bean id="ruleExecutionServiceImpl"
+	<bean id="ruleExecutionServiceImpl"
 		class="gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionServiceImpl"
-		scope="prototype" autowire="constructor" > 
-	</bean>
-	
-		<bean id="guvnorServiceImpl"
+		scope="prototype" autowire="constructor" /> 
+		
+	<bean id="guvnorServiceImpl"
 		class="gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.GuvnorServiceImpl"
 		scope="prototype"> 
-		<constructor-arg value="#{endpointAddressProperties.guvnorService}"  />
+		<constructor-arg index="0" value="#{endpointAddressProperties.guvnorService}"  />
+		<constructor-arg index="1" value="#{endpointAddressProperties.guvnorServiceUsername}"  />
+		<constructor-arg index="2" value="#{endpointAddressProperties.guvnorServicePassword}"  />
 	</bean>
+	
+	<bean id="simpleMarshallerImpl"
+		class="gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl"
+		scope="prototype" />
 		
 </beans>

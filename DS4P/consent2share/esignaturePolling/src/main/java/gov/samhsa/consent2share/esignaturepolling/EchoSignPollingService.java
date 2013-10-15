@@ -61,9 +61,6 @@ public class EchoSignPollingService implements EsignaturePollingService {
 	
 	/** The signature service. */
 	private EchoSignSignatureService signatureService;
-	
-	/** The consent export service. */
-	private ConsentExportService consentExportService;
 
 	/**
 	 * Instantiates a new echo sign polling service.

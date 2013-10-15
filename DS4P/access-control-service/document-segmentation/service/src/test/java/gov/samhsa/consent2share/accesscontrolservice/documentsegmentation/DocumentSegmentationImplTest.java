@@ -10,6 +10,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReader;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditServiceImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.brms.RuleExecutionService;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
@@ -19,9 +22,6 @@ import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentMaskerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentRedactorImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentTaggerImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.FileReader;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.FileReaderImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MarshallerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MetadataGeneratorImpl;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
@@ -72,7 +72,7 @@ public class DocumentSegmentationImplTest {
 	private static AuditServiceImpl auditServiceMock;
 	private static DocumentEditorImpl documentEditorMock;
 	private static DocumentFactModelExtractorImpl documentFactModelExtractorMock;
-	private static MarshallerImpl marshallerMock;
+	private static SimpleMarshallerImpl marshallerMock;
 	private static DocumentRedactorImpl documentRedactorMock;
 	private static DocumentTaggerImpl documentTaggerMock;
 	private static DocumentMaskerImpl documentMaskerMock;
@@ -139,7 +139,7 @@ public class DocumentSegmentationImplTest {
 				.thenReturn(testExecutionResponseContainer_xml);
 
 		// Marshaller mock
-		marshallerMock = mock(MarshallerImpl.class);
+		marshallerMock = mock(SimpleMarshallerImpl.class);
 		ruleExecutionContainerObj = setRuleExecutionContainer();
 		when(
 				marshallerMock.unmarshallFromXml(
@@ -212,7 +212,7 @@ public class DocumentSegmentationImplTest {
 		boolean ecrypt = true;
 		DocumentSegmentationImpl documentSegmentationWithRealMarshaller = new DocumentSegmentationImpl(
 				ruleExecutionServiceClientMock, auditServiceMock,
-				documentEditorMock, new MarshallerImpl(),
+				documentEditorMock, new SimpleMarshallerImpl(),
 				documentEncrypterMock, documentRedactorMock,
 				documentMaskerMock, documentTaggerMock,
 				documentFactModelExtractorMock,

@@ -25,24 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.accesscontrolservice.brms.service;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import javax.ws.rs.core.MediaType;
-
 import gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.GuvnorService;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshaller;
 import gov.samhsa.consent2share.accesscontrolservices.brms.domain.ClinicalFact;
 import gov.samhsa.consent2share.accesscontrolservices.brms.domain.FactModel;
 import gov.samhsa.consent2share.accesscontrolservices.brms.domain.RuleExecutionContainer;
@@ -56,26 +40,26 @@ import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.definition.rule.Rule;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.event.rule.AfterActivationFiredEvent;
 import org.drools.event.rule.DefaultAgendaEventListener;
 import org.drools.io.ResourceFactory;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 /**
  * The Class RuleExecutionServiceImpl.
  */
-@Component
 public class RuleExecutionServiceImpl implements RuleExecutionService {
+
+	/** The guvnor service. */
+	private GuvnorService guvnorService;
+
+	/** The marshaller. */
+	private SimpleMarshaller marshaller;
 
 	/** The knowledge session. */
 	private StatefulKnowledgeSession session;
-	
-	private GuvnorService guvnorService;
 
 	/** The knowledge base. */
 	private KnowledgeBase knowledgeBase;
@@ -83,22 +67,21 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 	/** The fired rule names. */
 	private String firedRuleNames = "";
 
-	/** The guvnor rest url. */
-	private String guvnorRestUrl;
-	
 	/** The logger. */
-	private final Logger LOGGER = LoggerFactory.getLogger(RuleExecutionServiceImpl.class);
+	private final Logger LOGGER = LoggerFactory
+			.getLogger(RuleExecutionServiceImpl.class);
 
 	/**
 	 * Instantiates a new rule execution service impl.
-	 *
-	 * @param guvnorRestUrl the guvnor rest url
+	 * 
+	 * @param guvnorRestUrl
+	 *            the guvnor rest url
 	 */
-	@Autowired
-	public RuleExecutionServiceImpl(
-			GuvnorService guvnorService) {
+	public RuleExecutionServiceImpl(GuvnorService guvnorService,
+			SimpleMarshaller marshaller) {
 		super();
 		this.guvnorService = guvnorService;
+		this.marshaller = marshaller;
 	}
 
 	/**
@@ -113,7 +96,8 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 
 			String casRules = guvnorService.getVersionedRulesFromPackage();
 
-			kbuilder.add(ResourceFactory.newByteArrayResource(casRules.getBytes()),
+			kbuilder.add(
+					ResourceFactory.newByteArrayResource(casRules.getBytes()),
 					ResourceType.DRL);
 
 			KnowledgeBuilderErrors errors = kbuilder.getErrors();
@@ -130,29 +114,33 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 			session.setGlobal("ruleExecutionContainer",
 					new RuleExecutionContainer());
 		} catch (Exception e) {
-			LOGGER.error(e.toString(),e);
+			LOGGER.error(e.toString(), e);
 		}
 
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.accesscontrolservices.brms.RuleExecutionService#assertAndExecuteClinicalFacts(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent2share.accesscontrolservices.brms.RuleExecutionService
+	 * #assertAndExecuteClinicalFacts(java.lang.String)
 	 */
 	@Override
-	public AssertAndExecuteClinicalFactsResponse assertAndExecuteClinicalFacts(String factModelXmlString) {
+	public AssertAndExecuteClinicalFactsResponse assertAndExecuteClinicalFacts(
+			String factModelXmlString) {
 		RuleExecutionContainer executionResponseContainer = null;
 		FactModel factModel = new FactModel();
-		AssertAndExecuteClinicalFactsResponse assertAndExecuteResponse = new
-		AssertAndExecuteClinicalFactsResponse();
+		AssertAndExecuteClinicalFactsResponse assertAndExecuteResponse = new AssertAndExecuteClinicalFactsResponse();
 
-		StringWriter executionResponseContainerXML = new StringWriter();
+		String executionResponseContainerXMLString = null;
 
 		LOGGER.debug("factModelXmlString: " + factModelXmlString);
 
 		try {
-			// unmarshall factmodel			
-			factModel = unmarshallFromXml(
-					FactModel.class, factModelXmlString);
+			// unmarshall factmodel
+			factModel = marshaller.unmarshallFromXml(FactModel.class,
+					factModelXmlString);
 
 			createStatefulKnowledgeSession();
 
@@ -172,35 +160,29 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 			});
 
 			session.fireAllRules();
-			
-			LOGGER.debug(
-					"Fired rules: {}...",	firedRuleNames);
+
+			LOGGER.debug("Fired rules: {}...", firedRuleNames);
 			LOGGER.debug("Fired rules: " + firedRuleNames);
 
 			executionResponseContainer = (RuleExecutionContainer) session
 					.getGlobal("ruleExecutionContainer");
 
 			// Marshal rule execution response
-			JAXBContext jaxbContext = JAXBContext.newInstance(RuleExecutionContainer.class);
-			Marshaller marshaller = jaxbContext.createMarshaller();
-			marshaller.setProperty("com.sun.xml.bind.xmlDeclaration",
-					Boolean.FALSE);
-			marshaller.marshal(executionResponseContainer,
-					executionResponseContainerXML);
-		} catch (Exception e) {
+			executionResponseContainerXMLString = marshaller
+					.marshall(executionResponseContainer);
+
+		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(), e);
 		} finally {
 			firedRuleNames = "";
 			session.dispose();
 		}
-		
-		 assertAndExecuteResponse
-		 .setRuleExecutionResponseContainer(executionResponseContainerXML
-		 .toString());
-		 
+
+		assertAndExecuteResponse
+				.setRuleExecutionResponseContainer(executionResponseContainerXMLString);
 
 		return assertAndExecuteResponse;
-	}	
+	}
 
 	/**
 	 * Adds the rule name.
@@ -211,13 +193,5 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 	private void addRuleName(String ruleName) {
 		firedRuleNames = (!firedRuleNames.equals("")) ? firedRuleNames + ", "
 				+ ruleName : ruleName;
-	}
-
-	private <T> T unmarshallFromXml(Class<T> clazz, String xml)
-			throws JAXBException {
-		JAXBContext context = JAXBContext.newInstance(clazz);
-		Unmarshaller um = context.createUnmarshaller();
-		ByteArrayInputStream input = new ByteArrayInputStream(xml.getBytes());
-		return (T) um.unmarshal(input);
 	}
 }

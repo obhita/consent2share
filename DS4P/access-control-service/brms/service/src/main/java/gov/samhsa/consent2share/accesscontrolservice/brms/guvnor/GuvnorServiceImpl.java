@@ -42,25 +42,38 @@ import org.slf4j.LoggerFactory;
  * The Class GuvnorServiceImpl.
  */
 public class GuvnorServiceImpl implements GuvnorService {
-	
+
 	/** The endpoint address. */
 	private String endpointAddress;
-	
+
+	private String guvnorServiceUsername;
+
+	private String guvnorServicePassword;
+
 	/** The Constant LOGGER. */
-	private static final Logger LOGGER = LoggerFactory.getLogger(GuvnorServiceImpl.class);
-	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(GuvnorServiceImpl.class);
+
 	/**
 	 * Instantiates a new clinically adaptive rules implementation.
-	 *
-	 * @param endpointAddress the endpoint address
+	 * 
+	 * @param endpointAddress
+	 *            the endpoint address
 	 */
-	public GuvnorServiceImpl(String endpointAddress ) {
+	public GuvnorServiceImpl(String endpointAddress,
+			String guvnorServiceUsername, String guvnorServicePassword) {
 		this.endpointAddress = endpointAddress;
+		this.guvnorServiceUsername = guvnorServiceUsername;
+		this.guvnorServicePassword = guvnorServicePassword;
 	}
-	
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.accesscontrolservices.brms.RuleExecutionService#getVersionedRulesFromPackage()
-	 */	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent2share.accesscontrolservices.brms.RuleExecutionService
+	 * #getVersionedRulesFromPackage()
+	 */
 	@Override
 	public String getVersionedRulesFromPackage() throws IOException {
 		String source = null;
@@ -70,10 +83,12 @@ public class GuvnorServiceImpl implements GuvnorService {
 
 		connection.setRequestMethod("GET");
 		connection.setRequestProperty("Accept", MediaType.TEXT_PLAIN);
-
-		connection.setRequestProperty("Authorization","Basic "
-								+ new Base64().encodeToString(("admin:admin"
-										.getBytes())));
+		String passwordString = guvnorServiceUsername + ":" + guvnorServicePassword;
+		connection.setRequestProperty(
+				"Authorization",
+				"Basic "
+						+ new Base64().encodeToString((passwordString
+								.getBytes())));
 		connection.connect();
 
 		source = readAsString(connection.getInputStream());
@@ -81,17 +96,20 @@ public class GuvnorServiceImpl implements GuvnorService {
 
 		return source;
 	}
-	
+
 	/**
 	 * Read as string.
-	 *
-	 * @param inputStream the input stream
+	 * 
+	 * @param inputStream
+	 *            the input stream
 	 * @return the string
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	private String readAsString(InputStream inputStream) throws IOException {
 		StringBuffer ret = new StringBuffer();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				inputStream));
 		String line;
 		while ((line = reader.readLine()) != null) {
 			ret.append(line + "\n");

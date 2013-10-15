@@ -312,11 +312,11 @@ used more than once per page.
 		position: absolute;
 		background: white;
 		max-height: auto;
-		max-width: 400px;
+	/*	max-width: 400px;  */
 		height: 520px;
 		top: 50px;
 		padding: 10px 20px 10px 20px;
-		z-index: 100;
+		z-index: 49;
 		@include border-radius (5px);
 		@include opacity(0.9);
 		@include background-image(linear-gradient(white 40%, white 60%, #fafafa 75%, #bbbbbb));
@@ -363,9 +363,9 @@ used more than once per page.
 
 	#home-feature-text {
 	text-shadow: 1px 1px 4px black;
-	position: absolute; 
-	max-width: 620px; 
-	width:80%;
+/*	position: absolute;   */
+/*	max-width: 620px; 	  */
+/*	width:80%;            */
 	display: inline; 
 	margin: 30px 0px 30px 50px; 
 	color: white;
@@ -382,6 +382,25 @@ used more than once per page.
 		#logoFragment img {
 			height: 38px;
 			margin: -10px 0 -11px 0;
+			}
+			
+		#login-navbar #watermark {
+			display: none;
+			}
+		
+		#watermark {
+			position: absolute;
+			top: 53px;
+			right: 10px;
+			opacity: .3;
+			text-align: right;
+			p {
+				font-size:1em;
+				line-height: 1.2em;
+				margin: 5px 0 0 0;
+				color:darkred;
+				z-index: 200;
+				}	
 			}
 
 
@@ -469,6 +488,9 @@ used more than once per page.
 		ul{
 			margin-bottom: 26px;
 		}
+		.iradio_square-blue {
+			margin-right: 5px;
+		}
 	}
 	
 		
@@ -514,6 +536,9 @@ used more than once per page.
 					width: 95%;
 					background-color: none;
 					border: none;
+					span {
+						margin-right: 5px;
+					}
 				}
 			}
 		}
@@ -926,7 +951,7 @@ since they may be used more than once.
 		height: 30px;
 		margin-top: 10px;
 		margin-right: 10px;
-		width: 220px;
+		width: 80%;
 		vertical-align: middle;
 	}
 	
@@ -1303,15 +1328,7 @@ since they may be used more than once.
 	.joyride-content-wrapper {
 		padding: 10px 22px 15px 15px;
 	}
-	
-	
-@media only screen and (max-width: 979px) {
-	
-	.btn-mainmenu {
-		display: block;
-  		float: right;
-		}	
-	}
+
 	
 	/*
 @media only screen and (max-width: 979px) {
@@ -1332,6 +1349,7 @@ since they may be used more than once.
 		}
 	}
 */
+
 	.jerry {
 		span.joyride-nub.top-right {
 			left: 220px;;
@@ -1471,12 +1489,34 @@ Media Query - defines how things should be styles under defined criteria
 		
 	}
 
+/* Min-Width 769 to Max-width 979px Wide 
+====================================================================== */
+@media only screen and (min-width: 769px) and (max-width: 979px) {
+	#sidenavMenu.nav-collapse {
+		height: auto !important;
+		}
+}
+
 
 /* 768px Wide - MOBILE - Landscape, Tablet Portrait (devices and browsers)
 ====================================================================== */
 
+@media only screen and (max-width: 768px) {
+	
+	.btn-mainmenu {
+		display: block;
+  		float: right;
+		}	
+	} 
+
 @media only screen and (min-width: 480px) and (max-width: 768px) {
 
+	#watermark {
+			p {
+				max-width:200px;
+				font-size: .95em;
+				}		
+			}
 	
 	#logoFragment img {
 			height: 30px;
@@ -1568,6 +1608,9 @@ Media Query - defines how things should be styles under defined criteria
 		display: none;
 	}	
 	
+	.row-fluid #home-login-container[class*="span"] {
+		margin-left:1.25%;
+	}
 	
 	[class*="span"],.uneditable-input[class*="span"],.row-fluid [class*="span"] {
 		display:block;
@@ -1634,11 +1677,11 @@ Media Query - defines how things should be styles under defined criteria
 		}
 
 
-		/*
+		
 #home-login-container {
 			margin-left: -1px;
 		}
-*/
+
 		
 		#content.row-fluid {
 			width: 100%;
@@ -1646,6 +1689,19 @@ Media Query - defines how things should be styles under defined criteria
 		
 /* Brand Logo  */
 		
+		#home-page #watermark {
+			p {
+				max-width:180px !important;
+				}		
+			}
+			
+		#watermark {
+			p {
+				/*max-width:180px;*/
+				font-size: .7em;
+				margin: 0;
+				}		
+			}
 		
 		#logoFragment img {
 			height: 30px;

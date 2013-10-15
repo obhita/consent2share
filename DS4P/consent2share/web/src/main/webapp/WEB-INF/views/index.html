@@ -22,7 +22,7 @@
 	<!-- END: CSS -->
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
-	        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	    <![endif]-->
 	<!-- START: Favicon -->
 	<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
@@ -62,8 +62,8 @@
 					<p id="h4-style" class="alert-heading">Warning!</p>
 
 					<p>
-						You need to have <a href="http://en.wikipedia.org/wiki/JavaScript"
-							th:href="@{http://en.wikipedia.org/wiki/JavaScript}"
+						You need to have <a href="https://en.wikipedia.org/wiki/JavaScript"
+							th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
 							target="_blank">JavaScript</a> enabled to use this site.
 					</p>
 				</div>
@@ -77,13 +77,13 @@
 						<section class="top-margin10">
 							<div id="home-feature-container">
 								<div id="home-feature-image">
-									<span id="home-feature-text">Your health is between you
+									<span id="home-feature-text" class="span5">Your health is between you
 										and your doctor, so take control of your medical privacy.</span>
 								</div>
 							</div>
 						</section>
 						
-						<div id="home-login-container" class="offset6 span5 overlay">
+						<div id="home-login-container" class="offset5 span6 overlay">
 
 							<fieldset class="login-section">
 
@@ -95,7 +95,10 @@
 									<p>Your medical privacy is important to you, so take
 										control of your health records and decide what information to
 										share and with whom to share it with. Get started today with a
-										free account, setup is easy and fast.</p>
+										free account, setup is easy and fast.
+									</p>
+									<p style="color: #b22222;"><span style="color:#ff0000;"><em>Please Note:</em></span> This site is for <strong>demonstration purposes</strong> only.  Please <span style="color:#ff0000;"><strong>DO NOT</strong></span> enter any personal data or personal health information.
+									</p>
 								</div>
 							</fieldset>
 
@@ -106,7 +109,7 @@
 
 								<div class="login-center">	
 										<div class="span-10 append-2 last" 
-									     xmlns:th="http://www.thymeleaf.org"
+									     xmlns:th="https://www.thymeleaf.org"
 									     th:with="lastUsernameKey=${T(org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter).SPRING_SECURITY_LAST_USERNAME_KEY},
 									              lastExceptionKey=${T(org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter).SPRING_SECURITY_LAST_EXCEPTION_KEY}">
 
@@ -250,53 +253,15 @@
 	<noscript>Javascript must be enabled in your browswer for this features in this website to fucntion properly</noscript>
 	
 	<script src="../../resources/js/jquery.validate.min.js"  
-	th:src="@{/resources/js/jquery.validate.min.js}" type="text/javascript">
+		th:src="@{/resources/js/jquery.validate.min.js}" type="text/javascript">
 	</script>
 	<noscript>Javascript must be enabled in your browswer for this features in this website to fucntion properly</noscript>
 	
-	<!-- JavaScript Functions -->
-	<script type="text/javascript">
-		$(function() {
-			$("#loginForm").validate({
-				onfocusout: false,
-			    onkeyup: false,
-			    onclick: false,
-				showErrors: function(errorMap, errorList) {
-		            $(".errormsg").html($.map(errorList, function (el) {
-		            	$('.loginError').empty();
-		                return el.message;
-		            }).join("<br/> "));
-		        },
-		        wrapper: "span",
-				rules: {
-					j_username: {
-						required: true,
-						minlength: 3,
-	                    maxlength: 30
-					} ,
-					j_password: {
-						required: true,
-						minlength: 8,
-	                    maxlength: 30
-					}			
-				},
-				messages: {
-					j_username: {
-						required: "Username is required",
-						minlength: $.format("Username must be at least {0} characters long"),
-	                    maxlength: $.format("Username must less than {0} characters long")
-					} ,
-					j_password: {
-						required: "Password is required",
-						minlength: $.format("Password must be at least {0} characters long"),
-	                    maxlength: $.format("Password must less than {0} characters long")
-					} 
-				}
-			});			
-			
-		});
+	<script src="../../resources/js/webpage-js/index.js"
+		th:src="@{/resources/js/webpage-js/index.js}" type="text/javascript">
 	</script>
-	<noscript>Alternate content for script</noscript>
+	<noscript>Javascript must be enabled in your browswer for this features in this website to fucntion properly</noscript>
+	
 	<!-- END: JavaScript-->
 	<!-- end container-fluid -->	 
 </body>

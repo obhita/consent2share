@@ -1,5 +1,6 @@
 package gov.samhsa.ds4ppilot.orchestrator;
 
+import gov.samhsa.consent2share.accesscontrolservice.orchestrator.xdsb.XdsbDocumentType;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 
 import java.io.BufferedReader;
@@ -33,7 +34,7 @@ public class XdsbMetadataGeneratorImplTest {
 
 	private void testgenerateMetadataXml(String fileName) {
 		XdsbMetadataGeneratorImpl xdsbMetadataGeneratorImpl = new XdsbMetadataGeneratorImpl(
-				new UniqueOidProviderImpl());
+				new UniqueOidProviderImpl(), XdsbDocumentType.CLINICAL_DOCUMENT);
 		InputStream is = xdsbMetadataGeneratorImpl.getClass().getClassLoader()
 				.getResourceAsStream(fileName);
 

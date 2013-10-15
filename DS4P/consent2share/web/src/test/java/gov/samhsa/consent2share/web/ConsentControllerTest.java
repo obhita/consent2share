@@ -428,4 +428,34 @@ public class ConsentControllerTest {
 		.andExpect(status().isOk());	
 			
 	}
+	
+	@Test
+	public void testAjaxCheckConsentStatus_when_consent_was_revoked() throws Exception{
+				
+		List<ConsentListDto> consentListDtos=new ArrayList<ConsentListDto>();
+		ConsentListDto consentListDto=mock(ConsentListDto.class);
+		consentListDtos.add(consentListDto);
+		
+		when(consentListDto.getId()).thenReturn((long)2);
+		when(consentListDto.getRevokeStage()).thenReturn(2);
+		
+		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreRevokeList=2"))
+		.andExpect(status().isOk());	
+			
+	}
+	
+	@Test
+	public void testAjaxCheckConsentStatus_when_consent_not_revoked() throws Exception{
+				
+		List<ConsentListDto> consentListDtos=new ArrayList<ConsentListDto>();
+		ConsentListDto consentListDto=mock(ConsentListDto.class);
+		consentListDtos.add(consentListDto);
+		
+		when(consentListDto.getId()).thenReturn((long)2);
+		when(consentListDto.getConsentStage()).thenReturn(1);
+		
+		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreRevokeList=2"))
+		.andExpect(status().isOk());	
+			
+	}
 }

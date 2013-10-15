@@ -4,7 +4,6 @@ import static org.junit.Assert.assertNotNull;
 import gov.samhsa.ds4ppilot.orchestrator.audit.AuditServiceImpl;
 import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32GetterImpl;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandlerImpl;
-import gov.samhsa.ds4ppilot.orchestrator.documentsegmentation.DocumentSegmentationImpl;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistryImpl;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepositoryImpl;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
@@ -53,121 +52,119 @@ public class SecuredOrchestratorImplTest {
 		reciepientEmailAddress = "Duane_Decouteau@direct.healthvault-stage.com";
 	}
 
-	@Ignore("This test should be configured to run as an integration test.") 
-	@Test
-	public void testSamlRetrieveDocumentSetRequest() throws JAXBException {
-		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
+//	@Ignore("This test should be configured to run as an integration test.") 
+//	@Test
+//	public void testSamlRetrieveDocumentSetRequest() throws JAXBException {
+//		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
+//
+//		final String contextHandlerEndpointAddress = "http://174.78.146.228:8080/DS4PACSServices/DS4PContextHandler";
+//		ContextHandlerImpl contextHandler = new ContextHandlerImpl(
+//				contextHandlerEndpointAddress);
+//
+//		final String endpointAddressForAuditServcie = "http://174.78.146.228:8080/DS4PACSServices/DS4PAuditService?wsdl";
+//		gov.samhsa.ds4ppilot.orchestrator.audit.AuditServiceImpl auditService = new AuditServiceImpl(
+//				endpointAddressForAuditServcie);
+//
+//		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
+//		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
+//
+//		final String documentSegmentationEndpointAddress = "http://xds-demo.feisystems.com:80/DocumentSegmentation/services/DocumentSegmentationService";
+//		DocumentSegmentationHandlerImpl documentSegmentation = new DocumentSegmentationHandlerImpl();
+//
+//		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
+//
+//		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
+//				xdsbRepositoryEndpointAddress);
+//
+//		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
+//		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
+//				xdsbRegistryEndpointAddress);
+//
+//		SecuredOrchestratorImpl securedOrchestrator = new SecuredOrchestratorImpl(
+//				contextHandler, c32Getter, documentSegmentation, auditService,
+//				dataHandlerToBytesConverter, xdsbRepository, xdsbRegistry);
+//
+//		securedOrchestrator.setSubjectPurposeOfUse("TREAT");
+//		securedOrchestrator.setSubjectLocality("2.16.840.1.113883.3.467");
+//		securedOrchestrator.setOrganization("SAMHSA");
+//		securedOrchestrator.setOrganizationId("FEiSystems");
+//
+//		securedOrchestrator.setResourceName("NwHINDirectSend");
+//		securedOrchestrator.setResourceType("C32");
+//		securedOrchestrator.setResourceAction("Execute");
+//		securedOrchestrator.setHomeCommunityId("2.16.840.1.113883.3.467");
+//		securedOrchestrator
+//				.setRepositoryUniqueId("1.3.6.1.4.1.21367.2010.1.2.1040");
+//
+//		gov.samhsa.ds4ppilot.schema.securedorchestrator.RetrieveDocumentSetResponse response = securedOrchestrator
+//				.retrieveDocumentSetRequest(
+//						"2132311954.131311.4101210.102100.89242147141011137",
+//						"eed552d2-2ad4-4ae4-8e28-b8b0dee93495", reciepientEmailAddress);
+//
+//		ihe.iti.xds_b._2007.RetrieveDocumentSetResponse testResponse = unmarshallFromXml(
+//				ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.class,
+//				response.getReturn());
+//
+//		DocumentResponse documentResponse = testResponse.getDocumentResponse()
+//				.get(0);
+//		byte[] processDocBytes = documentResponse.getDocument();
+//		String processedDocumentString = decryptDocument(processDocBytes,
+//				response.getKekEncryptionKey(), response.getKekMaskingKey());
+//
+//		LOGGER.debug("Processed C32 document: " + processedDocumentString);
+//
+//		assertNotNull(response);
+//	}
 
-		final String contextHandlerEndpointAddress = "http://174.78.146.228:8080/DS4PACSServices/DS4PContextHandler";
-		ContextHandlerImpl contextHandler = new ContextHandlerImpl(
-				contextHandlerEndpointAddress);
-
-		final String endpointAddressForAuditServcie = "http://174.78.146.228:8080/DS4PACSServices/DS4PAuditService?wsdl";
-		gov.samhsa.ds4ppilot.orchestrator.audit.AuditServiceImpl auditService = new AuditServiceImpl(
-				endpointAddressForAuditServcie);
-
-		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
-		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
-
-		final String documentSegmentationEndpointAddress = "http://xds-demo.feisystems.com:80/DocumentSegmentation/services/DocumentSegmentationService";
-		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
-				documentSegmentationEndpointAddress);
-
-		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
-
-		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
-				xdsbRepositoryEndpointAddress);
-
-		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
-		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
-				xdsbRegistryEndpointAddress);
-
-		SecuredOrchestratorImpl securedOrchestrator = new SecuredOrchestratorImpl(
-				contextHandler, c32Getter, documentSegmentation, auditService,
-				dataHandlerToBytesConverter, xdsbRepository, xdsbRegistry);
-
-		securedOrchestrator.setSubjectPurposeOfUse("TREAT");
-		securedOrchestrator.setSubjectLocality("2.16.840.1.113883.3.467");
-		securedOrchestrator.setOrganization("SAMHSA");
-		securedOrchestrator.setOrganizationId("FEiSystems");
-
-		securedOrchestrator.setResourceName("NwHINDirectSend");
-		securedOrchestrator.setResourceType("C32");
-		securedOrchestrator.setResourceAction("Execute");
-		securedOrchestrator.setHomeCommunityId("2.16.840.1.113883.3.467");
-		securedOrchestrator
-				.setRepositoryUniqueId("1.3.6.1.4.1.21367.2010.1.2.1040");
-
-		gov.samhsa.ds4ppilot.schema.securedorchestrator.RetrieveDocumentSetResponse response = securedOrchestrator
-				.retrieveDocumentSetRequest(
-						"2132311954.131311.4101210.102100.89242147141011137",
-						"eed552d2-2ad4-4ae4-8e28-b8b0dee93495", reciepientEmailAddress);
-
-		ihe.iti.xds_b._2007.RetrieveDocumentSetResponse testResponse = unmarshallFromXml(
-				ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.class,
-				response.getReturn());
-
-		DocumentResponse documentResponse = testResponse.getDocumentResponse()
-				.get(0);
-		byte[] processDocBytes = documentResponse.getDocument();
-		String processedDocumentString = decryptDocument(processDocBytes,
-				response.getKekEncryptionKey(), response.getKekMaskingKey());
-
-		LOGGER.debug("Processed C32 document: " + processedDocumentString);
-
-		assertNotNull(response);
-	}
-
-	@Ignore("This test should be configured to run as an integration test.")
-	@Test
-	public void testSamlRegisteryStoredQueryRequest() {
-		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
-
-		final String endpointAddressForAuditServcie = "http://174.78.146.228:8080/DS4PACSServices/DS4PAuditService";
-		gov.samhsa.ds4ppilot.orchestrator.audit.AuditServiceImpl auditService = new AuditServiceImpl(
-				endpointAddressForAuditServcie);
-
-		final String contextHandlerEndpointAddress = "http://174.78.146.228:8080/DS4PACSServices/DS4PContextHandler";
-		ContextHandlerImpl contextHandler = new ContextHandlerImpl(
-				contextHandlerEndpointAddress);
-
-		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
-		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
-
-		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
-		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
-				documentSegmentationEndpointAddress);
-
-		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
-
-		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
-				xdsbRepositoryEndpointAddress);
-
-		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
-		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
-				xdsbRegistryEndpointAddress);
-
-		SecuredOrchestratorImpl securedOrchestrator = new SecuredOrchestratorImpl(
-				contextHandler, c32Getter, documentSegmentation, auditService,
-				dataHandlerToBytesConverter, xdsbRepository, xdsbRegistry);
-
-		securedOrchestrator.setSubjectPurposeOfUse("TREAT");
-		securedOrchestrator.setSubjectLocality("2.16.840.1.113883.3.467");
-		securedOrchestrator.setOrganization("SAMHSA");
-		securedOrchestrator.setOrganizationId("FEiSystems");
-
-		securedOrchestrator.setResourceName("NwHINDirectSend");
-		securedOrchestrator.setResourceType("C32");
-		securedOrchestrator.setResourceAction("Execute");
-
-		gov.samhsa.ds4ppilot.schema.securedorchestrator.RegisteryStoredQueryResponse response = securedOrchestrator
-				.registeryStoredQueryRequest(
-						"PUI100010060001^^^&2.16.840.1.113883.3.467&ISO", UUID
-								.randomUUID().toString());
-
-		assertNotNull(response);
-
-	}
+//	@Ignore("This test should be configured to run as an integration test.")
+//	@Test
+//	public void testSamlRegisteryStoredQueryRequest() {
+//		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
+//
+//		final String endpointAddressForAuditServcie = "http://174.78.146.228:8080/DS4PACSServices/DS4PAuditService";
+//		gov.samhsa.ds4ppilot.orchestrator.audit.AuditServiceImpl auditService = new AuditServiceImpl(
+//				endpointAddressForAuditServcie);
+//
+//		final String contextHandlerEndpointAddress = "http://174.78.146.228:8080/DS4PACSServices/DS4PContextHandler";
+//		ContextHandlerImpl contextHandler = new ContextHandlerImpl(
+//				contextHandlerEndpointAddress);
+//
+//		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
+//		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
+//
+//		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+//		DocumentSegmentationHandlerImpl documentSegmentation = new DocumentSegmentationHandlerImpl();
+//
+//		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
+//
+//		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
+//				xdsbRepositoryEndpointAddress);
+//
+//		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
+//		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
+//				xdsbRegistryEndpointAddress);
+//
+//		SecuredOrchestratorImpl securedOrchestrator = new SecuredOrchestratorImpl(
+//				contextHandler, c32Getter, documentSegmentation, auditService,
+//				dataHandlerToBytesConverter, xdsbRepository, xdsbRegistry);
+//
+//		securedOrchestrator.setSubjectPurposeOfUse("TREAT");
+//		securedOrchestrator.setSubjectLocality("2.16.840.1.113883.3.467");
+//		securedOrchestrator.setOrganization("SAMHSA");
+//		securedOrchestrator.setOrganizationId("FEiSystems");
+//
+//		securedOrchestrator.setResourceName("NwHINDirectSend");
+//		securedOrchestrator.setResourceType("C32");
+//		securedOrchestrator.setResourceAction("Execute");
+//
+//		gov.samhsa.ds4ppilot.schema.securedorchestrator.RegisteryStoredQueryResponse response = securedOrchestrator
+//				.registeryStoredQueryRequest(
+//						"PUI100010060001^^^&2.16.840.1.113883.3.467&ISO", UUID
+//								.randomUUID().toString());
+//
+//		assertNotNull(response);
+//
+//	}
 	
 	private String decryptDocument(byte[] processDocBytes,
 			byte[] kekEncryptionKeyBytes, byte[] kekMaskingKeyBytes) {

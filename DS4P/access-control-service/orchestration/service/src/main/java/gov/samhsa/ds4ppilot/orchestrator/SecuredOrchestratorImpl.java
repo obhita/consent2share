@@ -31,7 +31,7 @@ import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.orchestrator.audit.AuditService;
 import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32Getter;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandler;
-import gov.samhsa.ds4ppilot.orchestrator.documentsegmentation.DocumentSegmentation;
+import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.DocumentSegmentation;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistry;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepository;
 import gov.samhsa.ds4ppilot.schema.securedorchestrator.RegisteryStoredQueryResponse;

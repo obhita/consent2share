@@ -267,6 +267,7 @@
 			                   		 <td 	th:text="${individualProvider.providerTaxonomyDescription}">specialty</td>
 			                   		 <td	th:text="${individualProvider.npi}">NPI</td>
 			              		     <td>   
+			              		     		<!-- FIXME: Move internal javascript code to external .js file -->
 				                    		 <script th:inline="javascript">	
 							                   		function phoneNumberParser (number){
 								                   		
@@ -284,6 +285,7 @@
 			                   	  
 			                   		 </td>
 			                   		 <td>	
+			                   		 	 <!-- FIXME: Move internal javascript code to external .js file -->
 			                   		 	 <script th:inline="javascript">	
 			                   						
 			                   		 						var orgAddress=[[${individualProvider.firstLinePracticeLocationAddress}]];
@@ -308,7 +310,9 @@
 			                   		 <td	th:text="${organizationalProvider.orgName}">OfficeName</td>
 			                   		 <td	th:text="${organizationalProvider.providerTaxonomyDescription}">specialty</td>
 			                   		 <td	th:text="${organizationalProvider.npi}">NPI</td>
-			                   		 <td>   
+			                   		 <td>
+			                   		 
+			                   		 <!-- FIXME: Move internal javascript code to external .js file -->
 			                   		 <script th:inline="javascript">	
 						                   		function phoneNumberParser (number){
 						                   			if (number.length==10){
@@ -327,6 +331,7 @@
 			                   		 
 			                   		 
 			                   		 <td >
+			                   		 	<!-- FIXME: Move internal javascript code to external .js file -->
 			                   		 	<script th:inline="javascript">	
 			                   						
 			                   		 						var orgAddress=[[${organizationalProvider.firstLinePracticeLocationAddress}]];
@@ -629,6 +634,8 @@
 		<!-- end new scripts -->
 		
 		<!-- JavaScript Functions -->
+		
+		<!-- FIXME: Move internal javascript code to external .js file -->
 		<script type="text/javascript">	
 			
 			$(document).ready(function(){

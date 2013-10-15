@@ -23,6 +23,12 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-library</artifactId>
+			<version>1.1.1-SNAPSHOT</version>
+		</dependency>
+		<!-- TODO: REMOVE THIS -->
+		<dependency>
 			<groupId>common-library-jar-with-dependencies</groupId>
 			<artifactId>common-library-jar-with-dependencies</artifactId>
 			<version>1.1.0-SNAPSHOT</version>
@@ -36,38 +42,12 @@
 	</dependencies>
 
 	<build>
-		<plugins>
-			<!-- Below plugin provides a separate JAR for the JAX-WS artifacts (i.e., 
-				the objects created by running wsdl2java or wsimport), as this JAR will also 
-				be used by the SOAP client. More info: http://maven.apache.org/plugins/maven-assembly-plugin/ -->
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptors>
-						<descriptor>src/main/assembly/jaxws-jar.xml</descriptor>
-					</descriptors>
-					<appendAssemblyId>true</appendAssemblyId>
-					<attach>true</attach>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+	
+		<finalName>DocumentSegmentation</finalName>
+		
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>org.apache.felix</groupId>
-					<artifactId>maven-bundle-plugin</artifactId>
-					<version>2.3.5</version>
-					<extensions>true</extensions>
-				</plugin>
+				
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
@@ -96,7 +76,7 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-		<finalName>DocumentSegmentation</finalName>
+		
 	</build>
 
 	<profiles>
@@ -116,7 +96,7 @@
 							<dependency>
 								<groupId>xerces</groupId>
 								<artifactId>xercesImpl</artifactId>
-								<version>${xercesImpl-version}</version>
+								<version>${xercesImpl.version}</version>
 							</dependency>
 						</dependencies>
 						<executions>
@@ -135,17 +115,6 @@
 							</execution>					
 						</executions>
 					</plugin>
-					<plugin>
-						<groupId>org.apache.felix</groupId>
-						<artifactId>maven-bundle-plugin</artifactId>
-						<configuration>
-							<instructions>
-								<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-								<Require-Bundle>org.apache.cxf.bundle,org.springframework.beans</Require-Bundle>
-								<Export-Package>service</Export-Package>
-							</instructions>
-						</configuration>
-					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -157,7 +126,6 @@
 					<plugin>
 						<groupId>org.jvnet.jax-ws-commons</groupId>
 						<artifactId>jaxws-maven-plugin</artifactId>
-						<version>2.2</version>
 						<executions>
 							<execution>
 								<goals>

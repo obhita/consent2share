@@ -1,5 +1,8 @@
 package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation;
 
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverterImpl;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditServiceImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.brms.RuleExecutionServiceClientImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
@@ -9,9 +12,6 @@ import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentMaskerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentRedactorImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentTaggerImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentXmlConverterImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.FileReaderImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MarshallerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MetadataGeneratorImpl;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
@@ -53,7 +53,7 @@ public class DocumentSegmentationImplIT {
 	private static String xdsDocumentEntryUniqueId;
 	private static XacmlResult xacmlResultObject;
 
-	private static MarshallerImpl marshaller;
+	private static SimpleMarshallerImpl marshaller;
 	private static FileReaderImpl fileReader;
 	private static MetadataGeneratorImpl metadataGenerator;
 	private static DocumentEditorImpl documentEditor;
@@ -71,7 +71,7 @@ public class DocumentSegmentationImplIT {
 		documentEditor = new DocumentEditorImpl();
 		documentEditor.setFileReader(fileReader);
 		documentEditor.setMetadataGenerator(metadataGenerator);
-		marshaller = new MarshallerImpl();
+		marshaller = new SimpleMarshallerImpl();
 		documentTagger = new DocumentTaggerImpl();
 		documentEncrypter = new DocumentEncrypterImpl();
 		documentRedactor = new DocumentRedactorImpl();

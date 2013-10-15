@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.ds4ppilot.orchestrator;
 
+import gov.samhsa.consent2share.accesscontrolservice.orchestrator.xdsb.XdsbDocumentType;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 
 import java.io.ByteArrayInputStream;
@@ -44,6 +45,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import oasis.names.tc.ebxml_regrep.xsd.lcm._3.SubmitObjectsRequest;
 
 /**
@@ -51,11 +55,17 @@ import oasis.names.tc.ebxml_regrep.xsd.lcm._3.SubmitObjectsRequest;
  */
 public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 
+	/** The logger. */
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	/** The unique oid provider. */
 	private final UniqueOidProvider uniqueOidProvider;
 
-	/** The Constant XdsbMetadata_Xsl_File_Name. */
-	private static final String XdsbMetadata_Xsl_File_Name = "XdsbMetadata.xsl";
+	/** The Constant XDSB_METADATA_XSL_FILE_NAME_FOR_CLINICAL_DOCUMENT. */
+	private static final String XDSB_METADATA_XSL_FILE_NAME_FOR_CLINICAL_DOCUMENT = "XdsbMetadata.xsl";
+
+	/** The Constant XDSB_METADATA_XSL_FILE_NAME_FOR_PRIVACY_CONSENT. */
+	private static final String XDSB_METADATA_XSL_FILE_NAME_FOR_PRIVACY_CONSENT = "XdsbMetadataForXacmlPolicy.xsl";
 
 	/** The Constant HomeCommunityId_Parameter_Name. */
 	private static final String HomeCommunityId_Parameter_Name = "homeCommunityId";
@@ -66,14 +76,21 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 	/** The Constant XdsSubmissionSet_UniqueId_Parameter_Name. */
 	private static final String XdsSubmissionSet_UniqueId_Parameter_Name = "XDSSubmissionSet_uniqueId";
 
+	/** The document type for xdsb metadata. */
+	private XdsbDocumentType documentTypeForXdsbMetadata;
+
 	/**
 	 * Instantiates a new xdsb metadata generator impl.
 	 * 
 	 * @param uniqueOidProvider
 	 *            the unique oid provider
+	 * @param documentTypeForXdsbMetadata
+	 *            the document type for xdsb metadata
 	 */
-	public XdsbMetadataGeneratorImpl(UniqueOidProvider uniqueOidProvider) {
+	public XdsbMetadataGeneratorImpl(UniqueOidProvider uniqueOidProvider,
+			XdsbDocumentType documentTypeForXdsbMetadata) {
 		this.uniqueOidProvider = uniqueOidProvider;
+		this.documentTypeForXdsbMetadata = documentTypeForXdsbMetadata;
 	}
 
 	/*
@@ -90,8 +107,11 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 		InputStream inputStream = null;
 
 		try {
-			inputStream = Thread.currentThread().getContextClassLoader()
-					.getResourceAsStream(XdsbMetadata_Xsl_File_Name);
+			inputStream = Thread
+					.currentThread()
+					.getContextClassLoader()
+					.getResourceAsStream(
+							resolveXslFileName(documentTypeForXdsbMetadata));
 
 			StreamSource styleSheetStremSource = new StreamSource(inputStream);
 
@@ -131,6 +151,13 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.ds4ppilot.orchestrator.XdsbMetadataGenerator#generateMetadata
+	 * (java.lang.String, java.lang.String)
+	 */
 	@Override
 	public SubmitObjectsRequest generateMetadata(String document,
 			String homeCommunityId) {
@@ -147,6 +174,19 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 		return submitObjectsRequest;
 	}
 
+	/**
+	 * Unmarshall from xml.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param clazz
+	 *            the clazz
+	 * @param xml
+	 *            the xml
+	 * @return the t
+	 * @throws JAXBException
+	 *             the jAXB exception
+	 */
 	@SuppressWarnings("unchecked")
 	private static <T> T unmarshallFromXml(Class<T> clazz, String xml)
 			throws JAXBException {
@@ -157,6 +197,15 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 		return (T) um.unmarshal(input);
 	}
 
+	/**
+	 * Marshall.
+	 * 
+	 * @param obj
+	 *            the obj
+	 * @return the string
+	 * @throws Throwable
+	 *             the throwable
+	 */
 	@SuppressWarnings("unused")
 	private static String marshall(Object obj) throws Throwable {
 		final JAXBContext context = JAXBContext.newInstance(obj.getClass());
@@ -172,5 +221,27 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 		marshaller.marshal(obj, stringWriter);
 
 		return stringWriter.toString();
+	}
+
+	/**
+	 * Resolve xsl file name.
+	 * 
+	 * @param documentTypeForXdsbMetadata
+	 *            the document type for xdsb metadata
+	 * @return the string
+	 */
+	private String resolveXslFileName(
+			XdsbDocumentType documentTypeForXdsbMetadata) {
+		if (XdsbDocumentType.CLINICAL_DOCUMENT
+				.equals(documentTypeForXdsbMetadata)) {
+			return XDSB_METADATA_XSL_FILE_NAME_FOR_CLINICAL_DOCUMENT;
+		} else if (XdsbDocumentType.PRIVACY_CONSENT
+				.equals(documentTypeForXdsbMetadata)) {
+			return XDSB_METADATA_XSL_FILE_NAME_FOR_PRIVACY_CONSENT;
+		} else {
+			logger.error("Invalid document type for XdsbMetadataGenerator.");
+			throw new DS4PException(
+					"Invalid document type for XdsbMetadataGenerator.");
+		}
 	}
 }

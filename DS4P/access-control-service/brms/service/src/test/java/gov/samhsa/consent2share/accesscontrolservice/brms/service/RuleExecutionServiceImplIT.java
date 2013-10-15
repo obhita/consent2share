@@ -2,6 +2,7 @@ package gov.samhsa.consent2share.accesscontrolservice.brms.service;
 
 import gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.GuvnorServiceImpl;
 import gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionServiceImpl;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
 
 import org.junit.Assert;
@@ -32,10 +33,10 @@ public class RuleExecutionServiceImplIT {
 	 */
 	@Before
 	public void setUp() {
-		endpointAddressGuvnorService = "http://obhitaqaacs01/guvnor-5.5.0.Final-tomcat-6.0/rest/packages/AnnotationRules/source";
+		endpointAddressGuvnorService = "http://localhost:8080/guvnor-5.5.0.Final-tomcat-6.0/rest/packages/AnnotationRules/source";
 
 		sut = new RuleExecutionServiceImpl(new GuvnorServiceImpl(
-				endpointAddressGuvnorService));
+				endpointAddressGuvnorService,"admin", "admin"), new SimpleMarshallerImpl());
 	}
 
 	/**

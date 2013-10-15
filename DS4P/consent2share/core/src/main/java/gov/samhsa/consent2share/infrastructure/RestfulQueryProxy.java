@@ -51,6 +51,7 @@ public class RestfulQueryProxy  {
 	 * @return the string
 	 */
 	public String call(String domainURL,String query){
+		query=query.replaceAll(" ", "%20");
 		query=domainURL+query;
 		StringBuilder output=new StringBuilder();
 		try{

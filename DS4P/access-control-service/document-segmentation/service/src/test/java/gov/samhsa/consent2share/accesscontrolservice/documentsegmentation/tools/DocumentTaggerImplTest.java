@@ -2,6 +2,7 @@ package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools
 
 import static org.junit.Assert.assertTrue;
 
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 
 import java.util.UUID;

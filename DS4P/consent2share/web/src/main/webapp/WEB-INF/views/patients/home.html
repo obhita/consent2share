@@ -24,7 +24,7 @@
 	<!-- END: CSS -->
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
-	        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	    <![endif]-->
 	<!-- START: Favicon -->
 	<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
@@ -33,7 +33,7 @@
 <body>
 	<!-- !START: Patient Information -->
 
-	<div class="container-fluid">
+	<div id="home-page" class="container-fluid">
 		<!-- !START: Page Header -->
 
 		<div class="navbar">
@@ -185,13 +185,13 @@
 				<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE sideNavMenuFragment -->
 					<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
 					
-					<div class="nav-collapse sidebar-nav">
+					<div id="sidenavMenu" class="nav-collapse sidebar-nav">
 						<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
 							<li class="nav-header hidden-tablet" role="menuitem"></li>
 							
 							<li class="active" role="menuitem"><a href="#">
 								<div class="icon-home icon-large"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_home}"> My Home</span></a></li>
+									<span class= "hidden-tablet" th:text="#{sidebar_my_home}"> My Home</span></a></li>
 									
 							<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div>
 									<span class="hidden-tablet" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
@@ -232,7 +232,7 @@
 						<p id="h4-style" class="alert-heading">Warning!</p>
 						<p>
 							You need to have <a
-								href="http://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a>
+								href="https://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a>
 							enabled to use this site.
 						</p>
 					</div>
@@ -300,7 +300,7 @@
 
 						<!-- COMPONENT: Education -->				
 		
-			<div class="row-fluid">
+			<div>
 				<div class="box span12">
 				<div class="box-header">
 					<h2><span class="icon-bookmark"></span><span class="break"></span>Learn about Privacy and Consent</h2>
@@ -343,7 +343,7 @@
 				    <h3 id="myModalLabel">What is Consent 2 Share technology?</h3>
 				  </div>
 				  <div class="modal-body">
-				    <p><iframe src="http://www.youtube.com/embed/M7ttn21jVfI?feature=player_detailpage" frameborder="0" allowfullscreen="true"></iframe>
+				    <p><iframe src="https://www.youtube.com/embed/M7ttn21jVfI?feature=player_detailpage" frameborder="0" allowfullscreen="true"></iframe>
 					    <div>
 						    <strong>Media Type:</strong> <span class="label label-info">Video</span><br/>
 						    <strong>Length:</strong> 4:00 min <br/>

@@ -6,8 +6,6 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-
-
 	<beans profile="runtime">
 		<bean id="providerMapper" class="com.feisystems.provider.mappers.DozerProviderMapper"/>
 		<bean id="providerService" class="com.feisystems.provider.services.ProviderServiceImpl"/>
@@ -22,31 +20,5 @@
 		</bean>
 	</beans>
 	
-	<beans profile="test">
-		<bean id="providerMapper" class="com.feisystems.provider.mappers.DozerProviderMapper"/>
-		<bean id="providerService" class="com.feisystems.provider.services.ProviderServiceImpl"/>
-		<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
-		<context:component-scan base-package="com.feisysems.provider"/>
-		<context:property-placeholder location="classpath:spring/providers.properties" />
-		<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
-			<property name="driverClassName" value="${database-test.driverClassName}" />
-			<property name="url" value="${database-test.url}" />
-			<property name="username" value="${database-test.username}" />
-			<property name="password" value="${database-test.password}" />
-		</bean>
-	</beans>
 	
-	<beans profile="quality">
-		<bean id="providerMapper" class="com.feisystems.provider.mappers.DozerProviderMapper"/>
-		<bean id="providerService" class="com.feisystems.provider.services.ProviderServiceImpl"/>
-		<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
-		<context:component-scan base-package="com.feisysems.provider"/>
-		<context:property-placeholder location="classpath:spring/providers.properties" />
-		<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
-			<property name="driverClassName" value="${database-quality.driverClassName}" />
-			<property name="url" value="${database-quality.url}" />
-			<property name="username" value="${database-quality.username}" />
-			<property name="password" value="${database-quality.password}" />
-		</bean>
-	</beans>	
 </beans>

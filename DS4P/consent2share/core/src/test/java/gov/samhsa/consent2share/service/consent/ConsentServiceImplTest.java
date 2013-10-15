@@ -143,8 +143,10 @@ public class ConsentServiceImplTest {
 	@Test
 	public void testDeleteConsent_Check_if_Repository_and_findConsent_is_called(){
 		ConsentService cstspy=spy(cst);
+		Consent consent=mock(Consent.class);
+		when(cstspy.findConsent((long)1)).thenReturn(consent);
+		when(consent.getSignedPdfConsent()).thenReturn(null);
 		cstspy.deleteConsent((long)1);
-		verify(cstspy).findConsent((long)1);
 		verify(consentRepository).delete(any(Consent.class));
 	}
 	

@@ -22,28 +22,9 @@
 
 
 
-<!-- START: CSS -->
-
-<link id="bootstrap-style" href="../../../resources/css/bootstrap.css"
-	rel="stylesheet" />
-<link href="../../../resources/css/bootstrap-responsive.min.css"
-	rel="stylesheet" />
-<link href="../../../resources/css/themes-style.css" rel="stylesheet" />
-<link href="../../../resources/css/bootstrap-toggle-buttons.css"
-	rel="stylesheet" />
-
-<link href="../../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
-<link href="../../../resources/css/font-awesome.css" rel="stylesheet"
-	type="text/css" />
-	<link href="../../../resources/css/sentinel-style.css" rel="stylesheet" />
-
-<!-- END: CSS -->
-
-
-
 <!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
-		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 
 
@@ -222,7 +203,7 @@
 						<p class="h4-style alert-heading">Warning!</p>
 						<p>
 							You need to have <a
-								href="http://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a>
+								href="https://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a>
 							enabled to use this site.
 						</p>
 					</div>
@@ -399,22 +380,31 @@
 												<a href="#"
 												th:href="@{'javascript:document.' + 'consent_download_' + ${consentEntry.id} + '.submit()'}"
 												class="btn btn-small btn-primary" th:text="#{list_consent_view_consent}">View this Consent</a>												 
-
 												</span>
-												<a th:case="${2}" href="#"
+												
+												<span  th:case="${2}">
+												<a href="#"
 												th:href="@{'javascript:document.' + 'consent_download_' + ${consentEntry.id} + '.submit()'}"
 												class="btn btn-small btn-primary" th:text="#{list_consent_view_signed_consent}">View Signed Consent</a>
+												</span>
 											</li>
 
 
 
-											<li th:switch="${consentEntry.consentStage}"
-												class="help-inline" role="listitem"><a th:case="${1}"
-												href="#" class="btn btn-small btn-warning"
+												<li th:switch="${consentEntry.consentStage}"
+												class="help-inline" role="listitem">
+												
+												<span th:case="${1}">
+												<a href="#" class="btn btn-small btn-warning"
 												onclick="window.open('toEmail.html')" th:text="#{list_consent_go_mailbox}">Go to Your Mailbox</a>
-												<a th:case="${0}" id="signnow" href="#"
+												</span>
+												
+												<span th:case="${0}">
+												<a href="#"
 												th:href="@{'javascript:document.' + 'consent_sign_' + ${consentEntry.id} + '.submit()'}"
-												class="btn btn-small btn-success" th:text="#{list_consent_submit}">Submit</a> </li>
+												class="btn btn-small btn-success" th:text="#{list_consent_submit}">Submit</a> 
+												</span> 
+												</li>
 
 																                	<li th:switch="${consentEntry.consentStage}" class="help-inline" role="listitem">
 																                	<a th:case="${2}" href="#" th:href="@{'exportXACMLConsents/'+ ${consentEntry.id}}" class="btn btn-small btn-success">  Export to XACML</a>
@@ -423,17 +413,26 @@
 
 											<!-- Button to trigger modal -->
 											<li th:switch="${consentEntry.revokeStage}" class="help-inline" role="listitem">
-											<a th:case="${0}" th:id="@{'revoke'+${consentEntry.id}}" class="btn btn-small  btn-inverse revokation-button" href="#revoke-modal"
+											
+											<span th:case="${0}">
+											<a  th:id="@{'revoke'+${consentEntry.id}}" class="btn btn-small  btn-inverse revokation-button" href="#revoke-modal"
 												role="button" data-edit-button="#content1"
 												data-toggle="modal" th:text="#{list_consent_withdrawal}">Withdrawal</a> 
-											<a th:case="${1}" class="btn btn-small  btn-inactive" role="button">
+											</span>	
+											<span th:case="${1}">	
+											<a class="btn btn-small  btn-inactive" role="button">
 											<div style="margin-right: 4px; margin-left: -4px" class="icon-refresh icon-spin"></div><span th:text="#{list_consent_withdrawal_in_progress}">Withdrawal
 													In Progress</span></a>
-											<a th:case="${2}" href="#" class="btn btn-small btn-primary"
+											</span>
+											<span th:case="${2}">			
+											<a  href="#" class="btn btn-small btn-primary"
 											th:href="@{'javascript:document.' + 'revokation_download_' + ${consentEntry.id} + '.submit()'}" th:text="#{list_consent_view_signed_revocation}">
 													View Signed Revocation</a>
-											<a th:case="${4}" href="#"	th:href="@{'deleteConsents/'+ ${consentEntry.id}}"
+													</span>
+											<span th:case="${4}">			
+											<a  href="#"	th:href="@{'deleteConsents/'+ ${consentEntry.id}}"
 												class="btn btn-small btn-danger" th:text="#{list_consent_delete}">Delete</a>
+												</span>
 											</li>
 
 										</ul>
@@ -612,13 +611,13 @@
 	<!-- START: JavaScript-->
 
 	<script src="../../../resources/js/jquery.min.js"
-		th:src="@{/resources/js/jquery.min.js}" type="text/javascript">
-		
+		th:src="@{/resources/js/jquery.min.js}"
+		type="text/javascript">
 	</script>
 	<noscript>Alternate content for script</noscript>
 	<script src="../../../resources/js/bootstrap.min.js"
-				th:src="@{/resources/js/bootstrap.min.js}" 
-				type="text/javascript"></script>
+		th:src="@{/resources/js/bootstrap.min.js}" 
+		type="text/javascript"></script>
 	<noscript>Alternate content for script</noscript>
 	<script src="../../../resources/js/jquery.toggle.buttons.js"
 		th:src="@{/resources/js/jquery.toggle.buttons.js}"
@@ -628,9 +627,9 @@
 		th:src="@{/resources/js/bootstrap-datepicker.js}"
 		type="text/javascript"></script>
 	<noscript>Alternate content for script</noscript>
-		<script src="../../../resources/js/bootstrap-tooltip.js"
-				th:src="@{/resources/js/bootstrap-tooltip.js}"
-				type="text/javascript"></script>
+	<script src="../../../resources/js/bootstrap-tooltip.js"
+		th:src="@{/resources/js/bootstrap-tooltip.js}"
+		type="text/javascript"></script>
 	<script src="../../../resources/js/bootstrap-popover.js"
 		th:src="@{/resources/js/bootstrap-popover.js}" type="text/javascript"></script>
 	<script src="../../../resources/js/jquery.joyride-2.0.3.js"
@@ -638,40 +637,32 @@
 		type="text/javascript"></script>
 	<script src="../../../resources/js/jquery.cookie.js"
 		th:src="@{/resources/js/jquery.cookie.js}" type="text/javascript"></script>
-	<script src="../../../resources/js/consent/listConsent.js" 
-				th:src="@{/resources/js/consent/listConsent.js}"
-				type="text/javascript"></script>
 	<script src="../../../resources/js/modernizr.mq.js"
 		th:src="@{/resources/js/modernizr.mq.js}" type="text/javascript"></script>
+		
+	<!-- Custom JS Script -->
+	<script src="../../../resources/js/consent/listConsent.js" 
+			th:src="@{/resources/js/consent/listConsent.js}"
+			type="text/javascript"></script>
 
-			
-	
+	<!-- FIXME: Move internal javascript code to external .js file -->
 	<script type="text/javascript">
 		consentPreSignList=[];
-		$(document).ready(function() {
-			
-			$('#normal-toggle-button').toggleButtons();
-			$('#info-toggle-button').toggleButtons();
-			$('.datepicker').datepicker();
-
-			$('body').removeClass('fouc_loading');
-
-			$("#signnow").click(function() {
-				$(this).attr("disabled", "disabled");
-			});
-
-			initListConsent();
-		});
-		</script>
-		<span th:each="consentEntry:${listConsentDtos}">
+		consentPreRevokeList=[];
+	</script>
+		
+	<span th:each="consentEntry:${listConsentDtos}">
+		<!-- FIXME: Move internal javascript code to external .js file -->
 		<script th:inline="javascript">
-		if([[${consentEntry.consentStage}]]==1){
-		consentPreSignList.push([[${consentEntry.id}]]);
-		}
+			if([[${consentEntry.consentStage}]]==1){
+				consentPreSignList.push([[${consentEntry.id}]]);
+			}
+			
+			if([[${consentEntry.revokeStage}]]==1){
+				consentPreRevokeList.push([[${consentEntry.id}]]);
+			}
 		</script> 
-		</span>
-	
-	
+	</span>
 	<noscript>Alternate content for script</noscript>
 
 	<!-- END: JavaScript-->

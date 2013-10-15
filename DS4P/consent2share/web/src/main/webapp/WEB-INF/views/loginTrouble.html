@@ -134,13 +134,7 @@
 		</footer>
 	</div>
 	<!-- START: JavaScript-->
-
-		<script src="../../resources/js/jquery-1.7.2.min.js"></script><noscript>Alternate content for script</noscript>
-		<script src="../../resources/js/bootstrap.js"></script><noscript>Alternate content for script</noscript>
-		<script src="../../resources/js/bootstrap-popover.js" type="text/javascript"></script>
-		<script src="../../resources/js/bootstrap-modal.js" type="text/javascript"></script>
-		<script src="../../resources/js/modernizr.mq.js" type="text/javascript"></script>
-
+	
 		<script src="../../resources/js/jquery.min.js" 
 				th:src="@{/resources/js/jquery.min.js}" 
 				type="text/javascript">
@@ -166,19 +160,10 @@
 		<script src="../../resources/js/modernizr.mq.js" 
 				th:src="@{/resources/js/modernizr.mq.js}"
 				type="text/javascript"></script>
-		<script type="text/javascript">
-		$(document).ready(function(){ 
-			
-			$("#mybutton").click(function(){
-				var selectedRadioButton = $("#trouble input[name='optionRadio']:checked");
-				window.location.href = selectedRadioButton.val();
-			});
 		
-			
-						
-		});					
-	
-		</script><noscript>Alternate content for script</noscript>
+		<script src="../../resources/js/webpage-js/loginTrouble.js" 
+				th:src="@{/resources/js/webpage-js/loginTrouble.js}"
+				type="text/javascript"></script>
 	
 	<!-- END: JavaScript-->	
 		

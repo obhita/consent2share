@@ -99,5 +99,124 @@
         	<type>pom</type>
         </dependency>        
     </dependencies>
+    
+    
+	<build>
+
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
+	</build>
+
+	<profiles>
+
+		<!-- mvn clean install -->
+		<!-- mvn clean install -Pdev -->
+		<!-- mvn clean install -Denvironment.type=dev -->
+		<profile>
+			<id>dev</id>
+			<activation>
+				<!-- activeByDefault option will only work if no other profiles are active -->
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>environment.type</name>
+					<value>dev</value>
+				</property>
+			</activation>
+			
+			
+			
+
+		</profile>
+
+		<!-- mvn clean install -Pqa -->
+		<!-- mvn clean install -Denvironment.type=qa -->
+		<profile>
+			<id>qa</id>
+			<activation>
+				<property>
+					<name>environment.type</name>
+					<value>qa</value>
+				</property>
+			</activation>
+		</profile>
+
+		<!-- mvn clean install -Pdemo -->
+		<!-- mvn clean install -Denvironment.type=demo -->
+		<profile>
+			<id>demo</id>
+			<activation>
+				<property>
+					<name>environment.type</name>
+					<value>demo</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<debug>false</debug>
+							<optimize>true</optimize>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		
+
+		<!-- Jenkins by default defines a property BUILD_NUMBER which is used to 
+			enable the profile. -->
+		<profile>
+			<id>jenkins</id>
+			<activation>
+				<property>
+					<name>env.BUILD_NUMBER</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>cobertura-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
     <name>Provider Lookup POM</name>
 </project>

@@ -33,9 +33,7 @@
 
 	</dependencies>
 
-
 	<build>
-
 
 		<resources>
 			<resource>
@@ -162,25 +160,6 @@
 								<exclude>**/*StagingIntegrationTest.java</exclude>
 							</excludes>
 						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- Jenkins by default defines a property BUILD_NUMBER which is used to 
-			enable the profile. -->
-		<profile>
-			<id>jenkins</id>
-			<activation>
-				<property>
-					<name>env.BUILD_NUMBER</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>cobertura-maven-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>

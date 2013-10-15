@@ -169,6 +169,10 @@ public class ConsentServiceImpl implements ConsentService {
 	 */
 	public void deleteConsent(Long consentId) {
 		Consent consent=findConsent(consentId);
+		if (consent.getSignedPdfConsent()!=null){
+			if (consent.getSignedPdfConsent().getSignedPdfConsentContent()!=null)
+				return;
+		}
         consentRepository.delete(consent);
     }
 

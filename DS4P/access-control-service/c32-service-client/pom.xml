@@ -18,6 +18,7 @@
 
 	<build>
 		<finalName>c32-client</finalName>
+		
 		<plugins>
 			<!-- Generate Java classes from WSDL during build -->
 			<plugin>
@@ -28,7 +29,7 @@
 					<dependency>
 						<groupId>xerces</groupId>
 						<artifactId>xercesImpl</artifactId>
-						<version>${xercesImpl-version}</version>
+						<version>${xercesImpl.version}</version>
 					</dependency>
 				</dependencies>
 				<executions>
@@ -54,6 +55,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			
 			<!-- Add generated sources - avoids having to copy generated sources to 
 				build location -->
 			<plugin>
@@ -74,6 +76,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			
 			<!-- Build the JAR with dependencies -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -84,17 +87,10 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		
 		<!-- Build with Java 1.6 -->
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>1.6</source>
-						<target>1.6</target>
-					</configuration>
-				</plugin>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>

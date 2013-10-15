@@ -225,16 +225,32 @@ public class ConsentController {
 		boolean isSigned = false;
 		String[] consentPreSignStringList = request
 				.getParameterValues("consentPreSignList");
+		
+		String[] consentPreRevokeStringList = request
+				.getParameterValues("consentPreRevokeList");
+		
+		
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		List<ConsentListDto> consentListDtos = consentService
 				.findAllConsentsDtoByPatient(patientService
 						.findIdByUsername(currentUser.getUsername()));
-		if (consentPreSignStringList.length != 0) {
+		if (consentPreSignStringList!= null) {
 			for (String consentIdString : consentPreSignStringList) {
 				long consentId = Long.parseLong(consentIdString);
 				for (ConsentListDto consentListDto : consentListDtos) {
 					if (consentListDto.getId() == consentId
 							&& consentListDto.getConsentStage() == 2)
+						isSigned = true;
+				}
+			}
+		}
+		
+		if (consentPreRevokeStringList!= null) {
+			for (String consentIdString : consentPreRevokeStringList) {
+				long consentId = Long.parseLong(consentIdString);
+				for (ConsentListDto consentListDto : consentListDtos) {
+					if (consentListDto.getId() == consentId
+							&& consentListDto.getRevokeStage() == 2)
 						isSigned = true;
 				}
 			}

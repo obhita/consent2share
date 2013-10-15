@@ -30,6 +30,7 @@
     </appender> 
     
     <logger name="gov.samhsa.ds4ppilot.orchestrator"></logger>
+    <logger name="gov.samhsa.consent2share.accesscontrolservice.orchestrator"></logger>
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

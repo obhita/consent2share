@@ -15,8 +15,8 @@
 	
 	<modules>
 		<module>service</module>
-		<module>war</module>
-		<module>client</module>
+<!-- 		<module>war</module> -->
+<!-- 		<module>client</module> -->
 	</modules>
 
 	<build>

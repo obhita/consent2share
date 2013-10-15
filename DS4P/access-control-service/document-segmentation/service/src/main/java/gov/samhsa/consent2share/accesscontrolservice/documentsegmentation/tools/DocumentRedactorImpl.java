@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools;
 
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverter;
 import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;

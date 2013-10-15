@@ -1,3 +1,18 @@
+$(document).ready(function() {
+			$('#normal-toggle-button').toggleButtons();
+			$('#info-toggle-button').toggleButtons();
+			$('.datepicker').datepicker();
+
+			$('body').removeClass('fouc_loading');
+
+			$("#signnow").click(function() {
+				$(this).attr("disabled", "disabled");
+			});
+
+			initListConsent();
+		}
+);
+
 function initSessionTimeoutChecker() {
 	function runSessionTimeout() {
 		window.location.replace("../resources/j_spring_security_logout");
@@ -7,7 +22,7 @@ function initSessionTimeoutChecker() {
 }
 
 function initConsentPresignStatusChecker () {
-	if (consentPreSignList.length!=0) {
+	if (consentPreSignList.length!=0||consentPreRevokeList!=0) {
 			valueInterval=0;
 			
 			setInterval(function() {						
@@ -16,7 +31,8 @@ function initConsentPresignStatusChecker () {
 				type:"GET",
 				traditional: true,
 				async:true, 
-				data: {consentPreSignList:consentPreSignList},
+				data: {consentPreSignList:consentPreSignList,
+					consentPreRevokeList:consentPreRevokeList},
 				beforeSend : function(){
 					valueInterval=valueInterval+1;
 			        if(valueInterval==100)

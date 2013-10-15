@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation;
 
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshaller;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditService;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.brms.RuleExecutionService;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocument;
@@ -34,7 +35,6 @@ import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentMasker;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentRedactor;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentTagger;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.Marshaller;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
@@ -75,7 +75,7 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 	private final DocumentEditor documentEditor;
 
 	/** The marshaller. */
-	private final Marshaller marshaller;
+	private final SimpleMarshaller marshaller;
 
 	/** The document encrypter. */
 	private final DocumentEncrypter documentEncrypter;
@@ -157,7 +157,7 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 			RuleExecutionService ruleExecutionService,
 			AuditService auditService,
 			DocumentEditor documentEditor,
-			Marshaller marshaller,
+			SimpleMarshaller marshaller,
 			DocumentEncrypter documentEncrypter,
 			DocumentRedactor documentRedactor,
 			DocumentMasker documentMasker,

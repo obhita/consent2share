@@ -25,12 +25,13 @@
  ******************************************************************************/
 package gov.samhsa.ds4ppilot.orchestrator;
 
+import gov.samhsa.consent2share.accesscontrolservice.orchestrator.xdsb.XdsbDocumentType;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.orchestrator.c32getter.C32Getter;
 import gov.samhsa.ds4ppilot.orchestrator.contexthandler.ContextHandler;
-import gov.samhsa.ds4ppilot.orchestrator.documentsegmentation.DocumentSegmentation;
+import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.DocumentSegmentation;
 import gov.samhsa.ds4ppilot.orchestrator.dto.XacmlRequest;
 import gov.samhsa.ds4ppilot.orchestrator.dto.XacmlResponse;
 import gov.samhsa.ds4ppilot.orchestrator.xdsbregistry.XdsbRegistry;
@@ -485,7 +486,7 @@ public class OrchestratorImpl implements Orchestrator {
 		}
 
 		String metadataString = new XdsbMetadataGeneratorImpl(
-				new UniqueOidProviderImpl()).generateMetadataXml(documentSet,
+				new UniqueOidProviderImpl(), XdsbDocumentType.CLINICAL_DOCUMENT).generateMetadataXml(documentSet,
 						subjectLocality);
 
 		SubmitObjectsRequest submitObjectRequest = null;

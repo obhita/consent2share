@@ -33,7 +33,7 @@
 		Edition annotations in your classes without needing to do any special configuration. 
 		The most commonly used annotation is @Autowired, which instructs Spring to 
 		dependency inject an object into your class. -->
-	<context:component-scan base-package="gov.samhsa.consent2share.domain, gov.samhsa.consent2share.infrastructure, gov.samhsa.consent2share.esignaturepolling, gov.samhsa.consent2share.service.consentexport">
+	<context:component-scan base-package="gov.samhsa.consent2share.domain, gov.samhsa.consent2share.infrastructure, gov.samhsa.consent2share.esignaturepolling">
 		<context:exclude-filter type="assignable" expression="gov.samhsa.consent2share.infrastructure.security.UserContext"/>
 	</context:component-scan>
 

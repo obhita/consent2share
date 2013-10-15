@@ -1,4 +1,369 @@
-function initAddConsent() {
+//**********************************************************************************
+//***START OF setupPage*************************************************************
+function setupPage(addConsent_tmp, specMedSetObj_tmp) {
+	var addConsent = addConsent_tmp;
+    
+	//Check if addConsent is a valid boolean value
+	if((addConsent !== true) && (addConsent !== false)){
+		addConsent = null;
+	    throw new ReferenceError("addConsent variable is not a valid boolean value");
+    }
+	
+	//Set popover 'a' element data attributes based on dynamic hidden form values prior to popup initialization
+	$('.input_i-text').each(function(){
+		var linkID = $(this).data("linkid");
+		var in_content = $(this).attr("value");
+		var in_title = $(this).data("intitle");
+		
+		document.getElementById(linkID).setAttribute("data-content", in_content);
+		document.getElementById(linkID).setAttribute("data-title", in_title);
+	});
+	
+	var specMedSetObj = null;
+	var specMedSet = null;
+	
+	if(addConsent === false){
+	    specMedSetObj = specMedSetObj_tmp;
+	    
+	    try{
+	    	specMedSet = specMedSetObj.clinicalConceptCodesSet;
+    	}catch(e){
+		    if(e.name == "TypeError"){
+		    	specMedSet = null;
+			}else{
+				throw e;
+			}
+		}
+	}
+	
+	
+	$('input').iCheck({
+		    checkboxClass: 'icheckbox_square-blue',
+		    radioClass: 'iradio_square-blue',
+		    increaseArea: '20%' // optional
+	});
+	
+	//Initialize page for adding/editing consent
+	initAddConsent(addConsent, specMedSet);
+
+	$('[data-toggle=popover]').popover();
+	$('html').on('mouseup', function(e) {
+	    if((!$(e.target).closest('.popover').length)) {
+	    	if((!$(e.target).closest('[data-toggle=popover]').length)){
+	        	$('.popover').each(function(){
+	            	$(this.previousSibling).popover('hide');
+	        	});
+			}
+	    }
+	});
+	
+	/* avoid popover to open more than on at the same time */
+	$('[data-toggle=popover]').click(function(){
+	    $('[data-toggle=popover]').not(this).popover('hide'); //all but this
+	});
+
+	// populate for edit consent page
+	$("#authorizers").empty();
+	$("#authorize-list input").each(function() {
+		if($(this).attr("checked")=="checked"){
+			$("#authorizers").append('<li class="uneditable-input"><span class="icon-user"></span>'
+					+$(this).parent().parent().children("span").text()
+					+'</li>');
+		}
+	});
+	$("#consentmadetodisplay").empty();
+	$("#disclose-list input").each(function() {
+		if($(this).attr("checked")=="checked"){
+			$("#consentmadetodisplay").append('<li class="uneditable-input" ><span class="icon-user"></span>'
+					+$(this).parent().parent().children("span").text()
+					+'</li>');
+		}
+	});
+	
+	//
+	
+	$('.toggleButton').toggleButtons();
+	$('.modal-toggle-button').toggleButtons(
+	{
+		onChange: function(e,active) {
+		if(!active){
+			$(e.parent().attr('data-edit-button')).show();
+			e.trigger('click');
+			}
+			else{
+			$(e.parent().attr('data-edit-button')).hide();
+				
+			}
+		}
+	});
+
+	$("body").removeClass('fouc_loading');
+
+	$("ul#pulldown_menu").sidebar({
+		position:"top",
+		open:"click",
+		close:"click",
+		//labelText:"GUIDE",
+		callback: {
+        	item : {
+            	enter : function(){},
+                leave : function(){}
+        	},
+        	sidebar : {
+            	open : function(){},
+                close : function(){}
+        	}	
+    	},
+    	inject : $("<div><span>GUIDE</span></div>")
+	});
+
+
+	$("div.sidebar-container").addClass("guide-pulldown-tab");
+	$("div.sidebar-inject.top > span").addClass("sidebar-label");
+	
+	$('#tourtest').joyride({
+	    tipContainer: '#consent-add-main',
+	    heightPadding: $('footer').outerHeight() + 10,
+	    mode: 'focus',
+	    autoStart: true,
+	    'preStepCallback': function() {
+		    var int_next_index = 0;
+		    try{
+		    	int_next_index = $('#tourtest').joyride('get_next_index');
+		    }catch(e){
+			    int_next_index = 0;
+			}
+		    
+		    var li_field_id = $('#tourtest li').get(int_next_index);
+		    var isShowDelayedNext = $(li_field_id).hasClass('show-delayed-next');
+		    var str_field_id = $(li_field_id).data("id");
+		    var tempVarIconUser = $('div#' + str_field_id).find('.icon-user');
+		    var tempVarBadge = $('div#' + str_field_id).find('.badge');
+		    var isDataPopulated = false;
+
+		    if(tempVarIconUser.length > 0 || tempVarBadge.length > 0){
+			    isDataPopulated = true;
+		    }else{
+		    	isDataPopulated = false;
+			}
+
+		    var obj_next_tip = $('#tourtest').joyride('get_next_tip');
+		    var btn_next_button = $(obj_next_tip).find('.joyride-next-tip');
+
+		    $(btn_next_button).addClass('hidden');
+		    
+		    if(isDataPopulated || isShowDelayedNext){					    	
+		    	setTimeout(function(){
+			    	$(btn_next_button).removeClass('hidden');
+				}, 500);
+		    }
+		},
+		'postRideCallback': function() {
+			if($('#btn_guide_off').hasClass('active') === false){
+				$('#btn_guide_on').removeClass('active');
+				$('#btn_guide_off').addClass('active');
+			}
+
+			jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
+		}
+	});
+	
+	
+
+	if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'on'){
+		turnGuideOn();
+	}else if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'off'){
+		turnGuideOff();
+	}else{
+		if($('#btn_guide_OnOff').hasClass('guide-off-flag') === false){
+			turnGuideOn();
+		}else{
+			turnGuideOff();
+		}
+	}
+	
+	
+	$('.modal-toggle-button span').on('click', function(e){
+		e.preventDefault();
+		e.stopImmediatePropagation();
+	});
+	
+	
+	$('#btn_guide_OnOff').click(function() {
+		if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
+			turnGuideOn();
+		}else{
+			turnGuideOff();
+		}
+    });
+    
+	$('#saveauthorizer').click(function() {
+		ifGuideOnGoNext();
+    });
+
+	$('#saveconsentmadeto').click(function() {
+		ifGuideOnGoNext();
+    });
+
+    $('#btn_close_share_settings').click(function() {
+    	ifGuideOnGoNext();
+	});
+
+    $('#btn_save_selected_purposes').click(function() {
+    	ifGuideOnGoNext();
+	});
+
+	$('#selectInfo').change(function() {				    
+	    if($('#selectInfo').prop('checked') == true){
+	    	ifGuideOnGoNext();
+		}
+	});
+
+    $('#selectPurposesToggle').change(function() {				    
+	    if($('#selectPurposesToggle').prop('checked') == true){
+	    	ifGuideOnGoNext();
+		}
+	});
+    
+	$("a[id*=i-icon]").bind('click', function() {
+		var id = $(this).attr("id").split('_')[1];
+		$("#message-block_"+id).css("display","block");
+
+	});
+	
+	$("body").on("closeJoyrideClick", function(e){
+		e.stopImmediatePropagation();
+		
+		$('#tourtest').joyride('end');
+		turnGuideOff();
+	});
+	
+	
+	
+	function ifGuideOnGoNext(){
+		if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'on'){
+			$('#tourtest').joyride("go_next");
+		}
+	}
+	
+}
+//***END OF setupPage***************************************************************
+//**********************************************************************************
+
+
+
+//**********************************************************************************
+//GLOBAL SCOPE FUNCTIONS
+//**********************************************************************************
+
+function showShareSettingsModal(){
+	$("#share-settings-modal").modal({
+		  keyboard: false,
+		  backdrop: 'static'
+	});
+}
+
+//Turn Joyride Guide Off
+function turnGuideOff(){
+	$('#btn_guide_OnOff').addClass('guide-off-flag');
+	
+	jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
+
+	$('#btn_guide_OnOff').text("Guide On");
+	
+	$('#tourtest').joyride('end');
+}
+
+//Turn Joyride Guide On
+function turnGuideOn(){
+	if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
+		$('#btn_guide_OnOff').removeClass('guide-off-flag');
+	}
+
+	jQuery.storage.setItem('guideStatus', 'on', 'sessionStorage');
+	
+	$('#btn_guide_OnOff').text("Guide Off");
+	
+	$('#tourtest').joyride('end');
+	$('#tourtest').joyride();
+}
+
+
+//Count number of opening parentheses '(' in string
+function countOpenParen(in_str){
+	//regular expression pattern to specify a global search for the open parenthesis '(' character
+	var open_paren_regexp =/\(/g;
+	var num_open_paren = 0;
+	
+	//calls countChar function to count number of occurances of open parentheses
+	num_open_paren = countChar(open_paren_regexp, in_str);
+	
+	return num_open_paren;
+}
+
+//Count number of closing parentheses ')' in string
+function countCloseParen(in_str){
+	//regular expression pattern to specify a global search for the close parenthesis ')' character
+	var close_paren_regexp =/\)/g;
+	var num_close_paren = 0;
+	
+	//calls countChar function to count number of occurances of close parentheses
+	num_close_paren = countChar(close_paren_regexp, in_str);
+	
+	return num_close_paren;
+}
+
+//Count number of occurances of the character specified by the regular expression pattern
+function countChar(in_regexp_patt, in_str){
+	var num_char = 0;	
+	
+	//counts the number of occurances of the character specified by the regular expression pattern
+	/*     NOTE: the .match() function returns null if no match is found. Since that would result
+	           in the .length() function throwing a TypeError if called on a null value, "||[]"
+	           is included after the .match() function call. This causes .match() to return
+	           a 0 length array instead of null if no match is found, which allows .length()
+	           to return a count of '0' instead of throwing a TypeError. */
+	try{
+		num_char = (in_str.match(in_regexp_patt)||[]).length;
+	}catch(e){
+		switch(e.name){
+		case "TypeError":
+			num_char = 0;
+			break;
+		default:
+			throw e;
+			num_char = 0;
+			break;
+		}
+	}
+	
+	return num_char;
+}
+
+//#ISSUE 138 Fix Start
+//Resetting the Checked values to avoid saving duplicate consents 
+function clearConsent(form){	
+	$("form input").each(function(){
+		if($(this).prop("checked")==true){
+			$(this).prop('checked', false);
+		}
+	});		
+	
+}
+//#ISSUE 138 Fix End
+
+
+
+//**********************************************************************************
+//FUNCTION TO INITIALIZE PAGE WHEN ADDING/EDITING A CONSENT
+//**********************************************************************************
+function initAddConsent(addConsent, specMedSet) {
+	
+				//Check if addConsent is a valid boolean value
+				if((addConsent !== true) && (addConsent !== false)){
+				    throw new ReferenceError("addConsent variable is not a valid boolean value");
+			    }
+	
 				//******************************************************************************************
 				//MAIN CODE
 				//******************************************************************************************
@@ -38,28 +403,27 @@ function initAddConsent() {
 				}
 				
 		        $('#date-picker-start').datepicker('setValue',startDate);
-		      //  $('#date-picker-start').datepicker("option","dateFormat","dd/mm/yyyy");
 		        $('#date-picker-start').attr('value',$('#date-picker-start').attr('value'));
 		        $('#date-picker-start').attr('data-date-format',startDate);
 			    $('#date-picker-end').datepicker('setValue',endDate);
 			    $('#date-picker-end').attr('value',$('#date-picker-end').attr('value'));
-
-			   //date picker End
+			    
+			    //Date Picker End
 				 
-				 if (addConsent == true) {
-					$("#allInfo").iCheck("check");
-//					 $("#allPurposes").iCheck("check");
-					 $("#edit1").hide();
-//					 $("#edit2").hide();
-				 }
-				 // edit consent
-				 else {
-					 loadAllSharePreferences();
-					 loadAllPurposeofshareform();
-					 loadAllLastSpecificMedicalInfoState();
-					 
-					 // disable providers in made to list that are checked in to disclose list
-					 $(".isMadeToList").each(function(){
+			    //Check if adding or editing consent
+			    if (addConsent == true) {
+			    	//ADDING CONSENT:
+			    	$("#allInfo").iCheck("check");
+			    	$("#edit1").hide();
+				}else{
+					//EDITING CONSENT:
+					
+					loadAllSharePreferences();
+					loadAllPurposeofshareform();
+					loadAllLastSpecificMedicalInfoState();
+					
+					// disable providers in made to list that are checked in to disclose list
+					$(".isMadeToList").each(function(){
 						var providerId=$(this).attr("id").substr(2,$(this).attr("id").length-2);
 						if($("#from"+providerId).prop('checked')==true){
 							$("#to"+providerId).iCheck('disable');
@@ -69,10 +433,10 @@ function initAddConsent() {
 							$("#to"+providerId).iCheck('enable');
 							$("#to"+providerId).closest('label').removeClass("joe");
 						}
-					 }); 
+					}); 
 					 
-					 // disable providers in to disclose list that are checked in to made list
-					 $(".toDiscloseList").each(function(){
+					// disable providers in to disclose list that are checked in to made list
+					$(".toDiscloseList").each(function(){
 						var providerId=$(this).attr("id").substr(4,$(this).attr("id").length-4);
 						if($("#to"+providerId).prop('checked')==true){
 							$("#from"+providerId).iCheck('disable');
@@ -82,89 +446,83 @@ function initAddConsent() {
 							$("#from"+providerId).iCheck('enable');
 							$("#from"+providerId).closest('label').removeClass("joe");
 						}
-					 });
+					});
 					 
-					 if (areAllInfoUnSelected()) {
-						 $("#allInfo").iCheck("check");
-						 $("#edit1").hide();
-					 }else{
-						 $("#selectInfo").iCheck("check");
-
-						 $("#sensitivityinfo input").each(function(){
-								if ($(this).prop('checked') == true) {
-									var toAppendMain='<div id="TagMain'+ 
-									$(this).attr('id')+ 
-									'" class="badge">'+
-									$(this).parent().text()+
-									"</div>";
-									$("#notsharedmainpage").append(toAppendMain);
-								}
-							});
+					if (areAllInfoUnSelected()) {
+						$("#allInfo").iCheck("check");
+						$("#edit1").hide();
+					}else{
+						$("#selectInfo").iCheck("check");
+						
+						$("#sensitivityinfo input").each(function(){
+							if ($(this).prop('checked') == true) {
+								var toAppendMain='<div id="TagMain'+ 
+								$(this).attr('id')+ 
+								'" class="badge">'+
+								$(this).parent().text()+
+								"</div>";
+								$("#notsharedmainpage").append(toAppendMain);
+							}
+						});
+						
+						$("#medicalinfo input").each(function(){
+							if ($(this).prop('checked') == true) {
+								var toAppendMain='<div id="TagMain'+ 
+								$(this).attr('id')+ 
+								'" class="badge">'+
+								$(this).parent().text()+
+								"</div>";
+								$("#notsharedmainpage").append(toAppendMain);
+							}
+						});
+						
+						$("#clinicalDocumentType input").each(function(){
+							if ($(this).prop('checked') == true) {
+								var toAppendMain='<div id="TagMain'+ 
+								$(this).attr('id')+ 
+								'" class="badge">'+
+								$(this).parent().text()+
+								"</div>";
+								$("#notsharedmainpage").append(toAppendMain);
+							}
+						});
 							
-							$("#medicalinfo input").each(function(){
-								if ($(this).prop('checked') == true) {
-									var toAppendMain='<div id="TagMain'+ 
-									$(this).attr('id')+ 
-									'" class="badge">'+
-									$(this).parent().text()+
-									"</div>";
-									$("#notsharedmainpage").append(toAppendMain);
-								}
-							});
-							
-							$("#clinicalDocumentType input").each(function(){
-								if ($(this).prop('checked') == true) {
-									var toAppendMain='<div id="TagMain'+ 
-									$(this).attr('id')+ 
-									'" class="badge">'+
-									$(this).parent().text()+
-									"</div>";
-									$("#notsharedmainpage").append(toAppendMain);
-								}
-							});
-							
-							$("#purposeOfSharingInputs input").each(function(){
-								if ($(this).prop('checked') == true) {
-									var toAppendMain='<div id="TagMain'+ 
-									$(this).attr('id')+ 
-									'" class="badge">'+
-									$(this).parent().text()+
-									"</div>";
-									$("#sharedpurpose").append(toAppendMain);
-								}
-							});
-					 }
+						$("#purposeOfSharingInputs input").each(function(){
+							if ($(this).prop('checked') == true) {
+								var toAppendMain='<div id="TagMain'+ 
+								$(this).attr('id')+ 
+								'" class="badge">'+
+								$(this).parent().text()+
+								"</div>";
+								$("#sharedpurpose").append(toAppendMain);
+							}
+						});
+					}
 					 
-					 if (areAllPurposesUnselected()) {
-						 $("#allPurposes").iCheck("check");
-					 }
-					 else {
-						 $("#selectPurposes").iCheck("check");
-					 }
-				 }
-				 
-				// check all only if page is add consent (not edit)
-					if (addConsent == true) {
-						uncheckAllSharePreferences(loadAllSharePreferences);
-						checkRecommendedPurposeofsharing(loadAllPurposeofshareform);
+					if (areAllPurposesUnselected()) {
+						$("#allPurposes").iCheck("check");
 					}
 					else {
-//						if(!areAllInfoSelected()) {
-//							$('#selectInfo').prop('checked', true);
-//						}
-						loadAllSharePreferences();
-						loadAllPurposeofshareform();
-						
+						$("#selectPurposes").iCheck("check");
 					}
-					
-					loadAllProviders();
-					
-					reAppendMediInfoBadges();
-					reAppendPurposeOfUse();
-					
-					
-					
+				}
+				 
+				// check all only if page is add consent (not edit)
+				if (addConsent == true) {
+					uncheckAllSharePreferences(loadAllSharePreferences);
+					checkRecommendedPurposeofsharing(loadAllPurposeofshareform);
+				}
+				else {
+					loadAllSharePreferences();
+					loadAllPurposeofshareform();
+				}
 				
+				loadAllProviders();
+				
+				reAppendMediInfoBadges();
+				reAppendPurposeOfUse();
+
+					
 				//******************************************************************************************
 				//EVENT HANDLERS
 				//******************************************************************************************
@@ -245,8 +603,8 @@ function initAddConsent() {
 						//#ISSUE 138 Fix Start
 						// Loop through all forms and reset the checked values by its id or class attributes
 						$("form").each(function(e){
-							var idN = this.id;
-							var classN =  $(this).attr('class');							
+							//var idN = this.id;
+							//var classN =  $(this).attr('class');							
 							if( $(this).attr('id') !== undefined ) {
 								clearConsent('#idN');														
 							}
@@ -284,12 +642,6 @@ function initAddConsent() {
 					$('#date-picker-end').attr('value',ev.target.value);
 		        });				
 				
-//				$("#allPurposes").on("ifChecked",function(){
-//						checkAllPurposeofsharing();
-//						$("#sharedpurpose").empty();
-//						$('#edit2').hide();
-//						loadAllPurposeofshareform();
-//				});
 				
 				$("#selectInfo").on("ifChecked",function(){
 					$('#edit1').show();
@@ -297,13 +649,6 @@ function initAddConsent() {
 					loadAllSharePreferences();
 					uncheckAllMedicalInfo();
 				});
-				
-//				$("#selectPurposes").on("ifChecked",function(){
-//					$('#edit2').show();
-//					$("#selected-purposes-modal").modal('show');
-//					uncheckAllPurposeofsharing();
-//					loadAllPurposeofshareform();
-//				});
 
 				
 				$("#btn_save_selected_purposes").click(function(){
@@ -449,7 +794,6 @@ function initAddConsent() {
 				             } );
 				        },
 				        search: function() {
-				          // custom minLength
 				          var term = this.value;
 				          if ( term.length < 2 ) {
 				            return false;
@@ -573,7 +917,7 @@ function initAddConsent() {
 					$(".inputformPerson input").each(function(){
 						if($(this).prop("id")!=null)
 							lastProviderState[$(this).prop("id")]=$(this).prop("checked");
-				});
+					});
 				}
 				
 				function loadAllLastSpecificMedicalInfoState(){
@@ -784,70 +1128,4 @@ function initAddConsent() {
                     specmedinfoary[specmedinfoid]=newEntry;
                     updateSpecMedInfo();
 				}
-
-
-};
-
-
-//Count number of opening parentheses '(' in string
-function countOpenParen(in_str){
-	//regular expression pattern to specify a global search for the open parenthesis '(' character
-	var open_paren_regexp =/\(/g;
-	var num_open_paren = 0;
-	
-	//calls countChar function to count number of occurances of open parentheses
-	num_open_paren = countChar(open_paren_regexp, in_str);
-	
-	return num_open_paren;
 }
-
-//Count number of closing parentheses ')' in string
-function countCloseParen(in_str){
-	//regular expression pattern to specify a global search for the close parenthesis ')' character
-	var close_paren_regexp =/\)/g;
-	var num_close_paren = 0;
-	
-	//calls countChar function to count number of occurances of close parentheses
-	num_close_paren = countChar(close_paren_regexp, in_str);
-	
-	return num_close_paren;
-}
-
-//Count number of occurances of the character specifed by the regular expression pattern
-function countChar(in_regexp_patt, in_str){
-	var num_char = 0;	
-	
-	//counts the number of occurances of the character specifed by the regular expression pattern
-	/*     NOTE: the .match() function returns null if no match is found. Since that would result
-	           in the .length() function throwing a TypeError if called on a null value, "||[]"
-	           is included after the .match() function call. This causes .match() to return
-	           a 0 length array instead of null if no match is found, which allows .length()
-	           to return a count of '0' instead of throwing a TypeError. */
-	try{
-		num_char = (in_str.match(in_regexp_patt)||[]).length;
-	}catch(e){
-		switch(e.name){
-		case "TypeError":
-			num_char = 0;
-			break;
-		default:
-			throw e;
-			num_char = 0;
-			break;
-		}
-	}
-	
-	return num_char;
-}
-
-//#ISSUE 138 Fix Start
-//Resetting the Checked values to avoid saving duplicate consents 
-function clearConsent(form){	
-	$("form input").each(function(){
-		if($(this).prop("checked")==true){
-			$(this).prop('checked', false);
-		}
-	});		
-	
-}
-//#ISSUE 138 Fix Start

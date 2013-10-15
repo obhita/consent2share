@@ -31,12 +31,12 @@
 		<commons-logging-version>1.1.1</commons-logging-version>
 		<drools.version>5.4.0.Final</drools.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jaxb-api-version>2.2</jaxb-api-version>
-		<xstream-version>1.4.2</xstream-version>
+		<jaxb-api.version>2.2</jaxb-api.version>
+		<xstream.version>1.4.2</xstream.version>
 		<slf4j-api-version>1.6.6</slf4j-api-version>
 		<logback-core-version>0.9.19</logback-core-version>
 		<saxon-HE-version>9.4</saxon-HE-version>
-		<xercesImpl-version>2.8.1</xercesImpl-version>
+		<xercesImpl.version>2.8.1</xercesImpl.version>
 
 		<!-- Version Information for plugins -->
 		<!-- This version of maven-war-plugin fixes the flowing annoying message: 
@@ -334,14 +334,14 @@
 			<dependency>
 				<groupId>javax.xml.bind</groupId>
 				<artifactId>jaxb-api</artifactId>
-				<version>${jaxb-api-version}</version>
+				<version>${jaxb-api.version}</version>
 			</dependency>
 
 			<!-- xstream dependencies -->
 			<dependency>
 				<groupId>com.thoughtworks.xstream</groupId>
 				<artifactId>xstream</artifactId>
-				<version>${xstream-version}</version>
+				<version>${xstream.version}</version>
 			</dependency>
 
 			<!-- Saxon-HE dependencies -->
@@ -366,7 +366,7 @@
 					<dependency>
 						<groupId>xerces</groupId>
 						<artifactId>xercesImpl</artifactId>
-						<version>${xercesImpl-version}</version>
+						<version>${xercesImpl.version}</version>
 					</dependency>
 				</dependencies>
 				<executions>

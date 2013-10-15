@@ -155,8 +155,9 @@
 						<!-- COMPONENT: Healthcare Providers -->
 
 						<div class="span10">
-						    
+						    <span id="updatedMessage">
 						    <h3 th:text="${updatedMessage}">Updated your profile successfully.</h3>
+						    </span>
 						    
 							<section class="top-margin10">
 								<form id="profileForm" onsubmit="return validateProfileUpdateForm()" action="#" th:action="@{/patients/profile.html}"
@@ -522,10 +523,11 @@
 				th:src="@{/resources/js/dateValidator.js}"
 				type="text/javascript"></script>
 				
-		<script src="../../../resources/js/userAccountInfoValidation.js" 
-				th:src="@{/resources/js/userAccountInfoValidation.js}"
+		<script src="../../../resources/js/webpage-js/userAccountInfoValidation.js" 
+				th:src="@{/resources/js/webpage-js/userAccountInfoValidation.js}"
 				type="text/javascript"></script>
 				
+		<!-- FIXME: Move internal javascript code to external .js file -->
 		<script type="text/javascript">
 			$(document).ready(function() {				
 				var currentYear = (new Date).getFullYear();
