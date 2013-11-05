@@ -5,11 +5,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
+import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientLegalRepresentativeAssociation;
 import gov.samhsa.consent2share.domain.patient.PatientLegalRepresentativeAssociationPk;
@@ -18,7 +22,9 @@ import gov.samhsa.consent2share.domain.patient.PatientRepository;
 import gov.samhsa.consent2share.domain.provider.IndividualProvider;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
 import gov.samhsa.consent2share.infrastructure.DtoToDomainEntityMapper;
+import gov.samhsa.consent2share.infrastructure.EmailType;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
+import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.AddConsentOrganizationalProviderDto;
@@ -36,8 +42,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PatientServiceImplTest {
@@ -59,6 +69,15 @@ public class PatientServiceImplTest {
 
 	@Mock
 	private DtoToDomainEntityMapper<PatientProfileDto, Patient> patientProfileDtoToPatientMapper;
+	
+	@Mock
+	private UsersRepository usersRepository;
+	
+	@Mock
+	private PasswordEncoder passwordEncoder;
+	
+	@Mock
+	private EmailSender emailSender;
 
 	@Test
 	public void testCountAllPatients() {
@@ -218,10 +237,26 @@ public class PatientServiceImplTest {
 	}
 
 	@Test
-	public void testUpdatePatient() {
+	public void testUpdatePatient_when_authentication_success() throws AuthenticationFailedException {
+		final String username = "TheUsername";
+		AuthenticatedUser authenticatedUser = mock(AuthenticatedUser.class);
+		when(authenticatedUser.getUsername()).thenReturn(username);
+		when(userContext.getCurrentUser()).thenReturn(authenticatedUser);
+		
+		Users user=mock(Users.class);
+		when(user.getUsername()).thenReturn(username);
+		when(user.getPassword()).thenReturn("hashedpassword");
+		when(usersRepository.loadUserByUsername(anyString())).thenReturn(user);
+		when(passwordEncoder.matches("rawpassword", "hashedpassword")).thenReturn(true);
+		
 		// Arrange
 		PatientProfileDto patientProfileDtoInput = mock(PatientProfileDto.class);
 		Patient patient = mock(Patient.class);
+		when(patientProfileDtoInput.getUsername()).thenReturn(username);
+		when(patientProfileDtoInput.getPassword()).thenReturn("rawpassword");
+		when(patientProfileDtoInput.getFirstName()).thenReturn("albert");
+		when(patientProfileDtoInput.getLastName()).thenReturn("Smith");
+		when(patientProfileDtoInput.getEmail()).thenReturn("albert.smith@consent2share.com");
 		when(patientProfileDtoToPatientMapper.map(patientProfileDtoInput))
 				.thenReturn(patient);
 
@@ -231,6 +266,64 @@ public class PatientServiceImplTest {
 		// Assert
 		verify(patientRepository, times(1)).save(patient);
 	}
+	
+	@Test
+	public void testUpdatePatient_when_username_does_not_match_and_so_authentication_fails() {
+		AuthenticatedUser authenticatedUser = mock(AuthenticatedUser.class);
+		when(authenticatedUser.getUsername()).thenReturn("TheUsername");
+		when(userContext.getCurrentUser()).thenReturn(authenticatedUser);
+		Users user=mock(Users.class);
+		when(user.getUsername()).thenReturn("AnotherUsername");
+		
+		// Arrange
+		PatientProfileDto patientProfileDtoInput = mock(PatientProfileDto.class);
+		when(patientProfileDtoInput.getUsername()).thenReturn("AnotherUsername");
+
+		// Act
+		try {
+			sut.updatePatient(patientProfileDtoInput);
+		} catch (AuthenticationFailedException e) {
+			assertEquals (e.getMessage(),"Username does not match current active user.");
+		}
+		
+		// Assert
+			verify(patientRepository, times(0)).save(any(Patient.class));
+	}
+	
+	@Test
+	public void testUpdatePatient_when_username_matches_but_password_is_wrong(){
+		final String username = "TheUsername";
+		AuthenticatedUser authenticatedUser = mock(AuthenticatedUser.class);
+		when(authenticatedUser.getUsername()).thenReturn(username);
+		when(userContext.getCurrentUser()).thenReturn(authenticatedUser);
+		
+		Users user=mock(Users.class);
+		when(user.getUsername()).thenReturn(username);
+		when(user.getPassword()).thenReturn("hashedpassword");
+		when(usersRepository.loadUserByUsername(anyString())).thenReturn(user);
+		when(passwordEncoder.matches("rawpassword", "hashedpassword")).thenReturn(false);
+		
+		// Arrange
+		PatientProfileDto patientProfileDtoInput = mock(PatientProfileDto.class);
+		Patient patient = mock(Patient.class);
+		when(patientProfileDtoInput.getUsername()).thenReturn(username);
+		when(patientProfileDtoInput.getPassword()).thenReturn("rawpassword");
+		when(patientProfileDtoInput.getFirstName()).thenReturn("albert");
+		when(patientProfileDtoInput.getLastName()).thenReturn("Smith");
+		when(patientProfileDtoInput.getEmail()).thenReturn("albert.smith@consent2share.com");
+		when(patientProfileDtoToPatientMapper.map(patientProfileDtoInput))
+				.thenReturn(patient);
+
+		// Act
+		try {
+			sut.updatePatient(patientProfileDtoInput);
+		} catch (AuthenticationFailedException e) {
+			assertEquals (e.getMessage(),"Password is incorrect.");
+		}
+		// Assert
+		verify(patientRepository, times(0)).save(patient);
+	}
+
 
 	@Test
 	public void testFindAddConsentIndividualProviderDtoByUsername() {

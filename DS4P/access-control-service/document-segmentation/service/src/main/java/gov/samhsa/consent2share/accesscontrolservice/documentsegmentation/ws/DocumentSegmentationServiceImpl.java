@@ -96,7 +96,7 @@ public class DocumentSegmentationServiceImpl implements
 	}
 
 	/**
-	 * Sets the push orchestrator.
+	 * Sets the push pep.
 	 * 
 	 * @param documentSegmentationService
 	 *            the new document segmentation service

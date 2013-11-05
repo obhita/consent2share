@@ -19,9 +19,10 @@ import com.jerichosystems.esds.evaluation.xacml.policy.ObligationsType;
 import com.jerichosystems.esds.evaluation.xacml.policy.PolicySetType;
 import com.jerichosystems.services.xacmlpolicyevaluationservice._1.XACMLPolicyEvaluationService;
 import com.jerichosystems.services.xacmlpolicyevaluationservice._1.XACMLPolicyEvaluationServiceService;
+
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
-import gov.samhsa.ds4ppilot.schema.orchestrator.RegisteryStoredQueryResponse;
-import gov.samhsa.ds4ppilot.schema.orchestrator.RetrieveDocumentSetResponse;
+import gov.samhsa.ds4ppilot.schema.pep.RegisteryStoredQueryResponse;
+import gov.samhsa.ds4ppilot.schema.pep.RetrieveDocumentSetResponse;
 import gov.va.ds4p.cas.constants.DS4PConstants;
 import gov.va.ds4p.cas.providers.ClinicalDocumentProvider;
 import gov.va.ds4p.cas.providers.VocabularyProvider;
@@ -40,6 +41,7 @@ import gov.va.ehtac.ds4p.ws.EnforcePolicyResponse.Return;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest.DocumentRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
+
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -47,6 +49,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -56,6 +59,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.ResponseOptionType;

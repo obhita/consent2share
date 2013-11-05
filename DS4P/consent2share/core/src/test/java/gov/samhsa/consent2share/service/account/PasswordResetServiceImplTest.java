@@ -12,6 +12,8 @@ import static org.mockito.Mockito.when;
 import gov.samhsa.consent2share.domain.account.EmailToken;
 import gov.samhsa.consent2share.domain.account.EmailTokenRepository;
 import gov.samhsa.consent2share.domain.account.TokenGenerator;
+import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
@@ -24,6 +26,7 @@ import gov.samhsa.consent2share.service.dto.PasswordResetDto;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.mail.MessagingException;
 
@@ -46,13 +49,13 @@ public class PasswordResetServiceImplTest {
 
 	private PasswordResetServiceImpl sut;
 
-	private UserDetailsManager userDetailsManager;
 	private PatientRepository patientRepository;
 	private TokenGenerator tokenGenerator;
 	private Integer passwordResetTokenExpireInHours;
 	private EmailTokenRepository passwordResetTokenRepository;
 	private EmailSender emailSender;
 	private PasswordEncoder passwordEncoder;
+	private UsersRepository usersRepository;
 
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -70,7 +73,7 @@ public class PasswordResetServiceImplTest {
 		// Just to save a few lines of code for each individual test
 		// But independency, clarity of the unit tests are much more important
 		// than code reuse
-		userDetailsManager = mock(UserDetailsManager.class);
+		usersRepository = mock(UsersRepository.class);
 		patientRepository = mock(PatientRepository.class);
 		tokenGenerator = mock(TokenGenerator.class);
 		passwordResetTokenExpireInHours = 8;
@@ -78,7 +81,7 @@ public class PasswordResetServiceImplTest {
 		emailSender = mock(EmailSender.class);
 		passwordEncoder = mock(PasswordEncoder.class);
 
-		sut = new PasswordResetServiceImpl(userDetailsManager,
+		sut = new PasswordResetServiceImpl(usersRepository,
 				patientRepository, tokenGenerator,
 				passwordResetTokenExpireInHours, passwordResetTokenRepository,
 				emailSender, passwordEncoder);
@@ -154,7 +157,7 @@ public class PasswordResetServiceImplTest {
 			throws UsernameNotExistException, EmailAddressNotExistException,
 			MessagingException {
 		// Arrange
-		when(userDetailsManager.loadUserByUsername(anyString())).thenThrow(
+		when(usersRepository.loadUserByUsername(anyString())).thenThrow(
 				new UsernameNotFoundException("The Message"));
 		final String resetPasswordLinkPlaceHolder = "http://comsent2share.com/resetPassword.html?token=%s";
 		final String emailAddress = "emailAddress";
@@ -194,7 +197,7 @@ public class PasswordResetServiceImplTest {
 
 		passwordResetTokenExpireInHours = 5;
 
-		sut = new PasswordResetServiceImpl(userDetailsManager,
+		sut = new PasswordResetServiceImpl(usersRepository,
 				patientRepository, tokenGenerator,
 				passwordResetTokenExpireInHours, passwordResetTokenRepository,
 				emailSender, passwordEncoder);
@@ -243,7 +246,7 @@ public class PasswordResetServiceImplTest {
 		final String token = "TheToken";
 		when(tokenGenerator.generateToken()).thenReturn(token);
 
-		sut = new PasswordResetServiceImpl(userDetailsManager,
+		sut = new PasswordResetServiceImpl(usersRepository,
 				patientRepository, tokenGenerator,
 				passwordResetTokenExpireInHours, passwordResetTokenRepository,
 				emailSender, passwordEncoder);
@@ -286,7 +289,7 @@ public class PasswordResetServiceImplTest {
 		when(patientRepository.findByUsername(anyString())).thenReturn(patient);
 		when(patient.getEmail()).thenReturn(emailAddress);
 
-		sut = new PasswordResetServiceImpl(userDetailsManager,
+		sut = new PasswordResetServiceImpl(usersRepository,
 				patientRepository, tokenGenerator,
 				passwordResetTokenExpireInHours, passwordResetTokenRepository,
 				emailSender, passwordEncoder);
@@ -324,7 +327,7 @@ public class PasswordResetServiceImplTest {
 		when(patientRepository.findByUsername(anyString())).thenReturn(patient);
 		when(patient.getEmail()).thenReturn(emailAddress);
 
-		sut = new PasswordResetServiceImpl(userDetailsManager,
+		sut = new PasswordResetServiceImpl(usersRepository,
 				patientRepository, tokenGenerator,
 				passwordResetTokenExpireInHours, passwordResetTokenRepository,
 				emailSender, passwordEncoder);
@@ -397,43 +400,43 @@ public class PasswordResetServiceImplTest {
 	}
 
 
-	@Ignore
-	@Test
-	public void testResetPassword_UserDetails_With_Correct_Authorities_Is_Updated_By_UserDetailsManager()
-			throws TokenNotExistException, TokenExpiredException,
-			UsernameNotExistException, MessagingException {
-		// Arrange
-		final String token = "TheToken";
-		final String username = "Username";
-		final String password = "Password";
-		final String encodedPassword = "encodedPassword";
-		PasswordResetDto passwordResetDto = mock(PasswordResetDto.class);
-		when(passwordResetDto.getToken()).thenReturn(token);
-		when(passwordResetDto.getPassword()).thenReturn(password);
-		EmailToken passwordResetToken = mock(EmailToken.class);
-		when(passwordResetToken.isTokenExpired()).thenReturn(false);
-		when(passwordResetToken.getUsername()).thenReturn(username);
-		when(passwordResetTokenRepository.findByToken(token)).thenReturn(
-				passwordResetToken);
-		UserDetails userDetails = mock(UserDetails.class);
-		Collection<? extends GrantedAuthority> authorities = (Collection<? extends GrantedAuthority>) mock(Collection.class);
-		Iterator<? extends GrantedAuthority> authoritiesIterator = mock(Iterator.class);
-		when(authoritiesIterator.hasNext()).thenReturn(false);
-		when(authorities.iterator()).thenReturn((Iterator) authoritiesIterator);
-
-		when(userDetails.getAuthorities()).thenReturn((Collection) authorities);
-		when(userDetailsManager.loadUserByUsername(username)).thenReturn(
-				userDetails);
-
-		when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
-
-		// Act
-		sut.resetPassword(passwordResetDto, anyString());
-
-		// Assert
-		verify(userDetailsManager, times(1)).updateUser(
-				argThat(new IsUserDetailsnWithCorrectAuthorities(authorities)));
-	}
+//	@Ignore
+//	@Test
+//	public void testResetPassword_UserDetails_With_Correct_Authorities_Is_Updated_By_UsersRepository()
+//			throws TokenNotExistException, TokenExpiredException,
+//			UsernameNotExistException, MessagingException {
+//		// Arrange
+//		final String token = "TheToken";
+//		final String username = "Username";
+//		final String password = "Password";
+//		final String encodedPassword = "encodedPassword";
+//		PasswordResetDto passwordResetDto = mock(PasswordResetDto.class);
+//		when(passwordResetDto.getToken()).thenReturn(token);
+//		when(passwordResetDto.getPassword()).thenReturn(password);
+//		EmailToken passwordResetToken = mock(EmailToken.class);
+//		when(passwordResetToken.isTokenExpired()).thenReturn(false);
+//		when(passwordResetToken.getUsername()).thenReturn(username);
+//		when(passwordResetTokenRepository.findByToken(token)).thenReturn(
+//				passwordResetToken);
+//		Users user = mock(Users.class);
+//		Collection<? extends GrantedAuthority> authorities = (Collection<? extends GrantedAuthority>) mock(Collection.class);
+//		Iterator<? extends GrantedAuthority> authoritiesIterator = mock(Iterator.class);
+//		when(authoritiesIterator.hasNext()).thenReturn(false);
+//		when(authorities.iterator()).thenReturn((Iterator) authoritiesIterator);
+//
+//		when(user.getAuthorities()).thenReturn((Set<GrantedAuthority>) authorities);
+//		when(usersRepository.loadUserByUsername(username)).thenReturn(
+//				user);
+//
+//		when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+//
+//		// Act
+//		sut.resetPassword(passwordResetDto, anyString());
+//
+//		// Assert
+//		verify(usersRepository, times(1)).updateUser(
+//				argThat(new IsUserDetailsnWithCorrectAuthorities(authorities)));
+//	}
 
 	private class IsUserDetailsnWithCorrectAuthorities extends
 			ArgumentMatcher<UserDetails> {

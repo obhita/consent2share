@@ -292,99 +292,98 @@ function showCurrentPage( arrHtmlStr, page_index, items_per_page )
 }
 
 	
-	function clearLocation(){
-		//clear state_name value
+function clearLocation(){
+	//clear state_name value
+	clearState();
+	//trigger change event handler for state_name
+	$("#state_name").triggerHandler("change");
+
+	//clear city_name value
+	clearCity();
+	//trigger change event handler for city_name
+	$("#city_name").triggerHandler("change");
+
+	//clear zip_code value
+	clearZip();
+	//trigger change event handler for zip_code
+	$("#zip_code").triggerHandler("propertychange");
+	$('#empty_client_error_text').attr('style', "display: none;");
+}
+
+function clearName(){
+	$("#last_name").val('');
+	$("#first_name").val('');
+	$("#specialty").val('');
+	$("#gender").val('');
+	clearPhone();
+	$('#lname_client_error_text').attr('style', "display: none;");
+	$('#fname_client_error_text').attr('style', "display: none;");
+	$('#empty_client_error_text').attr('style', "display: none;");
+}
+
+function clearPhone(){
+	$("#phone1").val('');
+	$("#phone2").val('');
+	$("#phone3").val('');
+	$('#phone_client_error_text').attr('style', "display: none;");
+}
+
+function clearAll(){
+	clearLocation();
+	clearName();
+	clearPhone();
+	$('#empty_client_error_text').attr('style', "display: none;");
+}
+
+function clearCity(){
+	$("#city_name").val('');
+	$('#city_client_error_text').attr('style', "display: none;");
+}
+
+function clearState(){
+	$("#state_name").val('');
+}
+
+function clearZip(){
+	$("#zip_code").val('');
+	$('#zip_client_error_text').attr('style', "display: none;");
+}
+
+//enables or disables the state_name & city_name input boxes based on the current value of zip_code input box
+function city_stateEnableDisable(){
+	if($('#zip_code').val().length <= 0){
+		//if zip_code has no value entered, then re-enable the state_name input box
+		$('#state_name').prop('disabled', false);
+	}else{
+		//if zip_code does not have any value entered, then clear & disable state_name & city_name input boxes
 		clearState();
-		//trigger change event handler for state_name
-		$("#state_name").triggerHandler("change");
-		
-		//clear city_name value
 		clearCity();
-		//trigger change event handler for city_name
-		$("#city_name").triggerHandler("change");
-		
-		//clear zip_code value
+		$('#state_name').prop('disabled', true);
+		$('#city_name').prop('disabled', true);
+	}
+}
+
+
+//enables or disables the city_name input box based on the current selected value of state_name
+function cityEnableDisable(){
+	if($('#state_name').val().length <= 0){
+		//if state_name does not have a valid state selected, then clear & disable city_name input box
+		clearCity();
+		$('#city_name').prop('disabled', true);
+	}else{
+		//if state_name has valid state selected, then enable city_name input box
+		$('#city_name').prop('disabled', false);
+	}
+}
+
+//enables or disables the zip_code input box based on the current selected value of state_name & city_name
+function zipEnableDisable(){
+	if(($('#state_name').val().length <= "") && ($('#city_name').val() <= "")){
+		//if state_name & city name both do not have values, then enable zip_code input box
+		$('#zip_code').prop('disabled', false);
+	}else{
+		//if state_name or city name have a valid value, then clear and disable zip_code input box
 		clearZip();
-		//trigger change event handler for zip_code
-		$("#zip_code").triggerHandler("propertychange");
-		$('#empty_client_error_text').attr('style', "display: none;");
+		$('#zip_code').prop('disabled', true);
 	}
-	
-	function clearName(){
-		$("#last_name").val('');
-		$("#first_name").val('');
-		$("#specialty").val('');
-		$("#gender").val('');
-		clearPhone();
-		$('#lname_client_error_text').attr('style', "display: none;");
-		$('#fname_client_error_text').attr('style', "display: none;");
-		$('#empty_client_error_text').attr('style', "display: none;");
-	}
-	
-	function clearPhone(){
-		$("#phone1").val('');
-		$("#phone2").val('');
-		$("#phone3").val('');
-		$('#phone_client_error_text').attr('style', "display: none;");
-	}
-	
-	function clearAll(){
-		clearLocation();
-		clearName();
-		clearPhone();
-		$('#empty_client_error_text').attr('style', "display: none;");
-	}
-	
-	function clearCity(){
-		$("#city_name").val('');
-		$('#city_client_error_text').attr('style', "display: none;");
-	}
-	
-	function clearState(){
-		$("#state_name").val('');
-	}
-	
-	function clearZip(){
-		$("#zip_code").val('');
-		$('#zip_client_error_text').attr('style', "display: none;");
-	}
-	
-	//enables or disables the state_name & city_name input boxes based on the current value of zip_code input box
-	function city_stateEnableDisable(){
-    	if($('#zip_code').val().length <= 0){
-    		//if zip_code has no value entered, then re-enable the state_name input box
-    		$('#state_name').prop('disabled', false);
-        }else{
-            //if zip_code does not have any value entered, then clear & disable state_name & city_name input boxes
-        	clearState();
-        	clearCity();
-        	$('#state_name').prop('disabled', true);
-        	$('#city_name').prop('disabled', true);
-        }
-    }
-	
-	
-	//enables or disables the city_name input box based on the current selected value of state_name
-	function cityEnableDisable(){
-    	if($('#state_name').val().length <= 0){
-            //if state_name does not have a valid state selected, then clear & disable city_name input box
-    		clearCity();
-            $('#city_name').prop('disabled', true);
-        }else{
-            //if state_name has valid state selected, then enable city_name input box
-        	$('#city_name').prop('disabled', false);
-        }
-    }
-	
-	//enables or disables the zip_code input box based on the current selected value of state_name & city_name
-	function zipEnableDisable(){
-    	if(($('#state_name').val().length <= "") && ($('#city_name').val() <= "")){
-            //if state_name & city name both do not have values, then enable zip_code input box
-    		$('#zip_code').prop('disabled', false);
-        }else{
-            //if state_name or city name have a valid value, then clear and disable zip_code input box
-        	clearZip();
-            $('#zip_code').prop('disabled', true);
-        }
-    }
-	
+}

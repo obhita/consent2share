@@ -1,12 +1,21 @@
 package gov.samhsa.consent2share.service.provider;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import gov.samhsa.consent2share.service.dto.LookupDto;
+import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
+import gov.samhsa.consent2share.service.reference.StateCodeService;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -15,6 +24,10 @@ public class ProviderSearchLookupServiceImplTest {
 	
 	@InjectMocks
 	ProviderSearchLookupService providerSearchLookupServiceImpl = new ProviderSearchLookupServiceImpl();
+	
+	@Mock
+	StateCodeService stateCodeService;
+	
 	
 //	@Value("${ProviderSearchURL}") 
 //	String providerSearchURL;
@@ -83,6 +96,11 @@ public class ProviderSearchLookupServiceImplTest {
 	
 	@Test
 	public void testIsValidatedSearch_When_State_City_Given() {
+		LookupDto stateCode = mock(LookupDto.class);
+		List<LookupDto> stateCodes=new ArrayList<LookupDto>();
+		stateCodes.add(stateCode);
+		when(stateCodeService.findAllStateCodes()).thenReturn(stateCodes);
+		when(stateCode.getCode()).thenReturn("MD");
 		Boolean validateCall=providerSearchLookupServiceImpl.isValidatedSearch("MD","columbia",null,null,null,null,null, null);
 		assertEquals(true,validateCall);		
 	}

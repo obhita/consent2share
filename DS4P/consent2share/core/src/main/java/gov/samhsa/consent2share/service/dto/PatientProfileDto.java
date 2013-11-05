@@ -89,6 +89,9 @@ public class PatientProfileDto {
 
 	/** The username. */
 	private String username;
+	
+	/** The password. */
+	private String password;
 
 	/** The individual providers. */
 	private Set<IndividualProvider> individualProviders;
@@ -588,5 +591,23 @@ public class PatientProfileDto {
 	 */
 	public void setAddressCountryCode(String addressCountryCode) {
 		this.addressCountryCode = addressCountryCode;
+	}
+
+	/**
+	 * Gets the password.
+	 *
+	 * @return the password
+	 */
+	public String getPassword() {
+		return password;
+	}
+
+	/**
+	 * Sets the password.
+	 *
+	 * @param password the new password
+	 */
+	public void setPassword(String password) {
+		this.password = password;
 	}
 }

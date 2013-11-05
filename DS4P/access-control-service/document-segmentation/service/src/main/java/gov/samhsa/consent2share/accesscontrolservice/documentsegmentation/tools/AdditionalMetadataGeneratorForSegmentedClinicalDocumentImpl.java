@@ -57,7 +57,7 @@ public class AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl impleme
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * gov.samhsa.ds4ppilot.orchestrator.XdsbMetadataGenerator#generateMetadataXml
+	 * gov.samhsa.ds4ppilot.pep.XdsbMetadataGenerator#generateMetadataXml
 	 * (java.lang.String, java.lang.String)
 	 */
 	@Override

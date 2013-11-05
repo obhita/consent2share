@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<greenCCD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:hl7-org:v3">
+  <header>
+    <documentID root="00000000-0000-0000-0000-000000000000" extension="1" />
+    <title>Safe Harbor Enterprises Continuity of Care Document for Willard QoM Wilson</title>
+    <version>
+      <number>1</number>
+      <setID root="00000000-0000-0000-0000-000000000000" />
+    </version>
+    <confidentiality codeSystem="2.16.840.1.113883.5.25" code="N" />
+    <documentTimestamp value="201107271629" />
+    <personalInformation>
+      <patientInformation>
+        <personID root="00000000-0000-0000-0000-000000000000" extension="27000" />
+        <personAddress nullFlavor="UNK" />
+        <personPhone nullFlavor="UNK" />
+        <personInformation>
+          <personName>
+            <given>Willard</given>
+            <family>Wilson</family>
+          </personName>
+          <gender codeSystem="2.16.840.1.113883.5.1" codeSystemName="HL7 AdministrativeGender" code="M" displayName="Male" />
+          <personDateOfBirth value="19520812" />
+          <maritalStatus nullFlavor="UNK" />
+          <religiousAffiliation nullFlavor="UNK" />
+          <race nullFlavor="UNK" />
+          <ethnicity nullFlavor="UNK" />
+          <birthPlace name=", , " />
+        </personInformation>
+      </patientInformation>
+    </personalInformation>
+    <languagesSpoken>
+      <languageSpoken>
+        <languageCode code="en-US" />
+        <modeCode codeSystem="2.16.840.1.113883.5.60" codeSystemName="LanguageAbilityMode" code="RWR" displayName="Receive Written" />
+        <preferenceInd value="false" />
+      </languageSpoken>
+    </languagesSpoken>
+    <supports>
+      <support>
+        <date nullFlavor="UNK">
+          <low nullFlavor="UNK" />
+          <high nullFlavor="UNK" />
+        </date>
+      </support>
+    </supports>
+    <custodian>
+      <custodianID root="00000000-0000-0000-0000-000000000000" extension="100010020002" />
+      <custodianName>Safe Harbor Enterprises</custodianName>
+    </custodian>
+    <informationSource>
+      <author>
+        <authorTime value="20000407130000+0500" />
+        <authorName>
+          <prefix>prefix</prefix>
+          <given>given</given>
+          <family>family</family>
+          <suffix>suffix</suffix>
+        </authorName>
+        <reference>
+          <referenceDocumentID root="root6" extension="extension6" />
+          <referenceDocumentURL value="http://www.feiinfo.com" />
+        </reference>
+      </author>
+    </informationSource>
+  </header>
+  <body>
+    <encounters>
+      <encounter>
+        <encounterID root="27000" />
+        <encounterType codeSystem="2.16.840.1.113883.6.12" codeSystemName="CPT" code="99212" />
+        <encounterDateTime value="20100127" />
+        <admissionType nullFlavor="UNK" />
+        <encounterProvider>
+          <providerType nullFlavor="UNK" />
+          <providerID root="100010020001" />
+          <providerAddress nullFlavor="UNK" />
+          <providerTelecom nullFlavor="UNK" />
+          <providerName>
+            <given>Leo</given>
+            <family>Smith</family>
+          </providerName>
+          <providerOrganizationName>Safe Harbor Enterprises</providerOrganizationName>
+        </encounterProvider>
+      </encounter>
+      <encounter>
+        <encounterID root="27100" />
+        <encounterType codeSystem="2.16.840.1.113883.6.12" codeSystemName="CPT" code="99212" />
+        <encounterDateTime value="20100227" />
+        <admissionType nullFlavor="UNK" />
+        <encounterProvider>
+          <providerType nullFlavor="UNK" />
+          <providerID root="100010020001" />
+          <providerAddress nullFlavor="UNK" />
+          <providerTelecom nullFlavor="UNK" />
+          <providerName>
+            <given>Leo</given>
+            <family>Smith</family>
+          </providerName>
+          <providerOrganizationName>Safe Harbor Enterprises</providerOrganizationName>
+        </encounterProvider>
+      </encounter>
+      <encounter>
+        <encounterID root="27100" />
+        <encounterType codeSystem="2.16.840.1.113883.6.12" codeSystemName="CPT" code="99406" displayName="Tobacco Use Cessation Counseling" />
+        <encounterDateTime value="20100227" />
+        <admissionType nullFlavor="UNK" />
+        <encounterProvider>
+          <providerType nullFlavor="UNK" />
+          <providerID root="100010020001" />
+          <providerAddress nullFlavor="UNK" />
+          <providerTelecom nullFlavor="UNK" />
+          <providerName>
+            <given>Leo</given>
+            <family>Smith</family>
+          </providerName>
+          <providerOrganizationName>Safe Harbor Enterprises</providerOrganizationName>
+        </encounterProvider>
+      </encounter>
+      <encounter>
+        <encounterID root="28000" />
+        <encounterType codeSystem="2.16.840.1.113883.6.12" codeSystemName="CPT" code="99212" />
+        <encounterDateTime value="20101028" />
+        <admissionType nullFlavor="UNK" />
+        <encounterProvider>
+          <providerType nullFlavor="UNK" />
+          <providerID root="100010020001" />
+          <providerAddress nullFlavor="UNK" />
+          <providerTelecom nullFlavor="UNK" />
+          <providerName>
+            <given>Leo</given>
+            <family>Smith</family>
+          </providerName>
+          <providerOrganizationName>Safe Harbor Enterprises</providerOrganizationName>
+        </encounterProvider>
+      </encounter>
+      <encounter>
+        <encounterID root="28000" />
+        <encounterType codeSystem="2.16.840.1.113883.6.12" codeSystemName="CPT" code="99406" displayName="Tobacco Use Cessation Counseling" />
+        <encounterDateTime value="20101028" />
+        <admissionType nullFlavor="UNK" />
+        <encounterProvider>
+          <providerType nullFlavor="UNK" />
+          <providerID root="100010020001" />
+          <providerAddress nullFlavor="UNK" />
+          <providerTelecom nullFlavor="UNK" />
+          <providerName>
+            <given>Leo</given>
+            <family>Smith</family>
+          </providerName>
+          <providerOrganizationName>Safe Harbor Enterprises</providerOrganizationName>
+        </encounterProvider>
+      </encounter>
+    </encounters>
+    <vitalSigns>
+      <vitalSign>
+        <resultID root="27000" />
+        <refusalReason nullFlavor="UNK" />
+        <resultDateTime value="20100127" />
+        <procedureCode nullFlavor="UNK" />
+        <resultType codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED" code="160603005" displayName="Tobacco User" />
+        <resultStatus code="completed" />
+        <resultInterpretation nullFlavor="UNK" />
+      </vitalSign>
+
+      <vitalSign>
+        <resultID root="c6f88321-67ad-11db-bd13-0800200c9a69"/>
+        <resultDateTime value="20100130"/>
+        <procedureCode nullFlavor="UNK"/>
+        <resultType code="160603005" codeSystem="2.16.840.1.113883.6.96"
+            codeSystemName="SNOMED CT" displayName="Tobacco User"/>
+        <resultStatus code="completed"/>
+      </vitalSign>
+      
+    </vitalSigns>
+
+    <procedures>
+      <procedure>
+        <procedureID root="27100" />
+        <procedureType codeSystem="2.16.840.1.113883.6.12" codeSystemName="CPT" code="99406" displayName="Tobacco Use Cessation Counseling" />
+        <procedureFreeTextType>Tobacco Use Cessation Counseling</procedureFreeTextType>
+        <procedureDateTime value="20100227" />
+        <bodySite nullFlavor="UNK" />
+        <procedureProvider>
+          <providerType nullFlavor="UNK" />
+          <providerID root="100010020001" />
+          <providerAddress nullFlavor="UNK" />
+          <providerTelecom nullFlavor="UNK" />
+          <providerName>
+            <given>Leo</given>
+            <family>Smith</family>
+          </providerName>
+          <providerOrganizationName>Safe Harbor Enterprises</providerOrganizationName>
+        </procedureProvider>
+      </procedure>
+      <procedure>
+        <procedureID root="28000" />
+        <procedureType codeSystem="2.16.840.1.113883.6.12" codeSystemName="CPT" code="99406" displayName="Tobacco Use Cessation Counseling" />
+        <procedureFreeTextType>Tobacco Use Cessation Counseling</procedureFreeTextType>
+        <procedureDateTime value="20101028" />
+        <bodySite nullFlavor="UNK" />
+        <procedureProvider>
+          <providerType nullFlavor="UNK" />
+          <providerID root="100010020001" />
+          <providerAddress nullFlavor="UNK" />
+          <providerTelecom nullFlavor="UNK" />
+          <providerName>
+            <given>Leo</given>
+            <family>Smith</family>
+          </providerName>
+          <providerOrganizationName>Safe Harbor Enterprises</providerOrganizationName>
+        </procedureProvider>
+      </procedure>
+    </procedures>
+  </body>
+</greenCCD>

@@ -1,3 +1,4 @@
+//Code to execute on document.ready event for registration.html page
 $(document).ready(function() {
 	var currentYear = (new Date).getFullYear();
 	var minYear = currentYear - 125;

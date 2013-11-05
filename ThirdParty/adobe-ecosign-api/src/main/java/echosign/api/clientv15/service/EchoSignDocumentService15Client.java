@@ -4,7 +4,9 @@ package echosign.api.clientv15.service;
 import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.HashMap;
+
 import javax.xml.namespace.QName;
+
 import org.codehaus.xfire.XFireRuntimeException;
 import org.codehaus.xfire.aegis.AegisBindingProvider;
 import org.codehaus.xfire.annotations.AnnotationServiceFactory;
@@ -16,6 +18,7 @@ import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.soap.AbstractSoapBinding;
 import org.codehaus.xfire.transport.TransportManager;
 
+@SuppressWarnings({ "unused", "unchecked" , "rawtypes"})
 public class EchoSignDocumentService15Client {
 
     private static XFireProxyFactory proxyFactory = new XFireProxyFactory();
@@ -46,11 +49,12 @@ public class EchoSignDocumentService15Client {
         return getEndpoint((endpoint));
     }
 
-    public Collection getEndpoints() {
+	public Collection getEndpoints() {
         return endpoints.values();
     }
 
-    private void create0() {
+
+	private void create0() {
         TransportManager tm = (org.codehaus.xfire.XFireFactory.newInstance().getXFire().getTransportManager());
         HashMap props = new HashMap();
         props.put("annotations.allow.interface", true);

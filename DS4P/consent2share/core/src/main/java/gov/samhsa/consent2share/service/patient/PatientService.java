@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.patient;
 
+import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.AddConsentOrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
@@ -108,8 +109,9 @@ public interface PatientService {
 	 * Update patient.
 	 *
 	 * @param patientDto the patient dto
+	 * @throws AuthenticationFailedException 
 	 */
-	void updatePatient(PatientProfileDto patientDto);
+	void updatePatient(PatientProfileDto patientDto) throws AuthenticationFailedException;
 
 	/**
 	 * Find add consent individual provider dto by username.

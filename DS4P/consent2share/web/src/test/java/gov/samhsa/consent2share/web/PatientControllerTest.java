@@ -758,7 +758,9 @@ public class PatientControllerTest {
 						.param("birthDate", validBirthDate)
 						.param("email", validEmail)
 						.param(validGenderCode ,
-								validGenderCode ))
+								validGenderCode )
+						.param("username", username)
+						.param("password","password"))
 				.andExpect(
 						model().attribute("currentUser", equalTo(currentUser)))
 				.andExpect(

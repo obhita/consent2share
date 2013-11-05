@@ -70,56 +70,7 @@
 				<soap12:body use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="UpdateDocumentSet">
-			<soap12:operation soapAction="urn:ihe:iti:2010:UpdateDocumentSet"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="DeleteDocumentSet">
-			<soap12:operation soapAction="urn:ihe:iti:2010:DeleteDocumentSet"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="PatientRegistryRecordAdded">
-			<soap12:operation soapAction="urn:hl7-org:v3:PRPA_IN201301UV02"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="PatientRegistryRecordRevised">
-			<soap12:operation soapAction="urn:hl7-org:v3:PRPA_IN201302UV02"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="PatientRegistryDuplicatesResolved">
-			<soap12:operation soapAction="urn:hl7-org:v3:PRPA_IN201304UV02"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
+
 	</wsdl:binding>
 	<wsdl:binding name="XDSRegistry_HTTP_Endpoint" type="i0:XDSRegistry">
 		<wsp:PolicyReference URI="#XDSRegistry_HTTP_Endpoint_policy" />
@@ -144,56 +95,7 @@
 				<soap12:body use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="UpdateDocumentSet">
-			<soap12:operation soapAction="urn:ihe:iti:2010:UpdateDocumentSet"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="DeleteDocumentSet">
-			<soap12:operation soapAction="urn:ihe:iti:2010:DeleteDocumentSet"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="PatientRegistryRecordAdded">
-			<soap12:operation soapAction="urn:hl7-org:v3:PRPA_IN201301UV02"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="PatientRegistryRecordRevised">
-			<soap12:operation soapAction="urn:hl7-org:v3:PRPA_IN201302UV02"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="PatientRegistryDuplicatesResolved">
-			<soap12:operation soapAction="urn:hl7-org:v3:PRPA_IN201304UV02"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
+
 	</wsdl:binding>
 	<wsdl:service name="DocumentRegistryService">
 		<wsdl:port name="XDSRegistry_HTTPS_Endpoint" binding="tns:XDSRegistry_HTTPS_Endpoint">

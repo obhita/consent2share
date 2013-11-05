@@ -25,9 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation;
 
+import gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionService;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshaller;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditService;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.brms.RuleExecutionService;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocument;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEditor;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEncrypter;
@@ -226,7 +226,7 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 
 			// get execution response container
 			String executionResponseContainer = ruleExecutionService
-					.assertAndExecuteClinicalFacts(factModel);
+					.assertAndExecuteClinicalFacts(factModel).getRuleExecutionResponseContainer();
 
 			// unmarshall from xml to RuleExecutionContainer
 			ruleExecutionContainer = marshaller.unmarshallFromXml(

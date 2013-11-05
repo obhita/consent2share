@@ -25,6 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.patient;
 
+import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
+import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.ConsentIndividualProviderDisclosureIsMadeTo;
 import gov.samhsa.consent2share.domain.consent.ConsentIndividualProviderPermittedToDisclose;
@@ -37,6 +40,8 @@ import gov.samhsa.consent2share.domain.patient.PatientRepository;
 import gov.samhsa.consent2share.domain.provider.IndividualProvider;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
 import gov.samhsa.consent2share.infrastructure.DtoToDomainEntityMapper;
+import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
+import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.AddConsentOrganizationalProviderDto;
@@ -44,6 +49,7 @@ import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
+import gov.samhsa.consent2share.infrastructure.EmailType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,11 +57,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,6 +97,18 @@ public class PatientServiceImpl implements PatientService {
 	/** The patient profile dto to patient mapper. */
 	@Autowired
 	private DtoToDomainEntityMapper<PatientProfileDto, Patient> patientProfileDtoToPatientMapper;
+	
+	/** The users repository. */
+	@Autowired
+	private UsersRepository usersRepository;
+	
+	/** The password encoder. */
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	/** The email sender. */
+	@Autowired
+	private EmailSender emailSender;
 
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.patient.PatientService#countAllPatients()
@@ -251,10 +272,24 @@ public class PatientServiceImpl implements PatientService {
 	 */
 	@Override
 	@Transactional
-	public void updatePatient(PatientProfileDto patientDto) {
+	public void updatePatient(PatientProfileDto patientDto) throws AuthenticationFailedException{
+		AuthenticatedUser currentUser = userContext.getCurrentUser();
+		String username=patientDto.getUsername();
+		if (!currentUser.getUsername().equals(username))
+			throw new AuthenticationFailedException("Username does not match current active user.");
+		Users user=usersRepository.loadUserByUsername(username);
+		if (user!=null)
+		if (!passwordEncoder.matches(patientDto.getPassword(), user.getPassword()))
+			throw new AuthenticationFailedException("Password is incorrect.");
 		logger.info("{} being run...", "updatePatient");
 		Patient patient = patientProfileDtoToPatientMapper.map(patientDto);
 		patientRepository.save(patient);
+		try {
+			emailSender.sendMessage(patientDto.getFirstName()+" "+patientDto.getLastName(),
+					patientDto.getEmail(), EmailType.USER_PROFILE_CHANGE, null, null);
+		} catch (MessagingException e) {
+			logger.warn("Error when sending the email message.");
+		}
 	}
 	
 	/* (non-Javadoc)

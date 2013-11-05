@@ -59,7 +59,8 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.ValueListType;
 import org.hl7.v3.Device;
 import org.hl7.v3.Id;
 import org.hl7.v3.PRPAIN201301UV02;
-import org.hl7.v3.PRPAIN201302UV;
+import org.hl7.v3.PRPAIN201302UV02;
+import org.hl7.v3.PRPAIN201304UV02;
 import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess;
 import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject;
 import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent;
@@ -141,6 +142,28 @@ public class XdsbRegistryWebServiceClient {
 	}
 
 	/**
+	 * Resolve patient registry duplicates.
+	 * 
+	 * @param input
+	 *            the input
+	 * @return the string
+	 * @throws Throwable
+	 *             the throwable
+	 */
+	public String resolvePatientRegistryDuplicates(PRPAIN201304UV02 input)
+			throws Throwable {
+		String justPayloadXml = marshall(input);
+
+		final QName operationName = new QName("urn:ihe:iti:xds-b:2007",
+				"PatientRegistryDuplicatesResolved");
+
+		String responsePayload = getRawResponsePayload(operationName,
+				justPayloadXml);
+
+		return responsePayload;
+	}
+
+	/**
 	 * Revise patient registry record.
 	 * 
 	 * @param input
@@ -149,7 +172,7 @@ public class XdsbRegistryWebServiceClient {
 	 * @throws Throwable
 	 *             the throwable
 	 */
-	public String revisePatientRegistryRecord(PRPAIN201302UV input)
+	public String revisePatientRegistryRecord(PRPAIN201302UV02 input)
 			throws Throwable {
 		String justPayloadXml = marshall(input);
 
@@ -237,9 +260,11 @@ public class XdsbRegistryWebServiceClient {
 	 *             the throwable
 	 */
 	public static void main(String[] args) throws Throwable {
-		final String demoEndpoint = "http://feijboss01:8080/axis2/services/xdsregistryb";
-		//final String javaVmEndpoint = "http://192.168.223.134:8080/axis2/services/xdsregistryb";
-		//final String dotnetVmEndpoint = "http://192.168.223.138:8080/xdsservice/xdsregistry";
+		final String demoEndpoint = "http://obhidevacs001:9080/axis2/services/xdsregistryb";
+		// final String javaVmEndpoint =
+		// "http://192.168.223.134:8080/axis2/services/xdsregistryb";
+		// final String dotnetVmEndpoint =
+		// "http://192.168.223.138:8080/xdsservice/xdsregistry";
 
 		XdsbRegistryWebServiceClient xdsService = new XdsbRegistryWebServiceClient(
 				demoEndpoint);
@@ -358,7 +383,7 @@ public class XdsbRegistryWebServiceClient {
 		System.out.println("Run patientRegistryRecordRevised");
 
 		// PRPAIN201302UV
-		PRPAIN201302UV prpain201302uv = new PRPAIN201302UV();
+		PRPAIN201302UV02 prpain201302uv = new PRPAIN201302UV02();
 
 		prpain201301uv02.setControlActProcess(controlActProcess);
 

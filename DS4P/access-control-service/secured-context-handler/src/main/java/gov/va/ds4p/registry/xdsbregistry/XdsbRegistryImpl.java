@@ -31,7 +31,7 @@ import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 
 import org.hl7.v3.PRPAIN201301UV02;
-import org.hl7.v3.PRPAIN201302UV;
+import org.hl7.v3.PRPAIN201302UV02;
 
 public class XdsbRegistryImpl implements XdsbRegistry {
 
@@ -63,7 +63,7 @@ public class XdsbRegistryImpl implements XdsbRegistry {
 	}
 
 	@Override
-	public String revisePatientRegistryRecord(PRPAIN201302UV input) {
+	public String revisePatientRegistryRecord(PRPAIN201302UV02 input) {
 		XdsbRegistryWebServiceClient client = new XdsbRegistryWebServiceClient(
 				endpointAddress);
 		String result = null;

@@ -3,6 +3,7 @@ package gov.samhsa.consent2share.web;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.service.account.AccountService;
 import gov.samhsa.consent2share.service.account.AccountVerificationService;
@@ -63,8 +64,8 @@ public class SignupControllerTest {
 		mockMvc.perform(post("/registration.html")
 			.param("genderCode", "M"))
 				.andExpect(view().name("views/signupVerification"));
-		UserDetails userDetails = mock(UserDetails.class);
-		when(accountService.findUserByUsername(anyString())).thenReturn(userDetails);
+		Users user = mock(Users.class);
+		when(accountService.findUserByUsername(anyString())).thenReturn(user);
 		mockMvc.perform(post("/registration.html")
 			.param("genderCode", "M"))
 				.andExpect(view().name("views/registration"));

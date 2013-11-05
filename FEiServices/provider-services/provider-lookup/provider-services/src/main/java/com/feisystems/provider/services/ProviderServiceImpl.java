@@ -42,7 +42,6 @@ public class ProviderServiceImpl implements ProviderService {
 		return providerMapper.map(providerRepository.findOne(npi));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<ProviderDto> getByGenderCodeAndPostalCodeAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(
 			String genderCode, String postalCode, String taxonomy,

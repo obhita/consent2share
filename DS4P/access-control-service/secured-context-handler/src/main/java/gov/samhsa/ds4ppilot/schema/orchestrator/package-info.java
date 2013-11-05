@@ -1,2 +1,0 @@
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.samhsa.gov/ds4ppilot/schema/orchestrator")
-package gov.samhsa.ds4ppilot.schema.orchestrator;

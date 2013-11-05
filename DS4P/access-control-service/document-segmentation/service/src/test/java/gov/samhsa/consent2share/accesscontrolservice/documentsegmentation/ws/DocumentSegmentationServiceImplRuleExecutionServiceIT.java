@@ -6,7 +6,8 @@ import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.DocumentSegmentationImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditServiceImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.brms.RuleExecutionServiceClientImpl;
+import gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.GuvnorServiceImpl;
+import gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionServiceImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEditorImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEncrypterImpl;
@@ -45,9 +46,10 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 	private static String senderEmailAddress;
 	private static String recipientEmailAddress;
 	private static String xdsDocumentEntryUniqueId;
-	private static String endpointAddressForRuleExectionWebServiceClient;
 	private static String endpointAddressForAuditService;
-
+	private static String endpointAddressGuvnorService;
+	
+	private static RuleExecutionServiceImpl ruleExecutionService;
 	private static DocumentEditorImpl documentEditor;
 	private static SimpleMarshallerImpl marshaller;
 	private static DocumentEncrypterImpl documentEncrypter;
@@ -72,7 +74,6 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 		senderEmailAddress = "leo.smith@direct.obhita-stage.org";
 		recipientEmailAddress = "Duane_Decouteau@direct.healthvault-stage.com";
 		xdsDocumentEntryUniqueId = "123";
-		endpointAddressForRuleExectionWebServiceClient = "http://localhost:90/RuleExecutionService/services/RuleExecutionService";
 		endpointAddressForAuditService = "http://174.78.146.228:8080/DS4PACSServices/DS4PAuditService";
 	}
 
@@ -97,13 +98,17 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 		address = "http://localhost:9000/services/processDocumentservice";
 		wsdlURL = new URL(address + "?wsdl");
 		c32Document = fileReader.readFile("c32.xml");
+		
+		endpointAddressGuvnorService = "http://localhost:7070/guvnor-5.5.0.Final-tomcat-6.0/rest/packages/AnnotationRules/source";
+
+		ruleExecutionService = new RuleExecutionServiceImpl(new GuvnorServiceImpl(
+				endpointAddressGuvnorService,"admin", "admin"), new SimpleMarshallerImpl());
 		ep = Endpoint
 				.publish(
 						address,
 						new DocumentSegmentationServiceImpl(
 								new DocumentSegmentationImpl(
-										new RuleExecutionServiceClientImpl(
-												endpointAddressForRuleExectionWebServiceClient),
+										ruleExecutionService, 
 										new AuditServiceImpl(
 												endpointAddressForAuditService),
 										documentEditor, marshaller,

@@ -1,5 +1,47 @@
-//**********************************************************************************
-//***START OF setupPage*************************************************************
+/**********************************************************************************
+ * DOCUMENT.READY FUNCTION
+**********************************************************************************/
+$(document).ready(function() {
+	var addConsent_tmp = null;
+	var in_addConsent_tmp = $('#input_isAddConsent').val();
+
+	if(in_addConsent_tmp === "true"){
+		addConsent_tmp = true;
+	}else if(in_addConsent_tmp === "false"){
+		addConsent_tmp = false;
+	}else{
+		addConsent_tmp = null;
+	}
+
+	//Check if addConsent is a valid boolean value
+	if((addConsent_tmp !== true) && (addConsent_tmp !== false)){
+		console.log(addConsent_tmp);
+		addConsent_tmp = null;
+		throw new ReferenceError("addConsent_tmp variable is not a valid boolean value");
+	}
+
+	var specMedSetObj_tmp = null;
+
+	if(addConsent_tmp === false){
+		specMedSetObj_tmp = new Array();
+
+		$('.specmedinfo-input').each(function(){
+			var str_code = $(this).attr('id');
+			var str_codesys = $(this).data('codesys');
+			var str_dispname = $(this).data('dispname');
+
+			var newEntry = createSpecMedInfoObj(str_code, str_codesys, str_dispname);
+			specMedSetObj_tmp.push(newEntry);
+			newEntry = null;
+		});
+	}
+
+	setupPage(addConsent_tmp, specMedSetObj_tmp);
+});
+
+/***********************************************************************************
+ * START OF setupPage
+************************************************************************************/
 function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 	var addConsent = addConsent_tmp;
     
@@ -26,7 +68,7 @@ function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 	    specMedSetObj = specMedSetObj_tmp;
 	    
 	    try{
-	    	specMedSet = specMedSetObj.clinicalConceptCodesSet;
+	    	specMedSet = specMedSetObj;
     	}catch(e){
 		    if(e.name == "TypeError"){
 		    	specMedSet = null;
@@ -35,6 +77,38 @@ function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 			}
 		}
 	}
+	
+	
+	// set providers in consent being edited to be checked
+	$('.prov-npi-checked-input').each(function(){
+		var prov = $(this).val();
+		document.getElementById(prov).checked = true;
+	});
+	
+	// set sensitivity policy codes in consent being edited to be checked
+	$('.sensitivity-policy-code-checked-input').each(function(){
+		var sens_code = $(this).val();
+		document.getElementById(sens_code).checked = true;
+	});
+	
+	// set clinical document section type codes in consent being edited to be checked
+	$('.doc-sec-type-code-checked-input').each(function(){
+		var docsectyp_code = $(this).val();
+		document.getElementById(docsectyp_code).checked = true;
+	});
+	
+	// set clinical document section codes in consent being edited to be checked
+	$('.doc-sec-code-checked-input').each(function(){
+		var docsec_code = $(this).val();
+		document.getElementById(docsec_code).checked = true;
+	});
+	
+	// set purpose of use codes in consent being edited to be checked
+	$('.purpose-use-code-checked-input').each(function(){
+		var puruse_code = $(this).val();
+		document.getElementById(puruse_code).checked = true;
+	});
+	
 	
 	
 	$('input').iCheck({
@@ -247,116 +321,14 @@ function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 	}
 	
 }
-//***END OF setupPage***************************************************************
-//**********************************************************************************
+/**********************************************************************************
+ * END OF setupPage
+***********************************************************************************/
 
 
-
-//**********************************************************************************
-//GLOBAL SCOPE FUNCTIONS
-//**********************************************************************************
-
-function showShareSettingsModal(){
-	$("#share-settings-modal").modal({
-		  keyboard: false,
-		  backdrop: 'static'
-	});
-}
-
-//Turn Joyride Guide Off
-function turnGuideOff(){
-	$('#btn_guide_OnOff').addClass('guide-off-flag');
-	
-	jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
-
-	$('#btn_guide_OnOff').text("Guide On");
-	
-	$('#tourtest').joyride('end');
-}
-
-//Turn Joyride Guide On
-function turnGuideOn(){
-	if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
-		$('#btn_guide_OnOff').removeClass('guide-off-flag');
-	}
-
-	jQuery.storage.setItem('guideStatus', 'on', 'sessionStorage');
-	
-	$('#btn_guide_OnOff').text("Guide Off");
-	
-	$('#tourtest').joyride('end');
-	$('#tourtest').joyride();
-}
-
-
-//Count number of opening parentheses '(' in string
-function countOpenParen(in_str){
-	//regular expression pattern to specify a global search for the open parenthesis '(' character
-	var open_paren_regexp =/\(/g;
-	var num_open_paren = 0;
-	
-	//calls countChar function to count number of occurances of open parentheses
-	num_open_paren = countChar(open_paren_regexp, in_str);
-	
-	return num_open_paren;
-}
-
-//Count number of closing parentheses ')' in string
-function countCloseParen(in_str){
-	//regular expression pattern to specify a global search for the close parenthesis ')' character
-	var close_paren_regexp =/\)/g;
-	var num_close_paren = 0;
-	
-	//calls countChar function to count number of occurances of close parentheses
-	num_close_paren = countChar(close_paren_regexp, in_str);
-	
-	return num_close_paren;
-}
-
-//Count number of occurances of the character specified by the regular expression pattern
-function countChar(in_regexp_patt, in_str){
-	var num_char = 0;	
-	
-	//counts the number of occurances of the character specified by the regular expression pattern
-	/*     NOTE: the .match() function returns null if no match is found. Since that would result
-	           in the .length() function throwing a TypeError if called on a null value, "||[]"
-	           is included after the .match() function call. This causes .match() to return
-	           a 0 length array instead of null if no match is found, which allows .length()
-	           to return a count of '0' instead of throwing a TypeError. */
-	try{
-		num_char = (in_str.match(in_regexp_patt)||[]).length;
-	}catch(e){
-		switch(e.name){
-		case "TypeError":
-			num_char = 0;
-			break;
-		default:
-			throw e;
-			num_char = 0;
-			break;
-		}
-	}
-	
-	return num_char;
-}
-
-//#ISSUE 138 Fix Start
-//Resetting the Checked values to avoid saving duplicate consents 
-function clearConsent(form){	
-	$("form input").each(function(){
-		if($(this).prop("checked")==true){
-			$(this).prop('checked', false);
-		}
-	});		
-	
-}
-//#ISSUE 138 Fix End
-
-
-
-//**********************************************************************************
-//FUNCTION TO INITIALIZE PAGE WHEN ADDING/EDITING A CONSENT
-//**********************************************************************************
+/***********************************************************************************
+ * FUNCTION TO INITIALIZE PAGE WHEN ADDING/EDITING A CONSENT
+***********************************************************************************/
 function initAddConsent(addConsent, specMedSet) {
 	
 				//Check if addConsent is a valid boolean value
@@ -364,9 +336,9 @@ function initAddConsent(addConsent, specMedSet) {
 				    throw new ReferenceError("addConsent variable is not a valid boolean value");
 			    }
 	
-				//******************************************************************************************
-				//MAIN CODE
-				//******************************************************************************************
+				/*******************************************************************************************
+				 * MAIN CODE
+				*******************************************************************************************/
 	
 				var specmedinfoary = new Array();
 				var specmedinfoid=0;
@@ -447,6 +419,7 @@ function initAddConsent(addConsent, specMedSet) {
 							$("#from"+providerId).closest('label').removeClass("joe");
 						}
 					});
+					
 					 
 					if (areAllInfoUnSelected()) {
 						$("#allInfo").iCheck("check");
@@ -523,9 +496,9 @@ function initAddConsent(addConsent, specMedSet) {
 				reAppendPurposeOfUse();
 
 					
-				//******************************************************************************************
-				//EVENT HANDLERS
-				//******************************************************************************************
+				/*******************************************************************************************
+				 * EVENT HANDLERS
+				*******************************************************************************************/
 				
 				$(".removeEntry").live("click",function(){
 						var entryId=$(this).attr("id").substr(11,$(this).attr("id").length-11);
@@ -768,9 +741,9 @@ function initAddConsent(addConsent, specMedSet) {
 				
 				
 				
-				//******************************************************************************************
-				//FUNCTION DEFINITIONS
-				//******************************************************************************************
+				/******************************************************************************************
+				 * FUNCTION DEFINITIONS
+				*******************************************************************************************/
 				
 				$(function() {
 				    $( "#condition" )
@@ -1121,11 +1094,121 @@ function initAddConsent(addConsent, specMedSet) {
 				
 				function initSpecMedInfoArray(item){
 					newEntry=new Object();
-		        	 newEntry.displayName=item.displayName;
-		        	 newEntry.codeSystem=item.codeSystem;
-		        	 newEntry.code=item.code;
-		        	 newEntry.description=item.displayName;
+		        	newEntry.displayName=item.displayName;
+		        	newEntry.codeSystem=item.codeSystem;
+		        	newEntry.code=item.code;
+		        	newEntry.description=item.displayName;
                     specmedinfoary[specmedinfoid]=newEntry;
                     updateSpecMedInfo();
 				}
 }
+
+
+
+/***********************************************************************************
+ * GLOBAL SCOPE FUNCTIONS
+***********************************************************************************/
+
+function createSpecMedInfoObj(str_code, str_codeSystem, str_displayName){
+	newEntry = new Object();
+	newEntry.displayName = str_displayName;
+	newEntry.codeSystem = str_codeSystem;
+	newEntry.code = str_code;	
+	return newEntry;
+}
+
+function showShareSettingsModal(){
+	$("#share-settings-modal").modal({
+		  keyboard: false,
+		  backdrop: 'static'
+	});
+}
+
+//Turn Joyride Guide Off
+function turnGuideOff(){
+	$('#btn_guide_OnOff').addClass('guide-off-flag');
+	
+	jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
+
+	$('#btn_guide_OnOff').text("Guide On");
+	
+	$('#tourtest').joyride('end');
+}
+
+//Turn Joyride Guide On
+function turnGuideOn(){
+	if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
+		$('#btn_guide_OnOff').removeClass('guide-off-flag');
+	}
+
+	jQuery.storage.setItem('guideStatus', 'on', 'sessionStorage');
+	
+	$('#btn_guide_OnOff').text("Guide Off");
+	
+	$('#tourtest').joyride('end');
+	$('#tourtest').joyride();
+}
+
+
+//Count number of opening parentheses '(' in string
+function countOpenParen(in_str){
+	//regular expression pattern to specify a global search for the open parenthesis '(' character
+	var open_paren_regexp =/\(/g;
+	var num_open_paren = 0;
+	
+	//calls countChar function to count number of occurances of open parentheses
+	num_open_paren = countChar(open_paren_regexp, in_str);
+	
+	return num_open_paren;
+}
+
+//Count number of closing parentheses ')' in string
+function countCloseParen(in_str){
+	//regular expression pattern to specify a global search for the close parenthesis ')' character
+	var close_paren_regexp =/\)/g;
+	var num_close_paren = 0;
+	
+	//calls countChar function to count number of occurances of close parentheses
+	num_close_paren = countChar(close_paren_regexp, in_str);
+	
+	return num_close_paren;
+}
+
+//Count number of occurances of the character specified by the regular expression pattern
+function countChar(in_regexp_patt, in_str){
+	var num_char = 0;	
+	
+	//counts the number of occurances of the character specified by the regular expression pattern
+	/*     NOTE: the .match() function returns null if no match is found. Since that would result
+	           in the .length() function throwing a TypeError if called on a null value, "||[]"
+	           is included after the .match() function call. This causes .match() to return
+	           a 0 length array instead of null if no match is found, which allows .length()
+	           to return a count of '0' instead of throwing a TypeError. */
+	try{
+		num_char = (in_str.match(in_regexp_patt)||[]).length;
+	}catch(e){
+		switch(e.name){
+		case "TypeError":
+			num_char = 0;
+			break;
+		default:
+			throw e;
+			num_char = 0;
+			break;
+		}
+	}
+	
+	return num_char;
+}
+
+//#ISSUE 138 Fix Start
+//Resetting the Checked values to avoid saving duplicate consents 
+function clearConsent(form){	
+	$("form input").each(function(){
+		if($(this).prop("checked")==true){
+			$(this).prop('checked', false);
+		}
+	});		
+	
+}
+//#ISSUE 138 Fix End

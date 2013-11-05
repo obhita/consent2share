@@ -5,7 +5,9 @@
 create table users(
 username varchar(200) not null primary key,
 password varchar(256) not null,
-enabled boolean not null
+enabled boolean not null,
+failed_attempts tinyint not null,
+lockout_time varchar(30)
 );
 create table authorities (
 username varchar(200) not null,

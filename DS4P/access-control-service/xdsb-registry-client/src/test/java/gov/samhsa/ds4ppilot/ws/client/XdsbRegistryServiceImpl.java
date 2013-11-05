@@ -5,7 +5,7 @@ import ihe.iti.xds_b._2007.XDSRegistry;
 
 import java.util.logging.Logger;
 import javax.jws.WebService;
-import org.hl7.v3.PRPAIN201302UV;
+import org.hl7.v3.PRPAIN201302UV02;
 
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 
@@ -115,7 +115,7 @@ public class XdsbRegistryServiceImpl implements XDSRegistry {
 	 */
 	@Override
 	public Object patientRegistryRecordAdded(
-			PRPAIN201302UV input) {
+			PRPAIN201302UV02 input) {
 		LOG.info("Executing operation patientRegistryRecordAdded");
 		System.out.println(input);
 		try {

@@ -66,7 +66,8 @@ body {
   height: auto;
   margin-bottom: 40px;
   color: #646464;
-  height: 100%; }
+  height: 100%;
+  min-width: 310px; }
 
 ul, ol {
   padding: 0;
@@ -77,6 +78,10 @@ body .container-fluid {
   padding-left: 10px;
   min-height: 100%;
   position: relative; }
+
+#index-body .container-fluid {
+  padding-right: 0px;
+  padding-left: 0px; }
 
 body .main-content-wrapper {
   min-height: 100%;
@@ -157,7 +162,7 @@ used more than once per page.
   margin-top: 30px;
   text-align: left;
   width: auto;
-  padding: 0 20px 0 0; }
+  padding: 0 20px 0 15px; }
   #body-features .span4, #footer-features .span4 {
     margin-left: 10px;
     margin-bottom: 24px; }
@@ -210,8 +215,8 @@ used more than once per page.
   display: block;
   color: #fff;
   margin-bottom: 0px;
-  margin-left: -10px;
-  margin-right: -10px;
+  margin-left: 0px;
+  margin-right: 0px;
   text-align: center;
   font-weight: 300;
   font-size: .85em;
@@ -219,16 +224,17 @@ used more than once per page.
 
 /* Home Login Box  */
 #home-login-container {
-  display: inline;
+  display: inline-block;
   border: white;
   border-style: solid;
   border-width: 1px;
-  position: absolute;
+  /*	position: absolute; */
   background: white;
   max-height: auto;
   /*	max-width: 400px;  */
-  height: 520px;
-  top: 50px;
+  height: auto;
+  margin-top: 30px;
+  /*	top: 50px;   */
   padding: 10px 20px 10px 20px;
   z-index: 49;
   -webkit-border-radius: 5px;
@@ -265,15 +271,16 @@ used more than once per page.
 /* Home Feature */
 #home-feature-container {
   background-color: #b29f81;
-  margin-left: -70px;
-  margin-top: -10px; }
+  width: 100%;
+  /*	   margin-left:-70px;   */
+  /*	   margin-top:-10px;    */ }
   #home-feature-container #home-feature-image {
     background: url(../img/family-doc2.jpeg);
     background-repeat: no-repeat;
-    min-height: 565px;
+    height: 565px;
     min-width: 100%;
-    height: auto;
-    width: 103%; }
+    /*		   height: auto;   */
+    /*		   width: 103%;    */ }
 
 #home-feature-text {
   text-shadow: 1px 1px 4px black;
@@ -299,7 +306,7 @@ used more than once per page.
 #watermark {
   position: absolute;
   top: 53px;
-  right: 10px;
+  right: 7px;
   opacity: .3;
   text-align: right; }
   #watermark p {
@@ -372,7 +379,9 @@ used more than once per page.
     #share-all-med:hover p, #share-for-purpose:hover p, #consent-date-fill:hover p {
       color: #0088cc; }
   #share-all-med ul, #share-for-purpose ul, #consent-date-fill ul {
-    margin-bottom: 26px; }
+    margin-bottom: 20px; }
+    #share-all-med ul li:nth-of-type(1), #share-for-purpose ul li:nth-of-type(1), #consent-date-fill ul li:nth-of-type(1) {
+      margin-bottom: 10px; }
   #share-all-med .iradio_square-blue, #share-for-purpose .iradio_square-blue, #consent-date-fill .iradio_square-blue {
     margin-right: 5px; }
 
@@ -487,6 +496,9 @@ used more than once per page.
 #login-navbar .container-fluid {
   height: 46px;
   z-index: 50; }
+#login-navbar.navbar {
+  margin-left: 0;
+  margin-right: 0; }
 #login-navbar a.btn.btn-navbar, #login-navbar #create-account-navbar a.btn.btn-navbar {
   display: none; }
 #login-navbar #login-username, #login-navbar #login-password {
@@ -791,6 +803,10 @@ td.contacts-td {
     font-weight: 600; }
   .btn-cannot-delete-text .popover .popover-title, .btn-cannot-delete-text .popover .arrow {
     display: none; }
+
+.btn-danger:hover span {
+  color: white;
+  opacity: 1; }
 
 .minus-btn, .add-btn {
   color: rgba(255, 255, 255, 0.65); }
@@ -1110,6 +1126,9 @@ Media Query - defines how things should be styles under defined criteria
     margin-top: -28px;
     margin-bottom: 50px; }
 
+  #home-feature-container {
+    width: 100%; }
+
   #home-feature-text {
     text-shadow: 1px 1px 4px black;
     position: absolute;
@@ -1161,7 +1180,8 @@ Media Query - defines how things should be styles under defined criteria
     display: none; }
 
   .row-fluid #home-login-container[class*="span"] {
-    margin-left: 1.25%; }
+    margin-left: 5% !important;
+    margin-top: 20px !important; }
 
   [class*="span"], .uneditable-input[class*="span"], .row-fluid [class*="span"] {
     display: block;
@@ -1206,10 +1226,15 @@ Media Query - defines how things should be styles under defined criteria
     .login-section.login-fields {
       padding-top: 10px; }
       .login-section.login-fields .login-center {
-        margin-left: 10%; }
+        margin-left: 5%; }
 
+  /*
   #home-login-container {
-    margin-left: -1px; }
+  			margin-left: -1px;
+  		}
+  */
+  .row-fluid #home-login-container[class*="span"] {
+    margin-left: 5% !important; }
 
   #content.row-fluid {
     width: 100%; }
@@ -1220,7 +1245,7 @@ Media Query - defines how things should be styles under defined criteria
 
   #watermark p {
     /*max-width:180px;*/
-    font-size: .7em;
+    font-size: .75em;
     margin: 0; }
 
   #logoFragment img {
@@ -1243,6 +1268,9 @@ Media Query - defines how things should be styles under defined criteria
     height: 12px;
     margin: 2px;
     padding: 2px; }
+
+  #home-feature-container {
+    width: 100%; }
 
   #home-feature-text {
     text-shadow: 1px 1px 4px black;
@@ -1386,3 +1414,31 @@ Media Query - defines how things should be styles under defined criteria
   /*============================================================
   End of edits and additions to the original Joyride-2.0.3.css file.
   ============================================================*/ }
+/* Min-width 300px to Max-width 479px wide - MOBILE - Portrait, Mobile Landscape Size (devices and browsers)
+============================================================================ */
+@media only screen and (min-width: 300px) and (max-width: 399px) {
+  #watermark {
+    /*position: absolute;
+    top: 53px;
+    right: 7px;*/
+    max-width: 120px; }
+
+  #home-login-container {
+    margin-left: 5% !important;
+    margin-top: 10px;
+    height: auto; }
+    #home-login-container fieldset.login-section.login-fields {
+      padding-top: 0 !important; }
+    #home-login-container fieldset legend {
+      font-size: 17px;
+      margin-bottom: 5px;
+      padding: 0 0 10px; }
+    #home-login-container fieldset form#loginForm {
+      margin: 0 0 5px !important;
+      transition: margin .5s linear;
+      -webkit-transition: margin .5s linear;
+      -moz-transition: margin .5s linear;
+      -o-transition: margin .5s linear;
+      -ms-transition: margin .5s linear; }
+      #home-login-container fieldset form#loginForm > div:first-child {
+        padding-top: 2px; } }

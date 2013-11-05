@@ -22,8 +22,8 @@
 		<!-- <intercept-url pattern= "/resources/**" security="none"/> -->
 		
 		
-		<session-management session-fixation-protection="migrateSession" invalid-session-url="/index.html" >
-			<concurrency-control max-sessions="5" error-if-maximum-exceeded="false" expired-url="/index.html"  />
+		<session-management session-fixation-protection="migrateSession" >
+			<concurrency-control max-sessions="1" error-if-maximum-exceeded="false" expired-url="/index.html?expired=true" />
                       
          </session-management>  
 		
@@ -32,14 +32,14 @@
 
 	<!-- Configure Authentication mechanism -->
 	<authentication-manager alias="authenticationManager">
-		<authentication-provider>
+		<authentication-provider user-service-ref="accountUserDetailsService">
 			<password-encoder ref="passwordEncoder"/>
-			<jdbc-user-service id="userDetailsService"
-				data-source-ref="dataSource" />
 		</authentication-provider>
 	</authentication-manager>
 
 	<!-- Uses SHA-256 with multiple iterations and a random salt value. -->
 	<beans:bean id="passwordEncoder"
 		class="org.springframework.security.crypto.password.StandardPasswordEncoder" />
+	<beans:bean id="accountUserDetailsService"
+		class="gov.samhsa.consent2share.service.account.AccountUserDetailsService"/>
 </beans:beans>

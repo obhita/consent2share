@@ -64,9 +64,9 @@ span:last-child .alert.rounded {
 	*/
 #consent-current-active .badge, #share-all-med .badge {
   position: relative;
-  -webkit-border-radius: 1px;
-  -moz-border-radius: 1px;
-  border-radius: 1px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
   background-color: #fffff2;
   background-image: linear-gradient(to bottom, #fffff2, #fffff2);
   border-style: solid;
@@ -87,9 +87,9 @@ span:last-child .alert.rounded {
 
 #share-for-purpose .badge {
   position: relative;
-  -webkit-border-radius: 1px;
-  -moz-border-radius: 1px;
-  border-radius: 1px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
   background-color: #fffef2;
   background-image: linear-gradient(to bottom, #fffff2, #fffff2);
   border-style: solid;
@@ -291,6 +291,13 @@ ul.dashboard-list li a span {
 
 .box {
   margin-top: 20px; }
+
+#home-page .box-header {
+  height: auto; }
+  #home-page .box-header h2 .break {
+    padding: 12px 0 25px; }
+  #home-page .box-header h2 span:first-child {
+    float: left; }
 
 .box-header {
   height: 20px;

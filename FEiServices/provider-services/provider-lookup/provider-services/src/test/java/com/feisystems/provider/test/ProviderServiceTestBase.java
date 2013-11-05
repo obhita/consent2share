@@ -45,7 +45,7 @@ public class ProviderServiceTestBase {
 
 	protected List<ProviderDto> cityStateDtoReturn(){
 		Date d = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+	//	SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
 		ProviderDto bean1 = new ProviderDto("1111", "Individual", d,d);
 		ProviderDto bean2 = new ProviderDto("2222", "Individual", d,d);
 		ProviderDto bean3 = new ProviderDto("3333", "Individual", d,d);

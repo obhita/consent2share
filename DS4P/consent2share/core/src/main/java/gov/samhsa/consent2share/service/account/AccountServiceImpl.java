@@ -29,6 +29,8 @@ import gov.samhsa.consent2share.domain.account.EmailToken;
 import gov.samhsa.consent2share.domain.account.EmailTokenRepository;
 import gov.samhsa.consent2share.domain.account.TokenGenerator;
 import gov.samhsa.consent2share.domain.account.TokenType;
+import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
@@ -37,10 +39,11 @@ import gov.samhsa.consent2share.infrastructure.EmailType;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
+import gov.samhsa.consent2share.infrastructure.security.UsersAuthorityUtils;
 import gov.samhsa.consent2share.service.dto.SignupDto;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import javax.mail.MessagingException;
 
@@ -49,12 +52,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -67,9 +66,6 @@ public class AccountServiceImpl implements AccountService {
 
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
-	/** The user details manager. */
-	private UserDetailsManager userDetailsManager;
 	
 	/** The patient repository. */
 	private PatientRepository patientRepository;
@@ -94,6 +90,9 @@ public class AccountServiceImpl implements AccountService {
 	
 	/** The email token repository. */
 	private EmailTokenRepository emailTokenRepository;
+	
+	/** The users repository. */
+	private UsersRepository usersRepository;
 
 	/**
 	 * Instantiates a new account service impl.
@@ -110,20 +109,19 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Autowired
 	public AccountServiceImpl(
-			UserDetailsManager userDetailsManager,
 			PatientRepository patientRepository,
 			AdministrativeGenderCodeRepository administrativeGenderCodeRepository,
 			PasswordEncoder passwordEncoder, UserContext userContext,
 			EmailSender emailSender, 
-			TokenGenerator tokenGenerator, EmailTokenRepository emailTokenRepository,
+			TokenGenerator tokenGenerator, EmailTokenRepository emailTokenRepository, UsersRepository usersRepository,
 			@Value("${accountVerificationTokenExpireInHours}") Integer accountVerificationTokenExpireInHours) {
-		this.userDetailsManager = userDetailsManager;
 		this.patientRepository = patientRepository;
 		this.administrativeGenderCodeRepository = administrativeGenderCodeRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.userContext = userContext;
 		this.emailSender = emailSender;
 		this.emailTokenRepository = emailTokenRepository;
+		this.usersRepository=usersRepository;
 		this.tokenGenerator = tokenGenerator;
 		this.accountVerificationTokenExpireInHours = accountVerificationTokenExpireInHours;		
 	}
@@ -155,12 +153,12 @@ public class AccountServiceImpl implements AccountService {
 
 		patientRepository.save(patient);
 
-		List<GrantedAuthority> authorities = AuthorityUtils
-				.createAuthorityList("ROLE_USER");
-		String username = signupDto.getUsername();
-		UserDetails userDetails = new User(username, encodedPassword, false, true, true, true, authorities);		
+		Set<GrantedAuthority> authorities = UsersAuthorityUtils.createAuthoritySet("ROLE_USER");
 		
-		userDetailsManager.createUser(userDetails);
+		String username = signupDto.getUsername();
+		
+		Users user=new Users(username, encodedPassword, false, true, true, authorities);
+		usersRepository.createUser(user);
 
 		userContext.setCurrentUser(signupDto.getUsername());
 		
@@ -218,14 +216,14 @@ public class AccountServiceImpl implements AccountService {
 	 * @see gov.samhsa.consent2share.service.account.AccountService#findUserByUsername(java.lang.String)
 	 */
 	@Override
-	public UserDetails findUserByUsername(String username) {
-		UserDetails userDetails = null;
+	public Users findUserByUsername(String username) {
+		Users user = null;
 		try {
-			userDetails = userDetailsManager.loadUserByUsername(username);
+			user = usersRepository.loadUserByUsername(username);
 		} catch (UsernameNotFoundException e) {
 			String message = String.format("Username %s is not found.", username);
 			logger.info(message);
 		}
-		return userDetails;
+		return user;
 	}
 }

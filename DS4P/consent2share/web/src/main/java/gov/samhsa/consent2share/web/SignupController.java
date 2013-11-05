@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.web;
 
+import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
@@ -153,9 +154,9 @@ public class SignupController extends AbstractController {
 
 		String username = signupDto.getUsername();
 		
-		UserDetails userDetails = accountService.findUserByUsername(username);
+		Users user = accountService.findUserByUsername(username);
 
-		if (userDetails != null) {
+		if (user != null) {
 			List<LookupDto> genderCodes = administrativeGenderCodeService.findAllAdministrativeGenderCodes();
 			model.addAttribute("genderCodes", genderCodes);
 			FieldError error = new FieldError("signupDto", "username",

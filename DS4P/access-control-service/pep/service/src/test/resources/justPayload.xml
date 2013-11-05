@@ -1,0 +1,7 @@
+<pus:FilterC32Request
+	xmlns:pus="http://www.samhsa.gov/ds4ppilot/schema/pep">
+	<patientId>1234</patientId>
+	<packageAsXdm>true</packageAsXdm>
+	<senderEmailAddress>sender@test.com</senderEmailAddress>
+	<recipientEmailAddress>recipient@test.com</recipientEmailAddress>
+</pus:FilterC32Request>

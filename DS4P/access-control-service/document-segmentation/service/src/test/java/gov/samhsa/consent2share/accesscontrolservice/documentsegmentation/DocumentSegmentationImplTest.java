@@ -10,11 +10,11 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionService;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReader;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditServiceImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.brms.RuleExecutionService;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEditorImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEncrypterImpl;
@@ -24,6 +24,7 @@ import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentTaggerImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MetadataGeneratorImpl;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
+import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
 import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
@@ -136,7 +137,11 @@ public class DocumentSegmentationImplTest {
 		when(
 				ruleExecutionServiceClientMock
 						.assertAndExecuteClinicalFacts(testFactModel_xml))
-				.thenReturn(testExecutionResponseContainer_xml);
+				.thenReturn(mock(AssertAndExecuteClinicalFactsResponse.class));
+		
+		when(ruleExecutionServiceClientMock
+						.assertAndExecuteClinicalFacts(testFactModel_xml).getRuleExecutionResponseContainer())
+						.thenReturn(testExecutionResponseContainer_xml);
 
 		// Marshaller mock
 		marshallerMock = mock(SimpleMarshallerImpl.class);

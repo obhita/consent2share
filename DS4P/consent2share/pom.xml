@@ -22,17 +22,6 @@
 		<module>esignaturePolling</module>
 	</modules>
 
-
-	<dependencies>
-		<!-- Test -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-	</dependencies>
-
 	<build>
 
 		<resources>

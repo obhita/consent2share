@@ -340,7 +340,7 @@ public class ConsentController {
 		
 		SpecificMedicalInfosSetDto clinicalConceptCodesSet = new SpecificMedicalInfosSetDto(clinicalConceptCodes);
 		
-		model.addAttribute("DoNotShareClinicalConceptCodesSet", clinicalConceptCodesSet);
+		model.addAttribute("DoNotShareClinicalConceptCodes", clinicalConceptCodes);
 
 		model.addAttribute("defaultStartDate",
 				dateFormat.format(today.getTime()));

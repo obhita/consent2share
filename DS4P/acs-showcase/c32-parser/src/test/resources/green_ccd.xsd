@@ -1,0 +1,1162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2010 rel. 3 sp1 (http://www.altova.com) by Richard Geimer (private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:hl7-org:v3"
+	elementFormDefault="qualified" attributeFormDefault="unqualified"
+	targetNamespace="urn:hl7-org:v3">
+	<xs:include schemaLocation="green_cda_narrative.xsd"/>
+	<xs:element name="greenCCD">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="header">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="documentID" type="ii"/>
+							<xs:element name="title"/>
+							<xs:element name="version" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="number"/>
+										<xs:element name="setID" type="ii" minOccurs="0"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="confidentiality" type="cd"/>
+							<xs:element name="documentTimestamp" type="ts"/>
+							<xs:element name="personalInformation">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="patientInformation">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="personID" type="ii"/>
+												<xs:element name="personAddress" type="addr"
+												maxOccurs="unbounded"/>
+												<xs:element name="personPhone" type="tele"
+												maxOccurs="unbounded"/>
+												<xs:element name="personInformation"
+												maxOccurs="unbounded">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="personName" type="pnm"
+												maxOccurs="unbounded"/>
+												<xs:element name="gender" type="cd"/>
+												<xs:element name="personDateOfBirth" type="ts"/>
+												<xs:element name="maritalStatus" type="cd"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="religiousAffiliation" type="cd"
+												minOccurs="0"/>
+												<xs:element name="race" type="cd" minOccurs="0"
+												maxOccurs="unbounded"/>
+												<xs:element name="ethnicity" type="cd"
+												minOccurs="0"/>
+												<xs:element name="birthPlace" minOccurs="0">
+												<xs:complexType>
+												<xs:complexContent>
+												<xs:extension base="addr">
+												<xs:attribute name="name"/>
+												</xs:extension>
+												</xs:complexContent>
+												</xs:complexType>
+												</xs:element>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="languagesSpoken" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="languageSpoken" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="languageCode" type="cs"/>
+												<xs:element name="modeCode" type="ce"
+												minOccurs="0"/>
+												<xs:element name="preferenceInd" minOccurs="0">
+												<xs:complexType>
+												<xs:attribute name="nullFlavor"
+												type="nullFlavorType"/>
+												<xs:attribute name="value"/>
+												</xs:complexType>
+												</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="supports" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="support" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="date" type="ivlTs"/>
+												<xs:choice>
+												<xs:element name="guardian" type="contactType"/>
+												<xs:element name="contact" type="contactType"
+												maxOccurs="unbounded"/>
+												</xs:choice>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="custodian">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="custodianID" type="ii"
+											maxOccurs="unbounded"/>
+										<xs:element name="custodianName" type="onm" minOccurs="0"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="healthcareProviders" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="careProvisionDateRange" type="ivlTs">
+											<xs:annotation>
+												<xs:documentation>Not in C32, but required for CCD.
+												</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="healthcareProvider" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="role" type="cd"/>
+												<xs:element name="dateRange" type="ivlTs"/>
+												<xs:element name="providerEntity"
+												type="providerInformation"/>
+												<xs:element name="patientID" type="ii"
+												minOccurs="0"/>
+												<xs:element ref="comment" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element ref="informationSource"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="body">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="results" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation> </xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="encounters" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="encounter" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="encounterID" type="ii"
+												maxOccurs="unbounded"/>
+												<xs:element name="encounterType" minOccurs="0">
+												<xs:complexType>
+												<xs:complexContent>
+												<xs:extension base="cd"/>
+												</xs:complexContent>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="encounterDateTime" type="ivlTs"/>
+												<xs:element name="dischargeDisposition"
+												minOccurs="0"/>
+												<!-- Ignore for now, maps to part of the header -->
+												<xs:element name="admissionType" type="cd"
+												minOccurs="0"/>
+												<xs:element name="encounterProvider"
+												type="providerInformation" minOccurs="0"
+												maxOccurs="unbounded"/>
+												<xs:element name="facilityLocation" minOccurs="0">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="locationDuration" type="ivlTs"/>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="reasonForVisit" minOccurs="0">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="text" type="textType"
+												minOccurs="0"/>
+												<xs:element name="reason" type="cd"/>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												<!-- Ignore for now, maps to part of the header -->
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="medications" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="medication" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="indicateMedicationStopped"
+												type="ts" minOccurs="0"/>
+												<xs:element name="medicationDateRange"
+												type="ivlTs" minOccurs="0"/>
+												<xs:element name="admissionTiming" type="pivlTs"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="route" type="cd" minOccurs="0"/>
+												<xs:element name="dose" type="pq" minOccurs="0"/>
+												<xs:element name="site" type="cd" minOccurs="0"
+												maxOccurs="unbounded"/>
+												<xs:element name="doseRestriction" minOccurs="0">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="numerator" type="pq"/>
+												<xs:element name="denominator" type="pq"/>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="productForm" type="cd"
+												minOccurs="0"/>
+												<xs:element name="deliveryMethod" type="cd"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="medicationInformation"
+												type="medicationInformation" maxOccurs="unbounded"/>
+												<xs:element name="typeOfMedication" minOccurs="0">
+												<xs:complexType>
+												<xs:complexContent>
+												<xs:extension base="cd"/>
+												</xs:complexContent>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="statusOfMedication"
+												minOccurs="0">
+												<xs:complexType>
+												<xs:complexContent>
+												<xs:extension base="cd">
+												<xs:attribute name="valueType" type="valueType"/>
+												<xs:attribute name="status" type="statusType"/>
+												</xs:extension>
+												</xs:complexContent>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="indication" minOccurs="0"
+												maxOccurs="unbounded">
+												<xs:complexType>
+												<xs:complexContent>
+												<xs:extension base="cd">
+												<xs:attribute name="status" type="statusType"/>
+												<xs:attribute name="freeTextRef"/>
+												</xs:extension>
+												</xs:complexContent>
+												</xs:complexType>
+												</xs:element>
+                        <xs:element name="frequency"
+												minOccurs="0"/>
+												<xs:element name="patientInstructions"
+												minOccurs="0"/>
+												<xs:element name="reaction" type="cd"
+												minOccurs="0"/>
+												<xs:element name="vehicle" minOccurs="0"
+												maxOccurs="unbounded">
+												<xs:complexType>
+												<xs:complexContent>
+												<xs:extension base="cd">
+												<xs:attribute name="name"/>
+												</xs:extension>
+												</xs:complexContent>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="doseIndicator" minOccurs="0"
+												maxOccurs="unbounded"/>
+												<xs:element name="orderInformation" minOccurs="0"
+												maxOccurs="unbounded">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="orderNumber" type="ii"
+												minOccurs="0"/>
+												<xs:element name="fills" minOccurs="0">
+												<xs:complexType>
+												<xs:attribute name="value"/>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="quantityOrdered" type="pq"
+												minOccurs="0"/>
+												<xs:element name="orderExpirationDateTime"
+												type="ts" minOccurs="0"/>
+												<xs:element name="orderDateTime" type="ivlTs"
+												minOccurs="0"/>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="fulfillmentInstructions"
+												minOccurs="0"/>
+												<xs:element name="fulfillmentHistory"
+												minOccurs="0" maxOccurs="unbounded">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="prescriptionNumber" type="ii"
+												minOccurs="0"/>
+												<xs:element ref="provider" minOccurs="0"/>
+												<xs:element name="dispensingPharmacyLocation"
+												type="addr" minOccurs="0"/>
+												<xs:element name="dispenseDate" type="ivlTs"
+												minOccurs="0"/>
+												<xs:element name="quantityDispensed" type="pq"
+												minOccurs="0"/>
+												<xs:element name="fillNumber" minOccurs="0">
+												<xs:complexType>
+												<xs:attribute name="value"/>
+												<xs:attribute name="nullFlavor"
+												type="nullFlavorType"/>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="fillStatus" minOccurs="0">
+												<xs:complexType>
+												<xs:attribute name="value" type="statusType"/>
+												</xs:complexType>
+												</xs:element>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												<xs:element ref="comment" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="immunizations" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="immunization" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="administeredDate" type="ts"
+												minOccurs="0"/>
+												<xs:element name="medicationSeriesNumber"
+												type="pq" minOccurs="0"/>
+												<xs:element name="route" type="cd" minOccurs="0"/>
+												<xs:element name="reaction" type="cd"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="immunizationProvider"
+												type="providerInformation" minOccurs="0"
+												maxOccurs="unbounded"/>
+												<xs:element name="medicationInformation"
+												type="medicationInformation" maxOccurs="unbounded"/>
+												<xs:element name="refusalReason" type="cd"
+												minOccurs="0"/>
+												<xs:element name="statusOfImmunization" type="cd"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element ref="comment" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+												<xs:attribute name="refusalInd"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="allergies" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="allergy" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="adverseEventType" type="cd"/>
+												<xs:element name="adverseEventDate" type="ivlTs"
+												minOccurs="0"/>
+												<xs:element name="product" type="cd" minOccurs="0"
+												maxOccurs="unbounded"/>
+												<xs:element name="reaction" type="cd"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="severity" type="cd"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="allergyStatus" type="cd"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element ref="comment" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="vitalSigns" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="vitalSign" type="result"
+											maxOccurs="unbounded"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="advanceDirectives" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="advanceDirective" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="type">
+												<xs:complexType>
+												<xs:complexContent>
+												<xs:restriction base="cd">
+												<xs:sequence>
+												<xs:element name="originalText" type="xs:string"
+												minOccurs="0" maxOccurs="0"/>
+												<xs:element ref="qualifier" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+												</xs:restriction>
+												</xs:complexContent>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="value" type="cd"/>
+												<xs:element name="effectiveDate" type="ivlTs"/>
+												<xs:element name="status" type="ce"/>
+												<xs:element name="documentCustodian"
+												type="organizationInformation"/>
+												<xs:element ref="comment" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="procedures" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="procedure" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="procedureID" type="ii"
+												maxOccurs="unbounded"/>
+												<xs:element name="procedureType" minOccurs="0">
+												<xs:complexType>
+												<xs:complexContent>
+												<xs:restriction base="cd">
+												<xs:sequence>
+												<xs:element name="originalText" type="xs:string"
+												minOccurs="0" maxOccurs="0"/>
+												<xs:element ref="qualifier" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+												</xs:restriction>
+												</xs:complexContent>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="procedureFreeTextType"
+												type="xs:string"/>
+												<xs:element name="procedureDateTime" type="ivlTs"
+												minOccurs="0"/>
+												<xs:element name="bodySite" type="cd"
+												minOccurs="0"/>
+												<xs:element name="procedureProvider"
+												type="providerInformation" minOccurs="0"
+												maxOccurs="unbounded"/>
+												<xs:element ref="comment" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="insuranceProviders" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="insuranceProvider" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="resultID" type="ii"/>
+												<xs:element name="healthInsuranceType" type="cd"
+												minOccurs="0"/>
+												<xs:element name="payer"
+												type="organizationInformation"/>
+												<xs:element name="memberInformation">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="healthPlanCoverageDates"
+												type="ivlTs" minOccurs="0"/>
+												<xs:element name="memberID" type="ii"
+												minOccurs="0"/>
+												<xs:element name="patientRelationshipToSubscriber"
+												type="cd" minOccurs="0"/>
+												<xs:element name="patientAddress" type="addr"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="patientPhone" type="tele"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="patientName" type="pnm"/>
+												<xs:element name="patientDateOfBirth" type="ts"/>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												<xs:element
+												name="financialResponsibilityPartyType" type="cd"
+												minOccurs="0"/>
+												<xs:element name="subscriberInformation"
+												minOccurs="0">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="subscriberID" type="ii"/>
+												<xs:element name="subscriberAddress" type="addr"/>
+												<xs:element name="subscriberPhone" type="tele"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="subscriberName" type="pnm"/>
+												<xs:element name="subscriberDateOfBirth" type="ts"
+												/>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="guarantorInformation"
+												minOccurs="0" maxOccurs="unbounded">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="responsibilityEffectiveDate"
+												type="ivlTs" minOccurs="0"/>
+												<xs:element name="partyAddress" type="addr"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="partyPhone" type="tele"
+												minOccurs="0" maxOccurs="unbounded"/>
+												<xs:element name="partyName" type="pnm"
+												minOccurs="0"/>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="healthPlanName" minOccurs="0"/>
+												<xs:element ref="comment" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="pregnancies" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="pregnancy" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:complexContent>
+												<xs:extension base="cd">
+												<xs:sequence>
+												<xs:element ref="comment" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+												</xs:extension>
+												</xs:complexContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="conditions" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="condition" minOccurs="0"
+											maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+												<xs:element name="diagnosisPriority"
+												type="xs:integer" minOccurs="0"/>
+												<xs:element name="problemDate" type="ivlTs"
+												minOccurs="0"/>
+												<xs:element name="problemType" type="cd"
+												minOccurs="0"/>
+												<xs:element name="problemName"/>
+												<xs:element name="problemCode" type="cd"
+												minOccurs="0"/>
+												<xs:element name="treatingProvider" minOccurs="0"
+												maxOccurs="unbounded">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="treatingProviderID" type="ii"
+												minOccurs="0"/>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="ageAtOnset" type="xs:integer"
+												minOccurs="0"/>
+												<xs:element name="causeOfDeath" minOccurs="0">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="problemCode" type="cd"
+												minOccurs="0"/>
+												<xs:element name="timeOfDeath" type="ts"
+												minOccurs="0"/>
+												<xs:element name="ageAtDeath" type="xs:integer"
+												minOccurs="0"/>
+												</xs:sequence>
+												</xs:complexType>
+												</xs:element>
+												<xs:element name="problemStatus" type="ce"
+												minOccurs="0"/>
+												<xs:element ref="comment" minOccurs="0"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="planOfCare" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:choice maxOccurs="unbounded">
+											<xs:element name="plannedObservation"
+												type="plannedEvent"/>
+											<xs:element name="plannedProcedure" type="plannedEvent"/>
+											<xs:element name="plannedAct" type="plannedEvent"/>
+										</xs:choice>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="socialHistory" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="text" type="textType" minOccurs="0"/>
+										<xs:element name="socialHistoryEntry"
+											type="socialHistoryEntry" maxOccurs="unbounded"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="results">
+		<xs:annotation>
+			<xs:documentation>Check with Bob Dolin. Do we need to handle results organizers? C83
+				does not mention them. </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="text" type="textType" minOccurs="0"/>
+				<xs:element name="result" type="result" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="ii">
+		<xs:annotation>
+			<xs:documentation>Id</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="root"/>
+		<xs:attribute name="extension"/>
+		<xs:attribute name="nullFlavor" type="nullFlavorType"/>
+	</xs:complexType>
+	<xs:complexType name="cd">
+		<xs:annotation>
+			<xs:documentation>Code</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="originalText" minOccurs="0"/>
+			<xs:element ref="qualifier" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="code"/>
+		<xs:attribute name="displayName"/>
+		<xs:attribute name="codeSystem"/>
+		<xs:attribute name="codeSystemName"/>
+		<xs:attribute name="nullFlavor" type="nullFlavorType"/>
+	</xs:complexType>
+	<xs:complexType name="pq">
+		<xs:annotation>
+			<xs:documentation>Physical Quantity</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="value"/>
+		<xs:attribute name="unit"/>
+		<xs:attribute name="nullFlavor" type="nullFlavorType"/>
+	</xs:complexType>
+	<xs:complexType name="mo">
+		<xs:annotation>
+			<xs:documentation>Monetary Amount</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="value" use="required"/>
+		<xs:attribute name="currency" type="currencyType" use="optional"/>
+		<xs:attribute name="nullFlavor" type="nullFlavorType"/>
+	</xs:complexType>
+	<xs:complexType name="onm" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Organization name</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="nullFlavor" type="nullFlavorType"/>
+	</xs:complexType>
+	<xs:complexType name="pnm">
+		<xs:annotation>
+			<xs:documentation>Person Name</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="prefix" minOccurs="0"/>
+			<xs:element name="given"/>
+			<xs:element name="family"/>
+			<xs:element name="suffix" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="addr">
+		<xs:annotation>
+			<xs:documentation>Address (US only)</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="streetAddressLine" minOccurs="0" maxOccurs="2"/>
+			<xs:element name="city" minOccurs="0"/>
+			<xs:element name="state" minOccurs="0"/>
+			<xs:element name="postalCode" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="nullFlavor" type="nullFlavorType"/>
+	</xs:complexType>
+	<xs:complexType name="tele">
+		<xs:annotation>
+			<xs:documentation>Telecom</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="value"/>
+		<xs:attribute name="nullFlavor" type="nullFlavorType"/>
+	</xs:complexType>
+	<xs:complexType name="ts">
+		<xs:attribute name="value"/>
+		<xs:attribute name="nullFlavor" type="nullFlavorType"/>
+	</xs:complexType>
+	<xs:complexType name="ivlTs">
+		<xs:choice minOccurs="0">
+			<xs:sequence>
+				<xs:element name="low" type="ts">
+					<xs:annotation>
+						<xs:documentation> The low limit of the interval. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:choice minOccurs="0">
+					<xs:element name="width" type="pq" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation> The difference between high and low boundary. The
+								purpose of distinguishing a width property is to handle all cases of
+								incomplete information symmetrically. In any interval representation
+								only two of the three properties high, low, and width need to be
+								stated and the third can be derived. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="high" type="ts" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation> The high limit of the interval. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+			<xs:element name="high" type="ts">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:element>
+			<xs:sequence>
+				<xs:element name="width" type="pq">
+					<xs:annotation>
+						<xs:documentation> The difference between high and low boundary. The purpose
+							of distinguishing a width property is to handle all cases of incomplete
+							information symmetrically. In any interval representation only two of
+							the three properties high, low, and width need to be stated and the
+							third can be derived. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="high" type="ts" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation> The high limit of the interval. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:sequence>
+				<xs:element name="center" type="ts">
+					<xs:annotation>
+						<xs:documentation> The arithmetic mean of the interval (low plus high
+							divided by 2). The purpose of distinguishing the center as a semantic
+							property is for conversions of intervals from and to point values.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="width" type="pq" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation> The difference between high and low boundary. The purpose
+							of distinguishing a width property is to handle all cases of incomplete
+							information symmetrically. In any interval representation only two of
+							the three properties high, low, and width need to be stated and the
+							third can be derived. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:choice>
+		<xs:attribute name="value"/>
+		<xs:attribute name="nullFlavor" type="nullFlavorType"/>
+		<xs:attribute name="operator"/>
+	</xs:complexType>
+	<xs:complexType name="value">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="integer">
+					<xs:complexType>
+						<xs:attribute name="value"/>
+						<xs:attribute name="nullFlavor" type="nullFlavorType"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="monetaryAmount" type="mo"/>
+				<xs:element name="physicalQuantity" type="pq"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="result">
+		<xs:annotation>
+			<xs:documentation>Reusable result</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="resultID" type="ii" maxOccurs="unbounded"/>
+			<xs:element name="refusalReason" type="cd"
+				minOccurs="0"/>
+			<!-- required -->
+			<xs:element name="resultDateTime" type="ivlTs"/>
+			<xs:element name="procedureCode" type="cd"/>
+			<!-- required -->
+			<xs:element name="resultType" type="cd"/>
+			<!-- required -->
+			<xs:element name="resultStatus" type="cs"/>
+			<!-- required -->
+			<!-- optional -->
+			<xs:element name="resultValue" type="value" minOccurs="0"/>
+			<xs:element name="resultInterpretation" type="cd" minOccurs="0"/>
+			<!-- optional -->
+			<xs:element name="resultReferenceRange" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Skip reference range, review with Bob Dolin to see what is
+						important to capture. </xs:documentation>
+				</xs:annotation>
+				<!-- optional -->
+			</xs:element>
+			<xs:element ref="comment" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="medicationInformation">
+		<xs:annotation>
+			<xs:documentation>Reusable medical information</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="codedProductName">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="cd">
+							<xs:sequence>
+								<xs:element name="originalText" minOccurs="0" maxOccurs="0"/>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="codedBrandName" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="cd">
+							<xs:sequence>
+								<xs:element name="originalText" minOccurs="0" maxOccurs="0"/>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="freeTextProductName" type="xs:string"/>
+			<xs:element name="freeTextBrandName" type="xs:string" minOccurs="0"/>
+			<xs:element name="drugManufacturer" type="organizationInformation" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="providerInformation">
+		<xs:annotation>
+			<xs:documentation>Reusable provider information</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="providerType" type="cd" minOccurs="0"/>
+			<xs:element name="providerID" type="ii" minOccurs="0"/>
+			<xs:element name="providerAddress" type="addr" minOccurs="0"/>
+			<xs:element name="providerTelecom" type="tele" minOccurs="0"/>
+			<xs:element name="providerName" type="pnm" minOccurs="0"/>
+			<xs:element name="providerOrganizationName" type="onm" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="organizationInformation">
+		<xs:annotation>
+			<xs:documentation>Reusable organization information</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="organizationID" type="ii" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="organizationAddress" type="addr" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="organizationTelecom" type="tele" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="organizationName" type="onm" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="provider" type="organizationInformation"/>
+	<xs:element name="informationSource">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="author">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="authorTime" type="ts"/>
+							<xs:element name="authorName" type="pnm"/>
+							<xs:element name="reference" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="referenceDocumentID" type="ii"/>
+										<xs:element name="referenceDocumentURL">
+											<xs:complexType>
+												<xs:attribute name="value"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="informationSourceName" minOccurs="0">
+					<xs:complexType>
+						<xs:choice>
+							<xs:element name="personName" type="pnm"/>
+							<xs:element name="organizationName" type="onm"/>
+							<xs:element name="relatedPersonName" type="pnm"/>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="supportType">
+		<xs:annotation>
+			<xs:documentation>Enumeration of the types of providers available</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="GUARD"/>
+			<xs:enumeration value="AGNT"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="currencyType">
+		<xs:annotation>
+			<xs:documentation>Enumeration of the types of currency available</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ARS"/>
+			<xs:enumeration value="AUD"/>
+			<xs:enumeration value="BRL"/>
+			<xs:enumeration value="CAD"/>
+			<xs:enumeration value="CHF"/>
+			<xs:enumeration value="CLF"/>
+			<xs:enumeration value="CNY"/>
+			<xs:enumeration value="DEM"/>
+			<xs:enumeration value="ESP"/>
+			<xs:enumeration value="EUR"/>
+			<xs:enumeration value="FIM"/>
+			<xs:enumeration value="FRF"/>
+			<xs:enumeration value="GBP"/>
+			<xs:enumeration value="ILS"/>
+			<xs:enumeration value="INR"/>
+			<xs:enumeration value="JPY"/>
+			<xs:enumeration value="KRW"/>
+			<xs:enumeration value="MXN"/>
+			<xs:enumeration value="NLG"/>
+			<xs:enumeration value="NZD"/>
+			<xs:enumeration value="PHP"/>
+			<xs:enumeration value="RUR"/>
+			<xs:enumeration value="THB"/>
+			<xs:enumeration value="TRL"/>
+			<xs:enumeration value="TWD"/>
+			<xs:enumeration value="USD"/>
+			<xs:enumeration value="ZAR"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="valueType">
+		<xs:annotation>
+			<xs:documentation>Enumeration of the different xsi:type values available for a
+				VALUE</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CE"/>
+			<xs:enumeration value="BL"/>
+			<xs:enumeration value="BN"/>
+			<xs:enumeration value="BIN"/>
+			<xs:enumeration value="CR"/>
+			<xs:enumeration value="UUID"/>
+			<xs:enumeration value="II"/>
+			<xs:enumeration value="URL"/>
+			<xs:enumeration value="AD"/>
+			<xs:enumeration value="BL"/>
+			<xs:enumeration value="EN"/>
+			<xs:enumeration value="QTY"/>
+			<xs:enumeration value="PQR"/>
+			<xs:enumeration value="RTO"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="relationshipType">
+		<xs:annotation>
+			<xs:documentation>Enumeration of the different relationship types,
+				INCOMPLETE</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CHILD"/>
+			<xs:enumeration value="SON"/>
+			<xs:enumeration value="HUSB"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="statusType">
+		<xs:annotation>
+			<xs:documentation>Enumeration of the different status values available for status
+				codes</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="normal"/>
+			<xs:enumeration value="active"/>
+			<xs:enumeration value="cancelled"/>
+			<xs:enumeration value="pending"/>
+			<xs:enumeration value="suspended"/>
+			<xs:enumeration value="terminated"/>
+			<xs:enumeration value="nullified"/>
+			<xs:enumeration value="completed"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="nullFlavorType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="NP"/>
+			<xs:enumeration value="NI"/>
+			<xs:enumeration value="MSK"/>
+			<xs:enumeration value="NA"/>
+			<xs:enumeration value="OTH"/>
+			<xs:enumeration value="NINF"/>
+			<xs:enumeration value="PINF"/>
+			<xs:enumeration value="UNK"/>
+			<xs:enumeration value="NASK"/>
+			<xs:enumeration value="TRC"/>
+			<xs:enumeration value="ASKU"/>
+			<xs:enumeration value="NAV"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="confidentialityType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="N"/>
+			<xs:enumeration value="R"/>
+			<xs:enumeration value="V"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="comments">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="text" type="textType"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="comment">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="text" type="textType"/>
+				<xs:element name="reason" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="plannedEvent">
+		<xs:sequence>
+			<xs:element name="planId" type="ii"/>
+			<xs:element name="plannedTime" type="ivlTs" minOccurs="0"/>
+			<xs:element name="planType" type="cd"/>
+			<xs:element name="planFreeText" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+
+
+	<xs:complexType name="pivlTs">
+		<xs:sequence>
+			<xs:element name="period">
+				<xs:complexType>
+					<xs:attribute name="value"/>
+					<xs:attribute name="unit"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="institutionSpecified" type="xs:boolean"/>
+	</xs:complexType>
+	<xs:complexType name="cs">
+		<xs:attribute name="code"/>
+	</xs:complexType>
+	<xs:element name="qualifier">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name">
+					<xs:complexType>
+						<xs:complexContent>
+							<xs:restriction base="cd">
+								<xs:sequence>
+									<xs:element name="originalText" type="xs:string" minOccurs="0"/>
+									<xs:element ref="qualifier" minOccurs="0" maxOccurs="0"/>
+								</xs:sequence>
+							</xs:restriction>
+						</xs:complexContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="value">
+					<xs:complexType>
+						<xs:complexContent>
+							<xs:restriction base="cd">
+								<xs:sequence>
+									<xs:element name="originalText" type="xs:string" minOccurs="0"/>
+									<xs:element ref="qualifier" minOccurs="0" maxOccurs="0"/>
+								</xs:sequence>
+							</xs:restriction>
+						</xs:complexContent>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="ce">
+		<xs:complexContent>
+			<xs:restriction base="cd">
+				<xs:sequence>
+					<xs:element name="originalText" type="xs:string" minOccurs="0"/>
+					<xs:element ref="qualifier" minOccurs="0" maxOccurs="0"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="contactType">
+		<xs:sequence>
+			<xs:element name="contactAddress" type="addr" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="contactTelecom" type="tele" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="contactName" type="pnm" maxOccurs="unbounded"/>
+			<xs:element name="contactMothersMaidenName" type="onm" minOccurs="0"/>
+			<xs:element ref="comment" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="type" type="supportType"/>
+		<xs:attribute name="relationship" type="relationshipType"/>
+	</xs:complexType>
+
+	<xs:complexType name="socialHistoryEntry">
+		<xs:sequence>
+			<xs:element name="socialHistoryId" type="ii"/>
+			<xs:element name="socialHistoryTime" type="ivlTs" minOccurs="0"/>
+			<xs:element name="socialHistoryType" type="cd"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -7,6 +7,7 @@
 			<xs:attribute name="root" form="unqualified" type="xs:string" />
 			<xs:attribute name="nullFlavor" form="unqualified" type="xs:string" />
 			<xs:attribute name="extension" form="unqualified" type="xs:string" />
+			<xs:attribute name="assigningAuthorityName" form="unqualified" type="xs:string" />
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="device">
@@ -14,9 +15,32 @@
 			<xs:sequence>
 				<xs:element ref="id" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="telecom" minOccurs="0" maxOccurs="1" />
+				<xs:element name="asAgent" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="representedOrganization" minOccurs="1" maxOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element ref="id" minOccurs="1" maxOccurs="1" />									
+									</xs:sequence>
+									<xs:attribute name="determinerCode" form="unqualified" type="xs:string" />
+									<xs:attribute name="classCode" form="unqualified" type="xs:string" />
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="classCode" form="unqualified" type="xs:string" />
+					</xs:complexType>				
+				</xs:element>
 			</xs:sequence>
+			<xs:attribute name="classCode" form="unqualified" type="xs:string" />
 			<xs:attribute name="determinerCode" form="unqualified"
 				type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="code">
+		<xs:complexType>
+			<xs:attribute name="code" form="unqualified" type="xs:string" />
+			<xs:attribute name="codeSystem" form="unqualified" type="xs:string" />
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="telecom">
@@ -82,6 +106,7 @@
 				maxOccurs="1">
 				<xs:complexType>
 					<xs:sequence>
+						<xs:element ref="code" minOccurs="0" maxOccurs="1"/>
 						<xs:element name="subject" minOccurs="1" maxOccurs="1">
 							<xs:complexType>
 								<xs:sequence>
@@ -149,6 +174,7 @@
 																						</xs:complexType>
 																					</xs:element>
 																				</xs:sequence>
+																				<xs:attribute name="determinerCode" form="unqualified" type="xs:string" />
 																			</xs:complexType>
 																		</xs:element>
 																		<xs:element name="providerOrganization"
@@ -177,9 +203,65 @@
 																</xs:complexType>
 															</xs:element>
 														</xs:sequence>
+														<xs:attribute name="typeCode" form="unqualified" type="xs:string" />
 													</xs:complexType>
 												</xs:element>
+												<xs:element name="custodian" minOccurs="0" maxOccurs="1">
+													<xs:complexType>
+														<xs:sequence>
+															<xs:element name="assignedEntity" minOccurs="1" maxOccurs="1">
+																<xs:complexType>
+																	<xs:sequence>
+																		<xs:element ref="id" minOccurs="1" maxOccurs="1" />
+																		<xs:element name="assignedOrganization" minOccurs="0" maxOccurs="1">
+																			<xs:complexType>
+																				<xs:sequence>
+																					<xs:element name="name" type="xs:string"/>
+																				</xs:sequence>
+																			</xs:complexType>
+																		</xs:element>
+																	</xs:sequence>
+																	<xs:attribute name="classCode" form="unqualified" type="xs:string" />
+																</xs:complexType>																
+															</xs:element>
+														</xs:sequence>
+														<xs:attribute name="typeCode" form="unqualified" type="xs:string" />
+													</xs:complexType>													
+												</xs:element>
+												<xs:element name="replacementOf" minOccurs="0" maxOccurs="1">
+													<xs:complexType>
+														<xs:sequence>
+															<xs:element name="priorRegistration" minOccurs="1" maxOccurs="1">
+																<xs:complexType>
+																	<xs:sequence>
+																		<xs:element ref="statusCode" minOccurs="0" maxOccurs="1" />
+																		<xs:element name="subject1" minOccurs="1" maxOccurs="1">
+																			<xs:complexType>
+																				<xs:sequence>
+																					<xs:element name="priorRegisteredRole" minOccurs="1" maxOccurs="1">
+																						<xs:complexType>
+																							<xs:sequence>
+																								<xs:element ref="id" minOccurs="1" maxOccurs="1" />
+																							</xs:sequence>
+																							<xs:attribute name="classCode" form="unqualified" type="xs:string" />
+																						</xs:complexType>
+																					</xs:element>
+																				</xs:sequence>
+																				<xs:attribute name="typeCode" form="unqualified" type="xs:string" />
+																			</xs:complexType>
+																		</xs:element>																		
+																	</xs:sequence>
+																	<xs:attribute name="classCode" form="unqualified" type="xs:string" />
+																	<xs:attribute name="moodCode" form="unqualified" type="xs:string" />
+																</xs:complexType>
+															</xs:element>
+														</xs:sequence>
+														<xs:attribute name="typeCode" form="unqualified" type="xs:string" />
+													</xs:complexType>
+												</xs:element>												
 											</xs:sequence>
+											<xs:attribute name="classCode" form="unqualified" type="xs:string" />
+											<xs:attribute name="moodCode" form="unqualified" type="xs:string" />
 										</xs:complexType>
 									</xs:element>
 								</xs:sequence>
@@ -189,6 +271,7 @@
 						</xs:element>
 					</xs:sequence>
 					<xs:attribute name="moodCode" form="unqualified" type="xs:string" />
+					<xs:attribute name="classCode" form="unqualified" type="xs:string" />
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
@@ -210,11 +293,26 @@
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name="PRPA_IN201302UV">
+	<xs:element name="PRPA_IN201302UV02">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">An patient registry
 				revised request
 				specifies a request to revise an existing patient.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="PatientIdentityFeedRequestType">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+		
+	<xs:element name="PRPA_IN201304UV02">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">An patient registry
+				merge request
+				specifies a request to merge a patient to another patient.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>

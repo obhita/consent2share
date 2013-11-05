@@ -18,7 +18,6 @@
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>brms-service</artifactId>
-			<version>${project.version}</version>
 		</dependency>		
 	</dependencies>
 

@@ -10,11 +10,13 @@
 	<artifactId>c32-service-client</artifactId>
 	<name>C32 Service Client</name>
 	<packaging>jar</packaging>
-	<version>1.1.1-SNAPSHOT</version>
 	
-	<properties>
-		<cxf.wss4j.version>1.6.11</cxf.wss4j.version>
-	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+		</dependency>		
+	</dependencies>
 
 	<build>
 		<finalName>c32-client</finalName>
@@ -24,7 +26,6 @@
 			<plugin>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
-				<version>${cxf.version}</version>
 				<dependencies>
 					<dependency>
 						<groupId>xerces</groupId>
@@ -88,7 +89,6 @@
 			</plugin>
 		</plugins>
 		
-		<!-- Build with Java 1.6 -->
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
@@ -145,12 +145,5 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
-	<dependencies>
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>2.2</version>			
-		</dependency>		
-	</dependencies>
+	
 </project>

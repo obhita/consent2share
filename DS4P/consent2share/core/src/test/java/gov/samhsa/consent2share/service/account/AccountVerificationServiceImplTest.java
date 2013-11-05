@@ -4,16 +4,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
 import javax.mail.MessagingException;
 
 import gov.samhsa.consent2share.domain.account.EmailToken;
 import gov.samhsa.consent2share.domain.account.EmailTokenRepository;
 import gov.samhsa.consent2share.domain.account.TokenGenerator;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
 import gov.samhsa.consent2share.infrastructure.security.TokenExpiredException;
@@ -22,23 +18,18 @@ import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistExceptio
 import gov.samhsa.consent2share.service.dto.AccountVerificationDto;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.UserDetailsManager;
 
 public class AccountVerificationServiceImplTest {
 
 	private AccountVerificationServiceImpl sut;
 
-	private UserDetailsManager userDetailsManager;
 	private PatientRepository patientRepository;
 	private TokenGenerator tokenGenerator;
 	private Integer accountVerificationTokenExpireInHours;
 	private EmailTokenRepository emailTokenRepository;
-	private EmailSender emailSender;	
+	private EmailSender emailSender;
+	private UsersRepository usersRepository; 
 
 	@Before
 	public void setUp() {
@@ -46,7 +37,7 @@ public class AccountVerificationServiceImplTest {
 		// Just to save a few lines of code for each individual test
 		// But independency, clarity of the unit tests are much more important
 		// than code reuse
-		userDetailsManager = mock(UserDetailsManager.class);
+		usersRepository = mock(UsersRepository.class);
 		patientRepository = mock(PatientRepository.class);
 		tokenGenerator = mock(TokenGenerator.class);
 		accountVerificationTokenExpireInHours = 8;
@@ -54,7 +45,7 @@ public class AccountVerificationServiceImplTest {
 		emailSender = mock(EmailSender.class);
 		
 
-		sut = new AccountVerificationServiceImpl(userDetailsManager,
+		sut = new AccountVerificationServiceImpl(usersRepository,
 				patientRepository, tokenGenerator,
 				accountVerificationTokenExpireInHours, emailTokenRepository,
 				emailSender);

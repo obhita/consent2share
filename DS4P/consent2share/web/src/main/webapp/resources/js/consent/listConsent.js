@@ -8,10 +8,14 @@ $(document).ready(function() {
 			$("#signnow").click(function() {
 				$(this).attr("disabled", "disabled");
 			});
+			
+			var sign_revoke_arys = {
+					consentPreSignList: [],
+					consentPreRevokeList: []
+			};
 
-			initListConsent();
-		}
-);
+			initListConsent(sign_revoke_arys);
+});
 
 function initSessionTimeoutChecker() {
 	function runSessionTimeout() {
@@ -21,8 +25,8 @@ function initSessionTimeoutChecker() {
 	window.setTimeout(runSessionTimeout, 60000*10);
 }
 
-function initConsentPresignStatusChecker () {
-	if (consentPreSignList.length!=0||consentPreRevokeList!=0) {
+function initConsentPresignStatusChecker (sign_revoke_arys) {
+	if (sign_revoke_arys.consentPreSignList.length!=0||sign_revoke_arys.consentPreRevokeList!=0) {
 			valueInterval=0;
 			
 			setInterval(function() {						
@@ -31,8 +35,8 @@ function initConsentPresignStatusChecker () {
 				type:"GET",
 				traditional: true,
 				async:true, 
-				data: {consentPreSignList:consentPreSignList,
-					consentPreRevokeList:consentPreRevokeList},
+				data: {consentPreSignList:sign_revoke_arys.consentPreSignList,
+					consentPreRevokeList:sign_revoke_arys.consentPreRevokeList},
 				beforeSend : function(){
 					valueInterval=valueInterval+1;
 			        if(valueInterval==100)
@@ -71,8 +75,24 @@ function initRevokeModalListeners() {
 }
 
 
-function initListConsent() {
+function initListConsent(sign_revoke_arys) {
 	initSessionTimeoutChecker();
-	initConsentPresignStatusChecker();
+	
+	$('.consent-entry-input').each(function(){
+		if($(this).data('consentstage')==1){
+			sign_revoke_arys.consentPreSignList.push($(this).val());
+		}
+		
+		if($(this).data('revokestage')==1){
+			sign_revoke_arys.consentPreRevokeList.push($(this).val());
+		}
+	});
+	
+	initConsentPresignStatusChecker(sign_revoke_arys);
 	initRevokeModalListeners();
-}
+};
+
+
+
+
+

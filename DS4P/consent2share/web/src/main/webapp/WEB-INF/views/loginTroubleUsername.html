@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/common :: headerFragment">
 	
 	<!-- START: Meta -->
 
-	<meta charset="utf-8">
+	<meta charset="utf-8" />
 	<title>Create New Password</title>
-	<meta name="description" content="Consent Management System">
-	<meta name="author" content="FEiSystems">
+	<meta name="description" content="Consent Management System" />
+	<meta name="author" content="FEiSystems" />
 
 	<!-- END: Meta -->
 
@@ -15,7 +15,7 @@
 	
 	<!-- START: Mobile Specific -->
 	
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	
 	<!-- END: Mobile Specific -->
 
@@ -23,11 +23,11 @@
 
 	<!-- START: CSS -->
 
-	<link id="bootstrap-style" href="css/bootstrap.css" rel="stylesheet">
-	<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
-	<link href="css/themes-style.css" rel="stylesheet" type="text/css">
-	<link href="css/joyride-consent2share.css" rel="stylesheet" type="text/css">
-	<link href="css/sentinel-style.css" rel="stylesheet" type="text/css">
+	<link id="bootstrap-style" href="../../resources/css/bootstrap.css" rel="stylesheet" />
+	<link href="../resources/css/bootstrap-responsive.min.css" rel="stylesheet" />
+	<link href="../resources/css/themes-style.css" rel="stylesheet" type="text/css" />
+	<link href="../resources/css/joyride-consent2share.css" rel="stylesheet" type="text/css" />
+	<link href="../resources/css/sentinel-style.css" rel="stylesheet" type="text/css" />
 
 	<!-- END: CSS -->
 
@@ -59,7 +59,7 @@
 	<div role="navigation" class="navbar">
 		<div class="navbar-inner-header">
 			<div class="container-fluid">
-				<a id="bread-crumb-btn" href="login-trouble.html" class="btn  btn-info" ><span class="icon-chevron-left icon-white"></span></a>
+				<a id="bread-crumb-btn" href="loginTrouble.html" class="btn  btn-info" ><span class="icon-chevron-left icon-white"></span></a>
 				<h1><span class="nav-title">Share with confidence.</span></h1>
 				
 				<span th:include="fragment/common :: logoFragment">
@@ -99,15 +99,15 @@
 			                    
 								<legend>Forgot your username?</legend>				 
 								<div class="alert top-margin10">Please verify the information below to retrieve your account username. All information must match the information used to create the account. </div>
-                                <form id=create_account>
+                                <form id="create_account">
                                 	<label for="first_name">First Name</label> 
-	                                    <input id="first_name" name="firstname" type="text" required="required" aria-required="true"> 
+	                                    <input id="first_name" name="firstname" type="text" required="required" aria-required="true" /> 
 	                                    <label for="last_name">Last Name</label> 
-	                                    <input id="last_name" name="lastname" type="text" required aria-required="true">
+	                                    <input id="last_name" name="lastname" type="text" required="required" aria-required="true" />
 	                                    <label for="birth-date">Date of Birth</label> 
-	                                    <input id="birth-date" name="birthdate" type="text" required aria-required="true">  
+	                                    <input id="birth-date" name="birthdate" type="text" required="required" aria-required="true" />  
 	                                    <label for="email">Email</label> 
-	                                    <input id="email" name="email" type="text" required aria-required="true"> 
+	                                    <input id="email" name="email" type="text" required="required" aria-required="true" /> 
 
 		                       	 </form>	                                
 								   
@@ -118,7 +118,7 @@
 
                             	<div class="control-group bottom-btn-group">
                                 	<div class="controls">
-                                            <button type="button" class="btn" onClick="window.location.href='index-landing.html'" style="margin: 0 10px 0 0;">Cancel</button>
+                                            <button type="button" class="btn" onClick="window.location.href='index.html'" style="margin: 0 10px 0 0;">Cancel</button>
                                             <button class="btn btn-info" onClick="window.location.href='#'">Next</button> 
                                     </div>
                                 </div>	
@@ -142,7 +142,7 @@
 	
 	<!-- !START: Footer Region -->		
 	
-		<footer class="bottom">
+		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
 			<div>
 				
 				<!-- COMPONENT: Action Buttons -->
@@ -160,26 +160,20 @@
 	<!-- END: Footer Region --> 
 	</div>
 
-
-
 	<!-- START: JavaScript-->
-
-		<script src="js/jquery-1.7.2.min.js"></script><noscript>Alternate content for script</noscript>
-		<script src="js/bootstrap.js"></script><noscript>Alternate content for script</noscript>
-		<script src="js/bootstrap-popover.js" type="text/javascript"></script>
-		<script src="js/jquery.bootstrap-modal.js" type="text/javascript"></script>
-		<script src="js/modernizr.mq.js" type="text/javascript"></script>
-
-		<!-- JavaScript Functions -->
-		<!-- FIXME: Move internal javascript code to external .js file -->
-		<script type="text/javascript">	
-		
-			$(document).ready(function(){
-				
-							
-			});			
-		
-		</script><noscript>Alternate content for script</noscript>
+	
+		<script src="../../resources/js/bootstrap.min.js"
+				th:src="@{/resources/js/bootstrap.min.js}" 
+				type="text/javascript"></script>
+		<script src="../../resources/js/bootstrap-popover.js"
+				th:src="@{/resources/js/bootstrap-popover.js}"
+				type="text/javascript"></script>
+		<script src="../../resources/js/bootstrap-modal.js" 
+				th:src="@{/resources/js/bootstrap-modal.js}"
+				type="text/javascript"></script>
+		<script src="../../resources/js/modernizr.mq.js" 
+				th:src="@{/resources/js/modernizr.mq.js}"
+				type="text/javascript"></script>
 	
 	<!-- END: JavaScript-->
 	

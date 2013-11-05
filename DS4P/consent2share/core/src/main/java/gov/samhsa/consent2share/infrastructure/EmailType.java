@@ -37,5 +37,7 @@ public enum EmailType {
  /** The password reset request. */
  PASSWORD_RESET_REQUEST, 
  /** The password confirmation. */
- PASSWORD_CONFIRMATION;
+ PASSWORD_CONFIRMATION, 
+ /** The user profile change. */
+ USER_PROFILE_CHANGE;
 }

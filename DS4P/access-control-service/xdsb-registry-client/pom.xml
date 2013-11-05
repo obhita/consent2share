@@ -9,6 +9,13 @@
 	<artifactId>xdsb-registry-client</artifactId>
 	<name>XDS.b Registry Client</name>
 	<packaging>jar</packaging>
+	
+	<dependencies>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-library</artifactId>
+			</dependency>
+	</dependencies>
 
 	<build>
 		<finalName>xdsb-registry-client</finalName>

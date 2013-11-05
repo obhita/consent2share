@@ -27,6 +27,7 @@ package gov.samhsa.consent2share.web;
 
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
+import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.LegalRepresentativeDto;
 import gov.samhsa.consent2share.service.dto.PatientLegalRepresentativeAssociationDto;
@@ -48,6 +49,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
@@ -68,7 +71,9 @@ import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 @RequestMapping("/patients")
 public class LegalRepresentativeController {
 
-
+	/** The logger. */
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	/** The patient service. */
 	@Autowired
 	PatientService patientService;
@@ -227,8 +232,13 @@ public class LegalRepresentativeController {
 		PatientLegalRepresentativeAssociationDto associationDto = patientLegalRepresentativeAssociationService.getAssociationDtoFromLegalRepresentativeDto(newLegalRepresentativeDto);
 		
 		//TODO: The following should be in one transaction in service layer
+		//TODO: The patientService.updatePatient method is updated with authentication. The following method needs to be re-implemented if legal-representative is still needed in the future.
 		legalRepDto.setId(legalRepId);
-		patientService.updatePatient(legalRepDto);
+		try {
+			patientService.updatePatient(legalRepDto);
+		} catch (AuthenticationFailedException e) {
+			logger.warn("Exception when updating patient profile");
+		}
 		associationDto.setPatientId(patientService.findPatientProfileByUsername(currentUser.getUsername()).getId());
 		associationDto.setLegalRepresentativeId(legalRepId);
 		patientLegalRepresentativeAssociationService.updatePatientLegalRepresentativeAssociationDto(associationDto);

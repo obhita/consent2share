@@ -90,13 +90,6 @@
 			<artifactId>jaxb-impl</artifactId>
 		</dependency>
 
-		<!-- Saxon-HE dependencies -->
-		<dependency>
-			<groupId>net.sf.saxon</groupId>
-			<artifactId>Saxon-HE</artifactId>
-		</dependency>
-
-
 		<!-- iText -->
 		<dependency>
 			<groupId>com.itextpdf</groupId>

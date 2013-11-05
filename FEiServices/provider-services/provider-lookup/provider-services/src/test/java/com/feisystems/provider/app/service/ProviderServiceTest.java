@@ -25,7 +25,7 @@ import com.feisystems.provider.mappers.ProviderMapper;
 import com.feisystems.provider.repository.ProviderRepository;
 import com.feisystems.provider.services.ProviderServiceImpl;
 import com.feisystems.provider.test.ProviderServiceTestBase;
-
+@SuppressWarnings("unchecked")
 @RunWith(MockitoJUnitRunner.class)
 public class ProviderServiceTest extends ProviderServiceTestBase {
 	
@@ -41,6 +41,7 @@ public class ProviderServiceTest extends ProviderServiceTestBase {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
+
 
 	@Before
 	public void setUp() throws Exception {

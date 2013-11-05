@@ -1,0 +1,32 @@
+<h2>REM EHR #1</h2>
+
+<h3>Patients</h3>
+<table class="table table-striped">
+	<tr ng-repeat="patient in ehrNumOne.patients">
+		<td>Id: {{patient.id}}</td>
+		<td>Full Name: {{patient.fullName}}</td>
+		<td>
+			<div class="pull-right">
+				<button ng-click="getC32(patient)">Get C32</button>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<div ng-show="ehrNumOne.selectedPatient.c32Xml">
+	<h3>C32 for {{ehrNumOne.selectedPatient.fullName}} <button id="parseC32" class="btn btn-primary" ng-click="parseC32()">Parse C32</button></h3>
+	<pre style="height: 10pc; overflow-y: scroll;">{{ehrNumOne.selectedPatient.c32Xml}}</pre>
+</div>
+
+<div ng-show="ehrNumOne.selectedPatient.greenCcd">
+	<h3>Parsed C32 for {{ehrNumOne.selectedPatient.fullName}}</h3>
+	<div>Address:</div>
+	<div>
+		{{ehrNumOne.selectedPatient.greenCcd.header.personalInformation.patientInformation.personAddress[0].streetAddressLine[0]}}
+	</div>
+	<div>
+		{{ehrNumOne.selectedPatient.greenCcd.header.personalInformation.patientInformation.personAddress[0].city}},
+		{{ehrNumOne.selectedPatient.greenCcd.header.personalInformation.patientInformation.personAddress[0].state}}
+		{{ehrNumOne.selectedPatient.greenCcd.header.personalInformation.patientInformation.personAddress[0].postalCode}}
+	</div>
+</div>

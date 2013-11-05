@@ -75,8 +75,16 @@
 		<div th:if="${consentDto.id}!='null'"> 
 		<input class="consentId" id="consentId" name="id" type="text" th:value="${consentDto.id}"/> 
 		</div>
+		<div th:if="${!addConsent}">		
+			<div class="specmedinfo-input-div" th:each="DoNotShareClinicalConceptCode:${DoNotShareClinicalConceptCodes}">
+					<input class="specmedinfo-input" th:id="${DoNotShareClinicalConceptCode.code}"
+					type="hidden" th:attr="data-codesys=${DoNotShareClinicalConceptCode.codeSystem},data-dispname=${DoNotShareClinicalConceptCode.displayName}"
+					th:value="${DoNotShareClinicalConceptCode.code} + ';' + ${DoNotShareClinicalConceptCode.displayName}" />
+			</div>
+		</div>
+		
 	</form> 	
-	<!-- END : Page Header -->	
+	
 	
 
 	<div id="consent-add-main" class="container-fluid" style="overflow:hidden">
@@ -125,7 +133,9 @@
 			</div>
 		</div>
 	</div>
-					
+	
+	<!-- END : Page Header -->	
+	
 	<div id="under-header"></div>
 		<div class="row-fluid main-content-wrapper">					
 			<div id="content">
@@ -201,17 +211,14 @@
 																																						
 																</div>
 																
+																<!-- editing existing consent -->
 																<div th:if="${!addConsent}">
 																	<div th:each="individualProvider:${individualProvidersDto}">
 														        		<label for="inidividualProvider" th:for="'from'+${individualProvider.npi}" class="checkbox">
 																		<input class="toDiscloseList" id="inidividualProvider" th:field="*{providersPermittedToDisclose}" th:id="'from'+${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" type="checkbox" name="individualConsentAuthorizedFrom" style="float: none;"/><span th:text="${individualProvider.lastName+', '+individualProvider.firstName}"> Doe, John</span>
 																		</label>
 																		<div th:if="${consentDto.providersPermittedToDiscloseNpi.contains(individualProvider.npi)}">
-																			<!-- FIXME: Move internal javascript code to external .js file -->
-																			<script th:inline="javascript">
-																				var prov =/*[[${individualProvider.npi}]]*/ 'Sebastian';
-																				document.getElementById('from'+prov).checked = true;	
-																			</script>
+																			<input type="hidden" class="prov-npi-checked-input" th:value="'from'+${individualProvider.npi}" />
 																		</div>
 																	</div>
 																	<div th:each="organizationalProvider:${organizationalProvidersDto}">
@@ -219,11 +226,7 @@
 																		<input class="toDiscloseList" id="organizationalProvider" th:field="*{organizationalProvidersPermittedToDisclose}" th:id="'from'+${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" type="checkbox" name="organizationalConsentAuthorizedFrom"  style="float: none;"/><span th:text="${organizationalProvider.orgName}"> Doe, John</span>
 																		</label>
 																		<div th:if="${consentDto.organizationalProvidersPermittedToDiscloseNpi.contains(organizationalProvider.npi)}">
-																			<!-- FIXME: Move internal javascript code to external .js file -->
-																			<script th:inline="javascript">
-																				var prov =/*[[${organizationalProvider.npi}]]*/ 'Sebastian';
-																				document.getElementById('from'+prov).checked = true;	
-																			</script>
+																			<input type="hidden" class="prov-npi-checked-input" th:value="'from'+${organizationalProvider.npi}" />
 																		</div>																		
 																	</div>
 																</div>
@@ -305,11 +308,7 @@
 																	<input class="isMadeToList" id="inidividualProvider" th:field="*{providersDisclosureIsMadeTo}" th:id="'to'+${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" type="checkbox" name="individualConsentMadeTo"  style="float: none;"/><span th:text="${individualProvider.lastName+', '+individualProvider.firstName}"> Doe, John</span>
 																	</label>
 																		<div th:if="${consentDto.providersDisclosureIsMadeToNpi.contains(individualProvider.npi)}">
-																			<!-- FIXME: Move internal javascript code to external .js file -->
-																			<script th:inline="javascript">
-																				var prov =/*[[${individualProvider.npi}]]*/ 'Sebastian';
-																				document.getElementById('to'+prov).checked = true;	
-																			</script>
+																			<input type="hidden" class="prov-npi-checked-input" th:value="'to'+${individualProvider.npi}" />
 																		</div>
 																</div>
 																<div th:each="organizationalProvider:${organizationalProvidersDto}">
@@ -317,11 +316,7 @@
 																	<input class="isMadeToList" id="organizationalProvider" th:field="*{organizationalProvidersDisclosureIsMadeTo}" th:id="'to'+${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" type="checkbox" name="organizationalConsentMadeTo" style="float: none;"/><span th:text="${organizationalProvider.orgName}"> Doe, John</span>
 																	</label>
 																	<div th:if="${consentDto.organizationalProvidersDisclosureIsMadeToNpi.contains(organizationalProvider.npi)}">
-																		<!-- FIXME: Move internal javascript code to external .js file -->
-																		<script th:inline="javascript">
-																			var prov =/*[[${organizationalProvider.npi}]]*/ 'Sebastian';
-																			document.getElementById('to'+prov).checked = true;	
-																		</script>
+																		<input type="hidden" class="prov-npi-checked-input" th:value="'to'+${organizationalProvider.npi}" />
 																	</div>																		
 																</div>
 																
@@ -427,26 +422,19 @@
 																	        	</div>
 																	        </div>
 																	        
-<!-- 																	         th:object="${consentDto}" -->
 																	        <form id="sensitivityinfo" class="inputform" th:object="${consentDto}">
 																	        	<div th:each="SensitivityPolicyCode:${sensitivityPolicy}">
 																	        		<span th:if="${addConsent}">
 																		        		<label for="Substance-Abuse" th:for="${SensitivityPolicyCode.code}" class="checkbox checkedCheckbox1">
-	<!-- 																						 th:field="*{substanceAbuse}" -->
 																							<input id="Substance-Abuse" class="checkBoxClass1" th:field="*{doNotShareSensitivityPolicyCodes}" th:id="${SensitivityPolicyCode.code}" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}" type="checkbox" name="sensitivityPolicyInput" checked="checked" th:value="${SensitivityPolicyCode.code}"> Substance Abuse </input>
 																						</label>
 																					</span>
 																					<span th:if="${!addConsent}">
 																		        		<label for="Substance-Abuse" th:for="${SensitivityPolicyCode.code}" class="checkbox checkedCheckbox1">
-	<!-- 																						 th:field="*{substanceAbuse}" -->
 																							<input id="Substance-Abuse" class="checkBoxClass1" th:field="*{doNotShareSensitivityPolicyCodes}" th:id="${SensitivityPolicyCode.code}" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}" type="checkbox" name="sensitivityPolicyInput" th:value="${SensitivityPolicyCode.code}"> Substance Abuse </input>
 																						</label>																					
 																						<span th:if="${consentDto.doNotShareSensitivityPolicyCodes.contains(SensitivityPolicyCode.displayName)}">
-																							<!-- FIXME: Move internal javascript code to external .js file -->
-																							<script th:inline="javascript">
-																								var code  =/*[[${SensitivityPolicyCode.code}]]*/ 'Sebastian';
-																								document.getElementById(code).checked = true;	
-																							</script>
+																							<input type="hidden" class="sensitivity-policy-code-checked-input" th:value="${SensitivityPolicyCode.code}" />
 																						</span>																					
 																					</span>
 																				<!-- 	<div th:id="${'message-block_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}" class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}"></div></div></div>
@@ -460,9 +448,6 @@
 																					    class="input_i-text" th:id="${'i-text_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}" type="hidden"
 																					    th:value="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')+'_text'}}" />
 																	        	</div>
-<!-- 																	        	<label for="Substance-Abuse" class="checkbox"> -->
-<!-- 																					<input id="Substance-Abuse" type="checkbox" name="conditions" checked="checked" th:field="*{substanceAbuse}"/> Substance Abuse -->
-<!-- 																				</label> -->
 																			</form>												     	
 																	        </div>
 																        </div>
@@ -485,7 +470,6 @@
 																	        <div class="alert">
 																	         Select the medical information that you <strong>DO NOT</strong> wish to share.
 																		    </div>
-<!-- 																		     th:object="${consentDto}" -->
 																		
 																		<div class="consent-select">
 																			<div>
@@ -501,21 +485,15 @@
 																				<div th:each="clinicalDocumentSectionTypeCode:${clinicalDocumentSectionType}">
 																	        		<span th:if="${addConsent}">																				
 																		        		<label for="conditions" th:for="${clinicalDocumentSectionTypeCode.code}" class="checkbox checkedCheckbox1">
-	<!-- 																						 th:field="*{substanceAbuse}" -->
 																						<input id="conditions" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentSectionTypeCodes}" th:id="${clinicalDocumentSectionTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentSectionTypeCode.code}" type="checkbox" name="clinicalDocumentSectionTypeInput" checked="checked"> Medical Information Categories</input>
 																						</label>
 																					</span>
 																	        		<span th:if="${!addConsent}">																				
 																		        		<label for="conditions" th:for="${clinicalDocumentSectionTypeCode.code}" class="checkbox checkedCheckbox1">
-	<!-- 																						 th:field="*{substanceAbuse}" -->
 																						<input id="conditions" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentSectionTypeCodes}" th:id="${clinicalDocumentSectionTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentSectionTypeCode.code}" type="checkbox" name="clinicalDocumentSectionTypeInput"> Medical Information Categories</input>
 																						</label>
 																						<span th:if="${consentDto.doNotShareClinicalDocumentSectionTypeCodes.contains(clinicalDocumentSectionTypeCode.displayName)}">
-																							<!-- FIXME: Move internal javascript code to external .js file -->
-																							<script th:inline="javascript">
-																								var code  =/*[[${clinicalDocumentSectionTypeCode.code}]]*/ 'Sebastian';
-																								document.getElementById(code).checked = true;	
-																							</script>
+																							<input type="hidden" class="doc-sec-type-code-checked-input" th:value="${clinicalDocumentSectionTypeCode.code}" />
 																						</span>																					
 																					</span>	
 																																									
@@ -532,10 +510,6 @@
 																						title="" data-original-title="Medical Information Item 1"><span style="margin-left: 5px;" class="icon-info-sign"></span>
 																					</a> -->
 																	        	</div>
-																<!-- <label for="conditions" class="checkbox"> -->
-																<!-- <input id="conditions" type="checkbox" th:field="*{conditions}" checked="checked"/> Conditions -->
-																<!-- </label> -->
-																													     	
 																	        </div>
 																	        </form>
 																        </div>
@@ -584,11 +558,7 @@
 																						<input id="summarizationOfEpisodeNote" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentTypeCodes}" th:id="${clinicalDocumentTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentTypeCode.code}" type="checkbox" name="clinicalDocumentTypeInput"> Summarization of Episode Note</input>
 																						</label>
 																						<span th:if="${consentDto.doNotShareClinicalDocumentTypeCodes.contains(clinicalDocumentTypeCode.displayName)}">
-																							<!-- FIXME: Move internal javascript code to external .js file -->
-																							<script th:inline="javascript">
-																								var code  =/*[[${clinicalDocumentTypeCode.code}]]*/ 'Sebastian';
-																								document.getElementById(code).checked = true;	
-																							</script>
+																							<input type="hidden" class="doc-sec-code-checked-input" th:value="${clinicalDocumentTypeCode.code}" />
 																						</span>																					
 																					</span>																						
 																					<a href="#"  th:id="${'i-icon_' + #strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
@@ -754,11 +724,7 @@
 																<input id="emergency" th:field="*{shareForPurposeOfUseCodes}" th:id="${purposeOfUseItem.code}" th:text="#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}" th:value="${purposeOfUseItem.code}" type="checkbox" name="purposeOfUseInput" checked="checked"> Emergency</input>
 																</label>
 																<span th:if="${consentDto.shareForPurposeOfUseCodes.contains(purposeOfUseItem.displayName)}">
-																	<!-- FIXME: Move internal javascript code to external .js file -->
-																	<script th:inline="javascript">
-																		var code  =/*[[${purposeOfUseItem.code}]]*/ 'Sebastian';
-																		document.getElementById(code).checked = true;	
-																	</script>
+																	<input type="hidden" class="purpose-use-code-checked-input" th:value="${purposeOfUseItem.code}" />
 																</span>																	
 															</span>															
 																					<a href="#"  th:id="${'i-icon_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
@@ -888,7 +854,7 @@
 		</ul>
 
 			<div class="clearfix"></div>
-				<footer class="bottom" style="z-index:0">
+				<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
 					<div>
 					
 						<!-- COMPONENT: Action Buttons -->
@@ -905,15 +871,8 @@
 	</div><!-- end Container-fluid -->
 	
 	<input type="hidden" class="input_hidden" id="input_isAddConsent" th:value="${addConsent}" value="" />
-	<input type="hidden" class="input_hidden" id="input_doNotShareClinicalConceptCodesSet" th:value="${DoNotShareClinicalConceptCodesSet}" value="" />
-	
 	
 	<!-- START: JavaScript-->
-		<script src="../../../resources/js/jquery.min.js" 
-				th:src="@{/resources/js/jquery.min.js}" 
-				type="text/javascript">
-		</script>		
-		
 		<script src="../../../resources/js/jquery-ui.min.js"
 				th:src="@{/resources/js/jquery-ui.min.js}"
 				type="text/javascript"></script>
@@ -958,41 +917,7 @@
 		<!-- Custom JS Script -->
 		<script src="../../../resources/js/consent/addConsent.js" 
 				th:src="@{/resources/js/consent/addConsent.js}"
-				type="text/javascript" th:inline="javascript"></script>
-		
-		
-		<!-- FIXME: Move internal javascript code to external .js file -->
-		<script th:inline="javascript" type="text/javascript">
-			//<![CDATA[
-				$(document).ready(function() {
-					var addConsent_tmp = null;
-					var in_addConsent_tmp = $('#input_isAddConsent').val();
-					
-					if(in_addConsent_tmp === "true"){
-						addConsent_tmp = true;
-					}else if(in_addConsent_tmp === "false"){
-						addConsent_tmp = false;
-					}else{
-						addConsent_tmp = null;
-					}
-	
-					//Check if addConsent is a valid boolean value
-					if((addConsent_tmp !== true) && (addConsent_tmp !== false)){
-						console.log(addConsent_tmp);
-						addConsent_tmp = null;
-					    throw new ReferenceError("addConsent_tmp variable is not a valid boolean value");
-				    }
-	
-					var specMedSetObj_tmp = null;
-	
-					if(addConsent_tmp === false){
-					    specMedSetObj_tmp = /*[[${DoNotShareClinicalConceptCodesSet}]]*/ null;
-					}
-					
-					setupPage(addConsent_tmp, specMedSetObj_tmp);
-				});
-			//]]>
-		</script>	
+				type="text/javascript" th:inline="javascript"></script>	
 	
 	<!-- END: JavaScript-->
 </body>

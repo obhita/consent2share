@@ -116,6 +116,11 @@ public class EmailSenderImpl implements EmailSender {
 			  
 	        htmlContent = this.templateEngine.process("account-updated-template.html", ctx);
 			break;
+		case USER_PROFILE_CHANGE:
+			message.setFrom(messageProperties.getMessage("UserProfileUpdate.email.emailFrom", null, null));
+			message.setSubject(messageProperties.getMessage("UserProfileUpdate.email.subject", null, null));		
+	        htmlContent = this.templateEngine.process("user-profile-updated-template.html", ctx);
+			break;
 		default:
 			message.setFrom("support@consent2share.com");
 			message.setSubject("Support");

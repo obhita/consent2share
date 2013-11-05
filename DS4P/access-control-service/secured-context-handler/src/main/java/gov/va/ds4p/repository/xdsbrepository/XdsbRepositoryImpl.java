@@ -52,7 +52,7 @@ public class XdsbRepositoryImpl implements XdsbRepository {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepository#
+	 * @see gov.samhsa.ds4ppilot.pep.xdsbrepository.XdsbRepository#
 	 * provideAndRegisterDocumentSetRequest
 	 * (ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequest)
 	 */
@@ -71,7 +71,7 @@ public class XdsbRepositoryImpl implements XdsbRepository {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see gov.samhsa.ds4ppilot.orchestrator.xdsbrepository.XdsbRepository#
+	 * @see gov.samhsa.ds4ppilot.pep.xdsbrepository.XdsbRepository#
 	 * retrieveDocumentSetRequest
 	 * (ihe.iti.xds_b._2007.RetrieveDocumentSetRequest)
 	 */

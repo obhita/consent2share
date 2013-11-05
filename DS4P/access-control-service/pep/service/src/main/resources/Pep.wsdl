@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name=""
+	targetNamespace="http://www.samhsa.gov/ds4ppilot/contract/pep"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tsu="http://www.samhsa.gov/ds4ppilot/contract/pep"
+	xmlns:di="http://www.samhsa.gov/ds4ppilot/schema/pep"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://ws.ds4p.ehtac.va.gov/" xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+	xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy"
+	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl">
+
+	<wsdl:types>
+		<xsd:schema
+			targetNamespace="http://www.samhsa.gov/ds4ppilot/schema/pep">
+			<xsd:element name="RetrieveDocumentSetRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="documentUniqueId" type="xsd:string" />
+						<xsd:element name="messageId" type="xsd:string" />
+						<xsd:element name="purposeOfUse" type="xsd:string"/>
+						<xsd:element name="intendedRecipient" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="RetrieveDocumentSetResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="return" type="xsd:string" />
+						<xsd:element name="kekMaskingKey" type="xsd:base64Binary" />
+						<xsd:element name="kekEncryptionKey" type="xsd:base64Binary" />
+						<xsd:element name="metadata" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="RegisteryStoredQueryRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="patientId" type="xsd:string" />
+						<xsd:element name="messageId" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="RegisteryStoredQueryResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="return" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="DirectEmailSendRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="patiendId" type="xsd:string" />
+						<xsd:element name="recipientNPI" type="xsd:string" />
+						<xsd:element name="senderNPI" type="xsd:string" />
+						<xsd:element name="RecipientEmail" type="xsd:string" />
+						<xsd:element name="SenderEmail" type="xsd:string" />
+						<xsd:element name="PurposeOfUse" type="xsd:string" maxOccurs="unbounded"/>
+						<xsd:element name="requestedDoc" type="xsd:string" />
+						<xsd:element name="date" type="xsd:date" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="DirectEmailSendResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="return" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+		</xsd:schema>
+	</wsdl:types>
+	<!-- <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
+		wsu:Id="wsmtom_policy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"> 
+		<wsoma:OptimizedMimeSerialization xmlns:wsoma="http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization"/> 
+		</wsp:Policy> -->
+
+
+	<wsdl:message name="RetrieveDocumentSetRequest">
+		<wsdl:part element="di:RetrieveDocumentSetRequest" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="RetrieveDocumentSetResponse">
+		<wsdl:part element="di:RetrieveDocumentSetResponse" name="parameters" />
+	</wsdl:message>
+
+	<wsdl:message name="RegisteryStoredQueryRequest">
+		<wsdl:part element="di:RegisteryStoredQueryRequest" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="RegisteryStoredQueryResponse">
+		<wsdl:part element="di:RegisteryStoredQueryResponse" name="parameters" />
+	</wsdl:message>
+	
+	<wsdl:message name="DirectEmailSendRequest">
+		<wsdl:part element="di:DirectEmailSendRequest" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="DirectEmailSendResponse">
+		<wsdl:part element="di:DirectEmailSendResponse" name="parameters" />
+	</wsdl:message>
+
+	<wsdl:portType name="PepServicePortType">
+		<wsdl:operation name="RetrieveDocumentSet">
+			<wsdl:documentation>Retrieve documents from the XDS.b repository
+			</wsdl:documentation>
+			<wsdl:input message="tsu:RetrieveDocumentSetRequest" />
+			<wsdl:output message="tsu:RetrieveDocumentSetResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="RegisteryStoredQuery">
+			<wsdl:documentation>Query XDS.b repository for patient
+			</wsdl:documentation>
+			<wsdl:input message="tsu:RegisteryStoredQueryRequest" />
+			<wsdl:output message="tsu:RegisteryStoredQueryResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="DirectEmailSend">
+			<wsdl:documentation>Send Direct email
+			</wsdl:documentation>
+			<wsdl:input message="tsu:DirectEmailSendRequest" />
+			<wsdl:output message="tsu:DirectEmailSendResponse" />
+		</wsdl:operation>		
+	</wsdl:portType>
+
+	<wsdl:binding name="PepServiceBinding" type="tsu:PepServicePortType">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="RetrieveDocumentSet">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="RegisteryStoredQuery">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="DirectEmailSend">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>		
+
+	</wsdl:binding>
+	<wsdl:service name="PepService">
+		<wsdl:port binding="tsu:PepServiceBinding"
+			name="PepPort">
+			<soap:address
+				location="http://obhitaqaapp01/Pep/services/Pepservice" />
+		</wsdl:port>
+	</wsdl:service>
+	<wsp:Policy xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+		xmlns:ssp="http://schemas.sun.com/2006/03/wss/server" xmlns:sunwsp="http://java.sun.com/xml/ns/wsit/policy"
+		wsu:Id="PepServiceBindingPolicy">
+		<sp:AsymmetricBinding>
+			<wsp:Policy>
+				<sp:AlgorithmSuite>
+					<wsp:Policy>
+						<sp:Basic128 />
+					</wsp:Policy>
+				</sp:AlgorithmSuite>
+
+				<sp:InitiatorToken>
+					<wsp:Policy>
+						<sp:SamlToken
+							sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+							<wsp:Policy>
+								<!-- sp:WssSamlV11Token10 /-->
+								<sp:WssSamlV2/>
+							</wsp:Policy>
+						</sp:SamlToken>
+					</wsp:Policy>
+				</sp:InitiatorToken>
+				<sp:Layout>
+					<wsp:Policy>
+						<sp:Strict />
+					</wsp:Policy>
+				</sp:Layout>
+				<sp:IncludeTimestamp />
+				<sp:OnlySignEntireHeadersAndBody />
+				<sp:RecipientToken>
+					<wsp:Policy>
+						<sp:X509Token
+							sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+							<wsp:Policy>
+								<sp:RequireIssuerSerialReference />
+								<sp:WssX509V3Token10 />
+							</wsp:Policy>
+						</sp:X509Token>
+					</wsp:Policy>
+				</sp:RecipientToken>
+			</wsp:Policy>
+		</sp:AsymmetricBinding>
+		<sp:Wss10>
+			<wsp:Policy>				
+				<sp:MustSupportRefIssuerSerial />
+			</wsp:Policy>
+		</sp:Wss10>
+		<wsam:Addressing />
+	</wsp:Policy>
+
+</wsdl:definitions>

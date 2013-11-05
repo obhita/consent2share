@@ -33,11 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -45,6 +42,8 @@ import gov.samhsa.consent2share.domain.account.EmailToken;
 import gov.samhsa.consent2share.domain.account.EmailTokenRepository;
 import gov.samhsa.consent2share.domain.account.TokenGenerator;
 import gov.samhsa.consent2share.domain.account.TokenType;
+import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
@@ -65,8 +64,8 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	/** The user details manager. */
-	private UserDetailsManager userDetailsManager;
+	/** The users repository. */
+	private UsersRepository usersRepository;
 	
 	/** The patient repository. */
 	private PatientRepository patientRepository;
@@ -86,10 +85,11 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 	/** The password encoder. */
 	private PasswordEncoder passwordEncoder;
 
+	
 	/**
 	 * Instantiates a new password reset service impl.
 	 *
-	 * @param userDetailsManager the user details manager
+	 * @param usersRepository the users repository
 	 * @param patientRepository the patient repository
 	 * @param tokenGenerator the token generator
 	 * @param passwordResetTokenExpireInHours the password reset token expire in hours
@@ -99,13 +99,13 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 	 */
 	@Autowired
 	public PasswordResetServiceImpl(
-			UserDetailsManager userDetailsManager,
+			UsersRepository usersRepository,
 			PatientRepository patientRepository,
 			TokenGenerator tokenGenerator,
 			@Value("${passwordResetTokenExpireInHours}") Integer passwordResetTokenExpireInHours,
 			EmailTokenRepository passwordResetTokenRepository,
 			EmailSender emailSender, PasswordEncoder passwordEncoder) {
-		this.userDetailsManager = userDetailsManager;
+		this.usersRepository = usersRepository;
 		this.patientRepository = patientRepository;
 		this.tokenGenerator = tokenGenerator;
 		this.passwordResetTokenExpireInHours = passwordResetTokenExpireInHours;
@@ -135,7 +135,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 		}
 
 		try {
-			userDetailsManager.loadUserByUsername(username);
+			usersRepository.loadUserByUsername(username);
 		} catch (UsernameNotFoundException e) {
 			logger.warn(e.getMessage(), e);
 			throw new UsernameNotExistException(e.getMessage());
@@ -210,9 +210,9 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
 		String username = passwordResetToken.getUsername();
 
-		UserDetails userDetails = null;
+		Users user = null;
 		try {
-			userDetails = userDetailsManager.loadUserByUsername(username);
+			user = usersRepository.loadUserByUsername(username);
 		} catch (UsernameNotFoundException e) {
 			// TODO: Log here
 			throw new UsernameNotExistException(e.getMessage());
@@ -221,18 +221,26 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 		String encodedPassword = passwordEncoder.encode(passwordResetDto
 				.getPassword());
 
-		UserDetails updatedUserDetails = null;
+		Users updatedUser = null;
+		
+		updatedUser = new Users(user.getFailedLoginAttempts(), 
+				username, 
+				user.getPassword(), 
+				user.isEnabled(), 
+				user.isAccountNonExpired(), 
+				user.isCredentialsNonExpired(), 
+				user.getAuthorities());
 
-		if (userDetails.isEnabled()) {
+//		if (user.isEnabled()) {
+//
+//			updatedUser = new User(username, encodedPassword,
+//					user.getAuthorities());
+//		} else {
+//			updatedUser = new User(username, encodedPassword, false,
+//					true, true, true, user.getAuthorities());
+//		}
 
-			updatedUserDetails = new User(username, encodedPassword,
-					userDetails.getAuthorities());
-		} else {
-			updatedUserDetails = new User(username, encodedPassword, false,
-					true, true, true, userDetails.getAuthorities());
-		}
-
-		userDetailsManager.updateUser(updatedUserDetails);
+		usersRepository.updateUser(updatedUser);
 
 		Patient patient = patientRepository.findByUsername(username);
 		
@@ -251,9 +259,9 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
 		String username = passwordChangeDto.getUsername();
 		
-		UserDetails userDetails = null;
+		Users user = null;
 		try {
-			userDetails = userDetailsManager.loadUserByUsername(username);
+			user = usersRepository.loadUserByUsername(username);
 		} catch (UsernameNotFoundException e) {
 			// TODO: Log here
 			throw new UsernameNotExistException(e.getMessage());
@@ -262,8 +270,8 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 		String encodedOldPassword = passwordEncoder.encode(passwordChangeDto.getOldPassword());
 		String encodedNewPassword = passwordEncoder.encode(passwordChangeDto.getNewPassword());
 		
-		if(passwordEncoder.matches(passwordChangeDto.getOldPassword(), userDetails.getPassword()) == true){
-			userDetailsManager.changePassword(encodedOldPassword, encodedNewPassword);
+		if(passwordEncoder.matches(passwordChangeDto.getOldPassword(), user.getPassword()) == true){
+			usersRepository.changePassword(encodedOldPassword, encodedNewPassword);
 			return true;
 		}else{
 			return false;

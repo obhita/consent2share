@@ -29,11 +29,10 @@ import java.text.ParseException;
 
 import javax.mail.MessagingException;
 
+import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
 import gov.samhsa.consent2share.service.dto.SignupDto;
-
-import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * The Interface AccountService.
@@ -52,13 +51,14 @@ public interface AccountService {
 	 */
 	public abstract void signup(SignupDto signupDto, String hostName) throws MessagingException, ParseException, UsernameNotExistException, EmailAddressNotExistException;
 	
+	
 	/**
 	 * Find user by username.
 	 *
 	 * @param username the username
-	 * @return the user details
+	 * @return the users
 	 */
-	public abstract UserDetails findUserByUsername(String username); 
+	public abstract Users findUserByUsername(String username); 
 	
 	/**
 	 * Creates the email token.

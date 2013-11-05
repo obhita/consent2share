@@ -25,6 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.web;
 
+import java.util.HashSet;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -34,6 +36,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * The Class HomeController.
@@ -62,17 +65,22 @@ public class HomeController {
 	 * @param model the model
 	 * @return the string
 	 */
-	@RequestMapping(value = "index.html", method = RequestMethod.GET, produces = "text/html")
-	public String index(Model model) {
+	@RequestMapping(value = "index.html", method = RequestMethod.GET)
+	public String index(Model model, HttpServletRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); 
         if (!(auth instanceof AnonymousAuthenticationToken)) { /*The user is logged in :)*/ 
                         return "redirect:/patients/home.html";
         }
 
+		if (request.getParameter("expired") != null) {
+			model.addAttribute("expired", true);
 
+		}
 
 		return "views/index";
 	}
+	
+
 
 	/**
 	 * Error page.

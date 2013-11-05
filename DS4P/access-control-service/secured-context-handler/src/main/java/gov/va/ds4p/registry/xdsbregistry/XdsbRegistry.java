@@ -29,7 +29,7 @@ import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 
 import org.hl7.v3.PRPAIN201301UV02;
-import org.hl7.v3.PRPAIN201302UV;
+import org.hl7.v3.PRPAIN201302UV02;
 
 /**
  * The Interface XdsbRegistry.
@@ -61,5 +61,5 @@ public interface XdsbRegistry {
 	 *            the input
 	 * @return the string
 	 */
-	public String revisePatientRegistryRecord(PRPAIN201302UV input);
+	public String revisePatientRegistryRecord(PRPAIN201302UV02 input);
 }

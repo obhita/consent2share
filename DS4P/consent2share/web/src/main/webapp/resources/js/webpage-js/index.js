@@ -1,3 +1,4 @@
+//Code to execute on document.ready event for index.html page
 $(document).ready(function() {
 			$("#loginForm").validate({
 				onfocusout: false,

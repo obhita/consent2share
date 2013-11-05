@@ -28,6 +28,8 @@ package gov.samhsa.consent2share.service.account;
 import gov.samhsa.consent2share.domain.account.EmailToken;
 import gov.samhsa.consent2share.domain.account.EmailTokenRepository;
 import gov.samhsa.consent2share.domain.account.TokenGenerator;
+import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
@@ -43,10 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -59,8 +58,8 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	/** The user details manager. */
-	private UserDetailsManager userDetailsManager;
+	/** The users repository. */
+	private UsersRepository usersRepository;
 	
 	/** The patient repository. */
 	private PatientRepository patientRepository;
@@ -74,7 +73,7 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
 	/**
 	 * Instantiates a new account verification service impl.
 	 *
-	 * @param userDetailsManager the user details manager
+	 * @param usersRepository the users repository
 	 * @param patientRepository the patient repository
 	 * @param tokenGenerator the token generator
 	 * @param accountVerificationTokenExpireInHours the account verification token expire in hours
@@ -83,13 +82,13 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
 	 */
 	@Autowired
 	public AccountVerificationServiceImpl(
-			UserDetailsManager userDetailsManager,
+			UsersRepository usersRepository,
 			PatientRepository patientRepository,
 			TokenGenerator tokenGenerator,
 			@Value("${accountVerificationTokenExpireInHours}") Integer accountVerificationTokenExpireInHours,
 			EmailTokenRepository emailTokenRepository,
 			EmailSender emailSender) {
-		this.userDetailsManager = userDetailsManager;
+		this.usersRepository = usersRepository;
 		this.patientRepository = patientRepository;
 		this.emailTokenRepository = emailTokenRepository;
 		this.emailSender = emailSender;
@@ -139,17 +138,23 @@ public class AccountVerificationServiceImpl implements AccountVerificationServic
 
 		String username = emailToken.getUsername();
 
-		UserDetails userDetails = null;
+		Users user = null;
 		try {
-			userDetails = userDetailsManager.loadUserByUsername(username);
+			user = usersRepository.loadUserByUsername(username);
 		} catch (UsernameNotFoundException e) {
 			logger.warn(String.format(e.getMessage()), e);
 			throw new UsernameNotExistException(e.getMessage());
 		}		
 	
-		UserDetails updatedUserDetails = new User(username, userDetails.getPassword(), true, true, true, true, userDetails.getAuthorities());
+		Users updatedUser = new Users(user.getFailedLoginAttempts(), 
+				username, 
+				user.getPassword(), 
+				true, 
+				user.isAccountNonExpired(), 
+				user.isCredentialsNonExpired(), 
+				user.getAuthorities());
 
-		userDetailsManager.updateUser(updatedUserDetails);
+		usersRepository.updateUser(updatedUser);
 		
 		Patient patient = patientRepository.findByUsername(username);	
 		

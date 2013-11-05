@@ -3,8 +3,9 @@ package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl;
+import gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.GuvnorServiceImpl;
+import gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionServiceImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditServiceImpl;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.brms.RuleExecutionServiceClientImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEditorImpl;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEncrypterImpl;
@@ -52,7 +53,9 @@ public class DocumentSegmentationImplIT {
 	private static String endpointAddressForRuleExectionWebServiceClient;
 	private static String xdsDocumentEntryUniqueId;
 	private static XacmlResult xacmlResultObject;
+	private static String endpointAddressGuvnorService;
 
+	private static RuleExecutionServiceImpl ruleExecutionService;
 	private static SimpleMarshallerImpl marshaller;
 	private static FileReaderImpl fileReader;
 	private static MetadataGeneratorImpl metadataGenerator;
@@ -90,6 +93,10 @@ public class DocumentSegmentationImplIT {
 		endpointAddressForAuditServcie = "http://174.78.146.228:8080/DS4PACSServices/DS4PAuditService";
 		endpointAddressForRuleExectionWebServiceClient = "http://localhost:90/RuleExecutionService/services/RuleExecutionService";
 		xdsDocumentEntryUniqueId = "123";
+		endpointAddressGuvnorService = "http://localhost:7070/guvnor-5.5.0.Final-tomcat-6.0/rest/packages/AnnotationRules/source";
+		
+		ruleExecutionService = new RuleExecutionServiceImpl(new GuvnorServiceImpl(
+				endpointAddressGuvnorService,"admin", "admin"), new SimpleMarshallerImpl());
 		try {
 			xacmlResultObject = marshaller.unmarshallFromXml(XacmlResult.class,
 					xacmlResult);
@@ -103,12 +110,11 @@ public class DocumentSegmentationImplIT {
 	public void testSegmentDocument_Segment_Document() {
 
 		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
-				new RuleExecutionServiceClientImpl(
-						endpointAddressForRuleExectionWebServiceClient),
-				new AuditServiceImpl(endpointAddressForAuditServcie),
-				documentEditor, marshaller, documentEncrypter,
-				documentRedactor, documentMasker, documentTagger,
-				documentFactModelExtractor, additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
+				ruleExecutionService, new AuditServiceImpl(
+						endpointAddressForAuditServcie), documentEditor,
+				marshaller, documentEncrypter, documentRedactor,
+				documentMasker, documentTagger, documentFactModelExtractor,
+				additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
 		SegmentDocumentResponse result = documentSegmentation.segmentDocument(
 				c32Document.toString(), xacmlResult, false, true,
 				senderEmailAddress, recipientEmailAddress,

@@ -3,6 +3,8 @@ package gov.samhsa.consent2share.service.account;
 import static org.mockito.Mockito.*;
 import gov.samhsa.consent2share.domain.account.EmailTokenRepository;
 import gov.samhsa.consent2share.domain.account.TokenGenerator;
+import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
@@ -16,15 +18,12 @@ import javax.mail.MessagingException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 
 public class AccountServiceImplTest {
 
 	private AccountServiceImpl sut;
-
-	private UserDetailsManager userDetailsManager;
+	
 	private PatientRepository patientRepository;
 	private TokenGenerator tokenGenerator;
 	private Integer accountVerificationTokenExpireInHours;
@@ -33,6 +32,7 @@ public class AccountServiceImplTest {
 	private AdministrativeGenderCodeRepository administrativeGenderCodeRepository;
 	private PasswordEncoder passwordEncoder;
 	private UserContext userContext;
+	private UsersRepository usersRepository;
 
 	@Before
 	public void setUp() {
@@ -40,7 +40,6 @@ public class AccountServiceImplTest {
 		// Just to save a few lines of code for each individual test
 		// But independency, clarity of the unit tests are much more important
 		// than code reuse
-		userDetailsManager = mock(UserDetailsManager.class);
 		patientRepository = mock(PatientRepository.class);
 		administrativeGenderCodeRepository = mock(AdministrativeGenderCodeRepository.class);
 		tokenGenerator = mock(TokenGenerator.class);
@@ -49,10 +48,11 @@ public class AccountServiceImplTest {
 		emailSender = mock(EmailSender.class);
 		userContext = mock(UserContext.class);
 		passwordEncoder = mock(PasswordEncoder.class);
+		usersRepository=mock(UsersRepository.class);
 
-		sut = new AccountServiceImpl(userDetailsManager, patientRepository,
+		sut = new AccountServiceImpl(patientRepository,
 				administrativeGenderCodeRepository, passwordEncoder,
-				userContext, emailSender, tokenGenerator, emailTokenRepository,
+				userContext, emailSender, tokenGenerator, emailTokenRepository,usersRepository,
 				accountVerificationTokenExpireInHours);
 
 	}
@@ -122,8 +122,8 @@ public class AccountServiceImplTest {
 	
 	@Test
 	public void testFindByUserName() {
-		UserDetails userDetails = mock(UserDetails.class);
-		when(userDetailsManager.loadUserByUsername(anyString())).thenReturn(userDetails);
+		Users user = mock(Users.class);
+		when(usersRepository.loadUserByUsername(anyString())).thenReturn(user);
 		sut.findUserByUsername("username");
 	}
 }

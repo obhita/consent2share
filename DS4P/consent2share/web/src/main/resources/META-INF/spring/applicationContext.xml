@@ -117,6 +117,7 @@
 				<value>WEB-INF/i18n/add_consent_messages</value>
 				<value>WEB-INF/i18n/sidebar_messages</value>
 				<value>WEB-INF/i18n/header_messages</value>
+				<value>classpath:META-INF/spring/email</value>
 			</list>
 		</property>
 	</bean>

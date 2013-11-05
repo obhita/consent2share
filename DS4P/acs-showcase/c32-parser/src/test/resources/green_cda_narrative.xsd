@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:hl7-org:v3" 
+	elementFormDefault="qualified" attributeFormDefault="unqualified" targetNamespace="urn:hl7-org:v3">
+	<xs:complexType name="textType" mixed="true">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="a"/>
+			<xs:element ref="b"/>
+			<xs:element ref="i"/>
+			<xs:element ref="img"/>
+			<xs:element ref="ol"/>
+			<xs:element ref="ul"/>
+			<xs:element ref="u"/>
+			<xs:element ref="p"/>
+			<xs:element ref="br"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:element name="p">
+		<xs:complexType mixed="true">
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="a"/>
+				<xs:element ref="b"/>
+				<xs:element ref="i"/>
+				<xs:element ref="img"/>
+				<xs:element ref="u"/>
+				<xs:element ref="br"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="b">
+		<xs:complexType mixed="true">
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="a"/>
+				<xs:element ref="i"/>
+				<xs:element ref="br"/>
+				<xs:element ref="img"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="i">
+		<xs:complexType mixed="true">
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="a"/>
+				<xs:element ref="b"/>
+				<xs:element ref="img"/>
+				<xs:element ref="u"/>
+				<xs:element ref="br"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="u">
+		<xs:complexType mixed="true">
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="a"/>
+				<xs:element ref="b"/>
+				<xs:element ref="i"/>
+				<xs:element ref="br"/>
+				<xs:element ref="img"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ol">
+		<xs:complexType mixed="true">
+			<xs:sequence>
+				<xs:element ref="li" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ul">
+		<xs:complexType mixed="true">
+			<xs:sequence>
+				<xs:element ref="li" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="a">
+		<xs:complexType mixed="true">
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="b"/>
+				<xs:element ref="i"/>
+				<xs:element ref="img"/>
+				<xs:element ref="u"/>
+				<xs:element ref="br"/>
+			</xs:choice>
+			<xs:attribute name="href" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="img">
+		<xs:complexType mixed="false">
+			<xs:attribute name="src" type="xs:string" use="required"/>
+			<xs:attribute name="width" type="xs:int"/>
+			<xs:attribute name="height" type="xs:int"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="li">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="a"/>
+				<xs:element ref="b"/>
+				<xs:element ref="i"/>
+				<xs:element ref="img"/>
+				<xs:element ref="u"/>
+				<xs:element ref="br"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="br">
+		<xs:complexType/>
+	</xs:element>
+</xs:schema>

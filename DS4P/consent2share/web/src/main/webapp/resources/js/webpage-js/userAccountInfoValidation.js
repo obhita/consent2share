@@ -1,26 +1,6 @@
-function setDOBfromTxt(){
-	var inString = $('#date').attr('value');
-	
-	var inMonth = inString.substring(0, 2);
-	var inDay = inString.substring(3, 5);
-	var inYear = inString.substring(6, 10);
-	
-	setDOBMonth(inMonth);
-	setDOBDay(inDay);
-	setDOBYear(inYear);
-}
-
-function setDOBMonth(inMonth){
-	$('#month').attr('value', inMonth);
-}
-
-function setDOBDay(inDay){
-	$('#day').attr('value', inDay);
-}
-
-function setDOBYear(inYear){
-	$('#year').attr('value', inYear);
-}
+/**
+ * Functions involved in validating input for user account fields
+ */
 
 function preprocessInput(){
 	var selMonth = $('#month').val();
@@ -308,48 +288,80 @@ function chkPword(inPword, inUname){
 	
 }
 
+/** FUNCTION CHECKS FOR PHONE NUMBER
+ * Uses regular expression to check for valid
+ * phone number value and length.
+ * 
+ * NOTE: As phone number is not a required field, an input
+ * value with a length of zero is considered valid input.
+ * 
+ * @param inPhone
+ * @returns Boolean true (on successful validation)
+ * @returns String errorString (on failed validation)
+ */
 function chkPhone(inPhone){
 	var phoneRegEx = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+	var errorString = "Please provide a valid phone number. For example 123-456-7890.";
 	
 	if(inPhone.length == 0){
 		return true;
 	}else{
-		if( inPhone.length < 10 )
-			return false;
-		
 		if(phoneRegEx.test(inPhone) !== true){
-			return "Please provide a valid phone number. For example 123-456-7890.";
+			return errorString;
 		}else{
 			return true;
 		}
 	}
 }
 
+/** FUNCTION CHECKS FOR VALID ZIP CODE
+ * Uses regular expression to check for valid
+ * zip code value and length. Accepts both 5 digit
+ * zip codes & full 5+4 zip codes (5 digits plus
+ * four digits with a hyphen after the first 5 digits).
+ * 
+ * NOTE: As zip code is not a required field, an input
+ * value with a length of zero is considered valid input.
+ * 
+ * @param inZip
+ * @returns Boolean true (on successful validation)
+ * @returns String errorString (on failed validation)
+ */
 function chkZip(inZip){
 	var zipRegEx = /^\d{5}$|^\d{5}-\d{4}$/;
+	var errorString = "Please provide a valid zip code";
 	
 	if(inZip.length == 0){
 		return true;
 	}else{
-		if( inZip.length < 5 )
-			return false;
-		
 		if(zipRegEx.test(inZip) !== true){
-			return "Please provide a valid zip code";
+			return errorString;
 		}else{
 			return true;
 		}
 	}
 }
 
+/** FUNCTION CHECKS FOR SSN
+ * Uses regular expression to check for valid
+ * SSN value and length.
+ * 
+ * NOTE: As SSN is not a required field, an input
+ * value with a length of zero is considered valid input.
+ * 
+ * @param inSSN
+ * @returns Boolean true (on successful validation)
+ * @returns String errorString (on failed validation)
+ */
 function chkSSN(inSSN){
 	var ssnRegEx = /^\d{3}-?\d{2}-?\d{4}$/;
+	var errorString = "Please provide a valid social security number. For example 123-45-6789.";
 	
 	if(inSSN.length == 0){
 		return true;
 	}else{
 		if(ssnRegEx.test(inSSN) !== true){
-			return "Please provide a valid social security number. For example 123-45-6789.";
+			return errorString;
 		}else{
 			return true;
 		}

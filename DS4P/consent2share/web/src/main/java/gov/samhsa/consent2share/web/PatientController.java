@@ -27,6 +27,7 @@ package gov.samhsa.consent2share.web;
 
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
+import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
@@ -149,7 +150,7 @@ public class PatientController extends AbstractController{
 	@RequestMapping(value = "profile.html", method = RequestMethod.POST)
 	public String profile(@Valid PatientProfileDto patientProfileDto,
 			BindingResult bindingResult, Model model) {
-
+		
 		fieldValidator.validate(patientProfileDto, bindingResult);
 		
 		if (bindingResult.hasErrors()) {
@@ -158,14 +159,21 @@ public class PatientController extends AbstractController{
 			return "views/patients/profile";
 		} else {
 			AuthenticatedUser currentUser = userContext.getCurrentUser();
+			
 			model.addAttribute("currentUser", currentUser);
 			patientProfileDto.setAddressCountryCode("US");
 			patientProfileDto.setUsername(currentUser.getUsername());
-			patientService.updatePatient(patientProfileDto);
+			try {
+				patientService.updatePatient(patientProfileDto);
+				model.addAttribute("updatedMessage", "Updated your profile successfully!");
+			} catch (AuthenticationFailedException e) {
+				model.addAttribute("updatedMessage", "Failed. Please check your username and password and try again.");
+				PatientProfileDto originalPatientProfileDto=patientService.findPatientProfileByUsername(currentUser
+						.getUsername());
+				model.addAttribute("patientProfileDto", originalPatientProfileDto);
+			}
 			
 			populateLookupCodes(model);
-			
-			model.addAttribute("updatedMessage", "Updated your profile successfully!");
 
 			return "views/patients/profile";
 		}

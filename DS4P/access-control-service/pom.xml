@@ -21,7 +21,7 @@
 		
 		<module>brms</module>
 		
-		<module>context-handler-client</module>
+		<module>context-handler</module>
 		
 		<module>document-segmentation</module>	
 			
@@ -32,7 +32,7 @@
 		<module>xdsb-registry-client</module>
 		<module>xdsb-repository-client</module>		
 				
-		<module>orchestration</module>
+		<module>pep</module>
 	</modules>
 
 	<dependencies>

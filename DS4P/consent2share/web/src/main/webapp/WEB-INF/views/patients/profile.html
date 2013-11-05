@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org">
-<head th:include="fragment/common :: headerFragment" > 
+<head th:include="fragment/common :: headerFragment">
 <meta charset="utf-8" />
 <!-- title needs to be dynamic -->
 <title>Consent2Share</title>
@@ -11,15 +11,19 @@
 <!-- START: Mobile Specific -->
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <!-- END: Mobile Specific -->
-	<!-- START: CSS -->
-	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css" rel="stylesheet"/>
-	<link href="../../../resources/css/bootstrap-responsive.min.css" rel="stylesheet"/>
-	<link href="../../../resources/css/themes-style.css" rel="stylesheet"/>
-	<link href="../../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
-	<link href="../../../resources/css/sentinel-style.css" rel="stylesheet"/>
-	<link href="../../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
-	<link href="../../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
-	<!-- END: CSS -->
+<!-- START: CSS -->
+<link id="bootstrap-style" href="../../../resources/css/bootstrap.css"
+	rel="stylesheet" />
+<link href="../../../resources/css/bootstrap-responsive.min.css"
+	rel="stylesheet" />
+<link href="../../../resources/css/themes-style.css" rel="stylesheet" />
+<link href="../../../resources/css/bootstrap-toggle-buttons.css"
+	rel="stylesheet" />
+<link href="../../../resources/css/sentinel-style.css" rel="stylesheet" />
+<link href="../../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
+<link href="../../../resources/css/font-awesome.css" rel="stylesheet"
+	type="text/css" />
+<!-- END: CSS -->
 <!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -40,45 +44,58 @@
 		<div class="navbar" role="navigation">
 			<div class="navbar-inner-header">
 				<div class="container-fluid">
-					<a class="btn btn-info btn-mainmenu" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
-					<span class="icon-reorder"></span>
+					<a class="btn btn-info btn-mainmenu" data-toggle="collapse"
+						data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
+						<span class="icon-reorder"></span>
 					</a>
 					<h1>
 						<span class="nav-title">My Profile</span>
 					</h1>
-					
-					<span th:include="fragment/common :: logoFragment">
-						<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+
+					<span th:include="fragment/common :: logoFragment"> <a
+						class="brand" th:href="@{/index.html}" href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> -->
+							<span id="brand-gray"></span>
+							<div id="brand-circle">
+								<span id="brand-blue-2"></span>
+							</div> <span id="brand-blue"></span></a>
 					</span>
 
 					<!-- COMPONENT: Header Menu-->
 
-					<div th:include="fragment/myaccount_menu :: myaccountMenuFragment" class="btn-group pull-right">
-					<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE myaccountMenuFragment -->
-					<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
-					
-						<a class="btn" href="#">
-							<span class="icon-envelope"></span><span class="hidden-phone hidden-tablet"> Message Center</span> 
-							<span class="label label-warning hidden-phone">3</span> 
+					<div th:include="fragment/myaccount_menu :: myaccountMenuFragment"
+						class="btn-group pull-right">
+						<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE myaccountMenuFragment -->
+						<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
+
+						<a class="btn" href="#"> <span class="icon-envelope"></span><span
+							class="hidden-phone hidden-tablet"> Message Center</span> <span
+							class="label label-warning hidden-phone">3</span>
 						</a>
-					
+
 						<!-- COMPONENT: User Dropdown -->
-					
+
 						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-							<span class="icon-user">&nbsp;</span><span class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span>
-							<span class="caret"></span>
+							<span class="icon-user">&nbsp;</span><span
+							class="hidden-phone hidden-tablet" th:text="#{header_my_account}">
+								My Account</span> <span class="caret"></span>
 						</a>
-						
+
 						<ul role="menu" class="dropdown-menu">
-							<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_my_profile}">My Profile</a></li>
-							<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_change_password}">Change Password</a></li>
+							<li role="menuitem"><a href="profile.html"
+								th:href="@{/patients/profile.html}"
+								th:text="#{header_my_profile}">My Profile</a></li>
+							<li role="menuitem"><a href="profile.html"
+								th:href="@{/patients/profile.html}"
+								th:text="#{header_change_password}">Change Password</a></li>
 							<li role="menuitem" aria-disabled="true" class="divider"></li>
-							<li role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" th:text="#{header_logout}">Logout</a></li>
+							<li role="menuitem"><a href="../index.html"
+								th:href="@{/resources/j_spring_security_logout}"
+								th:text="#{header_logout}">Logout</a></li>
 						</ul>
-						
-					<!-- END OF SECTION REPLACED BY THYMELEAF -->
+
+						<!-- END OF SECTION REPLACED BY THYMELEAF -->
 					</div>
-					
+
 				</div>
 			</div>
 		</div>
@@ -88,46 +105,65 @@
 
 				<!-- START: Side Nav Menu -->
 
-				<div th:include="fragment/common :: sideNavMenuFragment" class="span2 main-menu-span">
-				<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE sideNavMenuFragment -->
+				<div th:include="fragment/common :: sideNavMenuFragment"
+					class="span2 main-menu-span">
+					<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE sideNavMenuFragment -->
 					<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
-					
+
 					<div class="nav-collapse sidebar-nav">
 						<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
 							<li class="nav-header hidden-tablet" role="menuitem"></li>
-							
+
 							<li class="active" role="menuitem"><a href="#">
-								<div class="icon-home icon-large"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_home}"> My Home</span></a></li>
-									
-							<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
-			
-							<li role="menuitem"><a href="connectionMain.html"><div class="icon-random"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
-			
-							<li role="menuitem"><a href="profile.html"><div class="icon-user"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_profile}"> My Profile</span></a></li>
-			
-							<li role="menuitem"><a href="../inbox/inboxMain.html" th:href="@{/inbox/inboxMain.html}"><div class="icon-inbox"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_in_box}"> Message Center</span></a></li>
-			
-			
-							<li role="menuitem"><a href="activityHistory.html"><div class="icon-time"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_activity_history}"> Activity History</span></a></li>
-			
-							<li role="menuitem"><a href="../clinicaldocuments/mymedicalinfo.html" th:href="@{/patients/medicalinfo.html}"><div class="icon-folder-open"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_medical_documents}"> Medical Documents</span></a></li>
-							
-							<li class="shortcut-button" role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}"><div class="icon-unlock-alt"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_change_password}"> Change Password</span></a></li>
-							
-							<li class="shortcut-button" role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}"><div class="icon-off"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_logout}"> Logout</span></a></li>
+									<div class="icon-home icon-large"></div> <span
+									class="hidden-tablet" th:text="#{sidebar_my_home}"> My
+										Home</span>
+							</a></li>
+
+							<li role="menuitem"><a href="../consents/listConsents.html"
+								th:href="@{/consents/listConsents.html}"><div
+										class="icon-file"></div> <span class="hidden-tablet"
+									th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
+
+							<li role="menuitem"><a href="connectionMain.html"><div
+										class="icon-random"></div> <span class="hidden-tablet"
+									th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
+
+							<li role="menuitem"><a href="profile.html"><div
+										class="icon-user"></div> <span class="hidden-tablet"
+									th:text="#{sidebar_my_profile}"> My Profile</span></a></li>
+
+							<li role="menuitem"><a href="../inbox/inboxMain.html"
+								th:href="@{/inbox/inboxMain.html}"><div class="icon-inbox"></div>
+									<span class="hidden-tablet" th:text="#{sidebar_in_box}">
+										Message Center</span></a></li>
+
+
+							<li role="menuitem"><a href="activityHistory.html"><div
+										class="icon-time"></div> <span class="hidden-tablet"
+									th:text="#{sidebar_activity_history}"> Activity History</span></a></li>
+
+							<li role="menuitem"><a
+								href="../clinicaldocuments/mymedicalinfo.html"
+								th:href="@{/patients/medicalinfo.html}"><div
+										class="icon-folder-open"></div> <span class="hidden-tablet"
+									th:text="#{sidebar_medical_documents}"> Medical
+										Documents</span></a></li>
+
+							<li class="shortcut-button" role="menuitem"><a
+								href="../changePassword.html" th:href="@{/changePassword.html}"><div
+										class="icon-unlock-alt"></div> <span class="hidden-tablet"
+									th:text="#{sidebar_change_password}"> Change Password</span></a></li>
+
+							<li class="shortcut-button" role="menuitem"><a
+								href="../index.html"
+								th:href="@{/resources/j_spring_security_logout}"><div
+										class="icon-off"></div> <span class="hidden-tablet"
+									th:text="#{sidebar_logout}"> Logout</span></a></li>
 						</ul>
 					</div>
-					
-				<!-- END OF SECTION REPLACED BY THYMELEAF -->
+
+					<!-- END OF SECTION REPLACED BY THYMELEAF -->
 				</div>
 
 				<!-- END: Side Nav Menu -->
@@ -155,15 +191,18 @@
 						<!-- COMPONENT: Healthcare Providers -->
 
 						<div class="span10">
-						    <span id="updatedMessage">
-						    <h3 th:text="${updatedMessage}">Updated your profile successfully.</h3>
-						    </span>
-						    
+							<span id="updatedMessage">
+								<h3 th:text="${updatedMessage}">Updated your profile
+									successfully.</h3>
+							</span>
+
 							<section class="top-margin10">
-								<form id="profileForm" onsubmit="return validateProfileUpdateForm()" action="#" th:action="@{/patients/profile.html}"
-									th:object="${patientProfileDto}" method="post">									
+								<form id="profileForm"
+									onsubmit="return validateProfileUpdateForm()" action="#"
+									th:action="@{/patients/profile.html}"
+									th:object="${patientProfileDto}" method="post">
 									<fieldset id="edit-login-required" class="row-fluid">
-										
+
 										<!-- <ul th:if="${#fields.hasErrors('*')}">
 											<li th:each="err : ${#fields.errors('*')}" th:text="${err}"
 												style="color: red;">Input is incorrect</li>
@@ -174,102 +213,111 @@
 										<div class="control-group">
 											<div>
 												<div>
-													<label for="first_name">First Name</label>													  
+													<label for="first_name">First Name</label>
 												</div>
 												<div class="inline-block">
-													<input id="first_name" name="firstname" type="text"	 aria-required="true" th:field="*{firstName}" />
-													<span class="required-text" th:errors="*{firstName}">First name is required.</span>
-													<span id="fname_client_error_text" class="required-text" style="display: none;">First name is required.</span>
+													<input id="first_name" name="firstname" type="text"
+														aria-required="true" th:field="*{firstName}" /> <span
+														class="required-text" th:errors="*{firstName}">First
+														name is required.</span> <span id="fname_client_error_text"
+														class="required-text" style="display: none;">First
+														name is required.</span>
 												</div>
 											</div>
-											
+
 											<div>
 												<div>
-													<label for="last_name">Last	Name</label> 													
+													<label for="last_name">Last Name</label>
 												</div>
 												<div class="inline-block">
-													<input id="last_name" name="lastname" type="text"  aria-required="true"	th:field="*{lastName}" /> 
-													<span class="required-text" th:errors="*{lastName}">Last name must be between 2 and 30 characters.</span>
-													<span id="lname_client_error_text" class="required-text" style="display: none">Last name is required.</span>
+													<input id="last_name" name="lastname" type="text"
+														aria-required="true" th:field="*{lastName}" /> <span
+														class="required-text" th:errors="*{lastName}">Last
+														name must be between 2 and 30 characters.</span> <span
+														id="lname_client_error_text" class="required-text"
+														style="display: none">Last name is required.</span>
 												</div>
 											</div>
-											
+
 											<div>
 												<div>
 													<label class="control-label">Gender</label>
-												</div>													
+												</div>
 												<div class="controls inline-block ">
 													<select id="gender" th:field="*{administrativeGenderCode}">
-														<option selected="selected" value="">--- Please Select ---</option>
+														<option selected="selected" value="">--- Please
+															Select ---</option>
 														<option th:each="gender : ${administrativeGenderCodes}"
-														th:value="${gender.code}" th:text="${gender.displayName}">F</option>
-													</select>
-													<span class="required-text" th:errors="*{administrativeGenderCode}">Gender Selection is required.</span>
-													<span id="gender_client_error_text" class="required-text" style="display: none;">Gender Selection is required.</span>
+															th:value="${gender.code}" th:text="${gender.displayName}">F</option>
+													</select> <span class="required-text"
+														th:errors="*{administrativeGenderCode}">Gender
+														Selection is required.</span> <span id="gender_client_error_text"
+														class="required-text" style="display: none;">Gender
+														Selection is required.</span>
 												</div>
 											</div>
-											
+
 											<div>
 												<div>
 													<label class="control-label">Date of Birth</label>
-												</div>													
+												</div>
 												<div id="dob" class="controls inline-block ">
-  													<input type="text" id="date" data-format="MM/DD/YYYY" data-template="MMM D YYYY" name="date" style="display: none;"  th:field="*{birthDate}"/>
-																									
-													<select id="month"> 
-														<option selected="selected" value="  ">Month</option> 
- 														<option value="01">January</option> 
- 														<option value="02">February</option> 
-														<option value="03">March</option> 
- 														<option value="04">April</option> 
- 														<option value="05">May</option> 
- 														<option value="06">June</option> 
- 														<option value="07">July</option>
- 														<option value="08">August</option> 
- 														<option value="09">September</option> 
-														<option value="10">October</option> 
- 														<option value="11">November</option> 
- 														<option value="12">December</option> 
- 													</select>
- 													<select id="day">
- 														<option selected="selected" value="  ">Day</option> 
- 														<option value="01">01</option>
- 														<option value="02">02</option>
- 														<option value="03">03</option>
- 														<option value="04">04</option>
- 														<option value="05">05</option>
- 														<option value="06">06</option>
- 														<option value="07">07</option>
- 														<option value="08">08</option>
- 														<option value="09">09</option>
- 														<option value="10">10</option>
- 														<option value="11">11</option>
- 														<option value="12">12</option>
- 														<option value="13">13</option>
- 														<option value="14">14</option>
- 														<option value="15">15</option>
- 														<option value="16">16</option>
- 														<option value="17">17</option>
- 														<option value="18">18</option>
- 														<option value="19">19</option>
- 														<option value="20">20</option>
- 														<option value="21">21</option>
- 														<option value="22">22</option>
- 														<option value="23">23</option>
- 														<option value="24">24</option>
- 														<option value="25">25</option>
- 														<option value="26">26</option>
- 														<option value="27">27</option>
- 														<option value="28">28</option>
- 														<option value="29">29</option>
- 														<option value="30">30</option>
- 														<option value="31">31</option>
- 													</select> 
- 													<select id="year"> 
- 														<option selected="selected" value="    ">Year</option>  
- 													</select> 
-													<span id="dob_error_text" class="required-text" th:errors="*{birthDate}">Date of Birth is required.</span>
-													<span id="dob_client_error_text" class="required-text" style="display: none;">Date of Birth is required.</span>
+													<input type="text" id="date" data-format="MM/DD/YYYY"
+														data-template="MMM D YYYY" name="date"
+														style="display: none;" th:field="*{birthDate}" /> <select
+														id="month">
+														<option selected="selected" value="  ">Month</option>
+														<option value="01">January</option>
+														<option value="02">February</option>
+														<option value="03">March</option>
+														<option value="04">April</option>
+														<option value="05">May</option>
+														<option value="06">June</option>
+														<option value="07">July</option>
+														<option value="08">August</option>
+														<option value="09">September</option>
+														<option value="10">October</option>
+														<option value="11">November</option>
+														<option value="12">December</option>
+													</select> <select id="day">
+														<option selected="selected" value="  ">Day</option>
+														<option value="01">01</option>
+														<option value="02">02</option>
+														<option value="03">03</option>
+														<option value="04">04</option>
+														<option value="05">05</option>
+														<option value="06">06</option>
+														<option value="07">07</option>
+														<option value="08">08</option>
+														<option value="09">09</option>
+														<option value="10">10</option>
+														<option value="11">11</option>
+														<option value="12">12</option>
+														<option value="13">13</option>
+														<option value="14">14</option>
+														<option value="15">15</option>
+														<option value="16">16</option>
+														<option value="17">17</option>
+														<option value="18">18</option>
+														<option value="19">19</option>
+														<option value="20">20</option>
+														<option value="21">21</option>
+														<option value="22">22</option>
+														<option value="23">23</option>
+														<option value="24">24</option>
+														<option value="25">25</option>
+														<option value="26">26</option>
+														<option value="27">27</option>
+														<option value="28">28</option>
+														<option value="29">29</option>
+														<option value="30">30</option>
+														<option value="31">31</option>
+													</select> <select id="year">
+														<option selected="selected" value="    ">Year</option>
+													</select> <span id="dob_error_text" class="required-text"
+														th:errors="*{birthDate}">Date of Birth is required.</span>
+													<span id="dob_client_error_text" class="required-text"
+														style="display: none;">Date of Birth is required.</span>
 												</div>
 											</div>
 
@@ -284,15 +332,19 @@
 												</div><span class="required-text" th:errors="*{birthDate}">Date of Birth is required.</span>											
 											</div>		
 											 -->
-											 	
+
 											<div>
 												<div>
 													<label for="email">Email</label>
 												</div>
-												<div class="inline-block">													
-													<input id="email" name="email" type="text"  aria-required="true" th:field="*{email}" />
-													<span class="required-text" th:errors="*{email}">Please provide a valid email address.</span>
-													<span id="email_client_error_text" class="required-text" style="display: none;">Please provide a valid email address.</span>
+												<div class="inline-block">
+													<input id="email" name="email" type="text"
+														aria-required="true" th:field="*{email}" /> <span
+														class="required-text" th:errors="*{email}">Please
+														provide a valid email address.</span> <span
+														id="email_client_error_text" class="required-text"
+														style="display: none;">Please provide a valid email
+														address.</span>
 												</div>
 											</div>
 
@@ -326,66 +378,80 @@
 
 										<div style="margin-top: 10px;" class="username-container">
 											<p>Address</p>
-											<label for="street">Street Address</label> 
-											<input id="street" name="streetAddressLine" type="text" th:field="*{addressStreetAddressLine}" /> 
-											<label for="city">City</label>
-											<input id="city" name="city" type="text" th:field="*{addressCity}" />
-
-											<label for="state">State</label> 
+											<label for="street">Street Address</label> <input id="street"
+												name="streetAddressLine" type="text"
+												th:field="*{addressStreetAddressLine}" /> <label for="city">City</label>
+											<input id="city" name="city" type="text"
+												th:field="*{addressCity}" /> <label for="state">State</label>
 											<select id="state" th:field="*{addressStateCode}">
-												<option selected="selected" value="">--- Please Select ---</option>
-												<option th:each="addressState : ${stateCodes}" th:value="${addressState.code}" th:text="${addressState.displayName}">Alabama</option>
-											</select> 
+												<option selected="selected" value="">--- Please
+													Select ---</option>
+												<option th:each="addressState : ${stateCodes}"
+													th:value="${addressState.code}"
+													th:text="${addressState.displayName}">Alabama</option>
+											</select>
 											<div>
 												<div>
 													<label for="zip">Zip Code</label>
 												</div>
-												<div class="inline-block"> 
-													<input id="zip" name="postalCode" type="text" th:field="*{addressPostalCode}" />
-													<span class="required-text" th:errors="*{addressPostalCode}">Please provide a valid zip code</span>
-													<span id="zip_client_error_text" class="required-text" style="display: none;">Please provide a valid zip code</span>
+												<div class="inline-block">
+													<input id="zip" name="postalCode" type="text"
+														th:field="*{addressPostalCode}" /> <span
+														class="required-text" th:errors="*{addressPostalCode}">Please
+														provide a valid zip code</span> <span id="zip_client_error_text"
+														class="required-text" style="display: none;">Please
+														provide a valid zip code</span>
 												</div>
-												
-													
-												</div>
+
+
 											</div>
-										
+										</div>
+
 										<div class="control-group">
 
 											<div>
 												<div>
-													<label for="phone">Phone Number</label> 
+													<label for="phone">Phone Number</label>
 												</div>
 												<div class="inline-block">
-													<input id="phone" name="telephone" type="text" th:field="*{telephoneTelephone}" />												
-													<span class="required-text" th:errors="*{telephoneTelephone}">Please provide a valid phone number. For example 123-456-7890.</span>
-													<span id="phone_client_error_text" class="required-text" style="display: none;">Please provide a valid phone number. For example 123-456-7890.</span>
+													<input id="phone" name="telephone" type="text"
+														th:field="*{telephoneTelephone}" /> <span
+														class="required-text" th:errors="*{telephoneTelephone}">Please
+														provide a valid phone number. For example 123-456-7890.</span> <span
+														id="phone_client_error_text" class="required-text"
+														style="display: none;">Please provide a valid phone
+														number. For example 123-456-7890.</span>
 												</div>
 											</div>
-											
+
 											<div>
 												<div>
-													<label for="socialsecurity">Social Security Number</label> 
+													<label for="socialsecurity">Social Security Number</label>
 												</div>
 												<div class="inline-block">
-													<input id="socialsecurity" name="socialSecurityNumber" type="text" th:field="*{socialSecurityNumber}" />
-													<span class="required-text" th:errors="*{socialSecurityNumber}">Please provide a valid social security number. For example 123-45-6789.</span>
-													<span id="ssn_client_error_text" class="required-text" style="display: none;">Please provide a valid social security number. For example 123-45-6789.</span>
-												
+													<input id="socialsecurity" name="socialSecurityNumber"
+														type="text" th:field="*{socialSecurityNumber}" /> <span
+														class="required-text" th:errors="*{socialSecurityNumber}">Please
+														provide a valid social security number. For example
+														123-45-6789.</span> <span id="ssn_client_error_text"
+														class="required-text" style="display: none;">Please
+														provide a valid social security number. For example
+														123-45-6789.</span>
+
 												</div>
 											</div>
-													
-													<label class="control-label">Marital Status</label>
-													<div class="controls">
-														<select th:field="*{maritalStatusCode.code}">
-															<option selected="selected" value="">--- Please
-																Select ---</option>
-															<option th:each="maritalStatus : ${maritalStatusCodes}"
-																th:value="${maritalStatus.code}"
-																th:text="${maritalStatus.displayName}">Married</option>
-														</select>
-													</div>
-												
+
+											<label class="control-label">Marital Status</label>
+											<div class="controls">
+												<select th:field="*{maritalStatusCode.code}">
+													<option selected="selected" value="">--- Please
+														Select ---</option>
+													<option th:each="maritalStatus : ${maritalStatusCodes}"
+														th:value="${maritalStatus.code}"
+														th:text="${maritalStatus.displayName}">Married</option>
+												</select>
+											</div>
+
 
 											<label class="control-label">Religious Affiliation</label>
 											<div class="controls">
@@ -419,20 +485,73 @@
 														th:text="${language.displayName}">English, US</option>
 												</select>
 											</div>
+											<br />
+											<!-- end username-container -->
 										</div>
 										<!-- what -->
 										<div style="clear: both"></div>
 
 										<div class="control-group bottom-btn-group">
 											<div class="controls">
-												<button type="button" class="btn" onClick="window.location.href='home.html'" style="margin: 0 10px 0 0;">Cancel</button>
-												<input type="submit" value="Save" class="btn btn-primary" />
+												<button type="button" class="btn"
+													onClick="window.location.href='home.html'"
+													style="margin: 0 10px 0 0;">Cancel</button>
+												<!-- Button trigger modal -->
+												<a id="saveProfile"	class="btn btn-primary btn-lg">Save</a>
 
-												
+												<!-- Modal -->
+												<div class="modal fade" id="username_password_modal" tabindex="-1"
+													role="dialog" aria-labelledby="username_password_modal_Label"
+													aria-hidden="true">
+													<div class="modal-dialog">
+														<div class="modal-content">
+															<div class="modal-header">
+																<button type="button" class="close" data-dismiss="modal"
+																	aria-hidden="true">&times;</button>
+																<h4 class="modal-title">Please re-enter your
+																	username and password:</h4>
+															</div>
+															<div class="modal-body">
+																<div id="username-password-container">
+																	<div>
+																		<div>
+																			<label for="user_name">Username</label>
+																		</div>
+																			<input id="user_name" name="username" type="text"
+																				aria-required="true" th:field="*{username}" /> 
+																	</div>
+
+																	<div>
+																		<div>
+																			<label for="password">Password</label>
+																		</div>
+																		<div class="inline-block">
+																			<input id="password" name="password" type="password"
+																				aria-required="true" th:field="*{password}"/> 
+																		</div>
+																	</div>
+																</div>
+															</div>
+															<div class="modal-footer">
+																<button type="button" class="btn btn-default"
+																	data-dismiss="modal">Close</button>
+																<input type="submit" value="Submit" class="btn btn-small btn-success" />
+<!-- 																<button type="button" class="btn btn-primary">Save -->
+<!-- 																	changes</button> -->
+															</div>
+														</div>
+														<!-- /.modal-content -->
+													</div>
+													<!-- /.modal-dialog -->
+												</div>
+
+
 											</div>
 										</div>
 									</fieldset>
 								</form>
+
+								<!-- /.modal -->
 							</section>
 
 						</div>
@@ -442,8 +561,10 @@
 
 
 					</div>
-				</div><!--/#content.span10-->
-			</div><!--/fluid-row-->
+				</div>
+				<!--/#content.span10-->
+			</div>
+			<!--/fluid-row-->
 			<!-- END: Content Region -->
 
 
@@ -462,8 +583,8 @@
 			<li data-id="add-provider-btn" class="user-guide"><img
 				class="number-icon" src="../../../resources/img/number-01.png"
 				alt="step-01" width="20" height="20"
-				th:src="@{/resources/img/number-01.png}" />Click the plus button
-				to add a Healthcare Provider to your health records.
+				th:src="@{/resources/img/number-01.png}" />Click the plus button to
+				add a Healthcare Provider to your health records.
 				<div class="disclaimer">Always consult your doctor or
 					physician to discuss any potential health risks.</div></li>
 			<li data-id="add-friend-btn" class="user-guide"><img
@@ -476,85 +597,56 @@
 
 		<div class="clearfix"></div>
 		<!-- START: Footer Region -->
-		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
-		<!-- COMPONENT: Action Buttons -->
-				<!--
+		<footer class="bottom"
+			th:include="fragment/common :: [//footer[@id='center-footer']]">
+			<!-- COMPONENT: Action Buttons -->
+			<!--
 				<a href="#" class="btn pull-left" data-dismiss="modal">Close</a>
 				<a href="#" class="btn btn-primary pull-right">Save changes</a>
 				-->
-				
-				<!-- COMPONENT: Copyright Information -->
-				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
+
+			<!-- COMPONENT: Copyright Information -->
+			<p class="top-margin10 pull-left">
+				&copy; <a class="footer-link" href="" target="_blank">A SAMHSA
+					Public Service</a> 2013
+			</p>
 
 		</footer>
-		
+
 		<!-- END: Footer Region -->
 	</div>
 
-<!-- START: JavaScript-->
+	<!-- START: JavaScript-->
+	<script src="../../../resources/js/bootstrap.min.js"
+		th:src="@{/resources/js/bootstrap.min.js}" type="text/javascript"></script>
+	<script src="../../../resources/js/jquery.toggle.buttons.js"
+		th:src="@{/resources/js/jquery.toggle.buttons.js}"
+		type="text/javascript"></script>
+	<script src="../../../resources/js/bootstrap-popover.js"
+		th:src="@{/resources/js/bootstrap-popover.js}" type="text/javascript"></script>
+	<script src="../../../resources/js/jquery.joyride-2.0.3.js"
+		th:src="@{/resources/js/jquery.joyride-2.0.3.js}"
+		type="text/javascript"></script>
+	<script src="../../../resources/js/jquery.cookie.js"
+		th:src="@{/resources/js/jquery.cookie.js}" type="text/javascript"></script>
+	<script src="../../../resources/js/modernizr.mq.js"
+		th:src="@{/resources/js/modernizr.mq.js}" type="text/javascript"></script>
+	<script src="../../../resources/js/moment.min.1.7.2.js"
+		th:src="@{/resources/js/moment.min.1.7.2.js}" type="text/javascript"></script>
+	<script src="../../../resources/js/dateValidator.js"
+		th:src="@{/resources/js/dateValidator.js}" type="text/javascript"></script>
 
-<script src="../../../resources/js/jquery.min.js" 
-				th:src="@{/resources/js/jquery.min.js}" 
-				type="text/javascript">
-		</script><noscript>Alternate content for script</noscript>
-				<script src="../../../resources/js/bootstrap.min.js"
-				th:src="@{/resources/js/bootstrap.min.js}" 
-				type="text/javascript"></script><noscript>Alternate content for script</noscript>
-		<script src="../../../resources/js/jquery.toggle.buttons.js"
-				th:src="@{/resources/js/jquery.toggle.buttons.js}" 
-				type="text/javascript"></script><noscript>Alternate content for script</noscript>
-		<script src="../../../resources/js/bootstrap-popover.js"
-				th:src="@{/resources/js/bootstrap-popover.js}"
-				type="text/javascript"></script>
-		<script src="../../../resources/js/jquery.joyride-2.0.3.js" 
-				th:src="@{/resources/js/jquery.joyride-2.0.3.js}"
-				type="text/javascript"></script>
-		<script src="../../../resources/js/jquery.cookie.js" 
-				th:src="@{/resources/js/jquery.cookie.js}"
-				type="text/javascript"></script>
-		<script src="../../../resources/js/modernizr.mq.js" 
-				th:src="@{/resources/js/modernizr.mq.js}"
-				type="text/javascript"></script>
-		<script src="../../../resources/js/moment.min.1.7.2.js" 
-				th:src="@{/resources/js/moment.min.1.7.2.js}"
-				type="text/javascript"></script>
-				
-		<script src="../../../resources/js/dateValidator.js" 
-				th:src="@{/resources/js/dateValidator.js}"
-				type="text/javascript"></script>
-				
-		<script src="../../../resources/js/webpage-js/userAccountInfoValidation.js" 
-				th:src="@{/resources/js/webpage-js/userAccountInfoValidation.js}"
-				type="text/javascript"></script>
-				
-		<!-- FIXME: Move internal javascript code to external .js file -->
-		<script type="text/javascript">
-			$(document).ready(function() {				
-				var currentYear = (new Date).getFullYear();
-				var minYear = currentYear - 125;
 
-				if(1900 > minYear){
-					minYear = 1900;
-				}
+	<!-- Custom JavaScript -->
+	<script src="../../../resources/js/webpage-js/profile.js"
+		th:src="@{/resources/js/webpage-js/profile.js}" type="text/javascript"></script>
 
-				for (var i=currentYear; i >= minYear; i--){
-					$('#year').append($("<option/>", { value: i, text: i}));
-				}
+	<script
+		src="../../../resources/js/webpage-js/userAccountInfoValidation.js"
+		th:src="@{/resources/js/webpage-js/userAccountInfoValidation.js}"
+		type="text/javascript"></script>
 
-				setDOBfromTxt();
-				
-				$('.toggleButton').toggleButtons();
-				$('#tourtest').joyride({
-					tipAnimation : 'pop',
-					tipLocation : 'right',
-					autoStart : true
-				});
-				$('#tourtest').hide();
-			});
-	
-		</script><noscript>Alternate content for script</noscript>
-	
-	<!-- END: JavaScript-->		
+	<!-- END: JavaScript-->
 
 </body>
 </html>

@@ -1,10 +1,10 @@
 # Passwords are the same: P@rr0tf1$h
-insert into users (username,password,enabled)
-values ('albert.smith','eb0b0f45263cb8239fdcc45d57e6ee9a7fabf5996d6b64d3cbd2e2b7e18a49183179fe4831d86ac3',1);
-insert into users (username,password,enabled)
-values ('consent2share.admin','9465493d519b7fd926a3b2b69887c41222018215880b9a014382624a4369e1cff57c494b8ac46b5b',1);
-insert into users (username,password,enabled)
-values ('disabled1','46ce538975b7f0826c44dfd5dada4c2eac8ab47b717a596aae311cd31695fe612523b7e644cd21e8',0);
+insert into users (username,password,enabled,failed_attempts)
+values ('albert.smith','eb0b0f45263cb8239fdcc45d57e6ee9a7fabf5996d6b64d3cbd2e2b7e18a49183179fe4831d86ac3',1,0);
+insert into users (username,password,enabled,failed_attempts)
+values ('consent2share.admin','9465493d519b7fd926a3b2b69887c41222018215880b9a014382624a4369e1cff57c494b8ac46b5b',1,0);
+insert into users (username,password,enabled,failed_attempts)
+values ('disabled1','46ce538975b7f0826c44dfd5dada4c2eac8ab47b717a596aae311cd31695fe612523b7e644cd21e8',0,0);
 
 
 insert into authorities(username,authority)

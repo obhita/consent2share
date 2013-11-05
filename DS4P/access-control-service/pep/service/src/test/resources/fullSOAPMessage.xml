@@ -1,0 +1,13 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:pus="http://www.samhsa.gov/ds4ppilot/schema/pep">
+	<soapenv:Header />
+	<soapenv:Body>
+		<pus:FilterC32Request>
+			<patientId>1234</patientId>
+			<packageAsXdm>true</packageAsXdm>
+			<senderEmailAddress>sender@test.com</senderEmailAddress>
+			<recipientEmailAddress>recipient@test.com</recipientEmailAddress>
+		</pus:FilterC32Request>
+	</soapenv:Body>
+</soapenv:Envelope>
+
