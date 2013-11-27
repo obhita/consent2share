@@ -142,7 +142,7 @@ public class ProviderControllerTest {
 	public void testDeleteIndividualProvider() throws Exception {
 		IndividualProviderDto individualProviderDto = mock(IndividualProviderDto.class);
 		when(individualProviderService.findIndividualProviderDto(anyLong())).thenReturn(individualProviderDto);
-		mockMvc.perform(get("/patients/connectionMain/deleteIndividualProvider/10"))
+		mockMvc.perform(post("/patients/connectionMain/deleteOrganizationalProvider").param("organizationalProviderid", "10"))
 			.andExpect(redirectedUrl("/patients/connectionMain.html"));
 	}
 
@@ -150,7 +150,7 @@ public class ProviderControllerTest {
 	public void testDeleteOrganizationalProvider() throws Exception {
 		OrganizationalProviderDto organizationalProviderDto = mock(OrganizationalProviderDto.class);
 		when(organizationalProviderService.findOrganizationalProviderDto(anyLong())).thenReturn(organizationalProviderDto);
-		mockMvc.perform(get("/patients/connectionMain/deleteOrganizationalProvider/10"))
+		mockMvc.perform(post("/patients/connectionMain/deleteOrganizationalProvider").param("organizationalProviderid", "10"))
 			.andExpect(redirectedUrl("/patients/connectionMain.html"));
 	}
 

@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.ds4ppilot.pep.contexthandler;
 
+import gov.samhsa.ds4ppilot.pep.dto.XacmlRequest;
 import gov.samhsa.ds4ppilot.pep.dto.XacmlResponse;
 
 import java.util.LinkedList;
@@ -44,88 +45,261 @@ import org.herasaf.xacml.core.policy.impl.ObligationType;
 import org.herasaf.xacml.core.simplePDP.SimplePDPFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * The Class PolicyDecisionPoint.
  */
-@Component("policyDecisionPoint")
 public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
-
-	/** The simple pdp. */
-	private PDP simplePDP;
 
 	/** The Constant LOGGER. */
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PolicyDecisionPointImpl.class);
-	
+
 	/** Data service for policy decision point implementation. */
-	@Autowired
 	private PolicyDecisionPointImplData data;
 
+	/** The request generator. */
+	private RequestGenerator requestGenerator;
+
+	/** The simple pdp. */
+	private PDP simplePDP;
+
 	/**
-	 * Instantiates a new policy decision point.
+	 * Instantiates a new policy decision point impl.
+	 * 
+	 * @param data
+	 *            the data
+	 * @param requestGenerator
+	 *            the request generator
 	 */
-	public PolicyDecisionPointImpl() {
-		this.simplePDP = SimplePDPFactory.getSimplePDP();
+	public PolicyDecisionPointImpl(PolicyDecisionPointImplData data,
+			RequestGenerator requestGenerator) {
+		super();
+		this.data = data;
+		this.requestGenerator = requestGenerator;
+		this.simplePDP = getSimplePDP();
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#getPolicies(java.lang.String)
+	/**
+	 * Gets all xacml policies of a patient unique id.
+	 * 
+	 * @param patientUniqueId
+	 *            the patient unique id
+	 * @return the policies
 	 */
-	@Override
-	public List<Evaluatable> getPolicies(String resourceId) {
+	public List<Evaluatable> getPolicies(String patientUniqueId) {
 
-		return data.getPolicies(resourceId);
+		return data.getPolicies(patientUniqueId);
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#deployPolicies(java.lang.String)
+	/**
+	 * Deploy all policies of a patient unique id.
+	 * 
+	 * @param pdp
+	 *            the pdp
+	 * @param patientUniqueId
+	 *            the patient unique id
+	 * @return the list
 	 */
-	@Override
-	public void deployPolicies(String resourceId) {
-		deployPolicies(getPolicies(resourceId));
+	public List<Evaluatable> deployPolicies(PDP pdp, String patientUniqueId) {
+		List<Evaluatable> deployedPolicies = getPolicies(patientUniqueId);
+		deployPolicies(pdp, deployedPolicies);
+		return deployedPolicies;
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#deployPolicies(java.util.List)
+	/**
+	 * Deploy policies.
+	 * 
+	 * @param pdp
+	 *            the pdp
+	 * @param policies
+	 *            the policies
 	 */
-	@Override
-	public void deployPolicies(List<Evaluatable> policies) {
-		PolicyRetrievalPoint repo = simplePDP.getPolicyRepository();
+	public void deployPolicies(PDP pdp, List<Evaluatable> policies) {
+		PolicyRetrievalPoint repo = pdp.getPolicyRepository();
 		UnorderedPolicyRepository repository = (UnorderedPolicyRepository) repo;
 		repository.deploy(policies);
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#undeployPolicy(org.herasaf.xacml.core.policy.Evaluatable)
+	/**
+	 * Undeploy multiple policies on the policy repository.
+	 * 
+	 * @param pdp
+	 *            the pdp
+	 * @param policy
+	 *            the policy
 	 */
-	@Override
-	public void undeployPolicy(Evaluatable policy) {
-		PolicyRepository repo = (PolicyRepository) simplePDP
-				.getPolicyRepository();
+	public void undeployPolicy(PDP pdp, Evaluatable policy) {
+		PolicyRepository repo = (PolicyRepository) pdp.getPolicyRepository();
 		repo.undeploy(policy.getId());
 
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#undeployPolicies(java.util.List)
+	/**
+	 * Undeploy policies.
+	 * 
+	 * @param pdp
+	 *            the pdp
+	 * @param policies
+	 *            the policies
 	 */
-	@Override
-	public void undeployPolicies(List<EvaluatableID> policyIds) {
-		PolicyRepository repo = (PolicyRepository) simplePDP
-				.getPolicyRepository();
+	public void undeployPolicies(PDP pdp, List<Evaluatable> policies) {
+		PolicyRepository repo = (PolicyRepository) pdp.getPolicyRepository();
+		for (Evaluatable policy : policies) {
+			repo.undeploy(policy.getId());
+		}
+	}
+
+	/**
+	 * Undeploy multiple policies on the policy repository.
+	 * 
+	 * @param pdp
+	 *            the pdp
+	 * @param policyIds
+	 *            the policy ids
+	 */
+	public void undeployPoliciesById(PDP pdp, List<EvaluatableID> policyIds) {
+		PolicyRepository repo = (PolicyRepository) pdp.getPolicyRepository();
 		repo.undeploy(policyIds);
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#evaluateRequest(org.herasaf.xacml.core.context.impl.RequestType)
+	/**
+	 * Gets the simple pdp.
+	 * 
+	 * @return the simple pdp
+	 */
+	public PDP getSimplePDP() {
+		return SimplePDPFactory.getSimplePDP();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#evaluateRequest
+	 * (org.herasaf.xacml.core.api.PDP,
+	 * org.herasaf.xacml.core.context.impl.RequestType, java.util.List)
 	 */
 	@Override
-	public XacmlResponse evaluateRequest(RequestType request) {
+	public XacmlResponse evaluateRequest(PDP pdp, RequestType request,
+			List<Evaluatable> policies) {
 		LOGGER.info("evaluateRequest invoked");
+		return managePoliciesAndEvaluateRequest(pdp, request, policies);
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#evaluateRequest
+	 * (org.herasaf.xacml.core.api.PDP,
+	 * org.herasaf.xacml.core.context.impl.RequestType, java.lang.String)
+	 */
+	@Override
+	public XacmlResponse evaluateRequest(PDP pdp, RequestType request,
+			String patientUniqueId) {
+		LOGGER.info("evaluateRequest invoked");
+		List<Evaluatable> deployedPolicies = deployPolicies(pdp,
+				patientUniqueId);
+		return managePoliciesAndEvaluateRequest(pdp, request, deployedPolicies);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#evaluateRequest
+	 * (org.herasaf.xacml.core.context.impl.RequestType)
+	 */
+	@Override
+	public XacmlResponse evaluateRequest(RequestType request,
+			String patientUniqueId) {
+		LOGGER.info("evaluateRequest invoked");
+		return managePoliciesAndEvaluateRequest(this.simplePDP, request,
+				patientUniqueId);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#evaluateRequest
+	 * (gov.samhsa.ds4ppilot.pep.dto.XacmlRequest)
+	 */
+	public XacmlResponse evaluateRequest(XacmlRequest xacmlRequest) {
+		LOGGER.info("evaluateRequest invoked");
+		RequestType request = requestGenerator.generateRequest(
+				xacmlRequest.getRecepientSubjectNPI(),
+				xacmlRequest.getIntermediarySubjectNPI(),
+				xacmlRequest.getPurposeOfUse(), xacmlRequest.getPatientId());
+		return managePoliciesAndEvaluateRequest(this.simplePDP, request,
+				xacmlRequest.getPatientUniqueId());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPoint#evaluateRequest
+	 * (org.herasaf.xacml.core.context.impl.RequestType, java.util.List)
+	 */
+	@Override
+	public XacmlResponse evaluateRequest(RequestType request,
+			List<Evaluatable> policies) {
+		LOGGER.info("evaluateRequest invoked");
+		return managePoliciesAndEvaluateRequest(this.simplePDP, request,
+				policies);
+	}
+
+	/**
+	 * Manage policies and evaluate request (deploys the policies, evaluates the
+	 * request. Policies are undeployed after evaluation).
+	 * 
+	 * @param pdp
+	 *            the pdp
+	 * @param request
+	 *            the request
+	 * @param patientUniqueId
+	 *            the patient unique id
+	 * @return the xacml response
+	 */
+	private XacmlResponse managePoliciesAndEvaluateRequest(PDP pdp,
+			RequestType request, String patientUniqueId) {
+		List<Evaluatable> deployedPolicies = deployPolicies(pdp,
+				patientUniqueId);
+		return managePoliciesAndEvaluateRequest(pdp, request, deployedPolicies);
+	}
+
+	/**
+	 * Manage policies and evaluate request (the policies should already be
+	 * deployed on pdp. Evaluates the request and undeploys the policies after
+	 * evaluation).
+	 * 
+	 * @param pdp
+	 *            the pdp
+	 * @param request
+	 *            the request
+	 * @param deployedPolicies
+	 *            the deployed policies
+	 * @return the xacml response
+	 */
+	private XacmlResponse managePoliciesAndEvaluateRequest(PDP pdp,
+			RequestType request, List<Evaluatable> deployedPolicies) {
+		XacmlResponse xacmlResponse = evaluateRequest(pdp, request);
+		undeployPolicies(pdp, deployedPolicies);
+		return xacmlResponse;
+	}
+
+	/**
+	 * Evaluate request.
+	 * 
+	 * @param simplePDP
+	 *            the simple pdp
+	 * @param request
+	 *            the request
+	 * @return the xacml response
+	 */
+	private XacmlResponse evaluateRequest(PDP simplePDP, RequestType request) {
 		XacmlResponse xacmlResponse = new XacmlResponse();
 
 		ResponseType response = simplePDP.evaluate(request);
@@ -159,5 +333,4 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 		LOGGER.debug("xacmlResponse is ready!");
 		return xacmlResponse;
 	}
-
 }

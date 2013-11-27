@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.ds4ppilot.pep;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -43,9 +44,10 @@ public class DataHandlerToBytesConverterImpl implements DataHandlerToBytesConver
 	 */
 	@Override
 	public byte[] toByteArray(DataHandler dataHandler) throws IOException {
-		DelegatingInputStream dis = ((DelegatingInputStream) dataHandler.getContent());
-		InputStream in = dis.getInputStream();
-		byte[] processedPayload = IOUtils.toByteArray(in);
+		ByteArrayInputStream dis = (ByteArrayInputStream) dataHandler.getContent();
+		//DelegatingInputStream dis = ((DelegatingInputStream) dataHandler.getContent());
+		//InputStream in = dis.getInputStream();
+		byte[] processedPayload = IOUtils.toByteArray(dis);
 		
 		return processedPayload;
 	}

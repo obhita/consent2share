@@ -25,10 +25,10 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools;
 
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverter;
 import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.common.utils.EncryptTool;
-import gov.samhsa.ds4ppilot.common.utils.XmlHelper;
 import gov.va.ds4p.cas.RuleExecutionResponse;
 
 import java.security.Key;
@@ -50,6 +50,9 @@ public class DocumentEncrypterImpl implements DocumentEncrypter {
 
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	/** The document xml converter. */
+	private DocumentXmlConverter documentXmlConverter;
 
 	/*
 	 * (non-Javadoc)
@@ -77,7 +80,7 @@ public class DocumentEncrypterImpl implements DocumentEncrypter {
 		if (encryptDoc) {
 
 			try {
-				xmlDocument = XmlHelper.loadDocument(document);
+				xmlDocument = documentXmlConverter.loadDocument(document);
 
 				/*
 				 * Get a key to be used for encrypting the element. Here we are
@@ -101,7 +104,7 @@ public class DocumentEncrypterImpl implements DocumentEncrypter {
 				// Output encrypted doc to file
 				// FileHelper.writeDocToFile(xmlDocument, "Encrypted_C32.xml");
 
-				xmlString = XmlHelper.converXmlDocToString(xmlDocument);
+				xmlString = documentXmlConverter.convertXmlDocToString(xmlDocument);
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				throw new DS4PException(e.toString(), e);
@@ -109,9 +112,29 @@ public class DocumentEncrypterImpl implements DocumentEncrypter {
 		}
 		return xmlString;
 	}
-	
+
 	/**
-	 * Encrypt element
+	 * Gets the document xml converter.
+	 * 
+	 * @return the document xml converter
+	 */
+	public DocumentXmlConverter getDocumentXmlConverter() {
+		return documentXmlConverter;
+	}
+
+	/**
+	 * Sets the document xml converter.
+	 * 
+	 * @param documentXmlConverter
+	 *            the new document xml converter
+	 */
+	public void setDocumentXmlConverter(
+			DocumentXmlConverter documentXmlConverter) {
+		this.documentXmlConverter = documentXmlConverter;
+	}
+
+	/**
+	 * Encrypt element.
 	 * 
 	 * @param xmlDocument
 	 *            the xml document

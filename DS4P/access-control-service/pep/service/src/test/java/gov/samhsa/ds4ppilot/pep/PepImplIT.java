@@ -152,7 +152,7 @@ public class PepImplIT {
 		String xdsDocumentEntryUniqueId = "123";
 		
 		// pdp
-		PolicyDecisionPoint pdpSpy = spy(policyDecisionPoint);
+		PolicyDecisionPointImpl pdpSpy = spy(policyDecisionPoint);
 		Evaluatable policy=null;
 		try {
 			InputStream is = new FileInputStream(samplePolicyPath);
@@ -188,7 +188,7 @@ public class PepImplIT {
 			PolicyDecisionPoint pdpSpy, RequestGenerator requestGeneratorMock)
 			throws IOException, FileNotFoundException {
 		// context handler
-		ContextHandlerImpl contextHandler = new ContextHandlerImpl(pdpSpy, requestGeneratorMock);
+		ContextHandlerImpl contextHandler = new ContextHandlerImpl(pdpSpy);
 
 		// c32 getter
 //		final String endpointAddress = "http:localhost/Rem.Web/C32Service.svc";
@@ -282,7 +282,7 @@ public class PepImplIT {
 		String xdsDocumentEntryUniqueId = "123";
 		
 		// pdp
-		PolicyDecisionPoint pdpSpy = spy(policyDecisionPoint);
+		PolicyDecisionPointImpl pdpSpy = spy(policyDecisionPoint);
 		Evaluatable policy=null;
 		try {
 			InputStream is = new FileInputStream(samplePolicyPath);
@@ -316,7 +316,7 @@ public class PepImplIT {
 			String purposeOfUse, String xdsDocumentEntryUniqueId,
 			PolicyDecisionPoint pdpSpy, RequestGenerator requestGeneratorMock) {
 		// context handler
-		ContextHandlerImpl contextHandler = new ContextHandlerImpl(pdpSpy, requestGeneratorMock);
+		ContextHandlerImpl contextHandler = new ContextHandlerImpl(pdpSpy);
 
 		// c32 getter
 //		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
@@ -385,7 +385,7 @@ public class PepImplIT {
 		String xdsDocumentEntryUniqueId = "123";
 		
 		// pdp
-		PolicyDecisionPoint pdpSpy = spy(policyDecisionPoint);
+		PolicyDecisionPointImpl pdpSpy = spy(policyDecisionPoint);
 		Evaluatable policy=null;
 		try {
 			InputStream is = new FileInputStream(samplePolicyPath);
@@ -421,7 +421,7 @@ public class PepImplIT {
 		String xdsDocumentEntryUniqueId = "123";
 		
 		// pdp
-		PolicyDecisionPoint pdpSpy = spy(policyDecisionPoint);
+		PolicyDecisionPointImpl pdpSpy = spy(policyDecisionPoint);
 		Evaluatable policy=null;
 		try {
 			InputStream is = new FileInputStream(samplePolicyPath);
@@ -466,7 +466,7 @@ public class PepImplIT {
 		String xdsDocumentEntryUniqueId = "123";
 		
 		// pdp
-		PolicyDecisionPoint pdpSpy = spy(policyDecisionPoint);
+		PolicyDecisionPointImpl pdpSpy = spy(policyDecisionPoint);
 		Evaluatable policy=null;
 		try {
 			InputStream is = new FileInputStream(samplePolicyPath);

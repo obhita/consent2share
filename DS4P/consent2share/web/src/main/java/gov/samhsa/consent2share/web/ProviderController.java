@@ -177,8 +177,8 @@ public class ProviderController {
 	 * @param model the model
 	 * @return the string
 	 */
-	@RequestMapping(value = "connectionMain/deleteIndividualProvider/{individualProviderid}", method = RequestMethod.GET)
-	public String deleteIndividualProvider( @PathVariable("individualProviderid") long individualProviderid, Model model) {
+	@RequestMapping(value = "connectionMain/deleteIndividualProvider", method = RequestMethod.POST)
+	public String deleteIndividualProvider(@RequestParam("individualProviderid") long individualProviderid, Model model) {
 			 AuthenticatedUser currentUser = userContext.getCurrentUser();
 			 PatientConnectionDto patientConnectionDto=patientService.findPatientConnectionByUsername(currentUser
 						.getUsername());
@@ -213,8 +213,8 @@ public class ProviderController {
 	 * @param model the model
 	 * @return the string
 	 */
-	@RequestMapping(value = "connectionMain/deleteOrganizationalProvider/{organizationalProviderid}", method = RequestMethod.GET)
-	public String deleteOrganizationalProvider( @PathVariable("organizationalProviderid") long organizationalProviderid, Model model) {
+	@RequestMapping(value = "connectionMain/deleteOrganizationalProvider", method = RequestMethod.POST)
+	public String deleteOrganizationalProvider( @RequestParam("organizationalProviderid") long organizationalProviderid, Model model) {
 		   
 			AuthenticatedUser currentUser = userContext.getCurrentUser();
 			PatientConnectionDto patientConnectionDto=patientService.findPatientConnectionByUsername(currentUser

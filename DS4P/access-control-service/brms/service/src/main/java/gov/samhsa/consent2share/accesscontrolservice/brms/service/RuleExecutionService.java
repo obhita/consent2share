@@ -27,7 +27,6 @@ package gov.samhsa.consent2share.accesscontrolservice.brms.service;
 
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface RuleExecutionService.
  */

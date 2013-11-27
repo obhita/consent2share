@@ -89,7 +89,7 @@ public class DocumentXmlConverterImplTest {
 		Document document = readDocument("src/test/resources/xmlDocument.txt");
 
 		// Act
-		String docString = documentXmlConverter.converXmlDocToString(document);
+		String docString = documentXmlConverter.convertXmlDocToString(document);
 		logger.debug(docString);
 
 		// Assert
@@ -104,7 +104,7 @@ public class DocumentXmlConverterImplTest {
 		Document document = readDocument("src/test/resources/xmlDocument.txt");
 
 		// Act
-		String docString = documentXmlConverter.converXmlDocToString(document);
+		String docString = documentXmlConverter.convertXmlDocToString(document);
 		logger.debug(docString);
 
 		// Assert
@@ -119,7 +119,7 @@ public class DocumentXmlConverterImplTest {
 		Document document = readDocument("src/test/resources/xmlDocument.txt");
 
 		// Act
-		String docString = documentXmlConverter.converXmlDocToString(document);
+		String docString = documentXmlConverter.convertXmlDocToString(document);
 		logger.debug(docString);
 
 		// Assert

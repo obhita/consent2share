@@ -29,25 +29,28 @@ package gov.samhsa.ds4ppilot.pep.dto;
  * The Class XacmlRequest.
  */
 public class XacmlRequest {
-	
+
 	/** The recepient subject npi. */
 	private String recepientSubjectNPI;
-	
+
 	/** The intermediary subject npi. */
 	private String intermediarySubjectNPI;
-	
+
 	/** The purpose of use. */
 	private String purposeOfUse;
-	
-	/** The resource id. */
-	private String resourceId;
-	
+
+	/** The patient id. */
+	private String patientId;
+
+	/** The patient unique id. */
+	private String patientUniqueId;
+
 	/** The home community id. */
 	private String homeCommunityId;
-	
+
 	/** The message id. */
 	private String messageId;
-	
+
 	/**
 	 * Gets the recepient subject npi.
 	 *
@@ -56,7 +59,7 @@ public class XacmlRequest {
 	public String getRecepientSubjectNPI() {
 		return recepientSubjectNPI;
 	}
-	
+
 	/**
 	 * Sets the recepient subject npi.
 	 *
@@ -65,7 +68,7 @@ public class XacmlRequest {
 	public void setRecepientSubjectNPI(String recepientSubjectNPI) {
 		this.recepientSubjectNPI = recepientSubjectNPI;
 	}
-	
+
 	/**
 	 * Gets the intermediary subject npi.
 	 *
@@ -74,7 +77,7 @@ public class XacmlRequest {
 	public String getIntermediarySubjectNPI() {
 		return intermediarySubjectNPI;
 	}
-	
+
 	/**
 	 * Sets the intermediary subject npi.
 	 *
@@ -83,7 +86,7 @@ public class XacmlRequest {
 	public void setIntermediarySubjectNPI(String intermediarySubjectNPI) {
 		this.intermediarySubjectNPI = intermediarySubjectNPI;
 	}
-	
+
 	/**
 	 * Gets the purpose of use.
 	 *
@@ -92,7 +95,7 @@ public class XacmlRequest {
 	public String getPurposeOfUse() {
 		return purposeOfUse;
 	}
-	
+
 	/**
 	 * Sets the purpose of use.
 	 *
@@ -101,25 +104,43 @@ public class XacmlRequest {
 	public void setPurposeOfUse(String purposeOfUse) {
 		this.purposeOfUse = purposeOfUse;
 	}
-	
+
 	/**
-	 * Gets the resource id.
+	 * Gets the patient id.
 	 *
-	 * @return the resource id
+	 * @return the patient id
 	 */
-	public String getResourceId() {
-		return resourceId;
+	public String getPatientId() {
+		return patientId;
 	}
-	
+
 	/**
-	 * Sets the resource id.
+	 * Sets the patient id.
 	 *
-	 * @param resourceId the new resource id
+	 * @param patientId the new patient id
 	 */
-	public void setResourceId(String resourceId) {
-		this.resourceId = resourceId;
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
 	}
-	
+
+	/**
+	 * Gets the patient unique id.
+	 *
+	 * @return the patient unique id
+	 */
+	public String getPatientUniqueId() {
+		return patientUniqueId;
+	}
+
+	/**
+	 * Sets the patient unique id.
+	 *
+	 * @param patientUniqueId the new patient unique id
+	 */
+	public void setPatientUniqueId(String patientUniqueId) {
+		this.patientUniqueId = patientUniqueId;
+	}
+
 	/**
 	 * Gets the home community id.
 	 *
@@ -128,7 +149,7 @@ public class XacmlRequest {
 	public String getHomeCommunityId() {
 		return homeCommunityId;
 	}
-	
+
 	/**
 	 * Sets the home community id.
 	 *
@@ -137,7 +158,7 @@ public class XacmlRequest {
 	public void setHomeCommunityId(String homeCommunityId) {
 		this.homeCommunityId = homeCommunityId;
 	}
-	
+
 	/**
 	 * Gets the message id.
 	 *
@@ -146,7 +167,7 @@ public class XacmlRequest {
 	public String getMessageId() {
 		return messageId;
 	}
-	
+
 	/**
 	 * Sets the message id.
 	 *
@@ -154,8 +175,5 @@ public class XacmlRequest {
 	 */
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
-	}
-	
-	
-
+	}	
 }

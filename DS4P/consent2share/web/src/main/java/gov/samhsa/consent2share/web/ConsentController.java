@@ -515,8 +515,8 @@ public class ConsentController {
 	 *            the consent id
 	 * @return the string
 	 */
-	@RequestMapping("deleteConsents/{consentId}")
-	public String deleteConsent(@PathVariable("consentId") Long consentId) {
+	@RequestMapping(value="/deleteConsents", method = RequestMethod.POST)
+	public String deleteConsent(@RequestParam("consentId") Long consentId) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());

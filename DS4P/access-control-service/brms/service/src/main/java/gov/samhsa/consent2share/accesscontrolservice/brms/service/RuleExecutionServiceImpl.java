@@ -58,12 +58,6 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 	/** The marshaller. */
 	private SimpleMarshaller marshaller;
 
-	/** The knowledge session. */
-	private StatefulKnowledgeSession session;
-
-	/** The knowledge base. */
-	private KnowledgeBase knowledgeBase;
-
 	/** The fired rule names. */
 	private String firedRuleNames = "";
 
@@ -74,49 +68,16 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 	/**
 	 * Instantiates a new rule execution service impl.
 	 * 
-	 * @param guvnorRestUrl
-	 *            the guvnor rest url
+	 * @param guvnorService
+	 *            the guvnor service
+	 * @param marshaller
+	 *            the marshaller
 	 */
 	public RuleExecutionServiceImpl(GuvnorService guvnorService,
 			SimpleMarshaller marshaller) {
 		super();
 		this.guvnorService = guvnorService;
 		this.marshaller = marshaller;
-	}
-
-	/**
-	 * Creates the stateful knowledge session.
-	 * 
-	 */
-	private void createStatefulKnowledgeSession() {
-
-		try {
-			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
-					.newKnowledgeBuilder();
-
-			String casRules = guvnorService.getVersionedRulesFromPackage();
-
-			kbuilder.add(
-					ResourceFactory.newByteArrayResource(casRules.getBytes()),
-					ResourceType.DRL);
-
-			KnowledgeBuilderErrors errors = kbuilder.getErrors();
-			if (errors.size() > 0) {
-				for (KnowledgeBuilderError error : errors) {
-					LOGGER.error(error.toString());
-				}
-			}
-
-			knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
-			knowledgeBase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-
-			session = knowledgeBase.newStatefulKnowledgeSession();
-			session.setGlobal("ruleExecutionContainer",
-					new RuleExecutionContainer());
-		} catch (Exception e) {
-			LOGGER.error(e.toString(), e);
-		}
-
 	}
 
 	/*
@@ -136,13 +97,11 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 		String executionResponseContainerXMLString = null;
 
 		LOGGER.debug("factModelXmlString: " + factModelXmlString);
-
+		StatefulKnowledgeSession session = createStatefulKnowledgeSession();
 		try {
 			// unmarshall factmodel
 			factModel = marshaller.unmarshallFromXml(FactModel.class,
 					factModelXmlString);
-
-			createStatefulKnowledgeSession();
 
 			session.insert(factModel.getXacmlResult());
 			for (ClinicalFact clinicalFact : factModel.getClinicalFactList()) {
@@ -175,13 +134,52 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 			LOGGER.error(e.getMessage(), e);
 		} finally {
 			firedRuleNames = "";
-			session.dispose();
+			if (session != null) {
+				session.dispose();
+			}
 		}
 
 		assertAndExecuteResponse
 				.setRuleExecutionResponseContainer(executionResponseContainerXMLString);
 
 		return assertAndExecuteResponse;
+	}
+
+	/**
+	 * Creates the stateful knowledge session.
+	 * 
+	 * @return the stateful knowledge session
+	 */
+	private StatefulKnowledgeSession createStatefulKnowledgeSession() {
+		StatefulKnowledgeSession session = null;
+		try {
+			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
+					.newKnowledgeBuilder();
+
+			String casRules = guvnorService.getVersionedRulesFromPackage();
+
+			kbuilder.add(
+					ResourceFactory.newByteArrayResource(casRules.getBytes()),
+					ResourceType.DRL);
+
+			KnowledgeBuilderErrors errors = kbuilder.getErrors();
+			if (errors.size() > 0) {
+				for (KnowledgeBuilderError error : errors) {
+					LOGGER.error(error.toString());
+				}
+			}
+
+			KnowledgeBase knowledgeBase = KnowledgeBaseFactory
+					.newKnowledgeBase();
+			knowledgeBase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+
+			session = knowledgeBase.newStatefulKnowledgeSession();
+			session.setGlobal("ruleExecutionContainer",
+					new RuleExecutionContainer());
+		} catch (Exception e) {
+			LOGGER.error(e.toString(), e);
+		}
+		return session;
 	}
 
 	/**

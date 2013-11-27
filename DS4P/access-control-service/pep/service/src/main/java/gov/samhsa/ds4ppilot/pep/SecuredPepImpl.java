@@ -31,6 +31,7 @@ import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.pep.audit.AuditService;
 import gov.samhsa.ds4ppilot.pep.c32getter.C32Getter;
 import gov.samhsa.ds4ppilot.pep.contexthandler.ContextHandler;
+import gov.samhsa.consent2share.accesscontrolservice.common.namespace.PEPNamespaceContext;
 import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.DocumentSegmentation;
 import gov.samhsa.ds4ppilot.pep.xdsbregistry.XdsbRegistry;
 import gov.samhsa.ds4ppilot.pep.xdsbrepository.XdsbRepository;
@@ -54,7 +55,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -679,37 +679,11 @@ public class SecuredPepImpl implements SecuredPep {
 		boolean consentDocumentExists = false;
 
 		try {
-			final String hl7Namespace = "urn:hl7-org:v3";
-			final String hl7NamespacePrefix = "hl7";
-
 			org.w3c.dom.Document document = loadXmlFrom(originalDocument);
-
-			// We map the prefixes to URIs
-			NamespaceContext namespaceContext = new NamespaceContext() {
-				@Override
-				public String getNamespaceURI(String prefix) {
-					String uri;
-					if (prefix.equals(hl7NamespacePrefix))
-						uri = hl7Namespace;
-					else
-						throw new IllegalArgumentException(prefix);
-					return uri;
-				}
-
-				@Override
-				public Iterator<?> getPrefixes(String val) {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public String getPrefix(String uri) {
-					throw new UnsupportedOperationException();
-				}
-			};
 
 			XPathFactory xpathFactory = XPathFactory.newInstance();
 			XPath xpath = xpathFactory.newXPath();
-			xpath.setNamespaceContext(namespaceContext);
+			xpath.setNamespaceContext(new PEPNamespaceContext());
 
 			String xpathExpression = "count(//*[@root='2.16.840.1.113883.3.445.1']) > 0";
 			consentDocumentExists = (Boolean) xpath.evaluate(xpathExpression,
@@ -737,42 +711,16 @@ public class SecuredPepImpl implements SecuredPep {
 
 		try {
 			// TODO: Refactor these code to a new class to be testable
-			final String hl7Namespace = "urn:hl7-org:v3";
-			final String hl7NamespacePrefix = "hl7";
-
 			org.w3c.dom.Document document = loadXmlFrom(responseOfAddPatient);
-
-			// We map the prefixes to URIs
-			NamespaceContext namespaceContext = new NamespaceContext() {
-				@Override
-				public String getNamespaceURI(String prefix) {
-					String uri;
-					if (prefix.equals(hl7NamespacePrefix))
-						uri = hl7Namespace;
-					else
-						throw new IllegalArgumentException(prefix);
-					return uri;
-				}
-
-				@Override
-				public Iterator<?> getPrefixes(String val) {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public String getPrefix(String uri) {
-					throw new UnsupportedOperationException();
-				}
-			};
 
 			XPathFactory xpathFactory = XPathFactory.newInstance();
 			XPath xpath = xpathFactory.newXPath();
-			xpath.setNamespaceContext(namespaceContext);
+			xpath.setNamespaceContext(new PEPNamespaceContext());
 
 			// Get acknowledgment type code
 			String xpathForAcknowledgementTypeCode = String.format(
 					"//%s:acknowledgement/%s:typeCode/@code",
-					hl7NamespacePrefix, hl7NamespacePrefix);
+					PEPNamespaceContext.HL7_PREFIX, PEPNamespaceContext.HL7_PREFIX);
 			String acknowledgementTypeCode = xpath.evaluate(
 					xpathForAcknowledgementTypeCode, document);
 

@@ -4,11 +4,11 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl;
 import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.common.utils.EncryptTool;
-import gov.samhsa.ds4ppilot.common.utils.XmlHelper;
 import gov.va.ds4p.cas.RuleExecutionResponse;
 
 import java.security.Key;
@@ -29,6 +29,7 @@ public class DocumentEncrypterImplTest {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private static FileReaderImpl fileReader;
+	private static DocumentXmlConverterImpl documentXmlConverter;
 
 	private static String c32;
 	private static Document c32Document;
@@ -41,11 +42,13 @@ public class DocumentEncrypterImplTest {
 	@Before
 	public void setUp() throws Exception {
 		fileReader = new FileReaderImpl();
+		documentXmlConverter = new DocumentXmlConverterImpl();
 
 		documentEncrypter = new DocumentEncrypterImpl();
+		documentEncrypter.setDocumentXmlConverter(documentXmlConverter);
 
 		c32 = fileReader.readFile("c32.xml");
-		c32Document = XmlHelper.loadDocument(c32);
+		c32Document = documentXmlConverter.loadDocument(c32);
 
 		ruleExecutionContainer = setRuleExecutionContainer();
 	}
@@ -66,12 +69,12 @@ public class DocumentEncrypterImplTest {
 			encryptedKey = keyCipher.encryptKey(c32Document, aesSymmetricKey);
 			rootElement = c32Document.getDocumentElement();
 
-			String notEncrypted = XmlHelper.converXmlDocToString(c32Document);
+			String notEncrypted = documentXmlConverter.convertXmlDocToString(c32Document);
 
 			// Act
 			documentEncrypter.encryptElement(c32Document, aesSymmetricKey,
 					encryptedKey, rootElement);
-			String encrypted = XmlHelper.converXmlDocToString(c32Document);
+			String encrypted = documentXmlConverter.convertXmlDocToString(c32Document);
 			logger.debug("NOT ENCRYPTED--> " + notEncrypted);
 			logger.debug("ENCRYPTED--> " + encrypted);
 

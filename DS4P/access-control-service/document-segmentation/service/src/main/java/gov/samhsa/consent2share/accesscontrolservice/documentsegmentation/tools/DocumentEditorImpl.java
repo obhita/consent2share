@@ -25,19 +25,18 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools;
 
+import gov.samhsa.consent2share.accesscontrolservice.common.namespace.PEPNamespaceContext;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverter;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReader;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
 import gov.samhsa.ds4ppilot.common.utils.FileHelper;
-import gov.samhsa.ds4ppilot.common.utils.XmlHelper;
 import gov.samhsa.ds4ppilot.common.xdm.XdmZipUtils;
 
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -60,6 +59,9 @@ public class DocumentEditorImpl implements DocumentEditor {
 	/** The file reader. */
 	private FileReader fileReader;
 
+	/** The document xml converter. */
+	private DocumentXmlConverter documentXmlConverter;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -71,7 +73,7 @@ public class DocumentEditorImpl implements DocumentEditor {
 	public String setDocumentCreationDate(String document) throws Exception,
 			XPathExpressionException, XMLEncryptionException {
 		Document xmlDocument;
-		xmlDocument = XmlHelper.loadDocument(document);
+		xmlDocument = documentXmlConverter.loadDocument(document);
 
 		// current date
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
@@ -81,7 +83,7 @@ public class DocumentEditorImpl implements DocumentEditor {
 		Element dateElement = getElement(xmlDocument, xPathExprEffectiveDate);
 		dateElement.setAttribute("value", dateFormat.format(date));
 
-		document = XmlHelper.converXmlDocToString(xmlDocument);
+		document = documentXmlConverter.convertXmlDocToString(xmlDocument);
 		return document;
 	}
 
@@ -96,35 +98,10 @@ public class DocumentEditorImpl implements DocumentEditor {
 	public Element getElement(Document xmlDocument, String xPathExprDisplayName)
 			throws XPathExpressionException, XMLEncryptionException, Exception {
 
-		NamespaceContext ctx = new NamespaceContext() {
-			@Override
-			public String getNamespaceURI(String prefix) {
-				String uri;
-				if (prefix.equals("hl7"))
-					uri = "urn:hl7-org:v3";
-				else if (prefix.equals("xenc"))
-					uri = "http://www.w3.org/2001/04/xmlenc#";
-				else
-					uri = null;
-				return uri;
-			}
-
-			@SuppressWarnings("rawtypes")
-			@Override
-			public Iterator getPrefixes(String val) {
-				return null;
-			}
-
-			@Override
-			public String getPrefix(String uri) {
-				return null;
-			}
-		};
-
 		// Create XPath instance
 		XPathFactory xpathFact = XPathFactory.newInstance();
 		XPath xpath = xpathFact.newXPath();
-		xpath.setNamespaceContext(ctx);
+		xpath.setNamespaceContext(new PEPNamespaceContext());
 
 		// Evaluate XPath expression against parsed document
 		Node node = (Node) xpath.evaluate(xPathExprDisplayName, xmlDocument,
@@ -209,5 +186,25 @@ public class DocumentEditorImpl implements DocumentEditor {
 	 */
 	public void setFileReader(FileReader fileReader) {
 		this.fileReader = fileReader;
+	}
+
+	/**
+	 * Gets the document xml converter.
+	 * 
+	 * @return the document xml converter
+	 */
+	public DocumentXmlConverter getDocumentXmlConverter() {
+		return documentXmlConverter;
+	}
+
+	/**
+	 * Sets the document xml converter.
+	 * 
+	 * @param documentXmlConverter
+	 *            the new document xml converter
+	 */
+	public void setDocumentXmlConverter(
+			DocumentXmlConverter documentXmlConverter) {
+		this.documentXmlConverter = documentXmlConverter;
 	}
 }

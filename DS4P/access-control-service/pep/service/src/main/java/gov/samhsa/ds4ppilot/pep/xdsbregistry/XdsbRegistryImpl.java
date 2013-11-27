@@ -25,13 +25,13 @@
  ******************************************************************************/
 package gov.samhsa.ds4ppilot.pep.xdsbregistry;
 
+import gov.samhsa.consent2share.accesscontrolservice.xdsb.registry.XdsbRegistryWebServiceClient;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
-import gov.samhsa.ds4ppilot.ws.client.XdsbRegistryWebServiceClient;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 
 import org.hl7.v3.PRPAIN201301UV02;
-import org.hl7.v3.PRPAIN201302UV;
+import org.hl7.v3.PRPAIN201302UV02;
 
 public class XdsbRegistryImpl implements XdsbRegistry {
 
@@ -63,7 +63,7 @@ public class XdsbRegistryImpl implements XdsbRegistry {
 	}
 
 	@Override
-	public String revisePatientRegistryRecord(PRPAIN201302UV input) {
+	public String revisePatientRegistryRecord(PRPAIN201302UV02 input) {
 		XdsbRegistryWebServiceClient client = new XdsbRegistryWebServiceClient(
 				endpointAddress);
 		String result = null;

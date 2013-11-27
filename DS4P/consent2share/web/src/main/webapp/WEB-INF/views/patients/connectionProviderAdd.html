@@ -12,6 +12,7 @@
 <!-- END: Meta -->
 <!-- START: Mobile Specific -->
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+
 <!-- END: Mobile Specific -->
 	<!-- START: CSS -->
 	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css" rel="stylesheet"/>
@@ -33,7 +34,8 @@
     <meta name="author" content="FEiSystems"/><!-- END: Meta -->
     <!-- START: Mobile Specific -->
     <meta name="viewport" content="width=device-width, initial-scale=1"/><!-- END: Mobile Specific -->    
-    
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>

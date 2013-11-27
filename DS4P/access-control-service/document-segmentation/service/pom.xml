@@ -18,11 +18,6 @@
 		
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
-			<artifactId>brms-client</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>brms-service</artifactId>
 		</dependency>		
 		
@@ -30,15 +25,17 @@
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>common-library</artifactId>
 		</dependency>
-		<!-- TODO: REMOVE THIS -->
-		<dependency>
-			<groupId>common-library-jar-with-dependencies</groupId>
-			<artifactId>common-library-jar-with-dependencies</artifactId>
-		</dependency>
-		
+	
 		<dependency>
 			<groupId>org.apache.ws.commons.axiom</groupId>
 			<artifactId>axiom-api</artifactId>
+		</dependency>
+		
+		<!-- Must specify Saxon-HE dependency here, even though it is specified as transitive dependencies -->
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>Saxon-HE</artifactId>
+			<scope>test</scope>
 		</dependency>
 		
 	</dependencies>

@@ -46,14 +46,29 @@ public class RequestGenerator {
 	/**
 	 * Generate request.
 	 *
-	 * @param accessorNPI the accessor npi
-	 * @param receiverNPI the receiver npi
+	 * @param recepientSubjectNPI the recepient subject npi
+	 * @param intermediarySubjectNPI the intermediary subject npi
 	 * @param purposeOfUse the purpose of use
-	 * @param resourceId the resource id
+	 * @param patientId the patient id
 	 * @return the request type
 	 */
-	public RequestType generateRequest(String accessorNPI, String receiverNPI, String purposeOfUse, String resourceId){
+	public RequestType generateRequest(String recepientSubjectNPI, String intermediarySubjectNPI, String purposeOfUse, String patientId){
 		RequestType requestType=null;
+		
+		String request=generateRequestString (recepientSubjectNPI, intermediarySubjectNPI, purposeOfUse, patientId);
+		InputStream is =new ByteArrayInputStream(request.getBytes());
+		try {
+			// Need call SimplePDPFactory.getSimplePDP() to use RequestMarshaller from herasaf
+			requestType=RequestMarshaller.unmarshal(is);
+		} catch (SyntaxException e) {
+			LOGGER.debug(e.toString(),e);
+		} catch (Exception e){
+			LOGGER.debug(e.toString(),e);
+		}
+		return requestType;
+	}
+	
+	public String generateRequestString(String recepientSubjectNPI, String intermediarySubjectNPI, String purposeOfUse, String patientId){
 
 		String date = getDate();
 		
@@ -61,28 +76,22 @@ public class RequestGenerator {
 				"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">     <Subject>      " +
 				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject\"       " +
 				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       " +
-				"<AttributeValue>"+accessorNPI+"</AttributeValue>      </Attribute>      " +
+				"<AttributeValue>"+recepientSubjectNPI+"</AttributeValue>      </Attribute>      " +
 				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject\"       " +
-				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>"+receiverNPI+"</AttributeValue>      " +
+				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>"+intermediarySubjectNPI+"</AttributeValue>      " +
 				"</Attribute>	  <Attribute AttributeId=\"gov.samhsa.consent2share.purpose-of-use-code\"       " +
 				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>"+purposeOfUse+"</AttributeValue>      " +
 				"</Attribute>     </Subject>     <Resource>      " +
 				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:resource:resource-id\"       " +
 				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       " +
-				"<AttributeValue>"+resourceId+"</AttributeValue>      </Attribute>     </Resource>     " +
+				"<AttributeValue>"+patientId+"</AttributeValue>      </Attribute>     </Resource>     " +
 				"<Action>      <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\"       " +
 				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>write</AttributeValue>      " +
 				"</Attribute>     </Action>     <Environment>		" +
 				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:environment:current-dateTime\"       " +
 				"DataType=\"http://www.w3.org/2001/XMLSchema#dateTime\">       " +
 				"<AttributeValue>"+date+"</AttributeValue>      </Attribute>	 </Environment>    </Request>";
-		InputStream is =new ByteArrayInputStream(request.getBytes());
-		try {
-			requestType=RequestMarshaller.unmarshal(is);
-		} catch (SyntaxException e) {
-			LOGGER.debug(e.toString(),e);
-		}
-		return requestType;
+		return request;
 	}
 	
 	/**

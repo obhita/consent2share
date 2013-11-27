@@ -10,17 +10,17 @@
 	<artifactId>c32-service-client</artifactId>
 	<name>C32 Service Client</name>
 	<packaging>jar</packaging>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
-		</dependency>		
+		</dependency>
 	</dependencies>
 
 	<build>
 		<finalName>c32-client</finalName>
-		
+
 		<plugins>
 			<!-- Generate Java classes from WSDL during build -->
 			<plugin>
@@ -56,9 +56,10 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<!-- Add generated sources - avoids having to copy generated sources to 
-				build location -->
+				build location. When working in eclipse, use context menu -> New -> Source 
+				Folder to make generated source known to Eclipse -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -77,73 +78,9 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<!-- Build the JAR with dependencies -->
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-			</plugin>
+
 		</plugins>
-		
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.cxf
-										</groupId>
-										<artifactId>
-											cxf-codegen-plugin
-										</artifactId>
-										<versionRange>
-											[2.6.0,)
-										</versionRange>
-										<goals>
-											<goal>wsdl2java</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.mojo
-										</groupId>
-										<artifactId>
-											build-helper-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.7,)
-										</versionRange>
-										<goals>
-											<goal>add-source</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+
 	</build>
-	
+
 </project>

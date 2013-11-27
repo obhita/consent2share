@@ -25,7 +25,11 @@
  ******************************************************************************/
 package gov.samhsa.ds4ppilot.pep;
 
-import gov.samhsa.consent2share.accesscontrolservice.pep.xdsb.XdsbDocumentType;
+import gov.samhsa.consent2share.accesscontrolservice.common.namespace.PEPNamespaceContext;
+import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.DocumentSegmentation;
+import gov.samhsa.consent2share.accesscontrolservice.xdsb.common.UniqueOidProviderImpl;
+import gov.samhsa.consent2share.accesscontrolservice.xdsb.common.XdsbDocumentType;
+import gov.samhsa.consent2share.accesscontrolservice.xdsb.common.XdsbMetadataGeneratorImpl;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
@@ -33,7 +37,6 @@ import gov.samhsa.ds4ppilot.pep.c32getter.C32Getter;
 import gov.samhsa.ds4ppilot.pep.contexthandler.ContextHandler;
 import gov.samhsa.ds4ppilot.pep.dto.XacmlRequest;
 import gov.samhsa.ds4ppilot.pep.dto.XacmlResponse;
-import gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.DocumentSegmentation;
 import gov.samhsa.ds4ppilot.pep.xdsbregistry.XdsbRegistry;
 import gov.samhsa.ds4ppilot.pep.xdsbrepository.XdsbRepository;
 import gov.samhsa.ds4ppilot.schema.pep.FilterC32Response;
@@ -54,7 +57,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,7 +66,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -87,7 +88,7 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
 import org.hl7.v3.Device;
 import org.hl7.v3.Id;
 import org.hl7.v3.PRPAIN201301UV02;
-import org.hl7.v3.PRPAIN201302UV;
+import org.hl7.v3.PRPAIN201302UV02;
 import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess;
 import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject;
 import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent;
@@ -149,27 +150,33 @@ public class PepImpl implements Pep {
 
 	/** The resource action. */
 	private String resourceAction; // = "Execute";
-	
+
 	/** The home community id. */
 	private String homeCommunityId;
-	
+
 	/** The Constant LOGGER. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(PepImpl.class);
 
 	/**
 	 * Instantiates a new pep impl.
-	 *
-	 * @param contextHandler the context handler
-	 * @param c32Getter the C32 getter
-	 * @param documentSegmentation the document segmentation
-	 * @param dataHandlerToBytesConverter the data handler to bytes converter
-	 * @param xdsbRepository the xdsb repository
-	 * @param xdsbRegistry the xdsb registry
+	 * 
+	 * @param contextHandler
+	 *            the context handler
+	 * @param c32Getter
+	 *            the C32 getter
+	 * @param documentSegmentation
+	 *            the document segmentation
+	 * @param dataHandlerToBytesConverter
+	 *            the data handler to bytes converter
+	 * @param xdsbRepository
+	 *            the xdsb repository
+	 * @param xdsbRegistry
+	 *            the xdsb registry
 	 */
 	public PepImpl(ContextHandler contextHandler, C32Getter c32Getter,
-                   DocumentSegmentation documentSegmentation,
-                   DataHandlerToBytesConverter dataHandlerToBytesConverter,
-                   XdsbRepository xdsbRepository, XdsbRegistry xdsbRegistry) {
+			DocumentSegmentation documentSegmentation,
+			DataHandlerToBytesConverter dataHandlerToBytesConverter,
+			XdsbRepository xdsbRepository, XdsbRegistry xdsbRegistry) {
 		super();
 		this.contextHandler = contextHandler;
 		this.c32Getter = c32Getter;
@@ -182,9 +189,8 @@ public class PepImpl implements Pep {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * Pep#handleC32Request(java.
-	 * lang.String, boolean, java.lang.String, java.lang.String)
+	 * @see Pep#handleC32Request(java. lang.String, boolean, java.lang.String,
+	 * java.lang.String)
 	 */
 	@Override
 	public FilterC32Response handleC32Request(String patientId,
@@ -224,7 +230,8 @@ public class PepImpl implements Pep {
 				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
 						.segmentDocument(originalC32,
 								xacmlResponseXml.toString(), packageAsXdm,
-								true, senderEmailAddress, recipientEmailAddress, "");
+								true, senderEmailAddress,
+								recipientEmailAddress, "");
 
 				processedPayload = dataHandlerToBytesConverter
 						.toByteArray(segmentDocumentResponse
@@ -244,18 +251,18 @@ public class PepImpl implements Pep {
 
 		return c32Response;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * Pep#handleC32Request(java.
-	 * lang.String, boolean, java.lang.String, java.lang.String)
+	 * @see Pep#handleC32Request(java. lang.String, boolean, java.lang.String,
+	 * java.lang.String)
 	 */
 	@Override
 	public FilterC32Response handleC32Request(String recepientSubjectNPI,
-			String intermediarySubjectNPI,
-			String resourceId, boolean packageAsXdm, String senderEmailAddress, String recipientEmailAddress, String xdsDocumentEntryUniqueId) {
+			String intermediarySubjectNPI, String resourceId,
+			boolean packageAsXdm, String senderEmailAddress,
+			String recipientEmailAddress, String xdsDocumentEntryUniqueId) {
 		StringWriter xacmlResponseXml = new StringWriter();
 		byte[] processedPayload;
 		FilterC32Response c32Response = new FilterC32Response();
@@ -264,22 +271,26 @@ public class PepImpl implements Pep {
 		XacmlResponse xacmlResponse = null;
 		XacmlRequest xacmlRequest = null;
 		try {
-			
-			xacmlRequest = setXacmlRequest(recepientSubjectNPI, intermediarySubjectNPI, subjectPurposeOfUse, resourceId, UUID.randomUUID().toString());
+
+			xacmlRequest = setXacmlRequest(recepientSubjectNPI,
+					intermediarySubjectNPI, subjectPurposeOfUse, resourceId,
+					UUID.randomUUID().toString());
 			xacmlResponse = contextHandler.enforcePolicy(xacmlRequest);
-			
+
 		} catch (Exception e) {
 			throw new DS4PException(e.toString(), e);
 		}
 
 		c32Response.setPdpDecision(xacmlResponse.getPdpDecision());
 
-		if (xacmlResponse.getPdpDecision().toLowerCase().equals(PERMIT.toLowerCase())) {
-			
+		if (xacmlResponse.getPdpDecision().toLowerCase()
+				.equals(PERMIT.toLowerCase())) {
+
 			String originalC32 = c32Getter.getC32(resourceId);
 
 			try {
-				XacmlResult xacmlResult = getXacmlResponse(xacmlRequest, xacmlResponse);
+				XacmlResult xacmlResult = getXacmlResponse(xacmlRequest,
+						xacmlResponse);
 
 				JAXBContext jaxbContext = JAXBContext
 						.newInstance(XacmlResult.class);
@@ -291,7 +302,8 @@ public class PepImpl implements Pep {
 				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
 						.segmentDocument(originalC32,
 								xacmlResponseXml.toString(), packageAsXdm,
-								true, senderEmailAddress, recipientEmailAddress, xdsDocumentEntryUniqueId);
+								true, senderEmailAddress,
+								recipientEmailAddress, xdsDocumentEntryUniqueId);
 
 				processedPayload = dataHandlerToBytesConverter
 						.toByteArray(segmentDocumentResponse
@@ -312,7 +324,9 @@ public class PepImpl implements Pep {
 		return c32Response;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see Pep#saveDocumentSetToXdsRepository(java.lang.String)
 	 */
 	@Override
@@ -330,32 +344,9 @@ public class PepImpl implements Pep {
 			// TODO: Refactor these code to a new class to be testable
 			org.w3c.dom.Document document = loadXmlFrom(documentSet);
 
-			// We map the prefixes to URIs
-			NamespaceContext namespaceContext = new NamespaceContext() {
-				@Override
-				public String getNamespaceURI(String prefix) {
-					String uri;
-					if (prefix.equals("hl7"))
-						uri = "urn:hl7-org:v3";
-					else
-						throw new IllegalArgumentException(prefix);
-					return uri;
-				}
-
-				@Override
-				public Iterator<?> getPrefixes(String val) {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public String getPrefix(String uri) {
-					throw new UnsupportedOperationException();
-				}
-			};
-
 			XPathFactory xpathFactory = XPathFactory.newInstance();
 			XPath xpath = xpathFactory.newXPath();
-			xpath.setNamespaceContext(namespaceContext);
+			xpath.setNamespaceContext(new PEPNamespaceContext());
 
 			// Get patient id
 			String xpathForPatientId = "//hl7:recordTarget/hl7:patientRole/hl7:id/@extension[1]";
@@ -467,7 +458,7 @@ public class PepImpl implements Pep {
 		if (patientExistsInRegistyBeforeAdding(responseOfAddPatient)) {
 			// Try to revise patient
 			// PRPAIN201302UV
-			PRPAIN201302UV prpain201302uv = new PRPAIN201302UV();
+			PRPAIN201302UV02 prpain201302uv = new PRPAIN201302UV02();
 
 			prpain201302uv.setControlActProcess(controlActProcess);
 
@@ -482,12 +473,12 @@ public class PepImpl implements Pep {
 
 			// TODO: Check the result here to see if the CA code is return. If
 			// not throws exception
-			//LOGGER.debug(result);
+			// LOGGER.debug(result);
 		}
 
 		String metadataString = new XdsbMetadataGeneratorImpl(
-				new UniqueOidProviderImpl(), XdsbDocumentType.CLINICAL_DOCUMENT).generateMetadataXml(documentSet,
-						subjectLocality);
+				new UniqueOidProviderImpl(), XdsbDocumentType.CLINICAL_DOCUMENT)
+				.generateMetadataXml(documentSet, subjectLocality);
 
 		SubmitObjectsRequest submitObjectRequest = null;
 
@@ -496,10 +487,10 @@ public class PepImpl implements Pep {
 			submitObjectRequest = unmarshallFromXml(SubmitObjectsRequest.class,
 					metadataString);
 		} catch (JAXBException e1) {
-			LOGGER.debug(e1.toString(),e1);
+			LOGGER.debug(e1.toString(), e1);
 		}
 
-		//LOGGER.debug(metadataString);
+		// LOGGER.debug(metadataString);
 
 		String documentId = null;
 
@@ -507,39 +498,16 @@ public class PepImpl implements Pep {
 		try {
 			org.w3c.dom.Document document = loadXmlFrom(metadataString);
 
-			// We map the prefixes to URIs
-			NamespaceContext namespaceContext = new NamespaceContext() {
-				@Override
-				public String getNamespaceURI(String prefix) {
-					String uri;
-					if (prefix.equals("rim"))
-						uri = "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
-					else
-						throw new IllegalArgumentException(prefix);
-					return uri;
-				}
-
-				@Override
-				public Iterator<?> getPrefixes(String val) {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public String getPrefix(String uri) {
-					throw new UnsupportedOperationException();
-				}
-			};
-
 			XPathFactory xpathFactory = XPathFactory.newInstance();
 			XPath xpath = xpathFactory.newXPath();
-			xpath.setNamespaceContext(namespaceContext);
+			xpath.setNamespaceContext(new PEPNamespaceContext());
 
 			// Get document id
 			String xpathForDocumentId = "//rim:ExtrinsicObject/@id[1]";
 			documentId = xpath.evaluate(xpathForDocumentId, document);
 
 		} catch (Exception e1) {
-			LOGGER.debug(e1.toString(),e1);
+			LOGGER.debug(e1.toString(), e1);
 		}
 
 		Document document = new Document();
@@ -555,11 +523,10 @@ public class PepImpl implements Pep {
 			registryResponse = xdsbRepository
 					.provideAndRegisterDocumentSetRequest(request);
 
-			/*try {
-				LOGGER.debug(marshall(registryResponse));
-			} catch (Throwable e) {
-				LOGGER.debug(e.toString(),e);
-			}*/
+			/*
+			 * try { LOGGER.debug(marshall(registryResponse)); } catch
+			 * (Throwable e) { LOGGER.debug(e.toString(),e); }
+			 */
 
 			RegistryErrorList registryErrorList = registryResponse
 					.getRegistryErrorList();
@@ -576,8 +543,11 @@ public class PepImpl implements Pep {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see Pep#retrieveDocumentSetRequest(java.lang.String, java.lang.String, java.lang.String, java.lang.String, gov.va.ehtac.ds4p.ws.EnforcePolicy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see Pep#retrieveDocumentSetRequest(java.lang.String, java.lang.String,
+	 * java.lang.String, java.lang.String, gov.va.ehtac.ds4p.ws.EnforcePolicy)
 	 */
 	@Override
 	public RetrieveDocumentSetResponse retrieveDocumentSetRequest(
@@ -597,7 +567,7 @@ public class PepImpl implements Pep {
 			documentRequest.setRepositoryUniqueId(repositoryUniqueId);
 			documentRequest.setDocumentUniqueId(documentUniqueId);
 			retrieveDocumentSetRequest.getDocumentRequest()
-			.add(documentRequest);
+					.add(documentRequest);
 
 			result = contextHandler.enforcePolicy(
 					enforcePolicy.getXspasubject(),
@@ -631,13 +601,13 @@ public class PepImpl implements Pep {
 									false, true,
 									"leo.smith@direct.obhita-stage.org",
 									enforcePolicy.getXspasubject()
-									.getSubjectEmailAddress(), "");
+											.getSubjectEmailAddress(), "");
 					processedPayload = dataHandlerToBytesConverter
 							.toByteArray(segmentDocumentResponse
 									.getProcessedDocument());
 					// get processed document
 					String processedDocument = new String(processedPayload);
-					// LOGGER.debug("processedDoc: " + processedDocument);					
+					// LOGGER.debug("processedDoc: " + processedDocument);
 					// set processed document in payload
 					DocumentResponse document = new DocumentResponse();
 					document.setDocument(processedDocument.getBytes());
@@ -645,26 +615,24 @@ public class PepImpl implements Pep {
 							0, document);
 					// set response from xdsb
 					retrieveDocumentSetResponse
-					.setReturn(marshall(xdsbRetrieveDocumentSetResponse));
+							.setReturn(marshall(xdsbRetrieveDocumentSetResponse));
 					retrieveDocumentSetResponse
-					.setKekEncryptionKey(segmentDocumentResponse
-							.getKekEncryptionKey());
+							.setKekEncryptionKey(segmentDocumentResponse
+									.getKekEncryptionKey());
 					retrieveDocumentSetResponse
-					.setKekMaskingKey(segmentDocumentResponse
-							.getKekMaskingKey());
+							.setKekMaskingKey(segmentDocumentResponse
+									.getKekMaskingKey());
 					retrieveDocumentSetResponse
-					.setMetadata(segmentDocumentResponse
-							.getPostProcessingMetadata());
-				}
-				else
-				{
+							.setMetadata(segmentDocumentResponse
+									.getPostProcessingMetadata());
+				} else {
 					DocumentResponse document = new DocumentResponse();
 					document.setDocument(rawDocument);
 					xdsbRetrieveDocumentSetResponse.getDocumentResponse().set(
 							0, document);
 					// set response from xdsb
 					retrieveDocumentSetResponse
-					.setReturn(marshall(xdsbRetrieveDocumentSetResponse));
+							.setReturn(marshall(xdsbRetrieveDocumentSetResponse));
 				}
 			}
 
@@ -681,8 +649,11 @@ public class PepImpl implements Pep {
 		return retrieveDocumentSetResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see Pep#registeryStoredQueryRequest(java.lang.String, gov.va.ehtac.ds4p.ws.EnforcePolicy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see Pep#registeryStoredQueryRequest(java.lang.String,
+	 * gov.va.ehtac.ds4p.ws.EnforcePolicy)
 	 */
 	@Override
 	public RegisteryStoredQueryResponse registeryStoredQueryRequest(
@@ -878,11 +849,11 @@ public class PepImpl implements Pep {
 	 */
 	public void setResourceAction(String resourceAction) {
 		this.resourceAction = resourceAction;
-	}	
+	}
 
 	/**
 	 * Gets the home community id.
-	 *
+	 * 
 	 * @return the home community id
 	 */
 	public String getHomeCommunityId() {
@@ -891,8 +862,9 @@ public class PepImpl implements Pep {
 
 	/**
 	 * Sets the home community id.
-	 *
-	 * @param homeCommunityId the new home community id
+	 * 
+	 * @param homeCommunityId
+	 *            the new home community id
 	 */
 	public void setHomeCommunityId(String homeCommunityId) {
 		this.homeCommunityId = homeCommunityId;
@@ -900,8 +872,9 @@ public class PepImpl implements Pep {
 
 	/**
 	 * Sets the xspa resource.
-	 *
-	 * @param patientId the patient id
+	 * 
+	 * @param patientId
+	 *            the patient id
 	 * @return the enforce policy. xsparesource
 	 */
 	public EnforcePolicy.Xsparesource setXspaResource(String patientId) {
@@ -915,9 +888,11 @@ public class PepImpl implements Pep {
 
 	/**
 	 * Sets the xspa subject.
-	 *
-	 * @param recipientEmailAddress the recipient email address
-	 * @param messageId the message id
+	 * 
+	 * @param recipientEmailAddress
+	 *            the recipient email address
+	 * @param messageId
+	 *            the message id
 	 * @return the enforce policy. xspasubject
 	 */
 	public EnforcePolicy.Xspasubject setXspaSubject(
@@ -932,26 +907,31 @@ public class PepImpl implements Pep {
 		xspasubject.setMessageId(messageId);
 		return xspasubject;
 	}
-	
+
 	/**
 	 * Sets the xacml request.
-	 *
-	 * @param recepientSubjectNPI the recepient subject npi
-	 * @param intermediarySubjectNPI the intermediary subject npi
-	 * @param purposeOfUse the purpose of use
-	 * @param resourceId the resource id
-	 * @param messageId the message id
+	 * 
+	 * @param recepientSubjectNPI
+	 *            the recepient subject npi
+	 * @param intermediarySubjectNPI
+	 *            the intermediary subject npi
+	 * @param purposeOfUse
+	 *            the purpose of use
+	 * @param resourceId
+	 *            the resource id
+	 * @param messageId
+	 *            the message id
 	 * @return the xacml request
 	 */
 	public XacmlRequest setXacmlRequest(String recepientSubjectNPI,
 			String intermediarySubjectNPI, String purposeOfUse,
-			String resourceId, String messageId)
-	{
+			String resourceId, String messageId) {
 		XacmlRequest xacmlRequest = new XacmlRequest();
 		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
 		xacmlRequest.setPurposeOfUse(purposeOfUse);
 		xacmlRequest.setRecepientSubjectNPI(recepientSubjectNPI);
-		xacmlRequest.setResourceId(resourceId);
+		xacmlRequest.setPatientId(resourceId);
+		xacmlRequest.setPatientUniqueId(resourceId);
 		xacmlRequest.setMessageId(messageId);
 		xacmlRequest.setHomeCommunityId(homeCommunityId);
 		return xacmlRequest;
@@ -973,15 +953,18 @@ public class PepImpl implements Pep {
 		xacmlResult.setSubjectPurposeOfUse(result.getPurposeOfUse());
 		return xacmlResult;
 	}
-	
+
 	/**
 	 * Gets the xacml response.
-	 *
-	 * @param xacmlRequest the xacml request
-	 * @param xacmlResponse the xacml response
+	 * 
+	 * @param xacmlRequest
+	 *            the xacml request
+	 * @param xacmlResponse
+	 *            the xacml response
 	 * @return the xacml response
 	 */
-	private XacmlResult getXacmlResponse(XacmlRequest xacmlRequest, XacmlResponse xacmlResponse) {
+	private XacmlResult getXacmlResponse(XacmlRequest xacmlRequest,
+			XacmlResponse xacmlResponse) {
 		XacmlResult xacmlResult = new XacmlResult();
 		xacmlResult.setHomeCommunityId(xacmlRequest.getHomeCommunityId());
 		xacmlResult.setMessageId(xacmlRequest.getMessageId());
@@ -993,10 +976,12 @@ public class PepImpl implements Pep {
 
 	/**
 	 * Marshall.
-	 *
-	 * @param obj the obj
+	 * 
+	 * @param obj
+	 *            the obj
 	 * @return the string
-	 * @throws Throwable the throwable
+	 * @throws Throwable
+	 *             the throwable
 	 */
 	private static String marshall(Object obj) throws Throwable {
 		final JAXBContext context = JAXBContext.newInstance(obj.getClass());
@@ -1010,12 +995,16 @@ public class PepImpl implements Pep {
 
 	/**
 	 * Unmarshall from xml.
-	 *
-	 * @param <T> the generic type
-	 * @param clazz the clazz
-	 * @param xml the xml
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param clazz
+	 *            the clazz
+	 * @param xml
+	 *            the xml
 	 * @return the t
-	 * @throws JAXBException the jAXB exception
+	 * @throws JAXBException
+	 *             the jAXB exception
 	 */
 	@SuppressWarnings("unchecked")
 	private static <T> T unmarshallFromXml(Class<T> clazz, String xml)
@@ -1028,10 +1017,12 @@ public class PepImpl implements Pep {
 
 	/**
 	 * Load xml from.
-	 *
-	 * @param xml the xml
+	 * 
+	 * @param xml
+	 *            the xml
 	 * @return the org.w3c.dom. document
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	private static org.w3c.dom.Document loadXmlFrom(String xml)
 			throws Exception {
@@ -1045,10 +1036,13 @@ public class PepImpl implements Pep {
 	}
 
 	/**
-	 * Gets the response with latest document entries for consent and nonconsent.
-	 *
-	 * @param adhocQueryResponse the adhoc query response
-	 * @return the response with latest document entries for consent and nonconsent
+	 * Gets the response with latest document entries for consent and
+	 * nonconsent.
+	 * 
+	 * @param adhocQueryResponse
+	 *            the adhoc query response
+	 * @return the response with latest document entries for consent and
+	 *         nonconsent
 	 */
 	private static AdhocQueryResponse getResponseWithLatestDocumentEntriesForConsentAndNonconsent(
 			AdhocQueryResponse adhocQueryResponse) {
@@ -1099,38 +1093,38 @@ public class PepImpl implements Pep {
 							int year = lengthOfDateTimeString >= 4 ? Integer
 									.parseInt(datetimeString.substring(0, 4))
 									: 0;
-									int month = lengthOfDateTimeString >= 6 ? Integer
-											.parseInt(datetimeString.substring(4, 6))
-											: 0;
-											int day = lengthOfDateTimeString >= 8 ? Integer
-													.parseInt(datetimeString.substring(6, 8))
-													: 0;
-													int hour = lengthOfDateTimeString >= 10 ? Integer
-															.parseInt(datetimeString.substring(8, 10))
-															: 0;
-															int minute = lengthOfDateTimeString >= 12 ? Integer
-																	.parseInt(datetimeString.substring(10, 12))
-																	: 0;
-																	int second = lengthOfDateTimeString >= 14 ? Integer
-																			.parseInt(datetimeString.substring(12, 14))
-																			: 0;
+							int month = lengthOfDateTimeString >= 6 ? Integer
+									.parseInt(datetimeString.substring(4, 6))
+									: 0;
+							int day = lengthOfDateTimeString >= 8 ? Integer
+									.parseInt(datetimeString.substring(6, 8))
+									: 0;
+							int hour = lengthOfDateTimeString >= 10 ? Integer
+									.parseInt(datetimeString.substring(8, 10))
+									: 0;
+							int minute = lengthOfDateTimeString >= 12 ? Integer
+									.parseInt(datetimeString.substring(10, 12))
+									: 0;
+							int second = lengthOfDateTimeString >= 14 ? Integer
+									.parseInt(datetimeString.substring(12, 14))
+									: 0;
 
-																			GregorianCalendar gregorianCalendar = new GregorianCalendar(
-																					year, month, day, hour, minute, second);
+							GregorianCalendar gregorianCalendar = new GregorianCalendar(
+									year, month, day, hour, minute, second);
 
-																			Date creationTime = gregorianCalendar.getTime();
+							Date creationTime = gregorianCalendar.getTime();
 
-																			if (isConsentDocumentEntry
-																					&& creationTime
-																					.after(theLatestConsentDocumentEntryCreationTime)) {
-																				theLatestConsentDocumentEntryCreationTime = creationTime;
-																				theLatestConsentDocumentEntryIndex = index;
-																			} else if (!isConsentDocumentEntry
-																					&& creationTime
-																					.after(theLatestNonConsentDocumentEntryCreationTime)) {
-																				theLatestNonConsentDocumentEntryCreationTime = creationTime;
-																				theLatestNonConsentDocumentEntryIndex = index;
-																			}
+							if (isConsentDocumentEntry
+									&& creationTime
+											.after(theLatestConsentDocumentEntryCreationTime)) {
+								theLatestConsentDocumentEntryCreationTime = creationTime;
+								theLatestConsentDocumentEntryIndex = index;
+							} else if (!isConsentDocumentEntry
+									&& creationTime
+											.after(theLatestNonConsentDocumentEntryCreationTime)) {
+								theLatestNonConsentDocumentEntryCreationTime = creationTime;
+								theLatestNonConsentDocumentEntryIndex = index;
+							}
 						}
 					}
 				}
@@ -1153,69 +1147,44 @@ public class PepImpl implements Pep {
 
 			if (latestDocumentEntryList.size() > 0) {
 				adhocQueryResponse.getRegistryObjectList().getIdentifiable()
-				.clear();
+						.clear();
 			}
 
 			for (int i = 0; i < latestDocumentEntryList.size(); i++) {
 				adhocQueryResponse.getRegistryObjectList().getIdentifiable()
-				.add(latestDocumentEntryList.get(i));
+						.add(latestDocumentEntryList.get(i));
 			}
 		}
 
-		/*try {
-			LOGGER.debug(marshall(adhocQueryResponse));
-		} catch (Throwable e) {
-			LOGGER.debug(e.toString(),e);
-		}*/
+		/*
+		 * try { LOGGER.debug(marshall(adhocQueryResponse)); } catch (Throwable
+		 * e) { LOGGER.debug(e.toString(),e); }
+		 */
 
 		return adhocQueryResponse;
 	}
 
 	/**
 	 * Checks if is consent document.
-	 *
-	 * @param originalDocument the original document
+	 * 
+	 * @param originalDocument
+	 *            the original document
 	 * @return true, if is consent document
 	 */
 	private boolean isConsentDocument(String originalDocument) {
 		boolean consentDocumentExists = false;
 
-		try {			
-			final String hl7Namespace = "urn:hl7-org:v3";
-			final String hl7NamespacePrefix = "hl7";
+		try {
 
 			org.w3c.dom.Document document = loadXmlFrom(originalDocument);
 
-			// We map the prefixes to URIs
-			NamespaceContext namespaceContext = new NamespaceContext() {
-				@Override
-				public String getNamespaceURI(String prefix) {
-					String uri;
-					if (prefix.equals(hl7NamespacePrefix))
-						uri = hl7Namespace;
-					else
-						throw new IllegalArgumentException(prefix);
-					return uri;
-				}
-
-				@Override
-				public Iterator<?> getPrefixes(String val) {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public String getPrefix(String uri) {
-					throw new UnsupportedOperationException();
-				}
-			};
-
 			XPathFactory xpathFactory = XPathFactory.newInstance();
 			XPath xpath = xpathFactory.newXPath();
-			xpath.setNamespaceContext(namespaceContext);
+			xpath.setNamespaceContext(new PEPNamespaceContext());
 
 			String xpathExpression = "count(//*[@root='2.16.840.1.113883.3.445.1']) > 0";
-			consentDocumentExists = (Boolean) xpath.evaluate(
-					xpathExpression, document, XPathConstants.BOOLEAN);		
+			consentDocumentExists = (Boolean) xpath.evaluate(xpathExpression,
+					document, XPathConstants.BOOLEAN);
 
 		} catch (Exception e) {
 			throw new DS4PException(
@@ -1228,8 +1197,9 @@ public class PepImpl implements Pep {
 
 	/**
 	 * Patient exists in registy before adding.
-	 *
-	 * @param responseOfAddPatient the response of add patient
+	 * 
+	 * @param responseOfAddPatient
+	 *            the response of add patient
 	 * @return true, if successful
 	 */
 	public static boolean patientExistsInRegistyBeforeAdding(
@@ -1239,42 +1209,17 @@ public class PepImpl implements Pep {
 
 		try {
 			// TODO: Refactor these code to a new class to be testable
-			final String hl7Namespace = "urn:hl7-org:v3";
-			final String hl7NamespacePrefix = "hl7";
-
 			org.w3c.dom.Document document = loadXmlFrom(responseOfAddPatient);
-
-			// We map the prefixes to URIs
-			NamespaceContext namespaceContext = new NamespaceContext() {
-				@Override
-				public String getNamespaceURI(String prefix) {
-					String uri;
-					if (prefix.equals(hl7NamespacePrefix))
-						uri = hl7Namespace;
-					else
-						throw new IllegalArgumentException(prefix);
-					return uri;
-				}
-
-				@Override
-				public Iterator<?> getPrefixes(String val) {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public String getPrefix(String uri) {
-					throw new UnsupportedOperationException();
-				}
-			};
 
 			XPathFactory xpathFactory = XPathFactory.newInstance();
 			XPath xpath = xpathFactory.newXPath();
-			xpath.setNamespaceContext(namespaceContext);
+			xpath.setNamespaceContext(new PEPNamespaceContext());
 
 			// Get acknowledgment type code
 			String xpathForAcknowledgementTypeCode = String.format(
 					"//%s:acknowledgement/%s:typeCode/@code",
-					hl7NamespacePrefix, hl7NamespacePrefix);
+					PEPNamespaceContext.HL7_PREFIX,
+					PEPNamespaceContext.HL7_PREFIX);
 			String acknowledgementTypeCode = xpath.evaluate(
 					xpathForAcknowledgementTypeCode, document);
 

@@ -14,7 +14,11 @@
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>common-library</artifactId>
-			</dependency>
+		</dependency>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>xdsb-common</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

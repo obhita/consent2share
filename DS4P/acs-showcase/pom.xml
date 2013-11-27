@@ -14,11 +14,12 @@
 	<artifactId>acs-showcase</artifactId>
 	<packaging>pom</packaging>
 	<name>ACS Showcase</name>
-	
+
 	<modules>
 		<module>c32-parser</module>
+		<module>pix-client</module>
 		<module>web</module>
-		<module>pixclient</module>
+		<module>hl7-gen</module>
 	</modules>
 
 	<build>

@@ -56,6 +56,6 @@ public interface DocumentXmlConverter {
 	 * @throws TransformerException
 	 *             the transformer exception
 	 */
-	public abstract String converXmlDocToString(Document xmlDocument)
+	public abstract String convertXmlDocToString(Document xmlDocument)
 			throws IOException, TransformerException;
 }

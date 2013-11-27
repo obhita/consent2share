@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.4" icons="true" automaticImage="PNG">  
+  <object id="1" language="java" name="gov.samhsa.consent2share.showcase.web.PixMgrController" 
+    project="acs-showcase-web" 
+    file="/acs-showcase-web/src/main/java/gov/samhsa/consent2share/showcase/web/PixMgrController.java" binary="false" 
+    label="pixMgrController" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="78" y="0"/>    
+    <execution id="2">      
+      <position height="249" width="185" x="5" y="99"/>    
+    </execution>    
+    <execution id="7">      
+      <position height="270" width="185" x="5" y="418"/>    
+    </execution>    
+    <execution id="12">      
+      <position height="246" width="185" x="5" y="765"/>    
+    </execution>  
+  </object>  
+  <object id="17" language="java" name="gov.samhsa.consent2share.showcase.service.PixManagerTransformService" 
+    project="acs-showcase-web" 
+    file="/acs-showcase-web/src/main/java/gov/samhsa/consent2share/showcase/service/PixManagerTransformService.java" 
+    binary="false" label="pixManagerTransformService" type="interface" autoSize="true">    
+    <position height="-1" width="-1" x="211" y="0"/>    
+    <execution id="4">      
+      <position height="21" width="200" x="194" y="120"/>    
+    </execution>    
+    <execution id="9">      
+      <position height="21" width="200" x="194" y="439"/>    
+    </execution>    
+    <execution id="14">      
+      <position height="21" width="200" x="194" y="786"/>    
+    </execution>  
+  </object>  
+  <object id="18" language="java" name="gov.samhsa.consent2share.showcase.service.PixManagerTransformServiceImpl" 
+    project="acs-showcase-web" 
+    file="/acs-showcase-web/src/main/java/gov/samhsa/consent2share/showcase/service/PixManagerTransformServiceImpl.java" 
+    binary="false" label="pixManagerTransformServiceImpl" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="544" y="0"/>  
+  </object>  
+  <object id="19" language="java" name="gov.samhsa.consent2share.showcase.service.PixOperationsService" 
+    project="acs-showcase-web" 
+    file="/acs-showcase-web/src/main/java/gov/samhsa/consent2share/showcase/service/PixOperationsService.java" 
+    binary="false" label="pixOperationsService" type="interface" autoSize="true">    
+    <position height="-1" width="-1" x="316" y="0"/>    
+    <execution id="6">      
+      <position height="181" width="200" x="619" y="146"/>    
+    </execution>    
+    <execution id="11">      
+      <position height="192" width="200" x="619" y="475"/>    
+    </execution>    
+    <execution id="16">      
+      <position height="181" width="200" x="619" y="809"/>    
+    </execution>  
+  </object>  
+  <object id="26" language="java" name="gov.samhsa.consent2share.showcase.service.PixOperationsServiceImpl" 
+    project="acs-showcase-web" 
+    file="/acs-showcase-web/src/main/java/gov/samhsa/consent2share/showcase/service/PixOperationsServiceImpl.java" 
+    binary="false" label="pixOperationsServiceImpl" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="564" y="0"/>    
+    <execution id="21">      
+      <position height="139" width="200" x="823" y="167"/>    
+    </execution>    
+    <execution id="23">      
+      <position height="150" width="200" x="823" y="496"/>    
+    </execution>    
+    <execution id="25">      
+      <position height="139" width="200" x="823" y="830"/>    
+    </execution>  
+  </object>  
+  <object id="39" language="java" name="gov.samhsa.consent2share.pixclient.util.PixManagerRequestXMLToJava" 
+    project="pix-client" 
+    file="/pix-client/src/main/java/gov/samhsa/consent2share/pixclient/util/PixManagerRequestXMLToJava.java" 
+    binary="false" label="pixManagerRequestXMLToJava" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="794" y="0"/>    
+    <execution id="28">      
+      <position height="21" width="202" x="1027" y="188"/>    
+    </execution>    
+    <execution id="32">      
+      <position height="21" width="202" x="1027" y="517"/>    
+    </execution>    
+    <execution id="36">      
+      <position height="21" width="202" x="1027" y="851"/>    
+    </execution>  
+  </object>  
+  <object id="40" language="java" name="gov.samhsa.consent2share.pixclient.service.PixManagerService" 
+    project="pix-client" 
+    file="/pix-client/src/main/java/gov/samhsa/consent2share/pixclient/service/PixManagerService.java" binary="false" 
+    label="pixManagerService" type="interface" autoSize="true">    
+    <position height="-1" width="-1" x="714" y="0"/>    
+    <execution id="30">      
+      <position height="63" width="193" x="1233" y="222"/>    
+    </execution>    
+    <execution id="34">      
+      <position height="63" width="193" x="1233" y="562"/>    
+    </execution>    
+    <execution id="38">      
+      <position height="63" width="193" x="1233" y="885"/>    
+    </execution>  
+  </object>  
+  <object id="47" language="java" name="gov.samhsa.consent2share.pixclient.service.PixManagerServiceImpl" 
+    project="pix-client" 
+    file="/pix-client/src/main/java/gov/samhsa/consent2share/pixclient/service/PixManagerServiceImpl.java" 
+    binary="false" label="pixManagerServiceImpl" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="1133" y="0"/>    
+    <execution id="42">      
+      <position height="21" width="193" x="1430" y="243"/>    
+    </execution>    
+    <execution id="44">      
+      <position height="21" width="193" x="1430" y="583"/>    
+    </execution>    
+    <execution id="46">      
+      <position height="21" width="193" x="1430" y="906"/>    
+    </execution>  
+  </object>  
+  <message id="3" operation="getPixAddXml(java.lang.String):java.lang.String">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="5" operation="addPerson(java.lang.String):java.lang.String">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="6"/>  
+  </message>  
+  <message id="8" operation="getPixUpdateXml(java.lang.String):java.lang.String">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="9"/>  
+  </message>  
+  <message id="10" operation="updatePerson(java.lang.String):java.lang.String">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="11"/>  
+  </message>  
+  <message id="13" operation="getPixQueryXml(java.lang.String):java.lang.String">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="14"/>  
+  </message>  
+  <message id="15" operation="queryPerson(java.lang.String):gov.samhsa.consent2share.pixclient.util.PixManagerBean">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="16"/>  
+  </message>  
+  <message id="20" operation="addPerson(java.lang.String):java.lang.String">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="21"/>  
+  </message>  
+  <message id="22" operation="updatePerson(java.lang.String):java.lang.String">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="23"/>  
+  </message>  
+  <message id="24" operation="queryPerson(java.lang.String):gov.samhsa.consent2share.pixclient.util.PixManagerBean">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="25"/>  
+  </message>  
+  <message id="27" 
+    operation="getPIXAddReqObject(java.lang.String,java.lang.String):gov.samhsa.consent2share.pixclient.ws.PRPAIN201301UV02">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="28"/>  
+  </message>  
+  <message id="29" 
+    operation="pixManagerPRPAIN201301UV02(gov.samhsa.consent2share.pixclient.ws.PRPAIN201301UV02):gov.samhsa.consent2share.pixclient.ws.MCCIIN000002UV01">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="30"/>  
+  </message>  
+  <message id="31" 
+    operation="getPIXUpdateReqObject(java.lang.String,java.lang.String):gov.samhsa.consent2share.pixclient.ws.PRPAIN201302UV02">    
+    <end type="SOURCE" refId="23"/>    
+    <end type="TARGET" refId="32"/>  
+  </message>  
+  <message id="33" 
+    operation="pixManagerPRPAIN201302UV02(gov.samhsa.consent2share.pixclient.ws.PRPAIN201302UV02):gov.samhsa.consent2share.pixclient.ws.MCCIIN000002UV01">    
+    <end type="SOURCE" refId="23"/>    
+    <end type="TARGET" refId="34"/>  
+  </message>  
+  <message id="35" 
+    operation="getPIXQueryReqObject(java.lang.String,java.lang.String):gov.samhsa.consent2share.pixclient.ws.PRPAIN201309UV02">    
+    <end type="SOURCE" refId="25"/>    
+    <end type="TARGET" refId="36"/>  
+  </message>  
+  <message id="37" 
+    operation="pixManagerPRPAIN201309UV02(gov.samhsa.consent2share.pixclient.ws.PRPAIN201309UV02):gov.samhsa.consent2share.pixclient.ws.PRPAIN201310UV02">    
+    <end type="SOURCE" refId="25"/>    
+    <end type="TARGET" refId="38"/>  
+  </message>  
+  <message id="41" 
+    operation="pixManagerPRPAIN201301UV02(gov.samhsa.consent2share.pixclient.ws.PRPAIN201301UV02):gov.samhsa.consent2share.pixclient.ws.MCCIIN000002UV01">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="42"/>  
+  </message>  
+  <message id="43" 
+    operation="pixManagerPRPAIN201302UV02(gov.samhsa.consent2share.pixclient.ws.PRPAIN201302UV02):gov.samhsa.consent2share.pixclient.ws.MCCIIN000002UV01">    
+    <end type="SOURCE" refId="34"/>    
+    <end type="TARGET" refId="44"/>  
+  </message>  
+  <message id="45" 
+    operation="pixManagerPRPAIN201309UV02(gov.samhsa.consent2share.pixclient.ws.PRPAIN201309UV02):gov.samhsa.consent2share.pixclient.ws.PRPAIN201310UV02">    
+    <end type="SOURCE" refId="38"/>    
+    <end type="TARGET" refId="46"/>  
+  </message>
+</sequence-diagram>

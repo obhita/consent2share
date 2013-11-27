@@ -13,28 +13,37 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.herasaf.xacml.core.api.PDP;
 import org.herasaf.xacml.core.context.RequestMarshaller;
 import org.herasaf.xacml.core.context.impl.RequestType;
 import org.herasaf.xacml.core.policy.Evaluatable;
 import org.herasaf.xacml.core.policy.PolicyMarshaller;
+import org.herasaf.xacml.core.simplePDP.SimplePDPFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PolicyDecisionPointDemoIT {
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(PolicyDecisionPointImplTest.class);
+			.getLogger(PolicyDecisionPointDemoIT.class);
 	private final String policyFile = "src/test/resources/samplePolicy.xml";
 	private final String requestFile = "src/test/resources/samplePolicyRequest.xml";
+	private PDP simplePDP;
 	private Evaluatable policy;
 	private List<Evaluatable> policies;
 	private RequestType request;
 	private PolicyDecisionPoint pdp;
+	@Mock
+	private PolicyDecisionPointImplData dataMock;
+	@Mock
+	private RequestGenerator requestGeneratorMock;
 
 	@Before
 	public void setUp() throws Exception {
-		pdp = new PolicyDecisionPointImpl();
+		simplePDP = SimplePDPFactory.getSimplePDP();
+		pdp = new PolicyDecisionPointImpl(dataMock,requestGeneratorMock);
 
 		try {
 			InputStream is = new FileInputStream(policyFile);
@@ -93,8 +102,7 @@ public class PolicyDecisionPointDemoIT {
 
 	@Test
 	public void test() {
-		pdp.deployPolicies(policies);
-		XacmlResponse response = pdp.evaluateRequest(request);
+		XacmlResponse response = pdp.evaluateRequest(simplePDP,request,policies);
 		printPolicy();
 		printRequest();
 		System.out.println("");

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions targetNamespace="http://www.samhsa.gov/ds4ppilot/contract/pep"
+				  xmlns:tns="http://www.samhsa.gov/ds4ppilot/contract/pep"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+                  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  xmlns:iti="urn:ihe:iti:xds-b:2007" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+                  xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy"
+                  xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract"
+                  xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex"
+                  xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:query="urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0"
+                  xmlns:hl7v3="urn:hl7-org:v3"
+                  xmlns:message="http://schema.samhsa.gov/ds4p/XDSbRegistry/Message"
+                  xmlns:pep="http://www.samhsa.gov/ds4ppilot/schema/pep">
+    <wsdl:types>
+        <xsd:schema targetNamespace="urn:ihe:iti:xds-b:2007/Imports">
+
+            <xsd:import schemaLocation="XDS.b_registry_types.xsd"
+                        namespace="http://schema.samhsa.gov/ds4p/XDSbRegistry/Message" />
+
+            <xsd:import schemaLocation="XDS.b_repository_types.xsd"
+                        namespace="urn:ihe:iti:xds-b:2007" />
+
+            <xsd:import schemaLocation="patient_identity_feed.xsd"
+                        namespace="urn:hl7-org:v3" />
+
+            <xsd:import schemaLocation="query.xsd"
+                        namespace="urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0" />
+
+        </xsd:schema>
+
+        <xsd:schema targetNamespace="http://www.samhsa.gov/ds4ppilot/schema/pep">
+
+
+            <xsd:element name="DirectEmailSendRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="patiendId" type="xsd:string" />
+                        <xsd:element name="recipientNPI" type="xsd:string" />
+                        <xsd:element name="senderNPI" type="xsd:string" />
+                        <xsd:element name="RecipientEmail" type="xsd:string" />
+                        <xsd:element name="SenderEmail" type="xsd:string" />
+                        <xsd:element name="PurposeOfUse" type="xsd:string" maxOccurs="unbounded"/>
+                        <xsd:element name="requestedDoc" type="xsd:string" />
+                        <xsd:element name="date" type="xsd:date" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="DirectEmailSendResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="return" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+
+    </wsdl:types>
+    <wsdl:message name="XDS_RegistryStoredQuery_InputMessage">
+        <wsdl:part name="input" element="query:AdhocQueryRequest" />
+    </wsdl:message>
+    <wsdl:message name="XDS_RegistryStoredQuery_OutputMessage">
+        <wsdl:part name="RegistryStoredQueryResult" element="query:AdhocQueryResponse" />
+    </wsdl:message>
+
+    <wsdl:message name="XDSRepository_RetrieveDocumentSet_InputMessage">
+        <wsdl:part name="input" element="iti:RetrieveDocumentSetRequest"
+                   xmlns:q3="http://schemas.microsoft.com/Message" />
+    </wsdl:message>
+    <wsdl:message name="XDSRepository_RetrieveDocumentSet_OutputMessage">
+        <wsdl:part name="RetrieveDocumentSetResult" element="iti:RetrieveDocumentSetResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="DirectEmailSendInputMessage">
+        <wsdl:part element="pep:DirectEmailSendRequest" name="parameters" />
+    </wsdl:message>
+    <wsdl:message name="DirectEmailSendOutputMessage">
+        <wsdl:part element="pep:DirectEmailSendResponse" name="parameters" />
+    </wsdl:message>
+
+    <wsdl:portType name="PepPortType">
+        <wsdl:operation name="RegistryStoredQuery">
+            <wsdl:input wsaw:Action="urn:ihe:iti:2007:RegistryStoredQuery"
+                        message="tns:XDS_RegistryStoredQuery_InputMessage" />
+            <wsdl:output wsaw:Action="urn:ihe:iti:2007:RegistryStoredQueryResponse"
+                         message="tns:XDS_RegistryStoredQuery_OutputMessage" />
+        </wsdl:operation>
+        <wsdl:operation name="RetrieveDocumentSet">
+            <wsdl:input wsaw:Action="urn:ihe:iti:2007:RetrieveDocumentSet"
+                        message="tns:XDSRepository_RetrieveDocumentSet_InputMessage" />
+            <wsdl:output wsaw:Action="urn:ihe:iti:2007:RetrieveDocumentSetResponse"
+                         message="tns:XDSRepository_RetrieveDocumentSet_OutputMessage" />
+        </wsdl:operation>
+        <wsdl:operation name="DirectEmailSend">
+            <wsdl:input wsaw:Action="http://www.samhsa.gov/ds4ppilot/contract/pep:DirectEmailSend"
+                        message="tns:DirectEmailSendInputMessage" />
+            <wsdl:output wsaw:Action="http://www.samhsa.gov/ds4ppilot/contract/pep:DirectEmailSendResponse"
+                         message="tns:DirectEmailSendOutputMessage" />
+        </wsdl:operation>
+
+    </wsdl:portType>
+</wsdl:definitions>

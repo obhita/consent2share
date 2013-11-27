@@ -61,11 +61,14 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.xml.sax.SAXException;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author sadhana.chandra
  * 
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ConsentTransformerImplTest {
 
 	@InjectMocks

@@ -25,12 +25,12 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools;
 
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverter;
 import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.common.utils.EncryptTool;
 import gov.samhsa.ds4ppilot.common.utils.FileHelper;
-import gov.samhsa.ds4ppilot.common.utils.XmlHelper;
 import gov.va.ds4p.cas.RuleExecutionResponse;
 
 import org.slf4j.Logger;
@@ -55,6 +55,9 @@ public class DocumentMaskerImpl implements DocumentMasker {
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	/** The document xml converter. */
+	private DocumentXmlConverter documentXmlConverter;
+
 	// commented out for redact-only application
 	//
 	// /** The pdp obligation prefix for mask. */
@@ -78,7 +81,7 @@ public class DocumentMaskerImpl implements DocumentMasker {
 		String xmlString = null;
 
 		try {
-			xmlDocument = XmlHelper.loadDocument(document);
+			xmlDocument = documentXmlConverter.loadDocument(document);
 
 			/*
 			 * Get a key to be used for encrypting the element. Here we are
@@ -132,13 +135,33 @@ public class DocumentMaskerImpl implements DocumentMasker {
 			// }
 
 			// FileHelper.writeDocToFile(xmlDocument, "Masked_C32.xml");
-			xmlString = XmlHelper.converXmlDocToString(xmlDocument);
+			xmlString = documentXmlConverter.convertXmlDocToString(xmlDocument);
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw new DS4PException(e.toString(), e);
 		}
 		return xmlString;
+	}
+
+	/**
+	 * Gets the document xml converter.
+	 * 
+	 * @return the document xml converter
+	 */
+	public DocumentXmlConverter getDocumentXmlConverter() {
+		return documentXmlConverter;
+	}
+
+	/**
+	 * Sets the document xml converter.
+	 * 
+	 * @param documentXmlConverter
+	 *            the new document xml converter
+	 */
+	public void setDocumentXmlConverter(
+			DocumentXmlConverter documentXmlConverter) {
+		this.documentXmlConverter = documentXmlConverter;
 	}
 
 	// commented out for redact-only application

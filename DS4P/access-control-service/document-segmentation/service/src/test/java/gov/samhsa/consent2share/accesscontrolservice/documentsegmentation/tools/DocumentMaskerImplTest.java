@@ -3,6 +3,7 @@ package gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl;
 import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
@@ -22,6 +23,7 @@ public class DocumentMaskerImplTest {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private static FileReaderImpl fileReader;
+	private static DocumentXmlConverterImpl documentXmlConverter;
 
 	private static XacmlResult xacmlResultMock;
 
@@ -33,8 +35,10 @@ public class DocumentMaskerImplTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		fileReader = new FileReaderImpl();
+		documentXmlConverter = new DocumentXmlConverterImpl();
 
 		documentMasker = new DocumentMaskerImpl();
+		documentMasker.setDocumentXmlConverter(documentXmlConverter);
 
 		c32 = fileReader.readFile("c32.xml");
 		ruleExecutionContainer = setRuleExecutionContainer();

@@ -19,7 +19,6 @@ import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
 import gov.samhsa.ds4ppilot.common.utils.EncryptTool;
 import gov.samhsa.ds4ppilot.common.utils.FileHelper;
-import gov.samhsa.ds4ppilot.common.utils.XmlHelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -58,6 +57,7 @@ public class DocumentSegmentationImplIT {
 	private static RuleExecutionServiceImpl ruleExecutionService;
 	private static SimpleMarshallerImpl marshaller;
 	private static FileReaderImpl fileReader;
+	private static DocumentXmlConverterImpl documentXmlConverter;
 	private static MetadataGeneratorImpl metadataGenerator;
 	private static DocumentEditorImpl documentEditor;
 	private static DocumentTaggerImpl documentTagger;
@@ -70,17 +70,20 @@ public class DocumentSegmentationImplIT {
 	@Before
 	public void setUp() throws IOException {
 		fileReader = new FileReaderImpl();
+		documentXmlConverter = new DocumentXmlConverterImpl();
 		metadataGenerator = new MetadataGeneratorImpl();
 		documentEditor = new DocumentEditorImpl();
 		documentEditor.setFileReader(fileReader);
 		documentEditor.setMetadataGenerator(metadataGenerator);
+		documentEditor.setDocumentXmlConverter(documentXmlConverter);
 		marshaller = new SimpleMarshallerImpl();
 		documentTagger = new DocumentTaggerImpl();
 		documentEncrypter = new DocumentEncrypterImpl();
+		documentEncrypter.setDocumentXmlConverter(documentXmlConverter);
 		documentRedactor = new DocumentRedactorImpl();
 		documentRedactor.setDocumentEditor(documentEditor);
 		documentRedactor
-				.setDocumentXmlConverter(new DocumentXmlConverterImpl());
+				.setDocumentXmlConverter(documentXmlConverter);
 		documentMasker = new DocumentMaskerImpl();
 		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
 		additionalMetadataGeneratorForSegmentedClinicalDocumentImpl = new AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl();
@@ -142,7 +145,7 @@ public class DocumentSegmentationImplIT {
 			document = documentRedactor.redactDocument(c32Document,
 					ruleExecutionContainer, xacmlResultObject);
 
-			Document processedDoc = XmlHelper.loadDocument(document);
+			Document processedDoc = documentXmlConverter.loadDocument(document);
 			FileHelper
 					.writeDocToFile(processedDoc, "unitTest_Redacted_C32.xml");
 
@@ -150,7 +153,7 @@ public class DocumentSegmentationImplIT {
 			// document = documentSegmentation.maskElement(document,
 			// ruleExecutionContainer, xacmlResultObject);
 
-			processedDoc = XmlHelper.loadDocument(document);
+			processedDoc = documentXmlConverter.loadDocument(document);
 			FileHelper.writeDocToFile(processedDoc, "unitTest_Masked_C32.xml");
 
 			/*
@@ -163,7 +166,7 @@ public class DocumentSegmentationImplIT {
 			document = documentEncrypter.encryptDocument(desedeEncryptKey,
 					document, ruleExecutionContainer);
 
-			processedDoc = XmlHelper.loadDocument(document);
+			processedDoc = documentXmlConverter.loadDocument(document);
 
 			FileHelper.writeDocToFile(processedDoc,
 					"unitTest_Encrypted_C32.xml");

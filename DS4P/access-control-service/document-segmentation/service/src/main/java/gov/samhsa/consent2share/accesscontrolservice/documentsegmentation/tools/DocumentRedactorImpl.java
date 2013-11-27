@@ -108,7 +108,7 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 			}
 			// Debug
 			// FileHelper.writeDocToFile(xmlDocument, "Redacted_C32.xml");
-			xmlString = documentXmlConverter.converXmlDocToString(xmlDocument);
+			xmlString = documentXmlConverter.convertXmlDocToString(xmlDocument);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw new DS4PException(e.toString(), e);

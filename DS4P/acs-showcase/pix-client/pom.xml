@@ -1,0 +1,132 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>gov.samhsa.consent2share</groupId>
+		<artifactId>acs-showcase</artifactId>
+		<version>0.1.0.BUILD-SNAPSHOT</version>
+	</parent>
+	<artifactId>pix-client</artifactId>
+
+
+	<dependencies>
+
+		<!-- Spring dependencies Start -->
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-ws-core</artifactId>
+		</dependency>
+
+		<!-- Spring dependencies End -->
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-jxpath</groupId>
+			<artifactId>commons-jxpath</artifactId>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		<finalName>pix-client</finalName>
+		<plugins>
+			<!-- Generate Java classes from WSDL during build -->
+			<plugin>
+				<groupId>org.jvnet.jax-ws-commons</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
+				<configuration>
+					<keep>true</keep>
+					<extension>true</extension>
+					<sourceDestDir>${basedir}/target/generated-sources</sourceDestDir>
+					<xnocompile>true</xnocompile>
+					<packageName>gov.samhsa.consent2share.pixclient.ws</packageName>
+					<target>2.0</target>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>wsimport</goal>
+						</goals>
+						<configuration>
+							<bindingFiles>
+								<bindingFile>${basedir}/src/main/resources/bindings/bindings.xjb</bindingFile>
+							</bindingFiles>
+							<wsdlFiles>
+								<wsdlFile>${basedir}/src/main/resources/wsdl/PIXPDQManager.wsdl</wsdlFile>
+							</wsdlFiles>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Add generated sources - avoids having to copy generated sources to 
+				build location -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${basedir}/target/generated-sources</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Build the JAR with dependencies -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+			
+ 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+					<instrumentation>
+						<ignores>
+							<ignore>gov/samhsa/consent2share/pixclient/ws/*</ignore>
+						</ignores>
+						<excludes>
+							<exclude>gov/samhsa/consent2share/pixclient/ws/*.class</exclude>
+						</excludes>
+					</instrumentation>
+					<formats>
+						<format>html</format>
+					</formats>
+				</configuration>
+			</plugin>	 		
+			
+		</plugins>
+
+	</build>
+	
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+		
+		</plugins>
+	
+	
+	</reporting> 
+</project>

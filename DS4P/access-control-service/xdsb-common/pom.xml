@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>gov.samhsa.consent2share</groupId>
+		<artifactId>access-control-service</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>xdsb-common</artifactId>
+	<name>XDS.b Common</name>
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-library</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>Saxon-HE</artifactId>
+		</dependency>			
+	</dependencies>
+
+	<build>
+		<finalName>xdsb-common</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-xjc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>xsdtojava</goal>
+						</goals>
+						<configuration>
+							<sourceRoot>${basedir}/target/generated-sources</sourceRoot>
+							<xsdOptions>
+								<xsdOption>
+									<xsd>src/main/resources/xml.xsd</xsd>
+								</xsdOption>
+								<xsdOption>
+									<xsd>src/main/resources/rim.xsd</xsd>
+								</xsdOption>
+								<xsdOption>
+									<xsd>src/main/resources/soap.xsd</xsd>
+								</xsdOption>
+								<xsdOption>
+									<xsd>src/main/resources/lcm.xsd</xsd>
+								</xsdOption>
+								<xsdOption>
+									<xsd>src/main/resources/query.xsd</xsd>
+								</xsdOption>
+								<xsdOption>
+									<xsd>src/main/resources/rs.xsd</xsd>
+								</xsdOption>
+								<xsdOption>
+									<xsd>src/main/resources/XDS.b_repository_types.xsd</xsd>
+								</xsdOption>
+							</xsdOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

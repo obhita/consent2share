@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>pep-service</artifactId>
-	<name>Pep - Web Service Provider</name>
+	<name>Pep - Service</name>
 	<packaging>jar</packaging>
 	<dependencies>
 		<!-- herasaf dependencies -->
@@ -17,7 +17,7 @@
 			<groupId>org.herasaf.xacml.core</groupId>
 			<artifactId>herasaf-xacml-core</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
@@ -37,8 +37,8 @@
 		<dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
-		</dependency>	
-	
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-ws-mex</artifactId>
@@ -63,12 +63,12 @@
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>c32-service-client</artifactId>
-		</dependency>		
-		
+		</dependency>
+
 		<dependency>
 			<groupId>gov.samhsa.consent2share.accesscontrolservice.contexthandler</groupId>
-  			<artifactId>context-handler-service</artifactId>
-		</dependency>	
+			<artifactId>context-handler-service</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
@@ -76,18 +76,25 @@
 		</dependency>
 
 		<dependency>
-			<groupId>secured-context-handler-jar-with-dependencies</groupId>
-			<artifactId>secured-context-handler-jar-with-dependencies</artifactId>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>Saxon-HE</artifactId>
+		</dependency>
+
+		<!-- TODO: Remove secured-context-handler all together  -->
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>secured-context-handler</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>xdsb-repository-client-jar-with-dependencies</groupId>
-			<artifactId>xdsb-repository-client-jar-with-dependencies</artifactId>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>xdsb-repository-client</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>xdsb-registry-client-jar-with-dependencies</groupId>
-			<artifactId>xdsb-registry-client-jar-with-dependencies</artifactId>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>xdsb-registry-client</artifactId>
 		</dependency>
 
 		<dependency>
@@ -103,18 +110,18 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>document-segmentation-service</artifactId>
 		</dependency>
 
 	</dependencies>
-	
+
 	<build>
 		<pluginManagement>
 			<plugins>
-				
+
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
@@ -176,6 +183,11 @@
 									<wsdlOptions>
 										<wsdlOption>
 											<wsdl>
+												${basedir}/src/main/resources/Pep.wsdl
+											</wsdl>
+										</wsdlOption>
+										<wsdlOption>
+											<wsdl>
 												${basedir}/src/main/resources/FilterC32Service.wsdl
 											</wsdl>
 										</wsdlOption>
@@ -202,7 +214,7 @@
 							</execution>
 						</executions>
 					</plugin>
-					
+
 				</plugins>
 			</build>
 		</profile>
@@ -224,7 +236,7 @@
 										src/main/resources
 									</wsdlDirectory>
 									<wsdlFiles>
-										<wsdlFile>FilterC32Service.wsdl</wsdlFile>
+										<wsdlFile>Pep.wsdl</wsdlFile>
 									</wsdlFiles>
 									<sourceDestDir>
 										${basedir}/target/generated-sources

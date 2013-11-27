@@ -45,128 +45,125 @@ import gov.va.ehtac.ds4p.ws.EnforcePolicyResponse.Return;
  */
 public class ContextHandlerImpl implements ContextHandler {
 
-	/** The endpoint address. */
-	private String endpointAddress;
-	
-	/** The request generator. */
-	private RequestGenerator requestGenerator;
-	
+
 	/** The policy desicion point. */
 	@Autowired
 	private PolicyDecisionPoint policyDesicionPoint;
-	
+
 	/** The Constant LOGGER. */
-	private static final Logger LOGGER = LoggerFactory.getLogger(ContextHandlerImpl.class);
-	
-	/**
-	 * Instantiates a new context handler implementation.
-	 *
-	 * @param endpointAddress the endpoint address
-	 */
-	public ContextHandlerImpl(String endpointAddress) {
-		this.endpointAddress = endpointAddress;
-	}
-	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(ContextHandlerImpl.class);
+
 	/**
 	 * Instantiates a new context handler impl.
-	 *
-	 * @param policyDesicionPoint the policy desicion point
-	 * @param requestGenerator the request generator
+	 * 
+	 * @param policyDesicionPoint
+	 *            the policy desicion point
+	 * @param requestGenerator
+	 *            the request generator
 	 */
-	public ContextHandlerImpl(PolicyDecisionPoint policyDesicionPoint, RequestGenerator requestGenerator) {
+	public ContextHandlerImpl(PolicyDecisionPoint policyDesicionPoint) {
+		super();
 		this.policyDesicionPoint = policyDesicionPoint;
-		this.requestGenerator = requestGenerator;
 	}
-	
-	/* (non-Javadoc)
-	 * @see gov.samhsa.ds4ppilot.pep.contexthandler.ContextHandler#enforcePolicy(gov.va.ehtac.ds4p.ws.EnforcePolicy.Xspasubject, gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.ds4ppilot.pep.contexthandler.ContextHandler#enforcePolicy(
+	 * gov.va.ehtac.ds4p.ws.EnforcePolicy.Xspasubject,
+	 * gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource)
 	 */
 	@Override
 	public Return enforcePolicy(Xspasubject xspasubject,
 			Xsparesource xsparesource) {
-		
-//		TODO Below is existing code, disabled for demo
-//		ContextHandlerWebServiceClient contextHandlerWebServiceClient = new ContextHandlerWebServiceClient(endpointAddress);
-//        
-//        Return result = contextHandlerWebServiceClient.enforcePolicy(xspasubject, xsparesource);
-//        
-//		return result;
-		
-		/////////////////////////////////////////////////////////////
+
+		// TODO Below is existing code, disabled for demo
+		// ContextHandlerWebServiceClient contextHandlerWebServiceClient = new
+		// ContextHandlerWebServiceClient(endpointAddress);
+		//
+		// Return result =
+		// contextHandlerWebServiceClient.enforcePolicy(xspasubject,
+		// xsparesource);
+		//
+		// return result;
+
+		// ///////////////////////////////////////////////////////////
 		// TODO The code below is written for demo
 		// map recepientSubjectNPI
 		String recepientSubjectNPI = xspasubject.getSubjectId();
-		if(recepientSubjectNPI.equals("Tao.Lin@direct.healthvault-stage.com") || recepientSubjectNPI.equals("joel_amoussou@direct.healthvault-stage.com"))
-		{
+		if (recepientSubjectNPI.equals("Tao.Lin@direct.healthvault-stage.com")
+				|| recepientSubjectNPI
+						.equals("joel_amoussou@direct.healthvault-stage.com")) {
 			recepientSubjectNPI = "1083949036";
-		}		
+		}
 		// map intermediarySubjectNPI
-		String intermediarySubjectNPI = "1174858088";		
+		String intermediarySubjectNPI = "1174858088";
 		// map purposeOfUse
-		String purposeOfUse = "TREAT";		
+		String purposeOfUse = "TREAT";
 		// map resourceId
 		String resourceId = xsparesource.getResourceId();
-		if(xsparesource.getResourceId().equals("PUI100010060001"))
-		{
+		if (xsparesource.getResourceId().equals("PUI100010060001")) {
 			resourceId = "consent2share@outlook.com";
 		}
-		RequestType req = requestGenerator.generateRequest(recepientSubjectNPI, intermediarySubjectNPI, purposeOfUse, resourceId);
-		policyDesicionPoint.deployPolicies(resourceId);
-		XacmlResponse xacmlResponse = policyDesicionPoint.evaluateRequest(req);
+		RequestGenerator requestGenerator = new RequestGenerator();
+		RequestType req = requestGenerator.generateRequest(recepientSubjectNPI,
+				intermediarySubjectNPI, purposeOfUse, resourceId);
+		XacmlResponse xacmlResponse = policyDesicionPoint.evaluateRequest(req,
+				resourceId);
 		Return result = new Return();
 		String pdpDecision = xacmlResponse.getPdpDecision();
-		pdpDecision = pdpDecision.substring(0, 1).toUpperCase() + pdpDecision.substring(1).toLowerCase();
+		pdpDecision = pdpDecision.substring(0, 1).toUpperCase()
+				+ pdpDecision.substring(1).toLowerCase();
 		result.setPdpDecision(pdpDecision);
 		result.setPurposeOfUse(purposeOfUse);
 		result.setResourceId(resourceId);
 		setObligations(result, xacmlResponse.getPdpObligation());
 		return result;
-		/////////////////////////////////////////////////////////////
+		// ///////////////////////////////////////////////////////////
 	}
-	
-	/////////////////////////////////////////////////////////////
-	// TODO The code below is written for demo	
-	private void setObligations(Return result, List<String> obligations)
-	{
+
+	// ///////////////////////////////////////////////////////////
+	// TODO The code below is written for demo
+	private void setObligations(Return result, List<String> obligations) {
 		Field field = null;
 		try {
 			field = result.getClass().getDeclaredField("pdpObligation");
 		} catch (SecurityException e) {
-			LOGGER.error(e.getMessage(),e);
+			LOGGER.error(e.getMessage(), e);
 		} catch (NoSuchFieldException e) {
-			LOGGER.error(e.getMessage(),e);
+			LOGGER.error(e.getMessage(), e);
 		}
 		makeAccessible(field);
 		try {
-			field.set(result,obligations);
+			field.set(result, obligations);
 		} catch (IllegalArgumentException e) {
-			LOGGER.error(e.getMessage(),e);
+			LOGGER.error(e.getMessage(), e);
 		} catch (IllegalAccessException e) {
-			LOGGER.error(e.getMessage(),e);
+			LOGGER.error(e.getMessage(), e);
 		}
 	}
-    private void makeAccessible(Field field) {
-        if (!Modifier.isPublic(field.getModifiers()) ||
-            !Modifier.isPublic(field.getDeclaringClass().getModifiers()))
-        {
-            field.setAccessible(true);
-        }
-    }
-	/////////////////////////////////////////////////////////////
-	
-	
-	/* (non-Javadoc)
-	 * @see gov.samhsa.ds4ppilot.pep.contexthandler.ContextHandler#enforcePolicy(gov.samhsa.ds4ppilot.pep.dto.XacmlRequest)
+
+	private void makeAccessible(Field field) {
+		if (!Modifier.isPublic(field.getModifiers())
+				|| !Modifier.isPublic(field.getDeclaringClass().getModifiers())) {
+			field.setAccessible(true);
+		}
+	}
+
+	// ///////////////////////////////////////////////////////////
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.ds4ppilot.pep.contexthandler.ContextHandler#enforcePolicy(
+	 * gov.samhsa.ds4ppilot.pep.dto.XacmlRequest)
 	 */
 	@Override
 	public XacmlResponse enforcePolicy(XacmlRequest xacmlRequest) {
-		policyDesicionPoint.deployPolicies(xacmlRequest.getResourceId());
-		RequestType req = requestGenerator.generateRequest(xacmlRequest.getRecepientSubjectNPI(), xacmlRequest.getIntermediarySubjectNPI(), xacmlRequest.getPurposeOfUse(), xacmlRequest.getResourceId());
-		LOGGER.debug("policyDesicionPoint.evaluateRequest(req) is getting invoked");
-		return policyDesicionPoint.evaluateRequest(req);
+		LOGGER.debug("policyDesicionPoint.evaluateRequest(xacmlRequest) is invoked");
+		return policyDesicionPoint.evaluateRequest(xacmlRequest);
 	}
-	
-
-	
-
 }

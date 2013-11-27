@@ -19,7 +19,7 @@
 	<languageCode code="en-US"/>
 	<recordTarget>
 		<patientRole>
-			<id root="ProviderID" extension="PUI100010060001" assigningAuthorityName="Provider Name"/>
+			<id root="ProviderID" extension="e46b6650-47ea-11e3-9d13-00155d84621a" assigningAuthorityName="Provider Name"/>
 			<addr use="HP">
 				<!--HITSP/C83 recommends that a patient have at least one address element with a use attribute of HP, i.e. home primary-->
 				None of the following address elements are specifically required by HITSP C32, so
@@ -60,11 +60,15 @@
 	<author>
 		<time value="20101026145730"/>
 		<assignedAuthor>
-			<id/>
+			<id extension="1346575297" root="2.16.840.1.113883.4.6" assigningAuthorityName="NPI"/>
 			<addr/>
 			<telecom/>
 			<assignedPerson>
-				<name>Staff</name>
+				<name>
+					<family>Welby</family>
+					<given>Marcus</given>
+					<prefix>Dr</prefix>
+				</name>
 			</assignedPerson>
 			<representedOrganization>
 				<name>NIST Healthcare Testing Laboratory</name>

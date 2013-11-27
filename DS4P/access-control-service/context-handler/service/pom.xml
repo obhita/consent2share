@@ -1,39 +1,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>context-handler</artifactId>
 		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 
-  <groupId>gov.samhsa.consent2share.accesscontrolservice.contexthandler</groupId>
-  <artifactId>context-handler-service</artifactId>
-  <packaging>jar</packaging>
+	<groupId>gov.samhsa.consent2share.accesscontrolservice.contexthandler</groupId>
+	<artifactId>context-handler-service</artifactId>
+	<packaging>jar</packaging>
 
-  <name>context-handler-service</name>
-  <url>http://maven.apache.org</url>
+	<name>context-handler-service</name>
+	<url>http://maven.apache.org</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>gov.samhsa.consent2share</groupId>
-    	<artifactId>common-library</artifactId>
-    </dependency>
-    <!-- herasaf dependencies -->
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-library</artifactId>
+		</dependency>
+		<!-- herasaf dependencies -->
 		<dependency>
 			<groupId>org.herasaf.xacml.core</groupId>
 			<artifactId>herasaf-xacml-core</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
@@ -54,7 +54,7 @@
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
@@ -65,19 +65,28 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-  </dependencies>
-  
-  <build>
-  	<plugins>
-  		<plugin>
-  			<groupId>org.apache.cxf</groupId>
+		
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>xdsb-registry-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>xdsb-repository-client</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
 				<dependencies>
-							<dependency>
-								<groupId>xerces</groupId>
-								<artifactId>xercesImpl</artifactId>
-								<version>${xercesImpl.version}</version>
-							</dependency>
+					<dependency>
+						<groupId>xerces</groupId>
+						<artifactId>xercesImpl</artifactId>
+						<version>${xercesImpl.version}</version>
+					</dependency>
 				</dependencies>
 				<executions>
 					<execution>
@@ -91,7 +100,7 @@
 									<wsdlLocation>classpath:DS4PContextHandler.wsdl</wsdlLocation>
 									<extraargs>
 										<extraarg>-client</extraarg>
-										 <!-- <extraarg>-impl</extraarg>	 -->									
+										<!-- <extraarg>-impl</extraarg> -->
 									</extraargs>
 								</wsdlOption>
 							</wsdlOptions>
@@ -101,9 +110,9 @@
 						</goals>
 					</execution>
 				</executions>
-  		</plugin>
-  	</plugins>
-  	<pluginManagement>
+			</plugin>
+		</plugins>
+		<pluginManagement>
 			<plugins>
 
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
@@ -159,5 +168,5 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-  </build>
+	</build>
 </project>

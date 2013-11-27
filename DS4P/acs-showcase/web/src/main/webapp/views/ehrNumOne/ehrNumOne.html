@@ -14,12 +14,42 @@
 </table>
 
 <div ng-show="ehrNumOne.selectedPatient.c32Xml">
-	<h3>C32 for {{ehrNumOne.selectedPatient.fullName}} <button id="parseC32" class="btn btn-primary" ng-click="parseC32()">Parse C32</button></h3>
+	<h3>C32 Operation :: {{ehrNumOne.selectedPatient.fullName}} 
+	 <button id="parseC32" class="btn btn-primary" ng-click="parseC32()">Parse C32</button></h3>
+	     <table style="width:100%;" class="table table-bordered">
+	        <tbody>
+	            <tr>
+	                <td><b>C32 > HL7V3 XMLs</b></td>
+	                <td><button id="C32ToHL7" class="btn btn-primary" ng-click="c32ToHL7Add()">PixAdd </button></td>
+	                <td><button id="C32ToHL7" class="btn btn-primary" ng-click="c32ToHL7Update()">PixUpdate </button></td>
+	                <td><button id="C32ToHL7" class="btn btn-primary" ng-click="c32ToHL7Query()">PixQuery </button></td>
+	            </tr>
+	            
+	              <tr>
+	                <td><b>REM > EMPI</b></td>
+	                <td><button id="addPix" class="btn btn-primary" ng-click="addPix()">Add EMPI</button></td>
+	                <td><button id="updatePix" class="btn btn-primary" ng-click="updatePix()">Update EMPI</button></td>
+	                <td><button id="queryPix" class="btn btn-primary" ng-click="queryPix()">Query EMPI</button></td>
+	            </tr>          
+<!-- 	              <tr>
+	                <td><b>REM > XDSB Reg</b></td>
+	                <td><button id="addPix" class="btn btn-primary" ng-click="addXdsb()">Add XDSB</button></td>
+	                <td><button id="updatePix" class="btn btn-primary" ng-click="updatePix()">Update XDSB</button></td>
+	                <td><button id="queryPix" class="btn btn-primary" ng-click="queryPix()">Query XDSB</button></td>
+	            </tr> 	 -->            
+	        </tbody>
+	    </table>
+
 	<pre style="height: 10pc; overflow-y: scroll;">{{ehrNumOne.selectedPatient.c32Xml}}</pre>
 </div>
 
+<div ng-show="ehrNumOne.selectedPatient.hl7v3Xml">
+	<h3>HL7V3 Operation ::  {{ehrNumOne.selectedPatient.id}} :: {{ehrNumOne.selectedPatient.fullName}} </h3>
+	<pre style="height: 10pc; overflow-y: scroll;">{{ehrNumOne.selectedPatient.hl7v3Xml}}</pre>
+</div>
+
 <div ng-show="ehrNumOne.selectedPatient.greenCcd">
-	<h3>Parsed C32 for {{ehrNumOne.selectedPatient.fullName}}</h3>
+	<h3>Parsed C32 Operation ::  {{ehrNumOne.selectedPatient.id}} :: {{ehrNumOne.selectedPatient.fullName}} </h3>
 	<div>Address:</div>
 	<div>
 		{{ehrNumOne.selectedPatient.greenCcd.header.personalInformation.patientInformation.personAddress[0].streetAddressLine[0]}}
@@ -29,4 +59,62 @@
 		{{ehrNumOne.selectedPatient.greenCcd.header.personalInformation.patientInformation.personAddress[0].state}}
 		{{ehrNumOne.selectedPatient.greenCcd.header.personalInformation.patientInformation.personAddress[0].postalCode}}
 	</div>
+</div>
+
+<div ng-show="ehrNumOne.selectedPatient.pixAddMsg">
+	<h3>PixAdd Operation ::  {{ehrNumOne.selectedPatient.id}} :: {{ehrNumOne.selectedPatient.fullName}} </h3>
+	<div ng-if=" true == ehrNumOne.selectedPatient.isError">
+	    <font color='red' > {{ehrNumOne.selectedPatient.pixAddMsg}} </font>
+	</div>
+	<div ng-if=" true != ehrNumOne.selectedPatient.isError">
+	    {{ehrNumOne.selectedPatient.pixAddMsg}} 
+	</div>		
+</div>
+
+<div ng-show="ehrNumOne.selectedPatient.pixUpdateMsg">
+	<h3>PixUpdate Operation ::  {{ehrNumOne.selectedPatient.id}} :: {{ehrNumOne.selectedPatient.fullName}} </h3>
+	<div ng-if=" true == ehrNumOne.selectedPatient.isError">
+	    <font color='red' > {{ehrNumOne.selectedPatient.pixUpdateMsg}} </font>
+	</div>
+	<div ng-if=" true != ehrNumOne.selectedPatient.isError">
+	    {{ehrNumOne.selectedPatient.pixUpdateMsg}} 
+	</div>	
+</div>
+
+<div ng-show="ehrNumOne.selectedPatient.pixManagerBean" >
+	<h3>PixQuery Operation ::  {{ehrNumOne.selectedPatient.id}} :: {{ehrNumOne.selectedPatient.fullName}} </h3>
+	
+	<div ng-if=" true == ehrNumOne.selectedPatient.isError">
+	    <font color='red' > {{ehrNumOne.selectedPatient.pixManagerBean.queryMessage}} </font>
+	</div>
+	<div ng-if=" true != ehrNumOne.selectedPatient.isError">
+	    {{ehrNumOne.selectedPatient.pixManagerBean.queryMessage}} 
+	</div>
+	<br />
+    <table style="width:100%;" class="table table-bordered" ng-show="ehrNumOne.selectedPatient.pixManagerBean.queryIdMap">
+        <thead>
+            <tr>
+                <th>Domain</th>
+                <th>Identifier</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="(k,v) in ehrNumOne.selectedPatient.pixManagerBean.queryIdMap">
+                <td>{{k}}</td>
+                <td>{{v}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+
+<div ng-show="ehrNumOne.selectedPatient.xdsbRegAddMsg">
+	<h3>XdsbRegAdd Operation ::  {{ehrNumOne.selectedPatient.id}} :: {{ehrNumOne.selectedPatient.fullName}} </h3>
+	<div ng-if=" true == ehrNumOne.selectedPatient.isError">
+	    <font color='red' > {{ehrNumOne.selectedPatient.xdsbRegAddMsg}} </font>
+	</div>
+	<div ng-if=" true != ehrNumOne.selectedPatient.isError">
+	    {{ehrNumOne.selectedPatient.xdsbRegAddMsg}} 
+	</div>		
 </div>

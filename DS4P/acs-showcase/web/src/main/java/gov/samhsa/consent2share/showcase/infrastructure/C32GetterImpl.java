@@ -25,11 +25,11 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.showcase.infrastructure;
 
+import gov.samhsa.schemas.client.C32WebServiceClient;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import gov.samhsa.schemas.client.C32WebServiceClient;
 
 /**
  * The Class C32GetterImpl.
@@ -40,6 +40,8 @@ public class C32GetterImpl implements C32Getter {
 	/** The endpoint address. */
 	private String endpointAddress;
 	
+	private C32WebServiceClient c32WebServiceClient;
+	
 	/**
 	 * Instantiates a new C32 getter implementation.
 	 *
@@ -48,6 +50,7 @@ public class C32GetterImpl implements C32Getter {
 	@Autowired
 	public C32GetterImpl(@Value("${c32GetterWebServiceEndpointAddress}") String endpointAddress) {
 		this.endpointAddress = endpointAddress;
+		c32WebServiceClient = new C32WebServiceClient(this.endpointAddress);
 	}
 	
 	/* (non-Javadoc)
@@ -55,9 +58,14 @@ public class C32GetterImpl implements C32Getter {
 	 */
 	@Override
 	public String getC32(String patientId) {
-		C32WebServiceClient c32WebServiceClient = new C32WebServiceClient(endpointAddress);
+		
 		String c32 = c32WebServiceClient.getC32(patientId);
 
 		return c32;
 	}
+
+	public void setC32WebServiceClient(C32WebServiceClient c32WebServiceClient) {
+		this.c32WebServiceClient = c32WebServiceClient;
+	}
+	
 }

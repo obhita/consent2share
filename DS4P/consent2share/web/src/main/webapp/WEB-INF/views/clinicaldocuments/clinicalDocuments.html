@@ -153,7 +153,7 @@
 
             <div class="span10">
             <br/><p class="h4-style">Document Upload</p><br/>
-				 <form action="#" th:action="@{/patients/clinicaldocuments.html}" method="post" enctype="multipart/form-data">	
+				 <form action="#" th:action="@{/patients/clinicaldocuments.html}" method="post" enctype="multipart/form-data">
 				    <table>
 				    <tr>
 				        <td>Name</td>
@@ -180,7 +180,7 @@
 				            <input class="btn btn-info" type="submit" value="Upload"/>
 				        </td>
 				    </tr>
-				</table>  
+				</table>
 				</form>
 				<br/><p class="h4-style" th:if="${#lists.isEmpty(clinicaldocumentDtos)}">No Documents Found</p>
 				<p class="h4-style" th:if="${not #lists.isEmpty(clinicaldocumentDtos)}">Uploaded Documents</p><br/>

@@ -11,6 +11,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionService;
+import gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReader;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl;
 import gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl;
@@ -29,7 +30,6 @@ import gov.samhsa.ds4ppilot.common.beans.RuleExecutionContainer;
 import gov.samhsa.ds4ppilot.common.beans.XacmlResult;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.common.utils.FileHelper;
-import gov.samhsa.ds4ppilot.common.utils.XmlHelper;
 import gov.va.ds4p.cas.RuleExecutionResponse;
 
 import java.io.ByteArrayOutputStream;
@@ -68,6 +68,7 @@ public class DocumentSegmentationImplTest {
 	private static String recipientEmailAddress;
 
 	private static FileReader fileReader;
+	private static DocumentXmlConverterImpl documentXmlConverter;
 
 	private static RuleExecutionService ruleExecutionServiceClientMock;
 	private static AuditServiceImpl auditServiceMock;
@@ -99,6 +100,8 @@ public class DocumentSegmentationImplTest {
 
 		// File reader
 		fileReader = new FileReaderImpl();
+		// Document-Xml converter
+		documentXmlConverter = new DocumentXmlConverterImpl();
 
 		testOriginal_C32_xml = fileReader.readFile("testOriginal_C32.xml");
 		testFactModel_xml = fileReader.readFile("testFactModel.xml");
@@ -337,7 +340,7 @@ public class DocumentSegmentationImplTest {
 			FileHelper.writeStringToFile(processDocString,
 					"processDocString.xml");
 
-			processedDoc = XmlHelper.loadDocument(processDocString);
+			processedDoc = documentXmlConverter.loadDocument(processDocString);
 
 			byte[] kekEncryptionKeyBytes = entryBytesFromZipBytes(zis,
 					"kekEncryptionKey");

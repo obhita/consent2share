@@ -8,9 +8,9 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import gov.samhsa.consent2share.accesscontrolservice.xdsb.registry.XdsbRegistryWebServiceClient;
 import gov.samhsa.ds4ppilot.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.schema.pep.FilterC32Response;
-import gov.samhsa.ds4ppilot.ws.client.XdsbRegistryWebServiceClient;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -37,7 +37,7 @@ import org.junit.Assert;
 import org.hl7.v3.Device;
 import org.hl7.v3.Id;
 import org.hl7.v3.PRPAIN201301UV02;
-import org.hl7.v3.PRPAIN201302UV;
+import org.hl7.v3.PRPAIN201302UV02;
 import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess;
 import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject;
 import org.hl7.v3.PatientIdentityFeedRequestType.ControlActProcess.Subject.RegistrationEvent;
@@ -355,7 +355,7 @@ public class PepImplTest {
 		prpain201301uv02.setSender(sender);
 
 		// PRPAIN201302UV
-		PRPAIN201302UV prpain201302uv = new PRPAIN201302UV();
+		PRPAIN201302UV02 prpain201302uv = new PRPAIN201302UV02();
 
 		prpain201301uv02.setControlActProcess(controlActProcess);
 

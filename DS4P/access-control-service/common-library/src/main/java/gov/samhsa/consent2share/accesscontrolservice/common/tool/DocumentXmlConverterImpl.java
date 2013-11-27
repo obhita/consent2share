@@ -67,10 +67,10 @@ public class DocumentXmlConverterImpl implements DocumentXmlConverter {
 	 * 
 	 * @see
 	 * gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.util
-	 * .DocumentXmlConverter#converXmlDocToString(org.w3c.dom.Document)
+	 * .DocumentXmlConverter#convertXmlDocToString(org.w3c.dom.Document)
 	 */
 	@Override
-	public String converXmlDocToString(Document xmlDocument)
+	public String convertXmlDocToString(Document xmlDocument)
 			throws IOException, TransformerException {
 		String xmlString = "";
 

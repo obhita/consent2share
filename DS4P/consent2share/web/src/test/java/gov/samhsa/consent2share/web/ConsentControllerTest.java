@@ -209,7 +209,7 @@ public class ConsentControllerTest {
 	@Test 
 	public void testDeleteConsent_when_succeeds() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(),anyLong())).thenReturn(true);
-		mockMvc.perform(get("/consents/deleteConsents/1"))
+		mockMvc.perform(post("/consents/deleteConsents").param("consentId", "1"))
 			.andExpect(view().name("redirect:/consents/listConsents.html"));
 		verify(consentService).deleteConsent(anyLong());
 	}
@@ -223,7 +223,7 @@ public class ConsentControllerTest {
 	@Test 
 	public void testDeleteConsent_when_authentication_fails() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(false);
-		mockMvc.perform(get("/consents/deleteConsents/2"))
+		mockMvc.perform(post("/consents/deleteConsents").param("consentId", "2"))
 			.andExpect(view().name("redirect:/consents/listConsents.html"));
 		verify(consentService,never()).deleteConsent(anyLong());
 	}

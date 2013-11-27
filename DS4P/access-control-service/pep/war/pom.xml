@@ -50,7 +50,7 @@
 				<artifactId>tomcat-maven-plugin</artifactId>
 				<configuration>
 					<server>Tomcat</server>
-					<url>http://localhost:90/manager</url>
+					<url>http://localhost:80/manager</url>
 					<path>/${project.build.finalName}</path>
 				</configuration>
 			</plugin>

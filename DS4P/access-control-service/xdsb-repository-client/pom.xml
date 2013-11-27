@@ -9,7 +9,18 @@
 	<artifactId>xdsb-repository-client</artifactId>
 	<name>XDS.b Repository Client</name>
 	<packaging>jar</packaging>
-
+	
+	<dependencies>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-library</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>xdsb-common</artifactId>
+		</dependency>		
+	</dependencies>
+	
 	<build>
 		<finalName>xdsb-repository-client</finalName>
 		

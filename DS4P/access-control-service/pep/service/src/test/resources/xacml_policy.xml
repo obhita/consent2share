@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Policy xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
         PolicyId="a07478e8-3642-42ff-980e-911e26ec3f47"
-        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides">
    <Description>
 				This is a reference policy for
 				consent2share@outlook.com</Description>
@@ -11,7 +11,7 @@
          <Resources>
             <Resource>
                <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match">
-                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">PUI100010060001</AttributeValue>
+                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">e46b6650-47ea-11e3-9d13-00155d84621a</AttributeValue>
                   <ResourceAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
                                                DataType="http://www.w3.org/2001/XMLSchema#string"/>
                </ResourceMatch>
@@ -33,7 +33,7 @@
                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
                      <SubjectAttributeDesignator MustBePresent="false"
-                                                 AttributeId="urn:samhsa:names:tc:consent2share:1.0:subject:accessor-provider-npi"
+                                                 AttributeId="urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"
                                                  DataType="http://www.w3.org/2001/XMLSchema#string"/>
                   </Apply>
                   <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">1083949036</AttributeValue>
@@ -41,7 +41,7 @@
                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
                      <SubjectAttributeDesignator MustBePresent="false"
-                                                 AttributeId="urn:samhsa:names:tc:consent2share:1.0:subject:accessor-provider-npi"
+                                                 AttributeId="urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"
                                                  DataType="http://www.w3.org/2001/XMLSchema#string"/>
                   </Apply>
                   <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">1568797520</AttributeValue>
@@ -49,7 +49,7 @@
                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
                      <SubjectAttributeDesignator MustBePresent="false"
-                                                 AttributeId="urn:samhsa:names:tc:consent2share:1.0:subject:accessor-provider-npi"
+                                                 AttributeId="urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"
                                                  DataType="http://www.w3.org/2001/XMLSchema#string"/>
                   </Apply>
                   <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">1902131865</AttributeValue>
@@ -59,7 +59,7 @@
                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
                      <SubjectAttributeDesignator MustBePresent="false"
-                                                 AttributeId="urn:samhsa:names:tc:consent2share:1.0:subject:receiver-provider-npi"
+                                                 AttributeId="urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"
                                                  DataType="http://www.w3.org/2001/XMLSchema#string"/>
                   </Apply>
                   <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">1346575297</AttributeValue>
@@ -67,7 +67,7 @@
                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
                      <SubjectAttributeDesignator MustBePresent="false"
-                                                 AttributeId="urn:samhsa:names:tc:consent2share:1.0:subject:receiver-provider-npi"
+                                                 AttributeId="urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"
                                                  DataType="http://www.w3.org/2001/XMLSchema#string"/>
                   </Apply>
                   <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">1285969170</AttributeValue>
@@ -75,7 +75,7 @@
                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
                      <SubjectAttributeDesignator MustBePresent="false"
-                                                 AttributeId="urn:samhsa:names:tc:consent2share:1.0:subject:receiver-provider-npi"
+                                                 AttributeId="urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"
                                                  DataType="http://www.w3.org/2001/XMLSchema#string"/>
                   </Apply>
                   <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">1174858088</AttributeValue>

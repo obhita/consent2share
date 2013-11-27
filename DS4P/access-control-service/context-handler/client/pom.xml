@@ -18,12 +18,12 @@
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
 				<dependencies>
-							<dependency>
-								<groupId>xerces</groupId>
-								<artifactId>xercesImpl</artifactId>
-								<version>${xercesImpl.version}</version>
-							</dependency>
-						</dependencies>
+					<dependency>
+						<groupId>xerces</groupId>
+						<artifactId>xercesImpl</artifactId>
+						<version>${xercesImpl.version}</version>
+					</dependency>
+				</dependencies>
 				<executions>
 					<execution>
 						<id>generate-sources</id>
@@ -36,7 +36,7 @@
 									<wsdlLocation>classpath:DS4PContextHandler.wsdl</wsdlLocation>
 									<extraargs>
 										<extraarg>-client</extraarg>
-										 <!-- <extraarg>-impl</extraarg>	 -->									
+										<!-- <extraarg>-impl</extraarg> -->
 									</extraargs>
 								</wsdlOption>
 							</wsdlOptions>
@@ -47,37 +47,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Add generated sources - avoids having to copy generated sources to 
-				build location -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${basedir}/target/generated-sources</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- Build the JAR with dependencies -->
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-			</plugin>
 		</plugins>
-		<!-- Build with Java 1.6 -->
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
