@@ -1,8 +1,16 @@
 @charset "UTF-8";
+/* !MIXINS */
+/*============================================================
+Mixin definitions for use in this SCSS file
+
+To use a defined mixin as part of a rule, use '@include'
+followed by the name of the mixin inside the curly brackets
+of the rule you want to use the mixin within.
+============================================================*/
 /* !BASE RULES */
 /*============================================================
 Base Rules are all default elements that use element
-selectors, a descendent selector, or child selector, along
+selectors, a descendant selector, or child selector, along
 with pseudo-classes. Base Rules define the default styling
 for how a base element should look in all occurrences on
 the page. Do not use class or ID selectors with Base Rules. 
@@ -73,15 +81,16 @@ ul, ol {
   padding: 0;
   margin: 13px 0 10px 25px; }
 
-body .container-fluid {
-  padding-right: 10px;
-  padding-left: 10px;
-  min-height: 100%;
-  position: relative; }
+label {
+  font-weight: inherit; }
 
-#index-body .container-fluid {
-  padding-right: 0px;
-  padding-left: 0px; }
+body .container {
+  position: relative;
+  width: auto; }
+
+#index-body div#content .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important; }
 
 body .main-content-wrapper {
   min-height: 100%;
@@ -103,10 +112,12 @@ ul li {
       ul li.spacing div span.last-child {
         margin-bottom: 20px; }
 
-hr.spacing {
-  border: 2px solid #eeeeee;
-  margin-top: 10px;
-  margin-bottom: 10px; }
+hr {
+  margin-top: 0px; }
+  hr.spacing {
+    border: 2px solid #eeeeee;
+    margin-top: 10px;
+    margin-bottom: 10px; }
 
 a, a:hover {
   text-decoration: none; }
@@ -143,6 +154,14 @@ legend {
   border: 0;
   border-bottom: 1px solid  #e5e5e5; }
 
+/* Override Bootstrap 3 default behavior for the following selector */
+header.navbar {
+  border: 0px; }
+
+/* Override Bootstrap 3 default behavior for the following selector (btn-default) */
+.btn.btn-default {
+  background-image: linear-gradient(to bottom, #ffffff, #e6e6e6); }
+
 /* Base Brushes */
 /* !LAYOUT RULES */
 /*============================================================
@@ -156,15 +175,47 @@ used more than once per page.
 .home-body {
   margin-bottom: 0px; }
 
-/* Body Features @extends: #footer-features */
+/* Set top margin for password strength checker bar (jQuery plugin) */
+div.pstrength-bar {
+  margin-top: 10px; }
+
+/* ----------------------------------------------------[ Bootstrap 3.0 Overides ] */
+/* Override Bootstrap 3 default behavior for the following selector */
+div.row, fieldset.row {
+  margin-right: 0px;
+  margin-left: 0px; }
+
+/* Override Bootstrap 3 default behavior for the following selector */
+.container > .navbar-header {
+  margin-right: 0px;
+  margin-left: 0px; }
+
+/* Override Bootstrap 3 default behavior for the following selector */
+header.navbar > .container {
+  /* Calls the force-pad mixin defined in this file with 0px as the parameter */ }
+
+/* Override joyride default behavior for the following selector */
+.joyride-modal-bg {
+  z-index: 1500; }
+
+/* Override joyride default behavior for the following selector */
+.joyride-focus-element {
+  z-index: 1501; }
+
+/* Override joyride default behavior for the following selector */
+.joyride-tip-guide {
+  z-index: 1501; }
+
+/* ----------------------------------------------------[ General Page Features ] */
+/* ----------------------------------------------------[ Body Features ] - @extends: #footer-features */
 #body-features, #footer-features {
   display: inline-block;
   margin-top: 30px;
   text-align: left;
   width: auto;
-  padding: 0 20px 0 15px; }
-  #body-features .span4, #footer-features .span4 {
-    margin-left: 10px;
+  padding: 0 20px 0 20px; }
+  #body-features .col-md-4, #footer-features .col-md-4 {
+    /*			margin-left: 10px;    */
     margin-bottom: 24px; }
   #body-features h3, #footer-features h3 {
     font-size: 20px;
@@ -180,15 +231,12 @@ used more than once per page.
     font-weight: 400;
     padding: 10px 20px 0 0; }
 
-.btn [class^="icon-"] + span, .btn [class*=" icon-"] + span {
-  margin-left: 3px; }
-
-/* 	Footer Features */
+/* ----------------------------------------------------[ Footer Features ] */
 #footer-features {
   width: 100%; }
   #footer-features h3 {
     font-size: 12px;
-    font-weight: 100px; }
+    font-weight: 100; }
   #footer-features div h3 {
     color: #7c7b7b; }
   #footer-features p {
@@ -222,7 +270,52 @@ used more than once per page.
   font-size: .85em;
   position: relative; }
 
-/* Home Login Box  */
+/* ----------------------------------------------------[ Administrator ] */
+/* --------------- TEMPORARY - Watermark hidden ------------------- */
+#watermark {
+  display: none; }
+
+#adminHomeSearchBar .hidden-xs {
+  padding-left: 4px;
+  display: inline-block !important; }
+
+.admin-pages #adminCreateConsent-2buttons {
+  float: right !important; }
+.admin-pages .box-header {
+  height: auto; }
+.admin-pages .summary-border {
+  background-color: #e4eaf1; }
+  .admin-pages .summary-border #patient-Account-btn {
+    margin-left: 10px; }
+.admin-pages div#createPatient.modal form > div {
+  padding-left: 15px !important; }
+.admin-pages div#createPatient.modal .modal-footer {
+  margin-top: 0 !important; }
+
+#adminPatientView-page div#editPatient.modal form > div {
+  padding-left: 15px !important; }
+#adminPatientView-page div#editPatient.modal .modal-footer {
+  margin-top: 0 !important; }
+
+div#createPatient span.required-text, div#editPatient span.required-text, div#editAdminProfile span.required-text {
+  margin: 3px 0 0 10px !important; }
+div#createPatient legend, div#editPatient legend, div#editAdminProfile legend {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 18px;
+  color: #0088cc; }
+div#createPatient .modal-header, div#editPatient .modal-header, div#editAdminProfile .modal-header {
+  border-radius: 6px 6px 0 0;
+  -webkit-border-radius: 6px 6px 0 0;
+  -moz-border-radius: 6px 6px 0 0;
+  background-color: #f6f6f6; }
+  div#createPatient .modal-header .h3-style, div#editPatient .modal-header .h3-style, div#editAdminProfile .modal-header .h3-style {
+    color: #0088cc !important; }
+
+.btn-padding {
+  padding: 24px; }
+
+/* ----------------------------------------------------[ Home Login Box ] */
 #home-login-container {
   display: inline-block;
   border: white;
@@ -253,6 +346,9 @@ used more than once per page.
   -moz-box-shadow: gray 2px 2px 10px;
   box-shadow: gray 2px 2px 10px;
   /* 		color: #fafafa */ }
+  #home-login-container form#loginForm input.form-control {
+    display: inline-block;
+    width: auto; }
 
 .overlay {
   float: right;
@@ -268,7 +364,7 @@ used more than once per page.
     .login-section.login-fields .login-center {
       margin-left: 10%; }
 
-/* Home Feature */
+/* ----------------------------------------------------[ Home Feature ] */
 #home-feature-container {
   background-color: #b29f81;
   width: 100%;
@@ -295,12 +391,12 @@ used more than once per page.
   word-wrap: break-word;
   line-height: 42px; }
 
-/* Brand Logo  */
+/* ----------------------------------------------------[ Brand Logo ] */
 #logoFragment img {
   height: 38px;
   margin: -10px 0 -11px 0; }
 
-#login-navbar #watermark {
+#index-body #watermark, #login-navbar #watermark {
   display: none; }
 
 #watermark {
@@ -318,7 +414,7 @@ used more than once per page.
 
 #brand-blue:before {
   content: "consent2share";
-  font-weight: 200px;
+  font-weight: 200;
   margin-right: 10px;
   background-color: transparent;
   color: #13aaea; }
@@ -351,12 +447,13 @@ used more than once per page.
 		}
 */
 #bread-crumb-btn {
-  float: left; }
+  float: left;
+  margin-top: 6px; }
 
 .summary-record-details-container {
   display: inline; }
   .summary-record-details-container ul {
-    width: 44%;
+    width: 47%;
     margin: 0 0 15px;
     display: inline-block;
     vertical-align: top;
@@ -368,6 +465,7 @@ used more than once per page.
     .summary-record-details-container ul:hover {
       background-color: beige; }
 
+/* ----------------------------------------------------[ Consent Layout ] */
 #share-all-med, #share-for-purpose, #consent-date-fill {
   background-color: rgba(210, 210, 210, 0.1);
   border-color: lightgrey; }
@@ -394,10 +492,10 @@ used more than once per page.
 
 #consent-main-div-position {
   position: relative;
-  margin-bottom: 0px; }
+  margin-bottom: 5px; }
 
 #consent-main-h4 {
-  margin-right: 35px; }
+  margin: 7px 35px 7px 0; }
 
 /*
 #consent-main-plus-span {
@@ -406,8 +504,11 @@ used more than once per page.
 	right: 0;
 }
 */
+#consent-main-plus-span .btn > span {
+  padding: 0 2px; }
+
 #consent-3buttons {
-  margin: 0px; }
+  margin: 10px 0 0; }
 
 #consent-to.summary-border, div#consent-from.summary-border {
   padding: 0;
@@ -480,9 +581,69 @@ used more than once per page.
     padding-left: 10px;
     margin-top: -2px; }
 
-/*connectionMain*/
+/* ----------------------------------------------------[ Connections Main ] */
+#connectionMain-page .result_row, #connectionProviderAdd-page .result_row {
+  padding-right: 2px;
+  margin: 3px 0px 3px 20px;
+  font-size: .95em;
+  font-family: helvetica;
+  color: black; }
+  #connectionMain-page .result_row span.result_field, #connectionProviderAdd-page .result_row span.result_field {
+    margin-right: 4px; }
+  #connectionMain-page .result_row span.provider_name_field, #connectionProviderAdd-page .result_row span.provider_name_field {
+    font-weight: bold; }
+  #connectionMain-page .result_row span.provider_specialty_field, #connectionProviderAdd-page .result_row span.provider_specialty_field {
+    font-style: italic; }
+#connectionMain-page .provider_record_space, #connectionProviderAdd-page .provider_record_space {
+  margin: 10px 0; }
+#connectionMain-page .provider_record_box, #connectionProviderAdd-page .provider_record_box {
+  border: solid lightblue 1px;
+  padding: 5px;
+  margin: 0 0 10px; }
+#connectionMain-page .provider_record_header, #connectionProviderAdd-page .provider_record_header {
+  background-color: #edf5fa;
+  padding: 5px; }
+  #connectionMain-page .provider_record_header.unassigned, #connectionProviderAdd-page .provider_record_header.unassigned {
+    background-color: #edf5fa !important; }
+    #connectionMain-page .provider_record_header.unassigned .add_button_space, #connectionProviderAdd-page .provider_record_header.unassigned .add_button_space {
+      color: #A57575 !important; }
+  #connectionMain-page .provider_record_header.assigned, #connectionProviderAdd-page .provider_record_header.assigned {
+    background-color: #CBe7CA !important; }
+    #connectionMain-page .provider_record_header.assigned .add_button_space, #connectionProviderAdd-page .provider_record_header.assigned .add_button_space {
+      color: #338A3A !important; }
+  #connectionMain-page .provider_record_header .add_button_space, #connectionProviderAdd-page .provider_record_header .add_button_space {
+    margin-left: 20px;
+    color: green; }
+#connectionMain-page .pagination, #connectionProviderAdd-page .pagination {
+  margin-left: 20px;
+  font-size: 80%; }
+#connectionMain-page .pagination a, #connectionProviderAdd-page .pagination a {
+  text-decoration: none;
+  border: solid 1px #ACE;
+  color: #168; }
+#connectionMain-page .pagination a, #connectionMain-page .pagination span, #connectionProviderAdd-page .pagination a, #connectionProviderAdd-page .pagination span {
+  display: block;
+  float: left;
+  padding: 0.3em 0.5em;
+  margin-right: 6px;
+  margin-bottom: 5px; }
+#connectionMain-page .pagination .currentpage, #connectionProviderAdd-page .pagination .currentpage {
+  background: #26B;
+  color: #fff;
+  border: solid 1px #ACE; }
+#connectionMain-page .pagination .currentpage.prev, #connectionMain-page .pagination .currentpage.next, #connectionProviderAdd-page .pagination .currentpage.prev, #connectionProviderAdd-page .pagination .currentpage.next {
+  color: #999;
+  border-color: #999;
+  background: #fff; }
+
+#tour-trigger-area > section:nth-child(3) {
+  overflow-x: auto;
+  border: 1px solid #ccc; }
+
 #add-provider-btn {
-  margin-bottom: 0px; }
+  margin: 10px 0px 0px; }
+  #add-provider-btn > span {
+    padding: 0 1px; }
 
 #legal-rep-fieldset span.btn {
   margin-top: 2px; }
@@ -492,9 +653,15 @@ used more than once per page.
 #current-providers-table [class^="icon-"], #current-providers-table [class*=" icon-"] {
   width: auto; }
 
-/* Login */
-#login-navbar .container-fluid {
-  height: 46px;
+/* ----------------------------------------------------[ Medical Info ] */
+#medical-documents .btn {
+  display: block !important; }
+#medical-documents div:first-child > button {
+  margin-bottom: 15px; }
+
+/* ----------------------------------------------------[ Login ] */
+#login-navbar .container {
+  /*			height: 46px;   */
   z-index: 50; }
 #login-navbar.navbar {
   margin-left: 0;
@@ -516,9 +683,17 @@ used more than once per page.
 #login-thirdparty img:last-child {
   margin-right: .5em; }
 
-/* Profile */
+/* ----------------------------------------------------[ Profile ] */
+#profile-page .form-control {
+  width: 270px; }
+
 #dob select {
-  width: auto; }
+  width: auto !important; }
+  #dob select.form-control {
+    display: inline; }
+
+div #dob {
+  white-space: nowrap; }
 
 .required-text {
   color: red;
@@ -531,7 +706,7 @@ used more than once per page.
 #passwordstrength.progress {
   margin-bottom: 10px; }
 
-/* 	Section */
+/*----------------------------------------------------[ Sections ] */
 #section-header {
   padding-bottom: 6px;
   margin: 2px 0;
@@ -562,35 +737,46 @@ used more than once per page.
   margin-right: 15px;
   color: #640095; }
 
-/*   Modal Layout 	*/
-.span3 checkbox {
+/* ----------------------------------------------------[ Modal Layout ] */
+.col-md-3 checkbox {
   margin-right: 12px;
   margin-left: -20px; }
 
-.modal .inputform > div, .modal form > div {
-  padding-left: 25px; }
-.modal .inputform label, .modal form label {
-  display: inline;
-  padding-left: 0; }
-  .modal .inputform label input, .modal form label input {
-    margin-left: -25px; }
-.modal .collapse.in {
-  overflow: initial; }
-.modal .popover {
-  width: auto;
-  right: 5% !important;
-  left: 5% !important; }
-  .modal .popover .arrow {
-    display: none; }
-.modal .modal-body .search-loading {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-image: url("../img/ajax-loader.gif");
-  background-position: center;
-  background-repeat: no-repeat; }
+/* Override Bootstrap 3 default behavior for the following selector */
+.modal {
+  z-index: 1600; }
+  .modal .inputform > div, .modal form > div {
+    padding-left: 25px; }
+  .modal .inputform label, .modal form label {
+    display: inline;
+    padding-left: 0; }
+    .modal .inputform label input, .modal form label input {
+      margin-left: -25px; }
+  .modal .collapse.in {
+    overflow: initial; }
+  .modal .popover {
+    width: auto;
+    right: 5% !important;
+    left: 5% !important; }
+    .modal .popover .arrow {
+      display: none; }
+  .modal .modal-body .search-loading {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-image: url("../img/ajax-loader.gif");
+    background-position: center;
+    background-repeat: no-repeat; }
+
+/* Override Bootstrap 3 default behavior for the following selector */
+.modal-body {
+  overflow-y: auto; }
+
+/* Override Bootstrap 3 default behavior for the following selector */
+.modal-backdrop {
+  z-index: 1590; }
 
 /* !MODULE RULES */
 /*============================================================
@@ -600,7 +786,63 @@ these modules live within major layout components of the page
 such as headers or footers. Modules should use class selectors
 since they may be used more than once.
 ============================================================*/
-/* Consent */
+/* ----------------------------------------------------[ Buttons ] */
+.btn-round {
+  border-radius: 24px;
+  height: 24px;
+  width: 24px; }
+
+.btn-primary.btn-margin {
+  margin-top: -26px; }
+
+.btn-success.btn-signup {
+  margin-bottom: 10px; }
+
+.bottom-btn-group {
+  margin: 20px 0 10px 0; }
+
+.btn-group {
+  margin: 5px 18px 5px 5px; }
+
+td.contacts-td {
+  width: 80%; }
+
+.btn-cannot-delete-text .popover {
+  left: 2%; }
+  .btn-cannot-delete-text .popover .popover-content {
+    color: #D51818;
+    font-weight: 600; }
+  .btn-cannot-delete-text .popover .popover-title, .btn-cannot-delete-text .popover .arrow {
+    display: none; }
+
+.btn-right-align {
+  text-align: center;
+  vertical-align: middle;
+  display: block;
+  float: right; }
+
+.btn-right-align-nomargin {
+  margin: 0px;
+  text-align: center;
+  vertical-align: middle;
+  display: block;
+  float: right; }
+
+.btn-danger:hover span {
+  color: white;
+  opacity: 1; }
+
+.minus-btn, .add-btn {
+  color: rgba(255, 255, 255, 0.65); }
+  .minus-btn:hover, .add-btn:hover {
+    color: white;
+    opacity: 1; }
+  .minus-btn a, .add-btn a {
+    color: inherit; }
+  .minus-btn .fa-white, .add-btn .fa-white {
+    opacity: 1; }
+
+/* ----------------------------------------------------[ Consent Modules] */
 .consent-select {
   display: inline-block; }
   .consent-select div {
@@ -621,11 +863,6 @@ since they may be used more than once.
 #add-legal-form.modal-body, [id*='edit-legal-form'].modal-body {
   max-height: 400px; }
 
-.modal-body p {
-  width: "400px";
-  height: "225px";
-  margin-left: "150px"; }
-
 .progress-wrapper {
   margin-bottom: 20px; }
 
@@ -637,11 +874,18 @@ since they may be used more than once.
   .progress-style .bar {
     width: 60%; }
 
+/* ----------------------------------------------------[ My Profile ] */
+.patient-profile {
+  float: left;
+  margin-right: 20px; }
+
+.edit-profile {
+  padding-top: 20px; }
+
 .username-container {
-  padding: 10px;
-  width: auto;
+  padding: 10px 15px;
   max-width: 100%;
-  margin: 4px 4px 4px -10px;
+  margin: 4px 4px 4px 0px;
   background-color: #f5f5f5;
   display: inline-block;
   -webkit-border-radius: 10px;
@@ -658,16 +902,15 @@ since they may be used more than once.
   margin-left: -6px;
   margin-right: 2px; }
 
-/* 	User Guide */
+/* ----------------------------------------------------[ Guide ] */
 .user-guide {
   font-size: 13px;
   line-height: 18px; }
 
-/*  SideBar Pulldown Tab  */
 .guide-pulldown-tab {
-  z-index: 200; }
+  z-index: 2000; }
 
-/* Disclaimer */
+/* ----------------------------------------------------[ Disclaimer ] */
 .disclaimer {
   font-size: .8em;
   color: #dadada;
@@ -675,7 +918,7 @@ since they may be used more than once.
   margin-top: 6px;
   margin-bottom: 15px; }
 
-/* 	Social Icons */
+/* ----------------------------------------------------[ Icons ] */
 #icon-set {
   margin-top: -10px;
   margin-left: 20%; }
@@ -686,24 +929,15 @@ since they may be used more than once.
 .divider {
   margin-right: 20px; }
 
-.btn-primary.btn-margin {
-  margin-top: -26px; }
+/* ----------------------------------------------------[ Accordion Panel Styles ] */
+.panel-title {
+  color: #428bca; }
 
-.btn-success.btn-signup {
-  margin-bottom: 10px; }
-
-.bottom-btn-group {
-  margin: 20px 0 10px 0; }
-
-/* Accordion styles for screen > Share All: Settings */
 .edit {
   margin-left: 15px;
   vertical-align: middle; }
 
-.condition-input {
-  height: 30px;
-  margin-top: 10px;
-  margin-right: 10px;
+#collapseFour .condition-input {
   width: 80%;
   vertical-align: middle; }
 
@@ -726,9 +960,10 @@ since they may be used more than once.
 .accordion-header-style {
   background-color: #f5f5f5; }
   .accordion-header-style a {
-    font-weight: 600; }
+    font-weight: 600;
+    display: block; }
   .accordion-header-style div {
-    font-weight: 100px;
+    font-weight: 100;
     margin-left: 15px;
     padding-bottom: 10px; }
 
@@ -756,6 +991,7 @@ since they may be used more than once.
   font-weight: 700;
   color: inherit; }
 
+/* ----------------------------------------------------[ Navigation ] */
 .nav-title {
   display: inline-block;
   text-align: center;
@@ -763,7 +999,7 @@ since they may be used more than once.
   font-size: 20px;
   font-weight: 300;
   vertical-align: middle;
-  margin: 4px 0px 4px 10px;
+  margin: 5px 0px 4px 0px;
   float: left; }
 
 .nav-call-out {
@@ -777,47 +1013,128 @@ since they may be used more than once.
   float: left; }
 
 .navbar {
-  margin-left: -10px;
-  margin-right: -10px;
   margin-bottom: 0px;
   overflow: visible; }
   .navbar #notification_bar a, .navbar #notification_bar a:hover {
     text-decoration: underline; }
 
-.navbar .brand {
+.navbar .navbar-brand {
   padding-right: 10px;
   padding-left: 10px;
+  padding-top: 14px;
+  padding-bottom: 14px;
   margin: 0;
   float: right; }
 
-.btn-group {
-  margin: 5px 18px 5px 5px; }
+.nav-popdown {
+  margin: 0 -20px;
+  min-height: 10px;
+  background-color: #FFF6C1;
+  border-bottom: 1px solid #F9E662;
+  border-bottom: 1px solid #f9e662;
+  border-bottom-color: #e4dbad;
+  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.15);
+  -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.15); }
 
-td.contacts-td {
-  width: 80%; }
+.btn-mainmenu {
+  float: right;
+  margin-top: 5px;
+  margin-bottom: 2px;
+  margin-right: 10px;
+  display: none; }
 
-.btn-cannot-delete-text .popover {
-  left: 2%; }
-  .btn-cannot-delete-text .popover .popover-content {
-    color: #D51818;
-    font-weight: 600; }
-  .btn-cannot-delete-text .popover .popover-title, .btn-cannot-delete-text .popover .arrow {
-    display: none; }
+.nav-popdown form {
+  margin: 0 20px; }
 
-.btn-danger:hover span {
-  color: white;
-  opacity: 1; }
+.nav-popdown label {
+  padding: 10px; }
 
-.minus-btn, .add-btn {
-  color: rgba(255, 255, 255, 0.65); }
-  .minus-btn:hover, .add-btn:hover {
-    color: white;
-    opacity: 1; }
-  .minus-btn a, .add-btn a {
-    color: inherit; }
-  .minus-btn [class*=" icon-white"], .add-btn [class*=" icon-white"] {
-    opacity: 1; }
+.nav-collapse .nav > li > a {
+  font-weight: normal; }
 
+.navbar-inner-header {
+  min-height: 40px;
+  padding-right: 10px;
+  padding-left: 10px;
+  float: none !important;
+  background-color: #fafafa;
+  background-image: -moz-linear-gradient(top, white, #f2f2f2);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#f2f2f2));
+  background-image: -webkit-linear-gradient(top, white, #f2f2f2);
+  background-image: -o-linear-gradient(top, white, #f2f2f2);
+  background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
+  background-repeat: repeat-x;
+  border: 1px solid #d4d4d4;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  /*   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0); */
+  /* 	*zoom:1; */
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065); }
+
+/* ---[ Navigation - Administrator Pages]--- */
+.admin-pages .navbar > .container .hidden-xs {
+  display: inline-block !important; }
+.admin-pages .navbar > .container .navbar-inner-header {
+  padding: 10px 15px;
+  position: relative; }
+.admin-pages .navbar > .container #page-title-left-no-facility-name #bread-crumb-btn {
+  margin-top: 8px; }
+.admin-pages .navbar > .container #page-title-left-no-facility-name h1 {
+  line-height: inherit; }
+.admin-pages .navbar > .container #page-title-left-no-facility-name .nav-title {
+  float: none; }
+.admin-pages .navbar > .container #page-title-left {
+  display: inline-block;
+  float: left;
+  position: relative;
+  top: 45%; }
+  .admin-pages .navbar > .container #page-title-left h1 {
+    display: block;
+    text-align: left;
+    float: none;
+    line-height: 23px;
+    margin-bottom: 0; }
+    .admin-pages .navbar > .container #page-title-left h1.nav-title {
+      margin: 0; }
+  .admin-pages .navbar > .container #page-title-left #facility-name {
+    font-size: 16px;
+    font-weight: 500;
+    font-style: italic;
+    color: #428bca; }
+.admin-pages .navbar > .container #page-title-right {
+  display: block;
+  float: right;
+  position: relative;
+  top: 45%; }
+  .admin-pages .navbar > .container #page-title-right #adminHome-navbar-buttons {
+    text-align: center;
+    margin: 0px 5px; }
+    .admin-pages .navbar > .container #page-title-right #adminHome-navbar-buttons p {
+      margin-bottom: 2px !important; }
+    .admin-pages .navbar > .container #page-title-right #adminHome-navbar-buttons div:first-child {
+      margin: 0;
+      padding: 10px 0; }
+    .admin-pages .navbar > .container #page-title-right #adminHome-navbar-buttons span.btn-group {
+      margin: 0; }
+.admin-pages .navbar > .container .navbar-brand {
+  margin: 0 !important;
+  /*	padding: 15px !important; */ }
+.admin-pages .box-header {
+  height: auto; }
+.admin-pages .summary-border {
+  background-color: #e4eaf1; }
+  .admin-pages .summary-border #patient-Account-btn {
+    margin-left: 10px; }
+.admin-pages div#createPatient.modal form > div {
+  padding-left: 15px !important; }
+.admin-pages div#createPatient.modal .modal-footer {
+  margin-top: 0 !important; }
+
+/* ----------------------------------------------------[ Margins ] */
 .top-margin10 {
   margin-top: 10px; }
 
@@ -845,19 +1162,7 @@ td.contacts-td {
 .form-horizontal .controls {
   margin-left: 0px; }
 
-.btn-right-align {
-  text-align: center;
-  vertical-align: middle;
-  display: block;
-  float: right; }
-
-.btn-right-align-nomargin {
-  margin: 0px;
-  text-align: center;
-  vertical-align: middle;
-  display: block;
-  float: right; }
-
+/* ----------------------------------------------------[ Footer ] */
 a.footer-link {
   color: #dcdcdc;
   text-decoration: none; }
@@ -869,7 +1174,7 @@ a:hover.footer-link {
 .input-fixed, input.btn.input-fixed {
   width: 290px; }
 
-[class^="icon-white"], [class*=" icon-white"] {
+.fa-white {
   opacity: .5; }
 
 .nav li a embed:hover {
@@ -884,57 +1189,21 @@ a:hover.footer-link {
   margin: 0;
   border: none; }
 
-.row-fluid .span11 .box .span8 {
+.row .col-md-11 .box .col-md-8 {
   width: 100%; }
 
-.nav-popdown {
-  margin: 0 -20px;
-  min-height: 10px;
-  background-color: #FFF6C1;
-  border-bottom: 1px solid #F9E662;
-  border-bottom: 1px solid #f9e662;
-  border-bottom-color: #e4dbad;
-  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.15);
-  -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.15); }
+/* ----------------------------------------------------[ SideNav Menu ] */
+/* sidenavMenu modifications to Bootstrap 3.0 upgrade.
+--------------------------------------------------*/
+#sidenavMenu.navbar-collapse {
+  padding-left: 0; }
+#sidenavMenu ul {
+  margin: 0; }
+  #sidenavMenu ul .hidden-md {
+    display: inline !important; }
 
-.btn-mainmenu {
-  display: none; }
-
-.navbar .btn, .navbar .btn-group {
-  margin-top: 5px;
-  margin-bottom: 2px; }
-
-.nav-popdown form {
-  margin: 0 20px; }
-
-.nav-popdown label {
-  padding: 10px; }
-
-.nav-collapse .nav > li > a {
-  font-weight: normal; }
-
-.navbar-inner-header {
-  min-height: 40px;
-  padding-right: 0;
-  padding-left: 0;
-  background-color: #fafafa;
-  background-image: -moz-linear-gradient(top, white, #f2f2f2);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#f2f2f2));
-  background-image: -webkit-linear-gradient(top, white, #f2f2f2);
-  background-image: -o-linear-gradient(top, white, #f2f2f2);
-  background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
-  background-repeat: repeat-x;
-  border: 1px solid #d4d4d4;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border-radius: 0;
-  /*   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0); */
-  /* 	*zoom:1; */
-  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065); }
-
+/* end sidenavMenu modifications to Bootstrap 3.0 upgrade.
+---------------------------------------------------------*/
 .summary-border {
   padding: 10px 8px;
   border: 1px solid lightgrey;
@@ -973,16 +1242,18 @@ a:hover.footer-link {
   font-size: 14px;
   color: #3D6386;
   position: relative;
-  top: 6px;
+  top: 0px;
   left: -24px;
   z-index: 101;
   border: 0;
   background-color: transparent; }
+.summary-container div.datepicker:before {
+  display: none; }
 
 /* !MODULE RULES - JOYRIDE STYLING */
-/*============================================================
+/*
 This section contains edits and additions to the original Joyride-2.0.3.css file.
-============================================================*/
+--------------------------------------------------------------------------------*/
 .joyride-content-wrapper {
   padding: 10px 22px 15px 15px; }
 
@@ -994,7 +1265,6 @@ This section contains edits and additions to the original Joyride-2.0.3.css file
 	
 	.btn-mainmenu {
 		display: block;
-  		float: right;
 	}
 	
 	}
@@ -1018,17 +1288,37 @@ This section contains edits and additions to the original Joyride-2.0.3.css file
   right: 15px; }
 
 /* !END MODULE RULES - JOYRIDE STYLING */
-/*============================================================
+/*
 End of edits and additions to the original Joyride-2.0.3.css file.
-============================================================*/
+-----------------------------------------------------------------*/
+/* !UTILITY RULES */
+/*
+Utility rules modify minor aspects of an element
+-----------------------------------------------*/
+.force-inline {
+  display: inline !important; }
+
+.no-pad, #index-body > .container, header.navbar > .container, #page-subcontent-holder, #page-subcontent-holder section[class^='col-md-'], #page-subcontent-holder section[class*=' col-md-'], #page-subcontent-holder section[class^='col-sm-'], #page-subcontent-holder section[class*=' col-sm-'], #home-login-container, #home-feature-text, #consent-3buttons.list-inline > li, .main-menu-div, .summary-container, .container.outmost-holder {
+  /* Calls the force-pad mixin defined in this file with 0px as the parameter */
+  padding-left: 0px !important;
+  padding-right: 0px !important; }
+
+.force-pad-10 {
+  /* Calls the force-pad mixin defined in this file with 10px as the parameter */
+  padding-left: 10px !important;
+  padding-right: 10px !important; }
+
+.container.outmost-holder {
+  min-height: 100% !important; }
+
 /* !STATE RULES */
-/*----------------------------------------------------------
+/*=============================================================
 State rules describe how a module or layout will look when
 in a particular state (for example, selected, focus, hidden
 etc.) or in a particular part of the screen or system. States
 should be made to stand alone and are usually built of a single
 class selector.
-----------------------------------------------------------*/
+=============================================================*/
 .inline-block {
   display: inline-block; }
 
@@ -1043,13 +1333,15 @@ class selector.
   font-style: normal;
   font-size: medium;
   font-weight: 600;
-  margin-bottom: 2px;
-  margin-top: 10px; }
+  /*
+  		margin-bottom:2px;
+  		margin-top: 10px;
+  */ }
 
 .gender {
   font-size: small;
   font-weight: 200;
-  margin-bottom: -4px; }
+  /* 		margin-bottom:-4px; */ }
 
 .birth-date {
   font-size: smaller;
@@ -1082,23 +1374,43 @@ Media Query - defines how things should be styles under defined criteria
 @media only screen and (max-height: 480px) {
   [id*='edit-legal-form'].modal-body, [id*='add-legal-form'].modal-body {
     max-height: 160px !important; } }
-/* Max-width 979px Wide 
+/*======================================================================
+	979px Max-width - WIDE SCREEN
 ====================================================================== */
 @media only screen and (max-width: 979px) {
-  /* Brand Logo  */
+  /* ----------------------------------------------------[ Brand Logo - 979px wide ] */
   .myaccount-buttons {
     display: none !important; } }
-/* Min-Width 769 to Max-width 979px Wide 
+.inline {
+  display: inline-block !important; }
+
+/* ----------------------------------------------------[ Admin Profile - 979px wide ] */
+#patient-info {
+  min-width: 340px; }
+
+/*======================================================================
+	769 Min-Width to 979px Max-width - WIDE SCREEN
 ====================================================================== */
 @media only screen and (min-width: 769px) and (max-width: 979px) {
+  /* ----------------------------------------------------[ SideNav Menu - 979px wide] */
   #sidenavMenu.nav-collapse {
     height: auto !important; } }
-/* 768px Wide - MOBILE - Landscape, Tablet Portrait (devices and browsers)
+/*====================================================================== 
+	768px Wide - MOBILE - Landscape, Tablet Portrait (devices and browsers)
 ====================================================================== */
 @media only screen and (max-width: 768px) {
+  /* ----------------------------------------------------[ Navbar - 768px wide] */
+  #sidenavMenu.navbar-collapse {
+    padding-left: 0;
+    padding-right: 0 !important; }
+
+  #adminHome-page #adminHomeSearchBar .hidden-xs, #adminPatientView-page #adminHomeSearchBar .hidden-xs, #patientViewCreateConsent-page #adminHomeSearchBar .hidden-xs, #editAdminProfile-page #adminHomeSearchBar .hidden-xs {
+    display: none !important; }
+  #adminHome-page .navbar > .container .hidden-xs, #adminPatientView-page .navbar > .container .hidden-xs, #patientViewCreateConsent-page .navbar > .container .hidden-xs, #editAdminProfile-page .navbar > .container .hidden-xs {
+    display: none !important; }
+
   .btn-mainmenu {
-    display: block;
-    float: right; } }
+    display: block; } }
 @media only screen and (min-width: 480px) and (max-width: 768px) {
   #watermark p {
     max-width: 200px;
@@ -1108,6 +1420,7 @@ Media Query - defines how things should be styles under defined criteria
     height: 30px;
     margin: -10px 0 -11px 0; }
 
+  /* ----------------------------------------------------[ Login - 768px wide] */
   #home-login-container {
     max-width: none;
     width: 90%; }
@@ -1126,6 +1439,7 @@ Media Query - defines how things should be styles under defined criteria
     margin-top: -28px;
     margin-bottom: 50px; }
 
+  /* ----------------------------------------------------[ Home Feature - 768px wide ] */
   #home-feature-container {
     width: 100%; }
 
@@ -1141,6 +1455,7 @@ Media Query - defines how things should be styles under defined criteria
     word-wrap: break-word;
     line-height: 42px; }
 
+  /* ----------------------------------------------------[ Consent - 768px wide  ] */
   #consent-right-arrow-container {
     margin-left: 1.2%; }
 
@@ -1148,8 +1463,20 @@ Media Query - defines how things should be styles under defined criteria
     width: auto;
     display: inherit; }
 
+  /* ----------------------------------------------------[ Administrator Home - 768px wide  ] */
   .btn-group {
     margin-right: 10px !important; }
+
+  #adminHome-navbar-buttons {
+    text-align: center;
+    margin: 0px 10px; }
+    #adminHome-navbar-buttons p {
+      margin-bottom: 2px !important; }
+    #adminHome-navbar-buttons div:first-child {
+      margin: 0 !important;
+      padding: 0; }
+    #adminHome-navbar-buttons span.btn-group {
+      margin: 0 !important; }
 
   .nav-popdown, #topnavbar {
     margin-left: 20px;
@@ -1164,6 +1491,7 @@ Media Query - defines how things should be styles under defined criteria
   #content {
     background: transparent; }
 
+  /* ----------------------------------------------------[ Summary Container - 768px wide  ] */
   .summary-container label.uneditable-input {
     width: 45%; }
 
@@ -1179,15 +1507,15 @@ Media Query - defines how things should be styles under defined criteria
     text-align: center;
     display: none; }
 
-  .row-fluid #home-login-container[class*="span"] {
+  .row #home-login-container[class*="col-md-"] {
     margin-left: 5% !important;
     margin-top: 20px !important; }
 
-  [class*="span"], .uneditable-input[class*="span"], .row-fluid [class*="span"] {
+  [class*="col-md-"], .uneditable-input[class*="col-md-"], .row [class*="col-md-"] {
     display: block;
     float: none;
     width: 100%;
-    margin-left: 2.7624309392265%;
+    /*		margin-left:2.7624309392265%; */
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box; }
@@ -1198,22 +1526,68 @@ Media Query - defines how things should be styles under defined criteria
   .fc-button-today, .fc-button-month, .fc-button-agendaWeek, .fc-button-agendaDay {
     display: none; }
 
-  .row-fluid {
-    width: 98%; }
+  .row {
+    width: 100%; }
 
   /* !MODULE RULES - JOYRIDE STYLING 
   768px Wide - MOBILE - Landscape, Tablet Portrait (devices and browsers) 
-  (min-width: 480px) and (max-width: 768px)*/
-  /*============================================================
+  (min-width: 480px) and (max-width: 767px)*/
+  /*
   This section contains edits and additions to the original Joyride-2.0.3.css file.
-  ============================================================*/
+  --------------------------------------------------------------------------------*/
   /* !END MODULE RULES - JOYRIDE STYLING */
-  /*============================================================
+  /*
   End of edits and additions to the original Joyride-2.0.3.css file.
-  ============================================================*/ }
-/* 479px wide - MOBILE - Portrait, Mobile Landscape Size (devices and browsers)
-============================================================================ */
+  ------------------------------------------------------------------*/ }
+/*============================================================================ 
+Min Width 480px to Max Width 768px Wide - MOBILE - Landscape, Tablet Portrait (devices and browsers) 
+	(min-width: 480px) and (max-width: 768px)
+============================================================================*/
+@media only screen and (min-width: 480px) and (max-width: 768px) {
+  .admin-pages .nav-title {
+    font-size: 18px; }
+  .admin-pages #facility-name {
+    font-size: 14px !important; } }
+/*============================================================================ 
+479px wide - MOBILE LANDSCAPE - Mobile Landscape Size (devices and browsers)
+============================================================================*/
 @media only screen and (max-width: 479px) {
+  /* ----------------------------------------------------[ Profile Section ] */
+  .hidden-479 {
+    display: none; }
+
+  #patient-info {
+    min-width: 400px; }
+
+  .patient-profile, .person, .gender, .birthdate {
+    font-size: 12px; }
+
+  .edit-profile .btn {
+    font-size: 12px; }
+
+  .btn-bar {
+    min-width: 272px; }
+    .btn-bar .btn {
+      font-size: 12px; }
+
+  .container {
+    padding-right: 10px;
+    padding-left: 10px; }
+
+  /* ----------------------------------------------------[ Data Grid Elements - 479px wide ] */
+  .inline {
+    display: inline-block !important; }
+
+  .btn-round {
+    border-radius: 24px;
+    height: 24px;
+    width: 24px; }
+
+  .grid-layout [class*="col-md-"] {
+    padding-right: 0px;
+    padding-left: 0px; }
+
+  /* ----------------------------------------------------[ Login ] */
   .overlay {
     float: left;
     margin-left: 10px;
@@ -1233,15 +1607,16 @@ Media Query - defines how things should be styles under defined criteria
   			margin-left: -1px;
   		}
   */
-  .row-fluid #home-login-container[class*="span"] {
+  .row #home-login-container[class*="col-md-"] {
     margin-left: 5% !important; }
 
-  #content.row-fluid {
+  #content.row {
     width: 100%; }
 
-  /* Brand Logo  */
-  #home-page #watermark p {
-    max-width: 180px !important; }
+  /* ----------------------------------------------------[ Brand Logo - 479px wide] */
+  #myhome-page #watermark p {
+    max-width: 180px !important;
+    margin-top: 5px; }
 
   #watermark p {
     /*max-width:180px;*/
@@ -1269,6 +1644,7 @@ Media Query - defines how things should be styles under defined criteria
     margin: 2px;
     padding: 2px; }
 
+  /* ----------------------------------------------------[ Home Feature - 479px wide ] */
   #home-feature-container {
     width: 100%; }
 
@@ -1288,8 +1664,15 @@ Media Query - defines how things should be styles under defined criteria
     max-height: auto;
     max-width: 400px;
     height: 520px;
-    top: 50px;
+    /*		top: 50px; 			*/
     width: 90%; }
+
+  /* ----------------------------------------------------[ Consent - 479px wide ] */
+  #collapseFour .condition-input {
+    width: 100%;
+    vertical-align: middle; }
+  #collapseFour button#addspecmedi {
+    margin-top: 10px; }
 
   #share-all-med p, #share-for-purpose p {
     font-size: 13px; }
@@ -1337,9 +1720,51 @@ Media Query - defines how things should be styles under defined criteria
   .pagination {
     padding: 5px; }
 
-  .nav-title {
-    font-size: 16px; }
+  /*	.nav-title {
+  		font-size:16px;
+  	} */
+  /* ----------------------------------------------------[ Administrator - - 479px wide ] */
+  /*#adminHome-page, #adminPatientView-page, #patientViewCreateConsent-page, #editAdminProfile-page*/
+  .admin-pages #dob select {
+    font-size: 12px !important; }
+  .admin-pages .box-content {
+    overflow-x: auto;
+    padding: 0px 5px; }
+  .admin-pages #adminCreateConsent-2buttons {
+    float: left !important; }
+  .admin-pages #page-title-left-no-facility-name h1 .nav-title {
+    max-width: 100px;
+    text-align: left;
+    font-size: 16px;
+    margin: 0; }
+  .admin-pages #page-title-left h1.nav-title {
+    font-size: 16px;
+    margin: 0; }
+  .admin-pages #page-title-left #facility-name {
+    font-size: 13px !important;
+    line-height: 1 !important; }
+  .admin-pages .navbar-brand {
+    margin: 0 !important;
+    padding: 10px 0 10px 5px !important; }
+  .admin-pages #page-title-right {
+    /*.navbar-brand {
+    	margin: 0 !important;
+    	padding: 11px 0 !important;
+    	}*/ }
+    .admin-pages #page-title-right #adminHome-navbar-buttons {
+      text-align: center;
+      margin: 0px !important; }
+      .admin-pages #page-title-right #adminHome-navbar-buttons div:first-child {
+        margin: 0;
+        padding: 0 !important; }
+      .admin-pages #page-title-right #adminHome-navbar-buttons .dropdown-menu {
+        left: -30px; }
 
+  #patientViewCreateConsent-page #three-buttons .btn {
+    font-size: 12px;
+    margin-bottom: 3px; }
+
+  /* ----------------------------------------------------[ Navbar - 479px wide ] */
   .navbar .btn-navbar {
     display: block;
     float: right;
@@ -1369,6 +1794,8 @@ Media Query - defines how things should be styles under defined criteria
   .btn-group {
     margin-right: 0 !important; }
 
+  /* ----------------------------------------------------[ Connections - 479px wide] */
+  /* Styles for the Contacts  */
   #connections-content legend {
     font-size: 16px;
     margin-bottom: 15px;
@@ -1378,12 +1805,12 @@ Media Query - defines how things should be styles under defined criteria
     font-size: 14px;
     padding-top: 2px; }
 
-  .uneditable-input, .row-fluid [class*="span"] {
+  .uneditable-input, .row [class*="col-md-"] {
     display: block;
     float: none;
     width: 100%;
     border: 0px solid;
-    margin-left: 2.7624309392265%;
+    /*		margin-left:2.7624309392265%;  */
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box; }
@@ -1402,27 +1829,34 @@ Media Query - defines how things should be styles under defined criteria
     border: 0;
     border-bottom: 1px solid  #e5e5e5; }
 
-  .row-fluid {
-    width: 98%; }
+  .row {
+    width: 100%; }
 
   /* !MODULE RULES - JOYRIDE STYLING 
   479px wide - MOBILE - Portrait, Mobile Landscape Size (devices and browsers) */
-  /*============================================================
+  /*
   This section contains edits and additions to the original Joyride-2.0.3.css file.
-  ============================================================*/
+  --------------------------------------------------------------------------------*/
   /* !END MODULE RULES - JOYRIDE STYLING */
-  /*============================================================
+  /*
   End of edits and additions to the original Joyride-2.0.3.css file.
-  ============================================================*/ }
-/* Min-width 300px to Max-width 479px wide - MOBILE - Portrait, Mobile Landscape Size (devices and browsers)
-============================================================================ */
+  -----------------------------------------------------------------*/ }
+/* =================================================================================================
+300px Min-width to 479px Max-width - MOBILE PORTRAIT  (devices and browsers)
+===================================================================================================*/
 @media only screen and (min-width: 300px) and (max-width: 399px) {
-  #watermark {
+  #adminhome-page .navbar > .container .navbar-inner-header, #adminPatientView-page .navbar > .container .navbar-inner-header, #patientViewCreateConsent-page .navbar > .container .navbar-inner-header {
+    padding: 10px 8px;
+    position: relative; }
+
+  #myhome-page #watermark, #listConsent-page #watermark, #activityHistory-page #watermark {
     /*position: absolute;
     top: 53px;
     right: 7px;*/
+    margin-top: 5px;
     max-width: 120px; }
 
+  /* ----------------------------------------------------[ Login Page - 300px wide ] */
   #home-login-container {
     margin-left: 5% !important;
     margin-top: 10px;

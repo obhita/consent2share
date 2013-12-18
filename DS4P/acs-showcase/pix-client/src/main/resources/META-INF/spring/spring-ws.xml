@@ -13,7 +13,7 @@
 			* In order to facilitate the sending of plain Java objects, the WebServiceTemplate requires a marshaller and unmarshaller.
 			* The WebServiceTemplate class uses an URI as the message destination. 
 			See: http://static.springsource.org/spring-ws/sites/2.0/reference/html/client.html#client-web-service-template
-	-->
+
 	<bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate"
 		p:marshaller-ref="jaxbMarshaller"
 		p:unmarshaller-ref="jaxbMarshaller"
@@ -21,7 +21,7 @@
 		
 		<constructor-arg ref="messageFactory"/> 
 		
-	</bean>    
+	</bean>    	-->
 	
 	<!-- 
 			There are two message factories for SOAP: SaajSoapMessageFactory and AxiomSoapMessageFactory. 

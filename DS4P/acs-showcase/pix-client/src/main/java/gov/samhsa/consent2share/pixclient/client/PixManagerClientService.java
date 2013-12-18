@@ -25,15 +25,47 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.pixclient.client;
 
+import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
 import gov.samhsa.consent2share.pixclient.util.PixManagerBean;
 
-
+/**
+ * The Interface PixManagerClientService.
+ */
 public interface PixManagerClientService {
-	
+
+	/**
+	 * Adds the person.
+	 * 
+	 * @param reqXMLPath
+	 *            the req xml path
+	 * @return the string
+	 */
 	public String addPerson(String reqXMLPath);
 
+	/**
+	 * Update person.
+	 * 
+	 * @param reqXMLPath
+	 *            the req xml path
+	 * @return the string
+	 */
 	public String updatePerson(String reqXMLPath);
 
+	/**
+	 * Query person.
+	 * 
+	 * @param xmlFilePath
+	 *            the xml file path
+	 * @return the pix manager bean
+	 */
 	public PixManagerBean queryPerson(String xmlFilePath);
 
+	/**
+	 * Provide and register clinical document.
+	 * 
+	 * @param c32xml
+	 *            the c32xml
+	 * @return the registry response
+	 */
+	public RegistryResponse provideAndRegisterClinicalDocument(String c32xml);
 }

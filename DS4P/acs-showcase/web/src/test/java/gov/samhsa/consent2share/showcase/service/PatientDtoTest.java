@@ -4,20 +4,22 @@ import static org.junit.Assert.assertNotNull;
 import gov.samhsa.consent2share.c32.dto.GreenCCD;
 import gov.samhsa.consent2share.pixclient.util.PixManagerBean;
 
+import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
+
+import org.hl7.v3.types.MCCIIN000002UV01;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PatientDtoTest {
-	
 
 	@Test
 	public void testPatientDto() {
-		
-		//Arrange
+
+		// Arrange
 		PatientDto sut = new PatientDto();
-		//Act
+		// Act
 		sut.setC32Xml("c32Xml");
 		sut.setDomain("domain");
 		sut.setError(true);
@@ -30,9 +32,12 @@ public class PatientDtoTest {
 		sut.setPixAddMsg("pixAddMsg");
 		sut.setPixManagerBean(new PixManagerBean());
 		sut.setPixUpdateMsg("pixUpdateMsg");
-		sut.setXdsbRegAddMsg("xdsbRegAddMsg");
+		sut.setXdsbRegAddMsg(new MCCIIN000002UV01());
+		sut.setXdsbRegUpdateMsg(new MCCIIN000002UV01());
+		sut.seteId("eId");
+		sut.setXdsbRepoProvideMsg(new RegistryResponse());
 
-		//Assert
+		// Assert
 		assertNotNull(sut.getC32Xml());
 		assertNotNull(sut.getDomain());
 		assertNotNull(sut.isError());
@@ -46,8 +51,8 @@ public class PatientDtoTest {
 		assertNotNull(sut.getPixManagerBean());
 		assertNotNull(sut.getPixUpdateMsg());
 		assertNotNull(sut.getXdsbRegAddMsg());
-		
+		assertNotNull(sut.getXdsbRegUpdateMsg());
+		assertNotNull(sut.geteId());
+		assertNotNull(sut.getXdsbRepoProvideMsg());
 	}
-
-
 }

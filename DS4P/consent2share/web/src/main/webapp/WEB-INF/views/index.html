@@ -13,12 +13,10 @@
 	<!-- END: Mobile Specific -->
 	<!-- START: CSS -->
 	<link id="bootstrap-style" href="../../resources/css/bootstrap.css" rel="stylesheet"/>
-	<link href="../../resources/css/bootstrap-responsive.min.css" rel="stylesheet"/>
-	<link href="../../resources/css/themes-style.css" rel="stylesheet"/>
 	<link href="../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
-	<link href="../../resources/css/sentinel-style.css" rel="stylesheet"/>
-	<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
 	<link href="../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+	<link href="../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../resources/css/sentinel-style.css" rel="stylesheet"/>
 	<!-- END: CSS -->
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
@@ -31,41 +29,44 @@
 </head>
 
 <body id="index-body" class="home-body">
+
+<div class="container outmost-holder">
+
 	<!-- START: Page Header -->
 
-	<div id="login-navbar" class="navbar">
-		<div class="navbar-inner-header">
-			<div class="container-fluid">
-				<a class="btn btn-navbar" data-toggle="collapse"
-					data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse"></a>
+	<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='Share with confidence.'">
+		<div class="container">
+			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/common :: navbarHeaderFragmentBasic">
+			<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE navbarHeaderFragmentBasic -->
+			<!-- The code below is here only to enhance source code readability -->
 				<h1>
-					<span class="nav-title">Share with confidence.</span>
+					<span class="nav-title" th:text="${currentPageTitle}">Share with confidence.</span>
 				</h1>
 				
-				<span th:include="fragment/common :: logoFragment">
-					<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+				<span th:substituteby="fragment/common :: logoFragment">
+					<div style="position: relative;">
+						<a id="logoFragment" class="navbar-brand brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+						<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
+					</div>
 				</span>
+			<!-- END OF SECTION REPLACED BY THYMELEAF -->
 			</div>
 		</div>
-	</div>
-
+	</header>
 	<div id="under-header"></div>
 	<!-- END : Page Header -->
 
-	<div class="container-fluid">
+	<div class="container no-pad">
 		<div id="content">
 
 			<!-- No Side Nav Menu -->
+			
 			<!-- JavaScrip Enable Message -->
-			<noscript>
-				<div class="alert alert-block span10">
+			<noscript th:substituteby="fragment/common :: noscriptFragment">
+				<div class="alert alert-warning col-md-10 col-sm-10">
 					<p id="h4-style" class="alert-heading">Warning!</p>
-
-					<p>
-						You need to have <a href="https://en.wikipedia.org/wiki/JavaScript"
-							th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
-							target="_blank">JavaScript</a> enabled to use this site.
-					</p>
+					<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
+					target="_blank">JavaScript</a>enabled to use this site.</p>
 				</div>
 			</noscript>
 			
@@ -74,20 +75,21 @@
 			<div>
 				<div>
 <!-- !Signup Now-->
-					<div id="home-feature-container" class="row-fluid">
+					<div id="home-feature-container" class="row">
 						<section id="home-feature-image">
-							<div id="home-feature-text" class="span5">Your health is between you
+							<div id="home-feature-text" class="col-md-5 col-sm-5">Your health is between you
 										and your doctor, so take control of your medical privacy.
 								
 							</div>
 						
-							<div id="home-login-container" class="span6">
+							<div id="home-login-container" class="col-md-6 col-sm-6">
+							<div class="container">
 
 								<fieldset class="login-section">
 	
 									<div class="login-section">
 										<a href="registration.html" th:href="@{registration.html}"
-											class="btn btn-block btn-success btn-large btn-signup">Sign
+											class="btn btn-block btn-success btn-lg btn-signup">Sign
 											up Now.</a>
 	
 										<p>Your medical privacy is important to you, so take
@@ -106,7 +108,7 @@
 									<legend>Log in with your C2S account</legend>
 	
 									<div class="login-center">	
-											<div class="span-10 append-2 last" 
+											<div class="append-2 last" 
 										     xmlns:th="https://www.thymeleaf.org"
 										     th:with="lastUsernameKey=${T(org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter).SPRING_SECURITY_LAST_USERNAME_KEY},
 										              lastExceptionKey=${T(org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter).SPRING_SECURITY_LAST_EXCEPTION_KEY}">
@@ -120,44 +122,33 @@
 											    <span class="errormsg" style="color: red;"></span><p/>
 										    </div>
 										
-										<form th:action="@{/resources/j_spring_security_check}" id="loginForm"
-											method="post">
-											
-											    <div><label for="j_username">Username:</label><input type="text"
-												class="input-xlarge-fluid" id="j_username" name="j_username"
-												autofocus="autofocus" required="required"
-												aria-required="true" /> 
-												</div>
-												<div><label for="j_password">Password:</label><input
-												type="password" class="input-xlarge-fluid" id="j_password"
-												name="j_password" required="required" aria-required="true" />
-												</div>
-											<p />
-	
-											<div class="controls">
-												<input type="submit" class="btn btn-primary" id="loginButton" name="loginButton"
-													value="Login" />
+										<form th:action="@{/resources/j_spring_security_check}" id="loginForm" method="post">
+											<div class="form-group">
+										    		<label for="j_username">Username:</label>
+										    		<input type="text" class="form-control" id="j_username" name="j_username" autofocus="autofocus" required="required" aria-required="true" /> 
 											</div>
+											
+											<div class="form-group">
+												<div>
+													<label for="j_password">Password:</label>
+													<input type="password" class="form-control" id="j_password" name="j_password" required="required" aria-required="true" />
+												</div>
+											</div>
+											
+											<div class="submit-control">
+												<button type="submit" class="btn btn-primary" id="loginButton" name="loginButton" value="Login">Login</button>
+											</div>
+											
 											<div class="top-margin10">
 	                                    		<a href="loginTrouble.html" th:href="@{loginTrouble.html}"><i>Trouble accessing your account?</i></a>
 	                                    	</div>
-	                                    
 										</form>
+										
 									</div>
 	
 								</fieldset>
 							<!-- !SECTION: Sign Up Now -->
-
-							<!-- !SECTION: Login With Third Party Account -->
-							<!--
-							<form>
-                               <fieldset class="login-section">
-                                    <legend>Login using facebook, google or linked-in</legend>
-
-                                    <div id="icon-set"> <img class="social-icons" src="images/facebook-gray.png" alt="facebook"> <img class="social-icons" src="images/google-gray.png" alt="google"><img class="social-icons" src="images/linkedin-gray.png" alt="linkedin"></div>
-		                       </fieldset>
-	                       </form>
--->
+							</div>
 							</div>
 						</section>
 						
@@ -165,8 +156,8 @@
 				</div>
 			</div>
 
-			<div id="body-features" class="row-fluid">
-						<div class="span4">
+			<div id="body-features" class="row">
+						<div class="col-md-4 col-sm-4">
 							<h3>What is privacy consent?</h3>
 							<p>If you have ever visited a doctors office to receive
 								treatment, you most likely were asked by a receptionist at the
@@ -176,7 +167,7 @@
 							<a href="#"> learn more</a>
 						</div>
 
-						<div class="span4">
+						<div class="col-md-4 col-sm-4">
 							<h3>About Consent 2 Share.</h3>
 							<p>Consent 2 Share is a publicly funded program which
 								provides individuals with education resources and electronic
@@ -186,7 +177,7 @@
 						</div>
 
 
-						<div class="span4">
+						<div class="col-md-4 col-sm-4">
 							<h3>Learn about privacy.</h3>
 							<p>Every year millions of individuals visit the doctors
 								office and are asked to share their medical records as part of
@@ -197,21 +188,18 @@
 		
 			
 		</div><!-- end content-->
-	</div><!-- end container-fluid -->
+	</div><!-- end container -->
 	
 	<!-- END: Content Region -->
 	<!-- ELEMENT: Divider -->
 
-	<!--         <div class="clearfix"></div> -->
-
 
 	<!-- START: Footer Region -->
 
-	<footer class="home-footer">
-
+	<footer class="home-footer" th:substituteby="fragment/common :: indexFooterFragment">
 		<div id="footer-features">
 
-			<div class="span4">
+			<div class="col-md-4 col-sm-4">
 				<h3>Education Center</h3>
 				<ul class="nav nav-pills">
 					<li><a href="#">Balancing Safety and Privacy </a></li>
@@ -223,7 +211,7 @@
 				</ul>
 			</div>
 
-			<div class="span4">
+			<div class="col-md-4 col-sm-4">
 				<h3>About Us</h3>
 				<ul class="nav nav-pills">
 					<li><a href="#">Contact Us</a></li>
@@ -236,36 +224,22 @@
 			</div>
 
 		</div>
+		
 
 	</footer>
 	<!-- END: Footer Region -->
+	
+</div>
+	
 	<!-- START: JavaScript-->
-	<script src="../../resources/js/jquery-1.7.2.min.js"
-		th:src="@{/resources/js/jquery-1.7.2.min.js}" type="text/javascript">
-	</script>
-	
-	
-	<script src="../../resources/js/jquery.icheck.js"
-		th:src="@{/resources/js/jquery.icheck.js}" type="text/javascript">
-	</script>
-	
-	
-	<script src="../../resources/js/bootstrap.js"
-		th:src="@{/resources/js/bootstrap.js}" type="text/javascript">
-	</script>
-	
-	
 	<script src="../../resources/js/jquery.validate.min.js"  
 		th:src="@{/resources/js/jquery.validate.min.js}" type="text/javascript">
 	</script>
 	
-	
 	<script src="../../resources/js/webpage-js/index.js"
 		th:src="@{/resources/js/webpage-js/index.js}" type="text/javascript">
 	</script>
-	
-	
 	<!-- END: JavaScript-->
-	<!-- end container-fluid -->	 
+		 
 </body>
 </html>

@@ -126,7 +126,7 @@ public class AccountControllerTest {
 			throws Exception {
 		mockMvc.perform(post("/loginTrouble.html").param("troubleTypeId", "2"))
 				.andExpect(status().is(302))
-				.andExpect(view().name("redirect:/views/underConstruction"));
+				.andExpect(view().name("redirect:/loginTroubleUsername.html"));
 	}
 
 	@Test
@@ -134,7 +134,7 @@ public class AccountControllerTest {
 			throws Exception {
 		mockMvc.perform(post("/loginTrouble.html").param("troubleTypeId", "3"))
 				.andExpect(status().is(302))
-				.andExpect(view().name("redirect:/views/underConstruction"));
+				.andExpect(view().name("redirect:/loginTroubleOther.html"));
 	}
 
 	@Test

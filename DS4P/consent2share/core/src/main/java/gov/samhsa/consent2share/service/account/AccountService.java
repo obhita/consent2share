@@ -25,14 +25,15 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.account;
 
-import java.text.ParseException;
-
-import javax.mail.MessagingException;
-
 import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.hl7.Hl7v3TransformerException;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
 import gov.samhsa.consent2share.service.dto.SignupDto;
+
+import java.text.ParseException;
+
+import javax.mail.MessagingException;
 
 /**
  * The Interface AccountService.
@@ -49,7 +50,7 @@ public interface AccountService {
 	 * @throws UsernameNotExistException the username not exist exception
 	 * @throws EmailAddressNotExistException the email address not exist exception
 	 */
-	public abstract void signup(SignupDto signupDto, String hostName) throws MessagingException, ParseException, UsernameNotExistException, EmailAddressNotExistException;
+	public abstract void signup(SignupDto signupDto, String hostName) throws MessagingException, ParseException, UsernameNotExistException, EmailAddressNotExistException,Hl7v3TransformerException;
 	
 	
 	/**

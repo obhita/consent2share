@@ -25,7 +25,7 @@
  ******************************************************************************/
 package gov.va.ds4p.repository.xdsbrepository;
 
-import gov.samhsa.consent2share.accesscontrolservice.xdsb.repository.XDSRepositorybWebServiceClient;
+import gov.samhsa.acs.xdsb.repository.wsclient.XDSRepositorybWebServiceClient;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;

@@ -72,6 +72,5 @@ public class EhrNumOneDto {
 
 	public void setSelectedPatient(PatientDto selectedPatient) {
 		this.selectedPatient = selectedPatient;
-	}
-	
+	}	
 }

@@ -29,7 +29,7 @@
 		</layout>
     </appender> 
     
-    <logger name="gov.samhsa.ds4ppilot.pep"></logger>
+    <logger name="gov.samhsa.acs.pep"></logger>
     <logger name="gov.samhsa.consent2share.accesscontrolservice.pep"></logger>
 
     <root level="WARN">

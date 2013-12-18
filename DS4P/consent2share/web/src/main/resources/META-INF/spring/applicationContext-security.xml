@@ -17,14 +17,15 @@
 		</headers>
 		
 		<form-login login-processing-url="/resources/j_spring_security_check"
-			login-page="/" default-target-url="/patients/home.html"
+			login-page="/" default-target-url="/defaultLoginPage.html"
 			authentication-failure-url="/index.html?login_error=1" /> 
 		<logout logout-url="/resources/j_spring_security_logout" logout-success-url="/" />
 		<!-- Configure these elements to secure URIs in your application -->
 		<intercept-url pattern="/choices/**" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/patients/**" access="isAuthenticated()" />
-		<intercept-url pattern="/clinicaldocuments/**" access="isAuthenticated()" />
-		<intercept-url pattern="/consents/**" access="isAuthenticated()" />
+		<intercept-url pattern="/Administrator/**" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/patients/**" access="hasRole('ROLE_USER')" />
+		<intercept-url pattern="/clinicaldocuments/**" access="hasRole('ROLE_USER')" />
+		<intercept-url pattern="/consents/**" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/**" access="permitAll" />
 		<logout invalidate-session="true" logout-url="/index.html" delete-cookies="true" />
 		<!-- <intercept-url pattern= "/resources/**" security="none"/> -->

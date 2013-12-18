@@ -13,17 +13,13 @@
 	<!-- START: Mobile Specific -->
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<!-- END: Mobile Specific -->
+	
 	<!-- START: CSS -->
-	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css"
-		rel="stylesheet"/>
-	<link href="../../../resources/css/bootstrap-responsive.min.css"
-		rel="stylesheet"/>
+	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css" rel="stylesheet"/>
 	<link href="../../../resources/css/themes-style.css" rel="stylesheet"/>
 	<link href="../../../resources/css/sentinel-style.css" rel="stylesheet"/>
-	<link href="../../../resources/css/bootstrap-toggle-buttons.css"
-		rel="stylesheet"/>
-	<link href="../../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
 	<!-- END: CSS -->
+	
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
 	        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -34,103 +30,110 @@
 </head>
 
 <body>
-    <!-- START: Page Header -->
 
-    <div id="upload-main" class="container-fluid">
-    
-    <div class="navbar">
-        <div class="navbar-inner-header">
-            <div class="container-fluid">
-            
-                <a id="bread-crumb-btn" href="mymedicalinfo.html" th:href="@{medicalinfo.html}" class="btn  btn-info" ><span class="icon-chevron-left icon-white"></span></a>
-           		<a class="btn btn-info btn-mainmenu" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
-					<span class="icon-reorder"></span>
+<div id="upload-main" class="container outmost-holder">
+	<!-- START: Page Header -->
+	<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='My Medical Information',currentPageURI='/patients/profile.html',backPageURI='/patients/medicalinfo.html'">
+		<div class="container">
+			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/patient_fragments :: navbarHeaderFragmentBackAndAccount">
+				<a th:substituteby="fragment/common :: backButtonFragment" id="bread-crumb-btn" th:href="@{${backPageURI}}" href="#" class="btn btn-info" >
+					<span class="fa fa-chevron-left fa-white"></span>
 				</a>
-
-				<h1><span class="nav-title">My Medical Information</span></h1>
 				
-				<span th:include="fragment/common :: logoFragment">
-					<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+				<a th:substituteby="fragment/common :: mobileMenuButtonFragment" class="btn btn-info btn-mainmenu" data-toggle="collapse" data-target=".top-nav.navbar-collapse,.sidebar-nav.navbar-collapse">
+					<span class="fa fa-reorder"></span>
+				</a>
+				<h1>
+					<span class="nav-title" th:text="${currentPageTitle}">Page Title</span>
+				</h1>
+	
+				<span th:substituteby="fragment/common :: logoFragment">
+					<div style="position: relative;">
+						<a id="logoFragment" class="navbar-brand brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+						<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
+					</div>
 				</span>
-				
+	
 				<!-- COMPONENT: Header Menu-->
-
-					<div th:include="fragment/myaccount_menu :: myaccountMenuFragment" class="btn-group pull-right">
+	
+				<div th:substituteby="fragment/myaccount_menu :: myaccountMenuFragment"
+					class="btn-group pull-right">
 					<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE myaccountMenuFragment -->
 					<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
-					
-						<a class="btn" href="#">
-							<span class="icon-envelope"></span><span class="hidden-phone hidden-tablet"> Message Center</span> 
-							<span class="label label-warning hidden-phone">3</span> 
-							<!-- <span class="label label-success hidden-phone">1</span>
-							<span class="label label-important hidden-phone">2</span> -->
-						</a>
-					
-						<!-- COMPONENT: User Dropdown -->
-					
-						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-							<span class="icon-user">&nbsp;</span><span class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span>
-							<span class="caret"></span>
-						</a>
-						
-						<ul role="menu" class="dropdown-menu">
-							<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_my_profile}">My Profile</a></li>
-							<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_change_password}">Change Password</a></li>
-							<li role="menuitem" aria-disabled="true" class="divider"></li>
-							<li role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" th:text="#{header_logout}">Logout</a></li>
-						</ul>
-						
+	
+					<a class="btn btn-default" href="#"> <span class="glyphicon glyphicon-envelope"></span><span
+						class="hidden-sm hidden-md"> Message Center</span> <span
+						class="label label-warning hidden-sm">3</span>
+					</a>
+	
+					<!-- COMPONENT: User Dropdown -->
+	
+					<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+						<span class="glyphicon glyphicon-user">&nbsp;</span><span
+						class="hidden-sm hidden-md" th:text="#{header_my_account}">
+							My Account</span> <span class="caret"></span>
+					</a>
+	
+					<ul role="menu" class="dropdown-menu">
+						<li role="menuitem"><a href="profile.html"
+							th:href="@{/patients/profile.html}"
+							th:text="#{header_my_profile}">My Profile</a></li>
+						<li role="menuitem"><a href="profile.html"
+							th:href="@{/patients/profile.html}"
+							th:text="#{header_change_password}">Change Password</a></li>
+						<li role="menuitem" aria-disabled="true" class="divider"></li>
+						<li role="menuitem"><a href="../index.html"
+							th:href="@{/resources/j_spring_security_logout}"
+							th:text="#{header_logout}">Logout</a></li>
+					</ul>
+	
 					<!-- END OF SECTION REPLACED BY THYMELEAF -->
-					</div>
-           
-           </div>
-        </div>
-    </div>
-
+				</div>
+			</div>
+		</div>
+	</header>
     <div id="under-header"></div>
-    
     <!-- END : Page Header -->
 
-        <div id="content" class="row-fluid main-content-wrapper">
-        
-        	<!-- START: Side Nav Menu -->
-
-				<div th:include="fragment/common :: sideNavMenuFragment" class="span2 main-menu-span">
+    <div id="content" class="row main-content-wrapper">
+    	
+    			<!-- START: Side Nav Menu -->
+				<div th:substituteby="fragment/patient_fragments :: sideNavMenuFragment" class="col-sm-2 main-menu-span">
 				<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE sideNavMenuFragment -->
 					<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
 					
-					<div class="nav-collapse sidebar-nav">
+					<div class="navbar-collapse sidebar-nav">
 						<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
-							<li class="nav-header hidden-tablet" role="menuitem"></li>
+							<li class="nav-header hidden-md" role="menuitem"></li>
 							
 							<li class="active" role="menuitem"><a href="../home.html">
-								<div class="icon-home icon-large"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_home}"> My Home</span></a></li>
+								<div class="glyphicon-home glyphicon-large"></div>
+									<span class="hidden-md" th:text="#{sidebar_my_home}"> My Home</span></a></li>
 									
-							<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
+							<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="glyphicon-file"></div>
+									<span class="hidden-md" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
 			
-							<li role="menuitem"><a href="connectionMain.html"><div class="icon-random"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
+							<li role="menuitem"><a href="connectionMain.html"><div class="glyphicon-random"></div>
+									<span class="hidden-md" th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
 			
-							<li role="menuitem"><a href="profile.html"><div class="icon-user"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_profile}"> My Profile</span></a></li>
+							<li role="menuitem"><a href="profile.html"><div class="glyphicon-user"></div>
+									<span class="hidden-md" th:text="#{sidebar_my_profile}"> My Profile</span></a></li>
 			
-							<li role="menuitem"><a href="../inbox/inboxMain.html" th:href="@{/inbox/inboxMain.html}"><div class="icon-inbox"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_in_box}"> Message Center</span></a></li>
+							<li role="menuitem"><a href="../inbox/inboxMain.html" th:href="@{/inbox/inboxMain.html}"><div class="glyphicon-inbox"></div>
+									<span class="hidden-md" th:text="#{sidebar_in_box}"> Message Center</span></a></li>
 			
 			
-							<li role="menuitem"><a href="activityHistory.html"><div class="icon-time"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_activity_history}"> Activity History</span></a></li>
+							<li role="menuitem"><a href="activityHistory.html"><div class="glyphicon-time"></div>
+									<span class="hidden-md" th:text="#{sidebar_activity_history}"> Activity History</span></a></li>
 			
-							<li role="menuitem"><a href="../clinicaldocuments/mymedicalinfo.html" th:href="@{/patients/medicalinfo.html}"><div class="icon-folder-open"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_medical_documents}"> Medical Documents</span></a></li>
+							<li role="menuitem"><a href="../clinicaldocuments/mymedicalinfo.html" th:href="@{/patients/medicalinfo.html}"><div class="glyphicon-folder-open"></div>
+									<span class="hidden-md" th:text="#{sidebar_medical_documents}"> Medical Documents</span></a></li>
 							
-							<li class="shortcut-button" role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}"><div class="icon-unlock-alt"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_change_password}"> Change Password</span></a></li>
+							<li class="shortcut-button" role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}"><div class="glyphicon-unlock-alt"></div>
+									<span class="hidden-md" th:text="#{sidebar_change_password}"> Change Password</span></a></li>
 							
-							<li class="shortcut-button" role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}"><div class="icon-off"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_logout}"> Logout</span></a></li>
+							<li class="shortcut-button" role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}"><div class="glyphicon-off"></div>
+									<span class="hidden-md" th:text="#{sidebar_logout}"> Logout</span></a></li>
 						</ul>
 					</div>
 					
@@ -140,71 +143,72 @@
 	<!-- END: Side Nav Menu -->
                        
            <!-- JavaScrip Enable Message -->
-           <noscript>
-            <div class="alert alert-block span10">
-                <p class="h4-style alert-heading">Warning!</p>
-
-                <p>You need to have <a href="http://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a> enabled to use this site.</p>
-            </div>
-          </noscript> 
+			<noscript th:substituteby="fragment/common :: noscriptFragment">
+				<div class="alert alert-warning col-sm-10">
+					<p id="h4-style" class="alert-heading">Warning!</p>
+					<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
+						target="_blank">JavaScript</a>enabled to use this site.</p>
+				</div>
+			</noscript>
           
           
           <!-- !START: Content Region-->
 
-            <div class="span10">
+          <div id="page-subcontent-holder" role="main" class="col-sm-10">
             <br/><p class="h4-style">Document Upload</p><br/>
-				 <form action="#" th:action="@{/patients/clinicaldocuments.html}" method="post" enctype="multipart/form-data">
-				    <table>
-				    <tr>
-				        <td>Name</td>
-				        <td><input id="name" name="name" type="text" required="required" aria-required="true" />  
-						</td> 
-				    </tr>
-				    <tr>
-				        <td>Description</td>
-				        <td><textarea name="description" id="description" rows="10"></textarea></td>
-				    </tr>
-				    <tr>
-				        <td>Clinical Document Type</td>
-				        <td><select name="documentType" id="documentType">
+				 <form action="#" th:action="@{/patients/clinicaldocuments.html}" method="post" enctype="multipart/form-data">	
+				    <div class="form-group row">
+				        <div class="col-sm-3">
+				        	<label for="name">Name</label>
+				        	<input id="name" name="name" type="text" required="required" aria-required="true" class="form-control"/>
+				        </div>
+				    </div>
+				    <div class="form-group row">
+				        <div class="col-sm-3">
+				        	<label for="description">Description</label>
+				        	<textarea name="description" id="description" rows="10" class="form-control"></textarea>
+				        </div>
+				    </div>
+				    <div class="form-group row">
+				    	<div class="col-sm-3">
+				        	<label for="documentType">Clinical Document Type</label>
+				        	<select name="documentType" id="documentType" class="form-control">
 								<option selected="selected" value="N/A">--- Please Select ---</option>
 								<option th:each="typeCode : ${allDocumentTypeCodes}" th:value="${typeCode.code}" th:text="${typeCode.displayName}">Diagnostic Imaging Report</option>
-							</select> </td>
-				    </tr>
-				    <tr>
-				        <td>Clinical Document</td>
-				        <td><input type="file" name="file" id="file"  required="required" aria-required="true" ></input></td>
-				    </tr>
-				    <tr>
-				        <td colspan="2">
-				            <input class="btn btn-info" type="submit" value="Upload"/>
-				        </td>
-				    </tr>
-				</table>
+							</select>
+						</div>
+				    </div>
+				    <div class="form-group row">
+				    	<div class="col-sm-3">
+				        	<label for="file">Clinical Document</label>
+				        	<input type="file" name="file" id="file"  required="required" aria-required="true" class="form-control"></input>
+				        </div>
+				    </div>
+				    <div class="form-group row">
+				    	<div class="col-sm-1">
+				        	<button class="btn btn-primary" type="submit" value="Upload">Upload</button>
+				        </div>
+				    </div>
 				</form>
-				<br/><p class="h4-style" th:if="${#lists.isEmpty(clinicaldocumentDtos)}">No Documents Found</p>
+				
+				<br/>
+				
+				<p class="h4-style" th:if="${#lists.isEmpty(clinicaldocumentDtos)}">No Documents Found</p>
 				<p class="h4-style" th:if="${not #lists.isEmpty(clinicaldocumentDtos)}">Uploaded Documents</p><br/>
-				<table th:if="${not #lists.isEmpty(clinicaldocumentDtos)}" class="table-striped" style="word-wrap:break-all; text-align:center;" width="700" height="100">
+				<table th:if="${not #lists.isEmpty(clinicaldocumentDtos)}" class="table-striped col-xs-12 col-sm-12 col-md-10" style="word-wrap:break-all; text-align:center;" height="100">
 				<tr> 
-				    <th>Name</th>
-				    <th>Document Type</th>
-				    <th>Description</th>
-				    <th>Operation</th>
+				    <th class="col-xs-3 col-sm-3">Name</th>
+				    <th class="col-xs-4 col-sm-4">Document Type</th>
+				    <th class="col-xs-4 col-sm-4">Description</th>
+				    <th class="col-xs-1 col-sm-1">Operation</th>
 				</tr>
 				    <tr th:each="clinicaldocumentDto : ${clinicaldocumentDtos}">
-				        <td width="100" th:text="${clinicaldocumentDto.name}">name</td>
-				        <td width="200" th:object="${clinicaldocumentDto.clinicalDocumentTypeCode}" 
+				        <td class="col-xs-3 col-sm-3" th:text="${clinicaldocumentDto.name}">name</td>
+				        <td class="col-xs-4 col-sm-4" th:object="${clinicaldocumentDto.clinicalDocumentTypeCode}" 
 				        	th:text="*{displayName}">document type</td>
-				        <td width="250" th:text="${clinicaldocumentDto.description}">description</td>
+				        <td class="col-xs-4 col-sm-4" th:text="${clinicaldocumentDto.description}">description</td>
 
-				        <td>
-<!-- 				            <a title="download" href="#" th:href="@{'/patients/downloaddoc/' + ${clinicaldocumentDto.id}}"> -->
-<!-- 				            	<img src="../../resources/img/download_clinical_document_icon.png" th:src="@{/resources/img/download_clinical_document_icon.png}"/> -->
-<!-- 				            </a>  -->
-				         
-<!-- 				            <a title="delete" href="#" th:href="@{'/patients/deletedoc/' + ${clinicaldocumentDto.id}}" onclick="return confirm('Are you sure you want to delete this document?')"> -->
-<!-- 				              	<img src="../../resources/img/delete_clinical_document_icon.png" th:src="@{/resources/img/delete_clinilcal_document_icon.png}"/> -->
-<!-- 				            </a>  -->
+				        <td class="col-xs-1 col-sm-1">
 							<form th:name="@{'form_download_' + ${clinicaldocumentDto.id}}" th:action="@{/patients/downloaddoc.html}" method="post">
 								<input type="hidden" name="download_id" th:value="${clinicaldocumentDto.id}"/>
 								<a th:href="@{'javascript:document.' + 'form_download_' + ${clinicaldocumentDto.id} + '.submit()'}"><img src="../../resources/img/delete_clinical_document_icon.png" th:src="@{/resources/img/download_clinical_document_icon.png}"/></a>
@@ -216,8 +220,8 @@
 				        </td>
 				    </tr>
 				</table>
-            </div><!-- end span10-->
-        </div><!-- end content row-fluid -->
+            </div><!-- end col-md-10-->
+        </div><!-- end content row -->
         <!-- END: Content Region -->
         <!-- ELEMENT: Divider -->
 
@@ -225,11 +229,6 @@
   
 		<!-- START: Footer Region -->
 		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
-		<!-- COMPONENT: Action Buttons -->
-				<!--
-				<a href="#" class="btn pull-left" data-dismiss="modal">Close</a>
-				<a href="#" class="btn btn-primary pull-right">Save changes</a>
-				-->
 				
 				<!-- COMPONENT: Copyright Information -->
 				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
@@ -238,11 +237,9 @@
 		
 		<!-- END: Footer Region -->
 
-    </div><!-- end container-fluid -->
+    </div><!-- end container -->
     
     <!-- START: JavaScript-->
-	
-	<script src="../../resources/js/bootstrap.js" th:src="@{/resources/js/bootstrap.js}" type="text/javascript"></script>
 	
 	
 	<!-- END: JavaScript-->

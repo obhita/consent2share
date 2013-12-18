@@ -11,7 +11,7 @@
          <Resources>
             <Resource>
                <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match">
-                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">e46b6650-47ea-11e3-9d13-00155d84621a</AttributeValue>
+                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">25a0d3f0-5b5d-11e3-9cbc-00155d466c30</AttributeValue>
                   <ResourceAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
                                                DataType="http://www.w3.org/2001/XMLSchema#string"/>
                </ResourceMatch>

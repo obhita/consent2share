@@ -12,12 +12,9 @@
 	<!-- END: Mobile Specific -->
 	<!-- START: CSS -->
 	<link id="bootstrap-style" href="../../resources/css/bootstrap.css" rel="stylesheet"/>
-	<link href="../../resources/css/bootstrap-responsive.min.css" rel="stylesheet"/>
-	<link href="../../resources/css/themes-style.css" rel="stylesheet"/>
-	<link href="../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
-	<link href="../../resources/css/sentinel-style.css" rel="stylesheet"/>
-	<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
 	<link href="../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+	<link href="../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../resources/css/sentinel-style.css" rel="stylesheet"/>
 
 	<!-- END: CSS -->
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -32,86 +29,86 @@
 </head>
 
 <body>
-		
-	<!-- !START: Page Header -->
-	
+<div class="container outmost-holder">
+	<!-- START: Page Header -->
+	<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='Create Account',backPageURI='/index.html'">
+		<div class="container">
+			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/common :: navbarHeaderFragmentBackOnly">
+			<a th:substituteby="fragment/common :: backButtonFragment" id="bread-crumb-btn" th:href="@{${backPageURI}}" href="#" class="btn btn-info" >
+				<span class="fa fa-chevron-left fa-white"></span>
+			</a>
+			
+			<h1>
+				<span class="nav-title" th:text="${currentPageTitle}">Page Title</span>
+			</h1>
+
+			<span th:substituteby="fragment/common :: logoFragment">
+				<div style="position: relative;">
+					<a id="logoFragment" class="navbar-brand brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+					<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
+				</div>
+			</span>
+	</div>
+		</div>
+	</header>
+	<div id="under-header"></div>
 	<!-- END : Page Header -->
 	
-	<div class="container-fluid">
-	<div role="navigation" class="navbar">
-		<div class="navbar-inner-header">
-			<div class="container-fluid">
-				 <a id="bread-crumb-btn" href="index.html" th:href="@{/index.html}" class="btn  btn-info" ><span class="icon-chevron-left icon-white"></span></a> 
-				<h1><span class="nav-title">Create Account</span></h1>
-				
-				<span th:include="fragment/common :: logoFragment">
-					<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
-				</span>
-				           
-			</div>
-		</div>
-	</div>
-	<div id="under-header"></div>
-		<div class="row-fluid main-content-wrapper">					
-			<div id="content">
+	<div class="row main-content-wrapper">					
+		<div id="content">
 
 	
-	<!-- JavaScrip Enable Message -->		
-			<noscript>
-				<div class="alert alert-block span10">
-					<p id="h4-style" class="alert-heading">Warning!</p>
-					<p>You need to have <a href="http://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a> enabled to use this site.</p>
-				</div>
-			</noscript>
+	<!-- JavaScript Enable Message -->		
+	<noscript th:substituteby="fragment/common :: noscriptFragment">
+		<div class="alert alert-warning col-md-10 col-sm-10">
+			<p id="h4-style" class="alert-heading">Warning!</p>
+			<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
+			target="_blank">JavaScript</a>enabled to use this site.</p>
+		</div>
+	</noscript>
 			
 
 				
-	<!-- !START: Content Region-->
+	<!-- START: Content Region-->
 	
-	<div role="main" class="span10 offset1">			
-		<div class="row-fluid">			
+	<div id="page-fullcontent-holder" role="main" class="col-xs-12 col-sm-10 col-sm-offset-1">			
+		<div class="row">			
 
 		<!-- !COMPONENT: Create CMS Account -->
 	
-			<div class="span9">
+			<div class="col-sm-9">
 				
 				 <section class="top-margin10">
 					<form id="signupForm" onsubmit="return validateSignupForm()" action="signupVerification.html" th:action="@{/registration.html}" th:object="${signupDto}" method="post">
-							<fieldset id="login-thirdparty" class="row-fluid">
+							<fieldset id="login-thirdparty" class="row">
 			                    
 			                    	<legend>Required Account Information</legend>									
 
-										<div class="control-group">
-											<div>
-												<div>
-	                                    			<label for="first_name">First Name</label>	                                    			
-	                                    		</div>
-	                                    		<div class="inline-block">
-	                                    			<input id="first_name" name="firstName" type="text" aria-required="true" th:field="*{firstName}"/>
+										<div class="required-info-group top-margin10">
+											<div class="form-group row">
+												<div class="col-sm-7 col-md-6 col-lg-5">
+	                                    			<label for="first_name">First Name</label>
+	                                    			<input id="first_name" name="firstName" type="text" aria-required="true" th:field="*{firstName}" class="form-control" />
 		                                    		<span class="required-text" th:errors="*{firstName}">First name is required.</span>
-		                                    		<span id="fname_client_error_text" class="required-text" style="display: none;">First name is required.</span> 
+		                                    		<span id="fname_client_error_text" class="required-text" style="display: none;">First name is required.</span>
 		                                    	</div>
 		                                    </div>
 										
-		                                    <div>
-												<div>
-													<label for="last_name">Last	Name</label>													
-												</div>
-												<div class="inline-block">
-													<input id="last_name" name="lastname" type="text" aria-required="true"	th:field="*{lastName}" /> 
+		                                    <div class="form-group row">
+		                                    	<div class="col-sm-7 col-md-6 col-lg-5">
+													<label for="last_name">Last	Name</label>
+													<input id="last_name" name="lastname" type="text" aria-required="true"	th:field="*{lastName}" class="form-control" />
 													<span class="required-text" th:errors="*{lastName}">Last name is required.</span>
 													<span id="lname_client_error_text" class="required-text" style="display: none">Last name is required.</span>
 												</div>
 											</div>
 											
-											<div>
-												<div>
+											<div class="form-group row">
+		                                    	<div class="col-sm-7 col-md-6 col-lg-5">
 			                                    	<label for="gender">Gender</label>
-												</div>
-												<div class="inline-block">
-			                                    	<select id="gender" name="gender" th:field="*{genderCode}">
-			                                    	<option value="">--- Please Select ---</option>
-			                                    	<option th:each="genderCode : ${genderCodes}" th:value="${genderCode.code}" th:text="${genderCode.displayName}">F</option>
+			                                    	<select id="gender" name="gender" th:field="*{genderCode}" class="form-control">
+			                                    		<option value="">--- Please Select ---</option>
+			                                    		<option th:each="genderCode : ${genderCodes}" th:value="${genderCode.code}" th:text="${genderCode.displayName}">F</option>
 		                                			</select>
                                			 		
 													<span class="required-text" th:errors="*{genderCode}">Gender Selection is required.</span>
@@ -119,188 +116,144 @@
 												</div>
 											</div>											
 											
-											<div>
-												<div>
-													<label class="control-label">Date of Birth</label>
-												</div>													
-												<div id="dob" class="controls inline-block ">
-													<input type="text" id="date" data-format="MM/DD/YYYY" data-template="MMM D YYYY" name="date" style="display: none;"  th:field="*{birthDate}"/>
-																									
-													<select id="month"> 
-														<option selected="selected" value="  ">Month</option> 
- 														<option value="01">January</option> 
- 														<option value="02">February</option> 
-														<option value="03">March</option> 
- 														<option value="04">April</option> 
- 														<option value="05">May</option> 
- 														<option value="06">June</option> 
- 														<option value="07">July</option>
- 														<option value="08">August</option> 
- 														<option value="09">September</option> 
-														<option value="10">October</option> 
- 														<option value="11">November</option> 
- 														<option value="12">December</option> 
- 													</select>
- 													<select id="day">
- 														<option selected="selected" value="  ">Day</option> 
- 														<option value="01">01</option>
- 														<option value="02">02</option>
- 														<option value="03">03</option>
- 														<option value="04">04</option>
- 														<option value="05">05</option>
- 														<option value="06">06</option>
- 														<option value="07">07</option>
- 														<option value="08">08</option>
- 														<option value="09">09</option>
- 														<option value="10">10</option>
- 														<option value="11">11</option>
- 														<option value="12">12</option>
- 														<option value="13">13</option>
- 														<option value="14">14</option>
- 														<option value="15">15</option>
- 														<option value="16">16</option>
- 														<option value="17">17</option>
- 														<option value="18">18</option>
- 														<option value="19">19</option>
- 														<option value="20">20</option>
- 														<option value="21">21</option>
- 														<option value="22">22</option>
- 														<option value="23">23</option>
- 														<option value="24">24</option>
- 														<option value="25">25</option>
- 														<option value="26">26</option>
- 														<option value="27">27</option>
- 														<option value="28">28</option>
- 														<option value="29">29</option>
- 														<option value="30">30</option>
- 														<option value="31">31</option>
- 													</select> 
- 													<select id="year"> 
- 														<option selected="selected" value="    ">Year</option>  
- 													</select> 
-													<span id="dob_error_text" class="required-text" th:errors="*{birthDate}">Date of Birth is required.</span>
-													<span id="dob_client_error_text" class="required-text" style="display: none;">Date of Birth is required.</span>
+											<div class="form-group row">
+		                                    	<div class="col-sm-7 col-md-6 col-lg-5">
+		                                    		<div>
+														<label for="date">Date of Birth</label>
+													</div>
+													<div id="dob" class="inline-block ">
+														<input type="text" id="date" data-format="MM/DD/YYYY" data-template="MMM D YYYY" name="date"
+															class="form-control" style="display: none;" th:field="*{birthDate}"/>
+																										
+														<select id="month" class="form-control"> 
+															<option selected="selected" value="  ">Month</option> 
+	 														<option value="01">January</option> 
+	 														<option value="02">February</option> 
+															<option value="03">March</option> 
+	 														<option value="04">April</option> 
+	 														<option value="05">May</option> 
+	 														<option value="06">June</option> 
+	 														<option value="07">July</option>
+	 														<option value="08">August</option> 
+	 														<option value="09">September</option> 
+															<option value="10">October</option> 
+	 														<option value="11">November</option> 
+	 														<option value="12">December</option> 
+	 													</select>
+	 													<select id="day" class="form-control">
+	 														<option selected="selected" value="  ">Day</option> 
+	 														<option value="01">01</option>
+	 														<option value="02">02</option>
+	 														<option value="03">03</option>
+	 														<option value="04">04</option>
+	 														<option value="05">05</option>
+	 														<option value="06">06</option>
+	 														<option value="07">07</option>
+	 														<option value="08">08</option>
+	 														<option value="09">09</option>
+	 														<option value="10">10</option>
+	 														<option value="11">11</option>
+	 														<option value="12">12</option>
+	 														<option value="13">13</option>
+	 														<option value="14">14</option>
+	 														<option value="15">15</option>
+	 														<option value="16">16</option>
+	 														<option value="17">17</option>
+	 														<option value="18">18</option>
+	 														<option value="19">19</option>
+	 														<option value="20">20</option>
+	 														<option value="21">21</option>
+	 														<option value="22">22</option>
+	 														<option value="23">23</option>
+	 														<option value="24">24</option>
+	 														<option value="25">25</option>
+	 														<option value="26">26</option>
+	 														<option value="27">27</option>
+	 														<option value="28">28</option>
+	 														<option value="29">29</option>
+	 														<option value="30">30</option>
+	 														<option value="31">31</option>
+	 													</select> 
+	 													<select id="year" class="form-control"> 
+	 														<option selected="selected" value="    ">Year</option>  
+	 													</select>
+													</div>
+													
+													<div>
+														<span id="dob_error_text" class="required-text" th:errors="*{birthDate}">Date of Birth is required.</span>
+														<span id="dob_client_error_text" class="required-text" style="display: none;">Date of Birth is required.</span>
+													</div>
 												</div>
 											</div>
-											
-											<!-- <div class="summary-container">
-												<div>
-													<label for="date-picker-birthdate">Date of Birth <span style="font-size: small;">( mm/dd/yyyy )</span></label>
-												</div>
-												<div class="input-append datepicker date inline-block" data-date="1-01-2013" data-date-format="mm/dd/yyyy">
-													<input size="16" type="text"  th:field="*{birthDate}" id="date-picker-birthdate"/>
-													<span class="add-on"><span class="icon-th"></span></span>																										
-												</div><span class="required-text" th:errors="*{birthDate}">Date of Birth is required.</span>											
-											</div>		 -->								
-										
-	                                     <div>
-		                                    <div>
-		                                    	<label for="email">Email</label>		                                    	 
-		                                    </div>
-		                                    <div class="inline-block">
-		                                        <input id="email" name="email" type="text"  aria-required="true"  th:field="*{email}"/>
-		                                    	<span class="required-text"  th:errors="*{email}">Please provide a valid email address.</span>
-		                                    	<span id="email_client_error_text" class="required-text" style="display: none;">Please provide a valid email address.</span>
-		                                    </div>
-	                                    </div>
-	                                    
-		                                 <div class="username-container">   
-	
-			                                <div>
-				                                <div>
-				                                	<label for="user_name">Username</label>			                                	 
-				                                </div>
-				                                <div class="inline-block">
-				                                	<input id="user_name" name="username" type="text"  aria-required="true"  th:field="*{username}"/>
-				                                	<span class="required-text" th:errors="*{username}">Username must be between 3 and 30 characters long.</span>
-				                                	<span id="username_client_error_text" class="required-text" style="display: none;">Username must be between 3 and 30 characters long.</span>
-				                                </div>
-			                                </div>
-			                                
-		                                    <div>
-			                                    <div>
-			                                    	<label for="password">Password</label>		                                    	 
-			                                    </div>
-			                                    <div class="inline-block">
-			                                    	<input id="password" name="password" type="password"  aria-required="true" th:field="*{password}"/>
-			                                    	<span class="required-text" th:errors="*{password}">Password is required.</span>
-			                                    	<span id="password_client_error_text" class="required-text" style="display: none;">Password is required.</span>	                                    
-			                                    </div>
-		                                    </div>
 
-
-												<!--  <div role="region" class="progress-wrapper" th:remove="all">
-			                                	<label >Password Strength:</label>
-			                                	<div  id="passwordstrength" aria-live="polite" aria-atomic="false" class="progress progress-success progress-style span4">
-			                            			<div class="bar"></div>
-			                            		</div> 
-			                            	</div>    -->                             
-										</div> <!-- end username-container -->
-										
-										<!--
-										<div class="top-margin15 bottom-margin20">
-											<p style="color:#0482d6;"><strong><span style="color:red;">PLEASE NOTE:</span></strong> When you successfully create a new Consent2Share account, you will be given a new <strong>Consent2Share.Direct</strong> email account. <em>(This is in addition to your personal email account required above to register.)</em> Your new <strong>Consent2Share.direct</strong> account is a secure email account used to protect all your personal information being transferred by this application, between all authorized parties. <span style="color:red;"><em>You may only send <strong>Direct</strong> emails to other existing <strong>Direct</strong> email accounts.</em></span></p>
-										</div>
-										-->
-			                    							
-	                        </div><!-- end control group -->
-
-							<div style="clear:both"></div>
-
-                                <div class="control-group top-margin15">
-                                        <div class="controls">
-                                         	
-                                         	<button type="button" class="btn"
-													onClick="window.location.href='index.html'"
-													style="margin: 0 10px 0 0;">Cancel</button>
-											<input type="submit" value="Save" class="btn btn-primary" />
-                                        </div>
-                               </div>	
-	                      </fieldset>
+		                                    <div class="form-group row">
+		                                    	<div class="col-sm-7 col-md-6 col-lg-5">
+			                                    	<label for="email">Email</label>
+			                                        <input id="email" name="email" type="text"  aria-required="true"  th:field="*{email}" class="form-control"/>
+			                                    	<span class="required-text" th:errors="*{email}">Please provide a valid email address.</span>
+		    	                                	<span id="email_client_error_text" class="required-text" style="display: none;">Please provide a valid email address.</span>
+		        	                            </div>
+	                	                    </div>
+	                	                    
+											<div class="form-group row">
+		                                   		<div class="col-sm-7 col-md-6 col-lg-5">
+			                                   		<label for="mrn">Medical Record Number(MRN)</label>
+		                                   			<input id="medicalRecordNumber" name="medicalRecordNumber" type="text" aria-required="true" th:field="*{medicalRecordNumber}" class="form-control"/>
+	                                    			<!--
+	                                    			<span class="required-text" th:errors="*{medicalRecordNumber}">MRN is required.</span>
+	                                    			<span id="mrn_client_error_text" class="required-text" style="display: none;">Medical Record Number is required.</span>
+	                                    			-->
+		                                    	</div>
+	                                    	</div>
+		                                    
+			                                <div class="row">
+			                                	<div class="username-container col-xs-12 col-sm-7 col-md-6 col-lg-5">
+				                            		<div class="form-group row">
+		                                    			<div>
+						                                	<label for="user_name">Username</label>
+					        	                        	<input id="user_name" name="username" type="text"  aria-required="true"  th:field="*{username}" class="form-control"/>
+					            	                    	<span class="required-text" th:errors="*{username}">Username must be between 3 and 30 characters long.</span>
+					                	                	<span id="username_client_error_text" class="required-text" style="display: none;">Username must be between 3 and 30 characters long.</span>
+					                    	            </div>
+				                            	    </div>
+			                                	
+				                                    <div class="form-group row">
+		        	                            		<div>
+				    	                                	<label for="password">Password</label>
+			        		                            	<input id="password" name="password" type="password"  aria-required="true" th:field="*{password}" class="form-control"/>
+			                	                    		<span class="required-text" th:errors="*{password}">Password is required.</span>
+				                	                    	<span id="password_client_error_text" class="required-text" style="display: none;">Password is required.</span>	                                    
+				                    	                </div>
+			                                    	</div>
+												</div> <!-- end username-container -->
+											</div>
+										</div><!-- end required-info-group -->
+         
+		                               	<div class="submit-cancel-btn-group row top-margin15">
+		                               		<button type="button" class="btn btn-default" onClick="window.location.href='index.html'" style="margin: 0 10px 0 0;">Cancel</button>
+		                               		<button type="submit" value="Save" class="btn btn-primary">Save</button>
+		                               	</div>
+	                      	</fieldset>
                    </form>
                </section>
-               
 			</div>
 
-		</div><!--/#content.span10-->
-	</div><!--/row-fluid-->
+		</div><!--/#content.col-sm-10-->
+	</div><!--/row-->
 	</div>
 	<!-- END: Content Region -->
 
-
 		</div>
-		<!-- ELEMENT: Divider -->
-
-		<div class="clearfix"></div>	
 	
 	 <!-- START: Footer Region -->
 		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
-		<!-- COMPONENT: Action Buttons -->
-				<!--
-				<a href="#" class="btn pull-left" data-dismiss="modal">Close</a>
-				<a href="#" class="btn btn-primary pull-right">Save changes</a>
-				-->
-				
+		
 				<!-- COMPONENT: Copyright Information -->
 				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
 		</footer>
 	</div>
+	
 	<!-- START: JavaScript-->
-		<script src="../../resources/js/bootstrap.min.js"
-				th:src="@{/resources/js/bootstrap.min.js}" 
-				type="text/javascript"></script>
-		<script src="../../resources/js/jquery.toggle.buttons.js"
-				th:src="@{/resources/js/jquery.toggle.buttons.js}" 
-				type="text/javascript"></script>
-		<script src="../../resources/js/bootstrap-popover.js"
-				th:src="@{/resources/js/bootstrap-popover.js}"
-				type="text/javascript"></script>
-		<script src="../../resources/js/jquery.joyride-2.0.3.js" 
-				th:src="@{/resources/js/jquery.joyride-2.0.3.js}"
-				type="text/javascript"></script>
-		<script src="../../resources/js/jquery.cookie.js" 
-				th:src="@{/resources/js/jquery.cookie.js}"
-				type="text/javascript"></script>
 		<script src="../../resources/js/modernizr.mq.js" 
 				th:src="@{/resources/js/modernizr.mq.js}"
 				type="text/javascript"></script>
@@ -315,8 +268,13 @@
 				th:src="@{/resources/js/dateValidator.js}"
 				type="text/javascript"></script>
 		
+		<!-- Custom JavaScript -->
 		<script src="../../resources/js/webpage-js/userAccountInfoValidation.js" 
 				th:src="@{/resources/js/webpage-js/userAccountInfoValidation.js}"
+				type="text/javascript"></script>
+		
+		<script src="../../../resources/js/webpage-js/profile_registration.js" 
+				th:src="@{/resources/js/webpage-js/profile_registration.js}"
 				type="text/javascript"></script>
 				
 		<script src="../../resources/js/webpage-js/registration.js"

@@ -9,9 +9,68 @@
 	<artifactId>context-handler-client</artifactId>
 	<name>Context Handler Client</name>
 	<packaging>jar</packaging>
+	
+	<properties>
+		<service-project-wsdl-folder>../service/src/main/resources/wsdl</service-project-wsdl-folder>
+	</properties>
+	
+	<dependencies>
+
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+
+		<!-- Testing -->
+
+		<!-- Web stack-specific dependencies that are internally needed by the 
+			Endpoint object as it exposes a web service -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http-jetty</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Below used by embedded Jetty (which implements Endpoint in CXF) -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<finalName>context-handler-client</finalName>
+		
+		<resources>
+			<resource>
+				<directory>${service-project-wsdl-folder}</directory>
+				<includes>
+					<include>**/*.*</include>
+				</includes>
+			</resource>
+			
+			<resource>
+				<directory>src/main/resources/wsdl</directory>
+				<includes>
+					<include>**/*.*</include>
+				</includes>
+			</resource>
+		</resources>
+		
 		<plugins>
 			<!-- Generate Java classes from WSDL during build -->
 			<plugin>
@@ -32,7 +91,7 @@
 							<sourceRoot>${basedir}/target/generated-sources</sourceRoot>
 							<wsdlOptions>
 								<wsdlOption>
-									<wsdl>${basedir}/src/main/resources/DS4PContextHandler.wsdl</wsdl>
+									<wsdl>${service-project-wsdl-folder}/DS4PContextHandler.wsdl</wsdl>
 									<wsdlLocation>classpath:DS4PContextHandler.wsdl</wsdlLocation>
 									<extraargs>
 										<extraarg>-client</extraarg>
@@ -48,60 +107,5 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.cxf
-										</groupId>
-										<artifactId>
-											cxf-codegen-plugin
-										</artifactId>
-										<versionRange>
-											[2.6.0,)
-										</versionRange>
-										<goals>
-											<goal>wsdl2java</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.mojo
-										</groupId>
-										<artifactId>
-											build-helper-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.7,)
-										</versionRange>
-										<goals>
-											<goal>add-source</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 </project>

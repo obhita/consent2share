@@ -25,103 +25,134 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.pixclient.service;
 
-import gov.samhsa.consent2share.pixclient.ws.MCCIIN000002UV01;
-import gov.samhsa.consent2share.pixclient.ws.PIXManagerPortType;
-import gov.samhsa.consent2share.pixclient.ws.PIXManagerService;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201301UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201302UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201304UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201309UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201310UV02;
+import java.net.URL;
 
+import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
+import org.hl7.v3.types.MCCIIN000002UV01;
+import org.hl7.v3.types.PRPAIN201301UV02;
+import org.hl7.v3.types.PRPAIN201302UV02;
+import org.hl7.v3.types.PRPAIN201304UV02;
+import org.hl7.v3.types.PRPAIN201309UV02;
+import org.hl7.v3.types.PRPAIN201310UV02;
+import org.openhie.openpixpdq.services.PIXManagerPortType;
+import org.openhie.openpixpdq.services.PIXManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-@Service(value = "PixManagerService")
+/**
+ * The Class PixManagerServiceImpl.
+ */
 public class PixManagerServiceImpl implements PixManagerService {
-	private String endpoint = null;
+
+	/** The logger. */
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	/** The endpoint address. */
+	private String endpointAddress;
+
+	/** The wsdl url. */
+	final URL wsdlURL = this.getClass().getClassLoader()
+			.getResource("PIXPDQManager.wsdl");
+
+	/** The service name. */
+	final QName serviceName = new QName("urn:org:openhie:openpixpdq:services",
+			"PIXManager_Service");
+
+	/** The port. */
 	private PIXManagerPortType port;
 
-	final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	public PixManagerServiceImpl() {
-		this(null);
-	}
-
-	public PixManagerServiceImpl(String endpoint) {
-		this.endpoint = endpoint;
-		PIXManagerService service = new PIXManagerService();
-		port = service.getPIXManagerPortSoap12();
-		if (this.endpoint != null)
-			((BindingProvider) port).getRequestContext().put(
-					BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpoint);
-	}
-
-	public String getEndpoint() {
-		return endpoint;
-	}
-
-	public PIXManagerPortType getPort() {
-		return port;
+	/**
+	 * Instantiates a new pix manager service impl.
+	 * 
+	 * @param endpointAddress
+	 *            the endpoint address
+	 */
+	public PixManagerServiceImpl(String endpointAddress) {
+		this.endpointAddress = endpointAddress;
+		this.port = createPort();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see gov.samhsa.consent2share.pixclient.client.PIXManager#
-	 * pixManagerPRPAIN201301UV02
-	 * (gov.samhsa.consent2share.pixclient.ws.PRPAIN201301UV02)
+	 * pixManagerPRPAIN201301UV02 (org.hl7.v3.types.PRPAIN201301UV02)
 	 */
 	@Override
 	public MCCIIN000002UV01 pixManagerPRPAIN201301UV02(PRPAIN201301UV02 body) {
-		return port.pixManagerPRPAIN201301UV02(body);
+		return this.port.pixManagerPRPAIN201301UV02(body);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see gov.samhsa.consent2share.pixclient.client.PIXManager#
-	 * pixManagerPRPAIN201302UV02
-	 * (gov.samhsa.consent2share.pixclient.ws.PRPAIN201302UV02)
+	 * pixManagerPRPAIN201302UV02 (org.hl7.v3.types.PRPAIN201302UV02)
 	 */
 	@Override
 	public MCCIIN000002UV01 pixManagerPRPAIN201302UV02(PRPAIN201302UV02 body) {
-		return port.pixManagerPRPAIN201302UV02(body);
+		return this.port.pixManagerPRPAIN201302UV02(body);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see gov.samhsa.consent2share.pixclient.client.PIXManager#
-	 * pixManagerPRPAIN201304UV02
-	 * (gov.samhsa.consent2share.pixclient.ws.PRPAIN201304UV02)
+	 * pixManagerPRPAIN201304UV02 (org.hl7.v3.types.PRPAIN201304UV02)
 	 */
 	@Override
 	public MCCIIN000002UV01 pixManagerPRPAIN201304UV02(PRPAIN201304UV02 body) {
-		return port.pixManagerPRPAIN201304UV02(body);
+		return this.port.pixManagerPRPAIN201304UV02(body);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see gov.samhsa.consent2share.pixclient.client.PIXManager#
-	 * pixManagerPRPAIN201309UV02
-	 * (gov.samhsa.consent2share.pixclient.ws.PRPAIN201309UV02)
+	 * pixManagerPRPAIN201309UV02 (org.hl7.v3.types.PRPAIN201309UV02)
 	 */
 	@Override
 	public PRPAIN201310UV02 pixManagerPRPAIN201309UV02(PRPAIN201309UV02 body) {
-		return port.pixManagerPRPAIN201309UV02(body);
+		return this.port.pixManagerPRPAIN201309UV02(body);
 	}
 
-	public void setEndpoint(String endpoint) {
-		this.endpoint = endpoint;
+	/**
+	 * Gets the port.
+	 * 
+	 * @return the port
+	 */
+	PIXManagerPortType getPort() {
+		return port;
 	}
 
-	public void setPort(PIXManagerPortType port) {
+	/**
+	 * Sets the port.
+	 * 
+	 * @param port
+	 *            the new port
+	 */
+	void setPort(PIXManagerPortType port) {
 		this.port = port;
 	}
 
+	/**
+	 * Creates the port.
+	 * 
+	 * @return the pIX manager port type
+	 */
+	private PIXManagerPortType createPort() {
+		PIXManagerPortType port = new PIXManagerService(wsdlURL, serviceName)
+				.getPIXManagerPortSoap12();
+		if (StringUtils.hasText(this.endpointAddress)) {
+			BindingProvider bp = (BindingProvider) port;
+			bp.getRequestContext().put(
+					BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+					this.endpointAddress);
+		}
+
+		return port;
+	}
 }

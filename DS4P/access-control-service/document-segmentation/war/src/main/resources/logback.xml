@@ -29,7 +29,7 @@
 		</layout>
     </appender> 
     
-    <logger name="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation"></logger>
+    <logger name="gov.samhsa.acs.documentsegmentation"></logger>
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

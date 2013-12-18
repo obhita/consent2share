@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
@@ -22,7 +24,9 @@ import gov.samhsa.consent2share.service.reference.RaceCodeService;
 import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +35,8 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -214,12 +220,10 @@ public class PatientControllerTest {
 	}
 	
 	@Test
-	public void testHome() throws Exception {
+	public void testHome_when_authority_is_ROLE_USER() throws Exception {
 		final String username = "username";
-
 		final AuthenticatedUser currentUser = mock(AuthenticatedUser.class);
 		when(currentUser.getUsername()).thenReturn(username);
-
 		when(userContext.getCurrentUser()).thenReturn(currentUser);
 		mockMvc.perform(get("/patients/home.html"))
 			.andExpect(view().name("views/patients/home"));

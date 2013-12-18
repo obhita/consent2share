@@ -3,7 +3,8 @@ package gov.samhsa.ds4ppilot.pep.ws;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import gov.samhsa.ds4ppilot.pep.SecuredPep;
+import gov.samhsa.acs.pep.SecuredPep;
+import gov.samhsa.acs.pep.ws.SecuredFilterC32ServiceImpl;
 import gov.samhsa.ds4ppilot.schema.securedpep.RetrieveDocumentSetResponse;
 
 import java.io.InputStream;

@@ -13,39 +13,42 @@
 <!-- START: Mobile Specific -->
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <!-- END: Mobile Specific -->
-	<!-- START: CSS -->
-	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css" rel="stylesheet"/>
-	<link href="../../../resources/css/bootstrap-responsive.min.css" rel="stylesheet"/>
-	<link href="../../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
-	<link href="../../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
-	<link href="../../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+<!-- START: CSS -->
+
+<!-- Bootstrap related CSS files -->
+<link id="bootstrap-style" href="../../resources/css/bootstrap.css"
+	rel="stylesheet" th:href="@{/resources/css/bootstrap.css}" />
+<link href="../../resources/css/font-awesome.css"
+	th:href="@{/resources/css/font-awesome.css}"
+	rel="stylesheet"/>
+<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet"
+	th:href="@{/resources/css/joyride-2.0.3.css}" />
+
+<!-- Custom CSS Files -->
+<link href="../../resources/css/themes-style.css" rel="stylesheet"
+	th:href="@{/resources/css/themes-style.css}" />
+<link href="../../resources/css/sentinel-style.css" rel="stylesheet"
+	th:href="@{/resources/css/sentinel-style.css}" />
 	
-	<link href="../../../resources/css/themes-style.css" rel="stylesheet"/>
-	<link href="../../../resources/css/sentinel-style.css" rel="stylesheet"/>
-	<!-- END: CSS -->
+<!-- END: CSS -->
+
+<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+<!-- START: Favicon -->
+<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
+<!-- END: Favicon -->
+
 </head>
 
 <head>
-	<!-- START: Meta -->
-
-	<meta charset="utf-8"/>
-	<title>My Consents </title>
-	<meta name="description" content="Consent Management System"/>
-	<meta name="author" content="FEiSystems"/>
-
-	<!-- END: Meta -->
-
-	<!-- START: Mobile Specific -->
-	
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	
-	<!-- END: Mobile Specific -->
 
 	<!-- START: CSS -->
+	<link href="../../../resources/css/jquery-ui.css" rel="stylesheet" th:href="@{/resources/css/jquery-ui.css}"/>
+	<link href="../../../resources/css/sidebar.css" rel="stylesheet" th:href="@{/resources/css/sidebar.css}"/>
 	<link href="../../../resources/css/aero.css" th:href="@{/resources/css/aero.css}" rel="stylesheet"/>
 	<link href="../../../resources/css/blue.css" th:href="@{/resources/css/blue.css}" rel="stylesheet"/>
-	<link href="../../../resources/css/sidebar.css" rel="stylesheet" th:href="@{/resources/css/sidebar.css}"/>
-	<link href="../../../resources/css/jquery-ui.css" rel="stylesheet" th:href="@{/resources/css/jquery-ui.css}"/>
 	
 	<style type="text/css">
 		.modal_checkbox_list {
@@ -54,26 +57,13 @@
 	</style>
 	
 	<!-- END: CSS -->
-
-
-	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
-		<!--[if lt IE 9]>
-		<script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-
-
-
-	<!-- START: Favicon -->
-		<!-- 	<link rel="shortcut icon" href="img/favicon.ico"> -->
-	<!-- END: Favicon -->
-
 </head>
 
 <body class="fouc_loading">
 	<form style="display: none;" id="formToBeSubmitted" action="#" th:action="@{/consents/addConsent.html}" th:Object="${consentDto}" method="post" >
 		<!-- Save on Edit requires Id to update the consent --> 
 		<div th:if="${consentDto.id}!='null'"> 
-		<input class="consentId" id="consentId" name="id" type="text" th:value="${consentDto.id}"/> 
+		<input class="consentId form-control" id="consentId" name="id" type="text" th:value="${consentDto.id}"/> 
 		</div>
 		<div th:if="${!addConsent}">		
 			<div class="specmedinfo-input-div" th:each="DoNotShareClinicalConceptCode:${DoNotShareClinicalConceptCodes}">
@@ -84,113 +74,110 @@
 		</div>
 		
 	</form> 	
-	
-	
 
-	<div id="consent-add-main" class="container-fluid" style="overflow:hidden">
+
+	<div class="container outmost-holder">
 	<!-- START: Page Header -->
-	<div class="navbar" role="navigation">
-		<div class="navbar-inner-header">
-		
-			<div class="container-fluid">
+	<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='Add Consent',currentPageURI='/consents/addConsent.html',backPageURI='/consents/listConsents.html'">
+		<div class="container">
+			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/patient_fragments :: navbarHeaderFragmentBackAndLang">
 			
-				<div class="row-fluid">
-				
-					<a id="bread-crumb-btn" href="../consents/listConsents.html" class="btn btn-info" ><span class="icon-chevron-left icon-white"></span></a> 
+			<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE navbarHeaderFragment -->
+			<!-- The code below is here only to enhance source code readability -->
+					<a id="bread-crumb-btn" href="connectionMain.html" class="btn btn-info" >
+						<span class="fa fa-chevron-left"></span>
+					</a>
+					
+					<a class="btn btn-info btn-mainmenu" data-toggle="collapse"
+						data-target=".top-nav.navbar-collapse,.sidebar-nav.navbar-collapse">
+						<span class="fa fa-reorder"></span>
+					</a>
 					<h1>
-					<span th:if="${addConsent}">	
-						<span class="nav-title" th:text="#{add_a_consent}">Add a Consent</span>
-					</span>
-					<span th:if="${!addConsent}">
-						<span class="nav-title" th:text="#{edit_a_consent}">Edit a Consent</span>					
-					</span>
+						<span class="nav-title">Add Consent</span>
 					</h1>
-				
-					<div>
-											
-						<span th:include="fragment/common :: logoFragment">
-							<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
-						</span>
 
-							<div class="btn-group btn-right-align">
-								<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-									<span class="icon-flag"></span>
-									<span class="hidden-phone hidden-tablet" th:text="#{language}">Language</span> 
-									<span class="caret"></span>
-								</a>
-
-								<ul class="dropdown-menu" role="menu">
-									<li role="menuitem"><a
-										th:href="@{'/consents/addConsent.html?lang=en'}">English</a></li>
-									<li role="menuitem"><a
-										th:href="@{'/consents/addConsent.html?lang=cn'}">Chinese</a></li>
-								</ul>
-							</div>
+					<span th:include="fragment/common :: logoFragment">
+						<div style="position: relative;">
+							<a id="logoFragment" class="navbar-brand brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+							<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
 						</div>
-											
-				</div>
-								
+					</span>
+					
+					<!-- COMPONENT: Language Menu Dropdown -->
+					<div th:include="fragment/myaccount_menu :: languageFragment" class="btn-group btn-right-align">
+						<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+							<span class="fa fa-flag"></span>
+							<span class="hidden-sm hidden-md"> Language</span>
+							<span class="caret"></span>
+						</a>
+						
+						<ul class="dropdown-menu" role="menu">
+							<li role="menuitem"><a th:href="@{'/consents/addConsent.html?lang=en'}">English</a></li>
+							<li role="menuitem"><a th:href="@{'/consents/addConsent.html?lang=cn'}">Chinese</a></li>
+						</ul>
+					</div>
+			<!-- END OF SECTION REPLACED BY THYMELEAF -->
 			</div>
 		</div>
-	</div>
-	
-	<!-- END : Page Header -->	
+	</header>
 	
 	<div id="under-header"></div>
-		<div class="row-fluid main-content-wrapper">					
-			<div id="content">
+	<div id="consent-add-main" class="container" style="overflow:hidden">
+	<div class="row main-content-wrapper">
+		<div id="content">
 	
 	<!-- JavaScrip Enable Message -->		
-			<noscript>
-				<div class="alert alert-block span10">
-					<p class="h4-style alert-heading">Warning!</p>
-					<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a> enabled to use this site.</p>
-				</div>
-			</noscript>
-			
-
-				
+	<noscript th:substituteby="fragment/common :: noscriptFragment">
+		<div class="alert alert-warning col-sm-10">
+			<p id="h4-style" class="alert-heading">Warning!</p>
+			<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
+			target="_blank">JavaScript</a>enabled to use this site.</p>
+		</div>
+	</noscript>
+	
+	
 	<!-- START: Content Region-->
 	
-		<div role="main" class="span10" style="adding-bottom: 40px;">			
-			<div class="row-fluid">			
+		<div id="page-fullcontent-holder" role="main" class="col-sm-10 col-sm-offset-1" style="adding-bottom: 40px;">			
+			<div class="row">			
 	
 			<!-- COMPONENT: Consents -->
 			
 			
 <!-- AUTHORIZE PERSONS SECTION -->		
 					
-				<div class="span10 offset1">
+				<div class="col-sm-10 col-sm-offset-1">
 					<section class="top-margin10">
-						<div class="row-fluid">
-							<fieldset class="control-group">
+						<div class="row">
+							<fieldset>
 							<legend><span  th:text="#{I}">I</span>, <span th:text="${currentUser.firstName+' '+currentUser.lastName}">John Doe</span>, <span  th:text="#{hereby}">hereby</span>... </legend>
 							</fieldset>
 						</div>
 					</section>
 					
-					<section id="consent-container" class="row-fluid summary-container">
+					<section id="consent-container" class="top-margin10 summary-container">
 						<a href="#authorize-modal" role="button" class="consent-authorize-box bottom-margin10" data-edit-button="#edit1,#content1" data-toggle="modal">
 								<div id="consent-from" class="summary-border">
 									<div class="form-inline">
 							        	<p class="no-click"><span  th:text="#{Authorize_the_following_person}"> Authorize the following individual(s) and/or organization(s)</span>:</p>
 							        		<ul id="authorizers" class="provider-ul"></ul>
-								<!-- <li class="uneditable-input" ><span class="icon-user"></span></li> -->
 							        </div>
 							    </div>
 							</a>
 						
 	<!-- AUTHORIZE MODAL - START -->
-						<div id="authorize-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="authorize-modal" aria-hidden="true">
+						<div id="authorize-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="authorize-modal" aria-hidden="true">
+							<div class="modal-dialog">
+							<div class="modal-content">
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
 										<p class="h3-style">Authorize</p>
 									</div>
 							<div class="modal-body">
 								<div>
-									<div class="accordion-heading">
+									<div class="panel-heading">
 										
-											<div class="accordion-inner nomargin">
+											<div class="panel-body nomargin">
 												<form class="inputformPerson" th:object="${consentDto}">
 													<div>
 														<label for="authorize-list">Select the individual(s) and or organization(s) authorized to share your information:</label>
@@ -246,7 +233,7 @@
 <!-- 																</div> -->
 															</div>
 																<!-- <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save changes</button> -->
-															<span class="btn-left-align"><button id="saveauthorizer" class="btn btn-success btn-lrg" data-dismiss="modal" aria-hidden="true"><span class="icon-plus icon-white"></span></button></span>
+															<span class="btn-left-align"><button id="saveauthorizer" class="btn btn-success btn-lrg" data-dismiss="modal" aria-hidden="true"><span class="fa fa-plus fa-white"></span></button></span>
 
 													</div>
 												</form>
@@ -255,11 +242,13 @@
 									</div><!-- end accordian-heading -->
 								</div><!-- end --> 
 							</div><!-- end modal-body -->
+							</div>
+							</div>
 						</div>
 						
 	<!-- AUTHORIZE MODAL - END -->
 						
-						<div id="consent-right-arrow-container" style="vertical-align:top;"><div id="consent-arrow" class="icon-arrow-right"></div>
+						<div id="consent-right-arrow-container" style="vertical-align:top;"><div id="consent-arrow" class="fa fa-arrow-right"></div>
 						</div>
 				
 						
@@ -268,21 +257,22 @@
 								<div class="form-inline">
 							        	<p><span  th:text="#{To_disclose_my_information_to}">To disclose my information to</span>:</p>
 							        	<ul id="consentmadetodisplay" class="provider-ul"></ul>
-							<!-- <li class="uneditable-input"><span class="icon-user"></span> Grant, U S</li> -->
 							   </div>
 						   </div>
 						   </a>
 	<!-- DISCLOSE MODAL-START -->
-						<div id="disclose-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="disclose-modal" aria-hidden="true">
+						<div id="disclose-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="disclose-modal" aria-hidden="true">
+							<div class="modal-dialog">
+							<div class="modal-content">
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
 										<p class="h3-style">Disclosure</p>
 									</div>
 							<div class="modal-body">
 								<div>
-									<div class="accordion-heading">
+									<div class="panel-heading">
 										
-											<div class="accordion-inner nomargin">
+											<div class="panel-body nomargin">
 												<form class="inputformPerson" th:object="${consentDto}">
 													<div>
 														<label for="disclose-list">Select the individual(s) and/or organization(s) for disclosure:</label>
@@ -326,7 +316,7 @@
 											<!-- <option value="individualProvider" th:value="${individualProvidersDto.npi}" th:each="individualProvidersDto:${individualProvidersDto}" th:text="${individualProvidersDto.lastName+', '+individualProvidersDto.firstName}">John, Doe</option> -->
 											<!-- <option value="organizationalProvider" th:value="${organizationalProvidersDto.npi}" th:each="organizationalProvidersDto:${organizationalProvidersDto}" th:text="${organizationalProvidersDto.orgName}">ABC Hospital</option> -->
 											<!-- </select> -->
-														<span class="btn-left-align"><button id="saveconsentmadeto" class="btn btn-success btn-lrg" data-dismiss="modal" aria-hidden="true"><span class="icon-plus icon-white"></span></button></span>
+														<span class="btn-left-align"><button id="saveconsentmadeto" class="btn btn-success btn-lrg" data-dismiss="modal" aria-hidden="true"><span class="fa fa-plus fa-white"></span></button></span>
 													</div>
 												</form>
 											</div>
@@ -334,6 +324,8 @@
 									</div><!-- end accordian-heading -->
 								</div><!-- end --> 
 							</div><!-- end modal-body -->
+							</div>
+							</div>
 						</div>
 		<!-- DISCLOSE MODAL - END -->
 		
@@ -342,7 +334,7 @@
 					
 <!-- SHARE ALL MEDICAL INFO SECTION -->			
 		
-					<section class="row-fluid bottom-margin10">
+					<section class="top-margin10 bottom-margin10">
 						<div id="share-all-med" class="summary-border top-margin10">
 							<p class="inline-block bottom-margin10"><strong><span  th:text="#{medical_information}">Medical Information</span></strong></p>
 							<hr></hr>
@@ -354,7 +346,9 @@
 										<div class="iradio_square-blue float-left"  >
 											<input id="allInfo"  title="share-settings-radio button" type="radio" name="medicalinfo"/>
 										</div>
-										<label for="allInfo">  <strong><span th:text="#{share}">SHARE</span></strong> <strong><span th:text="#{all}">ALL</span></strong>&nbsp;<span th:text="#{information}">information</span>&nbsp;<span th:text="#{in_my_medical_record}">in my medical record.</span></label>
+										<div style="overflow: hidden;">
+											<label for="allInfo" style="display:inline;">  <strong><span th:text="#{share}">SHARE</span></strong> <strong><span th:text="#{all}">ALL</span></strong>&nbsp;<span th:text="#{information}">information</span>&nbsp;<span th:text="#{in_my_medical_record}">in my medical record.</span></label>
+										</div>
 									</div>
 								</li>
 								<li>
@@ -366,10 +360,11 @@
 										     C2S::Add Consent::Link Applied to Wrong Element(s)
 										     Changed the label for to input:radio id 
 									-->
-									<label for="selectInfo" style="display:inline;"><strong><span th:text="#{share}">SHARE</span></strong>&nbsp;<span th:text="#{my_medical_record}">my medical information </span>&nbsp;<strong><span th:text="#{exception}">with exception</span></strong>&nbsp;<span th:text="#{of_specific}">of specific</span>&nbsp;<span th:text="#{information}">information</span><span>.</span></label>
-									
+									<div style="overflow: hidden;">
+										<label for="selectInfo" style="display:inline;"><strong><span th:text="#{share}">SHARE</span></strong>&nbsp;<span th:text="#{my_medical_record}">my medical information </span>&nbsp;<strong><span th:text="#{exception}">with exception</span></strong>&nbsp;<span th:text="#{of_specific}">of specific</span>&nbsp;<span th:text="#{information}">information</span><span>.</span></label>
+									</div>
 									<div style="display: inline;">
-										<a id="edit1" href="#share-settings-modal" role="button" class="btn btn-mini btn-info edit" data-toggle="modal">
+										<a id="edit1" href="#share-settings-modal" role="button" class="btn btn-xs btn-info edit" data-toggle="modal">
 											Edit
 										</a>
 										<!-- Issue #145 Fix End -->
@@ -386,7 +381,9 @@
 						</div>
 						
 <!-- SHARE SETTINGS MODAL - START -->
-						<div id="share-settings-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="share-settings-modal" aria-hidden="true">
+						<div id="share-settings-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="share-settings-modal" aria-hidden="true">
+						<div class="modal-dialog">
+						<div class="modal-content">
 								<div class="modal-header">
 									<button id="btn_close_selected_medinfo" type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
 									<p class="h3-style">Privacy Settings</p>
@@ -395,30 +392,29 @@
 									<div>
 										<section class="top-margin10">                   
 							                <fieldset>
-								                    <div class="control-group"> 
-									                    <div class="accordion" id="accordion2">
-										                    <div class="accordion-group">
-											                    <div class="accordion-heading">
+								                    <div class="privacy-settings-input-group"> 
+									                    <div class="panel-group" id="accordion2">
+										                    <div class="panel panel-default">
+											                    <div class="panel-heading">
 											                    
-												                <div class="accordion-header-style">    
+												                <div class="panel-title accordion-header-style">    
 													                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne" th:text="#{sensitive_information}">
 													                Sensitive Information Categories
 												                    </a>
-																</div>						            	 
-																	<div id="collapseOne" class="accordion-body collapse">
-																      <div class="accordion-inner"> 
+																</div></div>						            	 
+																	<div id="collapseOne" class="panel-collapse collapse">
+																      <div class="panel-body"> 
 																        <div>
-																	        <div class="alert">
-																	        <!-- <button type="button" class="close" data-dismiss="alert">&times;</button> -->
+																	        <div class="alert alert-warning">
 																	         <strong><span>DO NOT</span></strong>&nbsp;share the following areas of potentially sensitive information.
 																		    </div>
 																	        
 																	        <div class="consent-select">
 																	        	<div>
-																	        		<button id="btn_sensitivity_select_all" class="btn btn-mini btn-sel-all-tab" type="button">Select All</button>
+																	        		<button id="btn_sensitivity_select_all" class="btn btn-default btn-xs btn-sel-all-tab" type="button">Select All</button>
 																	        	</div>
 																	        	<div>
-																	        		<button id="btn_sensitivity_deselect_all" class="btn btn-mini btn-desel-all-tab" type="button">Deselect All</button>
+																	        		<button id="btn_sensitivity_deselect_all" class="btn btn-default btn-xs btn-desel-all-tab" type="button">Deselect All</button>
 																	        	</div>
 																	        </div>
 																	        
@@ -437,12 +433,9 @@
 																							<input type="hidden" class="sensitivity-policy-code-checked-input" th:value="${SensitivityPolicyCode.code}" />
 																						</span>																					
 																					</span>
-																				<!-- 	<div th:id="${'message-block_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}" class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}"></div></div></div>
-																					<a th:id="${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}"><span style="margin-left: 5px;" class="icon-info-sign"></span>
-																					</a> -->
 																					<a href="#"  th:id="${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
 																					 data-content="icon context" data-title="title" >
-																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
+																					<span style="margin-left: 5px;" class="fa fa-info-circle"></span>
 																					</a>
 																					<input th:attr="data-linkid=${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')},data-intitle=#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}"
 																					    class="input_i-text" th:id="${'i-text_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}" type="hidden"
@@ -452,31 +445,31 @@
 																	        </div>
 																        </div>
 																      </div>
-																    </div>
+																    
 											                    </div>
 									                         
-										                    <div class="accordion-group">
-											                    <div class="accordion-heading">
+										                    <div class="panel panel-default">
+											                    <div class="panel-heading">
 											                    
-												                <div class="accordion-header-style">
+												                <div class="panel-title accordion-header-style">
 												                	<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" >
 													                Medical Information Categories
 												                    </a>
 												               </div>
 												                    
-												                    <div id="collapseTwo" class="accordion-body collapse">
-																      <div class="accordion-inner">
+												                    <div id="collapseTwo" class="panel-collapse collapse">
+																      <div class="panel-body">
 																        <div>
-																	        <div class="alert">
+																	        <div class="alert alert-warning">
 																	         Select the medical information that you <strong>DO NOT</strong> wish to share.
 																		    </div>
 																		
 																		<div class="consent-select">
 																			<div>
-																				<button id="btn_med_info_select_all" class="btn btn-mini btn-sel-all-tab" type="button">Select All</button>
+																				<button id="btn_med_info_select_all" class="btn btn-default btn-xs btn-sel-all-tab" type="button">Select All</button>
 																			</div>
 																			<div>
-																				<button id="btn_med_info_deselect_all" class="btn btn-mini btn-desel-all-tab" type="button">Deselect All</button>
+																				<button id="btn_med_info_deselect_all" class="btn btn-default btn-xs btn-desel-all-tab" type="button">Deselect All</button>
 																			</div>
 																		</div>
 																		
@@ -499,16 +492,11 @@
 																																									
 																					<a href="#"  th:id="${'i-icon_' + #strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
 																					  data-content="icon content" data-title="title" >
-																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
+																					<span style="margin-left: 5px;" class="fa fa-info-circle"></span>
 																					</a>
 																					<input th:attr="data-linkid=${'i-icon_' + #strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')},data-intitle=#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}"
 																					    class="input_i-text" th:id="${'i-text_' + #strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '-')}" type="hidden"
 																					    th:value="#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')+'_text'}}" />
-																																											
-																					<!-- <a href="#" data-trigger="click" data-toggle="popover" data-placement="bottom" 
-																						data-content="Medical Information Item 1 text here." 
-																						title="" data-original-title="Medical Information Item 1"><span style="margin-left: 5px;" class="icon-info-sign"></span>
-																					</a> -->
 																	        	</div>
 																	        </div>
 																	        </form>
@@ -519,28 +507,28 @@
 											                    </div>
 										                    </div> 
 										                    
-										                    <div class="accordion-group">
-											                    <div class="accordion-heading">
+										                    <div class="panel panel-default">
+											                    <div class="panel-heading">
 											                    
-												                <div class="accordion-header-style">
+												                <div class="panel-title accordion-header-style">
 												                	<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree" >
 													                Clinical Document Type
 												                    </a>
 												               </div>
 												                    
-												                    <div id="collapseThree" class="accordion-body collapse">
-																      <div class="accordion-inner">
+												                    <div id="collapseThree" class="panel-collapse collapse">
+																      <div class="panel-body">
 																        <div>
-																	        <div class="alert">
+																	        <div class="alert alert-warning">
 																	         Select the clinical document types you <strong>DO NOT</strong> wish to share.
 																		    </div>
 																		    
 																		    <div class="consent-select">
 																		    	<div>
-																		    		<button id="btn_clinical_doc_select_all" class="btn btn-mini btn-sel-all-tab" type="button">Select All</button>
+																		    		<button id="btn_clinical_doc_select_all" class="btn btn-default btn-xs btn-sel-all-tab" type="button">Select All</button>
 																		    	</div>
 																		    	<div>
-																		    		<button id="btn_clinical_doc_deselect_all" class="btn btn-mini btn-desel-all-tab" type="button">Deselect All</button>
+																		    		<button id="btn_clinical_doc_deselect_all" class="btn btn-default btn-xs btn-desel-all-tab" type="button">Deselect All</button>
 																		    	</div>
 																		    </div>
 																		    
@@ -563,7 +551,7 @@
 																					</span>																						
 																					<a href="#"  th:id="${'i-icon_' + #strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
 																					  data-content="icon context" data-title="title">
-																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
+																					<span style="margin-left: 5px;" class="fa fa-info-circle"></span>
 																					</a>
 																					<input th:attr="data-linkid=${'i-icon_' +#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')},data-intitle=#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}"
 																					    class="input_i-text" th:id="${'i-text_' + #strings.replace(clinicalDocumentTypeCode.displayName, ' ', '-')}" type="hidden"
@@ -578,26 +566,26 @@
 										                    </div> 
 										                    
 										           
-										                    <div class="accordion-group">
-											                    <div class="accordion-heading">
+										                    <div class="panel panel-default">
+											                    <div class="panel-heading">
 												                    
-												                    <div class="accordion-header-style">
+												                    <div class="panel-title accordion-header-style">
 												                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour">
 													                    Specific Medical Information
 												                    </a>
 												                    </div>
-												                    <div id="collapseFour" class="accordion-body collapse" >
-																      <div class="accordion-inner">
-																      <div class="alert">
+												                    <div id="collapseFour" class="panel-collapse collapse" >
+																      <div class="panel-body">
+																      <div class="alert alert-warning">
 																	         Enter any specific medical information you <strong><span>DO NOT</span></strong>&nbsp; wish to share.
 																		    </div>
 																        
-																        <div  class="ui-widget" id="autocomplete">
+																        <div  class="form-group ui-widget" id="autocomplete">
 																        	<label for="condition">Enter a condition:</label>
 																 
-																	        <input id="condition" type="text"  class="condition-input"></input>
-																	        <span class="btn-left-align" ><button id="addspecmedi" class="btn btn-success btn-lrg"><span class="icon-plus icon-white"></span></button></span>
-																	        <p style="font-size:small;"><em>If you do not know the correct name of the condition, please leave this field empty.</em></p>
+																	        <input id="condition" type="text"  class="form-control force-inline condition-input"></input>
+																	        <span class="btn-left-align" ><button id="addspecmedi" class="btn btn-sm btn-success"><span class="fa fa-plus fa-white"></span></button></span>
+																	        <p class="top-margin10" style="font-size:small;"><em>If you do not know the correct name of the condition, please leave this field empty.</em></p>
 																	    
 																        </div>
 																        <form>
@@ -605,10 +593,6 @@
 																        <div>
 																	        <ul id="specmedinfo">
 																		        <li class="spacing">
-<!-- 																			        <div> -->
-<!-- 																				        <span>Syphillis</span> -->
-<!-- 																				    	<span><button class="btn btn-danger btn-mini list-btn"><span class="icon-minus icon-white"></span></button></span>     -->
-<!-- 																			        </div> -->
 																		        </li>
 																	        </ul>
 																	        <br/><br/><br/>
@@ -625,13 +609,17 @@
 									</div>
 								</div>
 								<div class="modal-footer">
-									<button id="btn_cancel_selected_medinfo" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+									<button id="btn_cancel_selected_medinfo" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Cancel</button>
 									<button id="btn_save_selected_medinfo" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save changes</button>
+								</div>
+								</div>
 								</div>
 							</div><!-- end of share-settings-modal -->
 						
 				<!-- felix modal -->
-						<div id="felix" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+						<div id="felix" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-dialog">
+						<div class="modal-content">
 							<div class="modal-header">
 								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 								<h3 id="myModalLabel">Substance Abuse</h3>
@@ -640,7 +628,9 @@
 								<p>Substance abuse, also known as drug abuse, is a patterned use of a substance (drug) in which the user consumes the substance in amounts or with methods neither approved nor advised by medical professionals. Substance abuse/drug abuse is not limited to mood-altering or psycho-active drugs. If an activity is performed using the objects against the rules and policies of the matter (as in steroids for performance enhancement in sports), it is also called substance abuse.</p>
 							</div>
 							<div class="modal-footer">
-								<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>											    
+								<button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>											    
+							</div>
+							</div>
 							</div>
 						</div>
 				<!-- end felix modal -->    
@@ -648,7 +638,7 @@
 					
 <!-- SHARE FOR PURPOSES SECTION -->		
 					
-					<section class="row-fluid bottom-margin10">
+					<section class="bottom-margin10">
 						<div id="share-for-purpose" class="summary-border">
 									<p class="inline-block bottom-margin10"><strong><span th:text="#{Purpose_of_Use}">Purpose of Use</span></strong></p>
 									<hr></hr>
@@ -664,7 +654,7 @@
 											     C2S::Add Consent::Link Applied to Wrong Element(s)
 											     Changed the label for to input:radio id
 										-->
-										<label for="selectPurposes"><strong><span th:text="#{share}">Share</span></strong>&nbsp;<span th:text="#{my_medical_record}">my medical record</span><strong>&nbsp;<span th:text="#{only}">ONLY</span></strong>&nbsp;<span th:text="#{for_the}">for the</span>&nbsp;<span th:text="#{selected_purposes}">selected purpose(s) of use.</span><span><a id="edit2" href="#selected-purposes-modal" role="button" class="btn btn-mini btn-info edit" data-toggle="modal">
+										<label for="selectPurposes"><strong><span th:text="#{share}">Share</span></strong>&nbsp;<span th:text="#{my_medical_record}">my medical record</span><strong>&nbsp;<span th:text="#{only}">ONLY</span></strong>&nbsp;<span th:text="#{for_the}">for the</span>&nbsp;<span th:text="#{selected_purposes}">selected purpose(s) of use.</span><span><a id="edit2" href="#selected-purposes-modal" role="button" class="btn btn-xs btn-info edit" data-toggle="modal">
 											Edit
 									</a> </span>
 										</label>
@@ -688,27 +678,28 @@
 						</div><!-- end modal2 -->
 						
 						<!-- Modal2 -->
-							<div id="selected-purposes-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="selected-purposes-modal" aria-hidden="true">
+							<div id="selected-purposes-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selected-purposes-modal" aria-hidden="true">
+							<div class="modal-dialog">
+							<div class="modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
 									<p class="h3-style">Share for selected purpose(s) only</p>
 								</div>
 								
-								
-								
+								<div class="modal-body">
 								<fieldset>
 								    <div> 
-								    	<div class="accordion-heading">
-								    		<div class="accordion-inner nomargin"> 
+								    	<div class="panel-heading">
+								    		<div class="panel-body nomargin"> 
 								    			<form class="purposeofshareform" th:object="${consentDto}">
-								    				<div class="alert">Share my information&nbsp;<strong>only</strong>&nbsp;for specified purpose(s) of use.</div>
+								    				<div class="alert alert-warning">Share my information&nbsp;<strong>only</strong>&nbsp;for specified purpose(s) of use.</div>
 								    												    				
 								    				<div class="consent-select">
 								    					<div>
-								    						<button id="btn_share_purposes_select_all" class="btn btn-mini btn-sel-all-tab" type="button">Select All</button>
+								    						<button id="btn_share_purposes_select_all" class="btn btn-default btn-xs btn-sel-all-tab" type="button">Select All</button>
 								    					</div>
 								    					<div>
-								    						<button id="btn_share_purposes_deselect_all" class="btn btn-mini btn-desel-all-tab" type="button">Deselect All</button>
+								    						<button id="btn_share_purposes_deselect_all" class="btn btn-default btn-xs btn-desel-all-tab" type="button">Deselect All</button>
 								    					</div>
 								    				</div>
 								    				
@@ -729,7 +720,7 @@
 															</span>															
 																					<a href="#"  th:id="${'i-icon_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')}" data-trigger="click" data-toggle="popover" data-placement="bottom"
 																					  data-content="icon context" data-title="title">
-																					<span style="margin-left: 5px;" class="icon-info-sign"></span>
+																					<span style="margin-left: 5px;" class="fa fa-info-circle"></span>
 																					</a>
 																					<input th:attr="data-linkid=${'i-icon_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')},data-intitle=#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}"
 																					    class="input_i-text" th:id="${'i-text_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')}" type="hidden"
@@ -744,15 +735,18 @@
 										</div>
 								    </div>
 								</fieldset>
+								</div>
 								<div class="modal-footer">
-									<button id="btn_cancel_selected_purposes" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+									<button id="btn_cancel_selected_purposes" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Cancel</button>
 									<button id="btn_save_selected_purposes" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save changes</button>
+								</div>
+								</div>
 								</div>
 							</div>
 					</section>
 					
 <!-- CONSENT DATES START -->		
-<section class="row-fluid bottom-margin10">
+<section class="bottom-margin10">
 		<div id="consent-date-fill" class="summary-border">
 		<p class="inline-block bottom-margin10"><strong><span th:text="#{Consent_Term}">Consent Term</span></strong></p>
 		<hr></hr>
@@ -763,7 +757,7 @@
 							<form class="summary-container inputformDate" th:object="${consentDto}">
 								<fieldset>
 									<label for="date-picker-start"><span th:text="#{start}">Consent Start</span></label>
-									<div class="input-append datepicker" data-date-format="mm/dd/yyyy">
+									<div class="input-group datepicker" data-date-format="mm/dd/yyyy">
 										<span th:if="${addConsent}">
 											<input class="datepicker" id="date-picker-start" name="consentStart" style="z-index: 100;" value="" />
 										</span>
@@ -779,7 +773,7 @@
 							<form class="summary-container inputformDate" th:object="${consentDto}">
 								<fieldset>
 									<label for="date-picker-end"><span th:text="#{end}">Consent End</span></label>
-									<div class="input-append datepicker date"  data-date-format="mm/dd/yyyy">
+									<div class="input-group datepicker date"  data-date-format="mm/dd/yyyy">
 										<span th:if="${addConsent}">
 											<input class="datepicker" id="date-picker-end" name="consentEnd" style="z-index: 100;" value="" />
 										</span>
@@ -797,10 +791,12 @@
 </section>
 
 <!-- CONSENT DATES END --> 				
-				<section class="control-group top-margin10">
-					<div class="controls" style="padding-top: 15px">
-						<button id="consent-add-cancel" type="button" class="btn" style="margin: 0 10px 0 0;" onclick="window.location.href='listConsents.html'"><span th:text="#{cancel}">Cancel</span></button>
-						<button id="consent-add-save" type="submit" class="btn btn-primary"><span th:text="#{save}">Save</span></button>
+				<section class="save-cancel-buttons-group top-margin10">
+					<div class="controls" style="padding-top: 15px;">
+						<button id="consent-add-cancel" type="button" class="btn btn-default" style="margin: 0 10px 0 0;" onclick="window.location.href='listConsents.html'"><span th:text="#{cancel}">Cancel</span></button>
+						<span id="consent-add-save-section" style="display:inline-block;">
+							<button id="consent-add-save" type="submit" class="btn btn-primary" style="margin: 5px;"><span th:text="#{save}">Save</span></button>
+						</span>
 					</div>         		
 				</section>
 					
@@ -809,29 +805,16 @@
 				</div>
 							
 			</div>
-		</div><!--end main.span10-->
-		<!-- START: Footer Region -->		
-	
-		
-		<!-- END: Footer Region -->	
-	
-
-			
-			
+		</div><!--end main.col-md-10-->			
 	</div><!-- end content line 96-->
 			
 
 
 	<!-- END: Content Region -->
 
-
-
-	<!-- ELEMENT: Divider -->
-
-		
 	
 
-		</div><!-- end first row-fluid --> 
+		</div><!-- end first row --> 
 		
 	    <ol id="tourtest" class="hidden">
 
@@ -841,64 +824,41 @@
 			<li data-id="share-for-purpose" class="user-guide show-delayed-next" data-placement="top"><img class="number-icon" src="../../../resources/img/number-04.png" th:src="@{/resources/img/number-04.png}" alt="step-04" width="20" height="20"/>This section is for selecting the reasons in which you medical information can be shared.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
 			<li data-id="consent-start-date" class="user-guide show-delayed-next"><img class="number-icon" src="../../../resources/img/number-05.png" th:src="@{/resources/img/number-05.png}" alt="step-05" width="20" height="20"/>This field specifies the date this consent becomes effective.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
 			<li data-id="consent-end-date" class="jerry user-guide show-delayed-next" data-options="nubPhonePosition:top-right"><img class="number-icon" src="../../../resources/img/number-06.png" th:src="@{/resources/img/number-06.png}" alt="step-06" width="20" height="20"/>This field specifies the date this consent will expire.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
-			<li data-id="consent-add-save" class="klinger user-guide show-delayed-next" data-options="tipLocation:left; tipTopOffset:-20;tipLeftOffset:18;nubPhonePosition:top"><img class="number-icon" src="../../../resources/img/number-07.png" th:src="@{/resources/img/number-07.png}" alt="step-07" width="20" height="20"/>Clicking the "Save" button will save this consent, and return you to your "My Consents" page.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
+			<li data-id="consent-add-save-section" class="klinger user-guide show-delayed-next" data-options="tipLocation:left; tipTopOffset:-20;tipLeftOffset:18;nubPhonePosition:top"><img class="number-icon" src="../../../resources/img/number-07.png" th:src="@{/resources/img/number-07.png}" alt="step-07" width="20" height="20"/>Clicking the "Save" button will save this consent, and return you to your "My Consents" page.<div class="disclaimer">Always consult your doctor or physician to discuss any potential health risks.</div></li>
 
 		</ol>
 		
 		<ul id="pulldown_menu">
 			<li>
 				<div style="z-index: 101;">
-					<button id="btn_guide_OnOff" type="button" class="btn">Guide On</button>
+					<button id="btn_guide_OnOff" type="button" class="btn btn-default">Guide On</button>
 				</div>
 			</li>
-		</ul>
-
-			<div class="clearfix"></div>
-				<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
-					<div>
-					
-						<!-- COMPONENT: Action Buttons -->
-						<!--
-						<a href="#" class="btn pull-left" data-dismiss="modal">Close</a>
-						<a href="#" class="btn btn-primary pull-right">Save changes</a>
-						-->
-						
-						<!-- COMPONENT: Copyright Information -->
-						<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
-				
-					</div>
-				</footer>
-	</div><!-- end Container-fluid -->
-	
-	<input type="hidden" class="input_hidden" id="input_isAddConsent" th:value="${addConsent}" value="" />
+		</ul>	
+			<input type="hidden" class="input_hidden" id="input_isAddConsent" th:value="${addConsent}" value="" />	
+	</div><!-- end Container -->
+		<!-- START: Footer Region -->
+		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
+			<div>
+					<!-- COMPONENT: Copyright Information -->
+					<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
+			</div>
+		</footer>
+		<!-- END: Footer Region -->
+	</div>
 	
 	<!-- START: JavaScript-->
 		<script src="../../../resources/js/jquery-ui.min.js"
 				th:src="@{/resources/js/jquery-ui.min.js}"
 				type="text/javascript"></script>
-		<script src="../../../resources/js/bootstrap.min.js"
-				th:src="@{/resources/js/bootstrap.min.js}" 
-				type="text/javascript"></script>
 		<script src="../../../resources/js/jquery.icheck.js"
 				th:src="@{/resources/js/jquery.icheck.js}" 
-				type="text/javascript"></script>
-		<script src="../../../resources/js/jquery.toggle.buttons.js"
-				th:src="@{/resources/js/jquery.toggle.buttons.js}" 
 				type="text/javascript"></script>
 		<script src="../../../resources/js/bootstrap-datepicker.js"
 				th:src="@{/resources/js/bootstrap-datepicker.js}" 
 				type="text/javascript"></script>
-		<script src="../../../resources/js/bootstrap-tooltip.js"
-				th:src="@{/resources/js/bootstrap-tooltip.js}"
-				type="text/javascript"></script>
-	 	<script src="../../../resources/js/bootstrap-popover.js"
-				th:src="@{/resources/js/bootstrap-popover.js}"
-				type="text/javascript"></script> 
 		<script src="../../../resources/js/jquery.joyride-2.0.3.js" 
 				th:src="@{/resources/js/jquery.joyride-2.0.3.js}"
-				type="text/javascript"></script>
-		<script src="../../../resources/js/jquery.cookie.js" 
-				th:src="@{/resources/js/jquery.cookie.js}"
 				type="text/javascript"></script>
 		<script src="../../../resources/js/modernizr.mq.js" 
 				th:src="@{/resources/js/modernizr.mq.js}"

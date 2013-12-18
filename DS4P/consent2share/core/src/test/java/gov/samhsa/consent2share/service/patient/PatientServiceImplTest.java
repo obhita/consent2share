@@ -28,9 +28,11 @@ import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedExce
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.AddConsentOrganizationalProviderDto;
+import gov.samhsa.consent2share.service.dto.PatientAdminDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -483,5 +485,20 @@ public class PatientServiceImplTest {
 
 		// Assert
 		assertTrue(result);
+	}
+	
+	@Test
+	public void testFindAllPatientByFirstNameAndLastName(){
+		List<Patient> patients=new ArrayList<Patient>();
+		Patient patient=mock(Patient.class);
+		Patient patient2=mock(Patient.class);
+		patients.add(patient);
+		patients.add(patient2);
+		when(patientRepository.findAllByFirstNameContainsAndLastNameContains("john", "smith")).thenReturn(patients);
+		PatientAdminDto patientAdminDto=mock(PatientAdminDto.class);
+		PatientAdminDto patientAdminDto2=mock(PatientAdminDto.class);
+		when(modelMapper.map(patient, PatientAdminDto.class)).thenReturn(patientAdminDto);
+		when(modelMapper.map(patient2, PatientAdminDto.class)).thenReturn(patientAdminDto2);
+		assertEquals(Arrays.asList(patientAdminDto,patientAdminDto2),sut.findAllPatientByFirstNameAndLastName("john", "smith"));
 	}
 }

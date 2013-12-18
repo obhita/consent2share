@@ -1,11 +1,11 @@
 package gov.samhsa.ds4ppilot.pep;
 
 import static org.junit.Assert.assertNotNull;
-import gov.samhsa.ds4ppilot.pep.audit.AuditServiceImpl;
-import gov.samhsa.ds4ppilot.pep.c32getter.C32GetterImpl;
-import gov.samhsa.ds4ppilot.pep.contexthandler.ContextHandlerImpl;
-import gov.samhsa.ds4ppilot.pep.xdsbregistry.XdsbRegistryImpl;
-import gov.samhsa.ds4ppilot.pep.xdsbrepository.XdsbRepositoryImpl;
+import gov.samhsa.acs.contexthandler.ContextHandlerImpl;
+import gov.samhsa.acs.pep.audit.AuditServiceImpl;
+import gov.samhsa.acs.pep.c32getter.C32GetterImpl;
+import gov.samhsa.acs.pep.xdsbregistry.XdsbRegistryImpl;
+import gov.samhsa.acs.pep.xdsbrepository.XdsbRepositoryImpl;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
 
 import java.io.ByteArrayInputStream;

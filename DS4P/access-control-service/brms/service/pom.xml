@@ -20,6 +20,7 @@
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>common-library</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>brms-factmodel</artifactId>
@@ -40,129 +41,77 @@
 		</dependency>
 
 		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>jsr311-api</artifactId>
+		</dependency>
+
+		<!-- Apache CXF dependencies -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- Testing -->
+
+		<!-- Web stack-specific dependencies that are internally needed by the 
+			Endpoint object as it exposes a web service -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http-jetty</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Below used by embedded Jetty (which implements Endpoint in CXF) -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
 
 	<build>
-		<finalName>RuleExecutionService</finalName>
-		
-		<pluginManagement>
-			<plugins>
-				
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.cxf</groupId>
-										<artifactId>
-											cxf-codegen-plugin
-										</artifactId>
-										<versionRange>[2.6.0,)</versionRange>
-										<goals>
-											<goal>wsdl2java</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+		<finalName>brms-service</finalName>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-codegen-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<groupId>xerces</groupId>
+						<artifactId>xercesImpl</artifactId>
+						<version>${xercesImpl.version}</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<configuration>
+							<sourceRoot>
+								${basedir}/target/generated-sources
+							</sourceRoot>
+							<wsdlOptions>
+								<wsdlOption>
+									<wsdl>
+										${basedir}/src/main/resources/wsdl/RuleExecutionService.wsdl
+									</wsdl>
+								</wsdlOption>
+							</wsdlOptions>
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 
 	</build>
 
-	<profiles>
-		<profile>
-			<id>CXF</id>
-			<!-- To use Metro by default, move activation element to its profile below -->
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.cxf</groupId>
-						<artifactId>cxf-codegen-plugin</artifactId>
-						<version>${cxf.version}</version>
-						<dependencies>
-							<dependency>
-								<groupId>xerces</groupId>
-								<artifactId>xercesImpl</artifactId>
-								<version>${xercesImpl.version}</version>
-							</dependency>
-						</dependencies>
-						<executions>
-							<execution>
-								<configuration>
-									<sourceRoot>
-										${basedir}/target/generated-sources
-									</sourceRoot>
-									<wsdlOptions>
-										<wsdlOption>
-											<wsdl>
-												${basedir}/src/main/resources/RuleExecutionService.wsdl
-											</wsdl>
-										</wsdlOption>
-									</wsdlOptions>
-								</configuration>
-								<goals>
-									<goal>wsdl2java</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>Metro</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jvnet.jax-ws-commons</groupId>
-						<artifactId>jaxws-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>wsimport</goal>
-								</goals>
-								<configuration>
-									<wsdlDirectory>
-										src/main/resources
-									</wsdlDirectory>
-									<wsdlFiles>
-										<wsdlFile>RuleExecutionService.wsdl</wsdlFile>
-									</wsdlFiles>
-									<sourceDestDir>
-										${basedir}/target/generated-sources
-									</sourceDestDir>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-
-		</profile>
-	</profiles>
 </project>

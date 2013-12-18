@@ -16,20 +16,20 @@
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 
 	<util:properties id="endpointAddressProperties"
-		location="/WEB-INF/endpointAddress.properties" />
+		location="/WEB-INF/classes/endpointAddress.properties" />
 	<util:properties id="parameterConfigProperties"
-		location="/WEB-INF/parameterConfig.Properties" />
+		location="/WEB-INF/classes/parameterConfig.Properties" />
 
 	<!-- End points -->
 	<jaxws:endpoint id="PepService" implementor="#pepPortTypeImpl"
-		wsdlLocation="classpath:Pep.wsdl" address="/PepService">
+		wsdlLocation="classpath:wsdl/Pep.wsdl" address="/PepService">
 		<jaxws:properties>
 			<entry key="mtom-enabled" value="true" />
 		</jaxws:properties>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint id="filterc32service" implementor="#filterC32ServiceImpl"
-		wsdlLocation="classpath:FilterC32Service.wsdl" address="/filterc32service">
+		wsdlLocation="classpath:wsdl/FilterC32Service.wsdl" address="/filterc32service">
 		<jaxws:properties>
 			<entry key="mtom-enabled" value="true" />
 		</jaxws:properties>
@@ -37,16 +37,16 @@
 	
     <!--
 	<jaxws:endpoint id="securedfilterc32service"
-		implementor="#securedfilterC32ServiceImpl" wsdlLocation="classpath:SecuredFilterC32Service.wsdl"
+		implementor="#securedfilterC32ServiceImpl" wsdlLocation="classpath:wsdl/SecuredFilterC32Service.wsdl"
 		address="/securedfilterc32service">
 		<jaxws:properties>
           <entry key="ws-security.signature.properties" value="crypto.properties"/>
-           <entry key="ws-security.callback-handler" value="gov.samhsa.ds4ppilot.pep.ws.ServerPasswordCallback"/>
+           <entry key="ws-security.callback-handler" value="gov.samhsa.acs.pep.ws.ServerPasswordCallback"/>
         </jaxws:properties>
 	</jaxws:endpoint>		
     
 	<jaxws:endpoint id="pushfilterc32service" implementor="#pushfilterC32ServiceImpl"
-		wsdlLocation="classpath:PushFilterC32Service.wsdl" address="/pushfilterc32service">
+		wsdlLocation="classpath:wsdl/PushFilterC32Service.wsdl" address="/pushfilterc32service">
 		<jaxws:properties>
 			<entry key="mtom-enabled" value="true" />
 		</jaxws:properties>
@@ -54,7 +54,7 @@
     -->
     
 	<jaxws:endpoint id="xdsdocumentservice" implementor="#XDSDocumentServiceImpl"
-		wsdlLocation="classpath:XDSDocumentService.wsdl" address="/xdsdocumentservice">
+		wsdlLocation="classpath:wsdl/XDSDocumentService.wsdl" address="/xdsdocumentservice">
 	</jaxws:endpoint>
 
 	<!-- Old beans -->
@@ -65,28 +65,28 @@
                 <entry key="action" value="Timestamp Signature Encrypt"/>
                 <entry key="signaturePropFile" value="crypto.properties"/>
                 <entry key="decryptionPropFile" value="crypto.properties"/>
-                <entry key="passwordCallbackClass" value="gov.samhsa.ds4ppilot.pep.ws.ServerPasswordCallback"/>
+                <entry key="passwordCallbackClass" value="gov.samhsa.acs.pep.ws.ServerPasswordCallback"/>
             </map>
         </constructor-arg>
     </bean> -->
 
 	<bean id="XDSDocumentServiceImpl"
-		class="gov.samhsa.ds4ppilot.pep.ws.XDSDocumentServiceImpl"
+		class="gov.samhsa.acs.pep.ws.XDSDocumentServiceImpl"
 		scope="prototype" autowire="byType" />
 
 	<bean id="filterC32ServiceImpl"
-		class="gov.samhsa.ds4ppilot.pep.ws.FilterC32ServiceImpl"
+		class="gov.samhsa.acs.pep.ws.FilterC32ServiceImpl"
 		scope="prototype" autowire="byType" />
 
 	<bean id="securedfilterC32ServiceImpl"
-		class="gov.samhsa.ds4ppilot.pep.ws.SecuredFilterC32ServiceImpl"
+		class="gov.samhsa.acs.pep.ws.SecuredFilterC32ServiceImpl"
 		scope="prototype" autowire="byType" />
 
 	<bean id="pushfilterC32ServiceImpl"
-		class="gov.samhsa.ds4ppilot.pep.ws.PushFilterC32ServiceImpl"
+		class="gov.samhsa.acs.pep.ws.PushFilterC32ServiceImpl"
 		scope="prototype" autowire="byType" />
 
-	<bean id="pepImpl" class="gov.samhsa.ds4ppilot.pep.PepImpl"
+	<bean id="pepImpl" class="gov.samhsa.acs.pep.PepImpl"
 		scope="prototype">
 		<constructor-arg ref="c32GetterImpl" />
 		<constructor-arg ref="contextHandlerImpl" />
@@ -105,7 +105,7 @@
 	</bean>
 
 	<bean id="securedPepImpl"
-		class="gov.samhsa.ds4ppilot.pep.SecuredPepImpl"
+		class="gov.samhsa.acs.pep.SecuredPepImpl"
 		scope="prototype">
 		<constructor-arg ref="c32GetterImpl" />
 		<constructor-arg ref="contextHandlerImpl" />
@@ -128,7 +128,7 @@
 	</bean>
 
 	<bean id="c32GetterImpl"
-		class="gov.samhsa.ds4ppilot.pep.c32getter.C32GetterImpl"
+		class="gov.samhsa.acs.pep.c32getter.C32GetterImpl"
 		scope="prototype">
 		<constructor-arg value="#{endpointAddressProperties.c32Service}" />
 	</bean>
@@ -137,58 +137,58 @@
 	
 	<!-- Common Tools -->
 	<bean id="documentXmlConverterImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.common.tool.DocumentXmlConverterImpl"
+		class="gov.samhsa.acs.common.tool.DocumentXmlConverterImpl"
 		scope="prototype"/>
 	<bean id="fileReaderImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.common.tool.FileReaderImpl"
+		class="gov.samhsa.acs.common.tool.FileReaderImpl"
 		scope="prototype"/>
 	<bean id="simpleMarshallerImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl"
+		class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl"
 		scope="prototype" />
 		
 	<!-- XDS.b -->
 	<!-- XDS.b: common -->
 	<bean id="xdsbErrorFactory"
-		class="gov.samhsa.consent2share.accesscontrolservice.xdsb.common.XdsbErrorFactory"
+		class="gov.samhsa.acs.xdsb.common.XdsbErrorFactory"
 		scope="prototype">
 	</bean>	
 	<!-- XDS.b: clients -->
 	<bean id="xdsbRegistryWebServiceClient"
-		class="gov.samhsa.consent2share.accesscontrolservice.xdsb.registry.XdsbRegistryWebServiceClient"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient"
 		scope="prototype">
 		<constructor-arg value="#{endpointAddressProperties.xdsbRegistry}" />
 	</bean>
 	<bean id="xdsbRepositorybWebServiceClient"
-		class="gov.samhsa.consent2share.accesscontrolservice.xdsb.repository.XDSRepositorybWebServiceClient"
+		class="gov.samhsa.acs.xdsb.repository.wsclient.XDSRepositorybWebServiceClient"
 		scope="prototype">
 		<constructor-arg value="#{endpointAddressProperties.xdsbRepository}" />
 	</bean>
 	<!-- XDS.b: adapters -->
 	<bean id="adhocQueryResponseFilter"
-		class="gov.samhsa.consent2share.accesscontrolservice.xdsb.registry.adapter.AdhocQueryResponseFilter"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.adapter.AdhocQueryResponseFilter"
 		scope="prototype" autowire="constructor">
 	</bean>
 	<bean id="xdsbRegistryAdapter"
-		class="gov.samhsa.consent2share.accesscontrolservice.xdsb.registry.adapter.XdsbRegistryAdapter"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.adapter.XdsbRegistryAdapter"
 		scope="prototype" autowire="constructor">
 	</bean>
 	<bean id="retrieveDocumentSetResponseFilter"
-		class="gov.samhsa.consent2share.accesscontrolservice.xdsb.repository.adapter.RetrieveDocumentSetResponseFilter"
+		class="gov.samhsa.acs.xdsb.repository.wsclient.adapter.RetrieveDocumentSetResponseFilter"
 		scope="prototype" autowire="constructor">
 	</bean>
 	<bean id="xdsbRepositoryAdapter"
-		class="gov.samhsa.consent2share.accesscontrolservice.xdsb.repository.adapter.XdsbRepositoryAdapter"
+		class="gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter"
 		scope="prototype" autowire="constructor">
 	</bean>
 	
 	<bean id="xdsbRepositoryImpl"
-		class="gov.samhsa.ds4ppilot.pep.xdsbrepository.XdsbRepositoryImpl"
+		class="gov.samhsa.acs.pep.xdsbrepository.XdsbRepositoryImpl"
 		scope="prototype">
 		<constructor-arg value="#{endpointAddressProperties.xdsbRepository}" />
 	</bean>
 
 	<bean id="xdsbRegistryImpl"
-		class="gov.samhsa.ds4ppilot.pep.xdsbregistry.XdsbRegistryImpl"
+		class="gov.samhsa.acs.pep.xdsbregistry.XdsbRegistryImpl"
 		scope="prototype">
 		<constructor-arg value="#{endpointAddressProperties.xdsbRegistry}" />
 	</bean>
@@ -196,110 +196,107 @@
 	<!-- PDP -->
 	<!-- PDP: data - PolicyDecisionPointImplDataXdsb -->
 	<bean id="policyDecisionPointImplDataXdsb"
-		class="gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPointImplDataXdsb"
+		class="gov.samhsa.acs.contexthandler.PolicyDecisionPointImplDataXdsb"
 		scope="prototype" autowire="constructor">
 	</bean>
 	
 	<!-- Uncomment the following to Use PolicyDecisionPointImplDataJdbc instead of PolicyDecisionPointImplDataXdsb -->
 	
 	<!-- <bean id="policyDecisionPointImplData"
-		class="gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPointImplDataJdbc"
+		class="gov.samhsa.acs.contexthandler.PolicyDecisionPointImplDataJdbc"
 		scope="prototype" autowire="constructor">
 	</bean>
-	
 	<bean id="dataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="url" value="jdbc:mysql://localhost:3306/consent2share?autoReconnect=true" />
 		<property name="username" value="root" />
 		<property name="password" value="admin" />
 	</bean>
-	
 	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler">
         <property name="nativeJdbcExtractor" ref="nativeJdbcExtractor"/>
     </bean>
-    
     <bean id="nativeJdbcExtractor"
 		class="org.springframework.jdbc.support.nativejdbc.C3P0NativeJdbcExtractor"
 		lazy-init="true" /> -->
 	
 	<!-- PDP: request generator -->
 	<bean id="requestGenerator"
-		class="gov.samhsa.ds4ppilot.pep.contexthandler.RequestGenerator"
+		class="gov.samhsa.acs.contexthandler.RequestGenerator"
 		scope="prototype">
 	</bean>
 	<!-- PDP: pdp -->
 	<bean id="policyDecisionPointImpl"
-		class="gov.samhsa.ds4ppilot.pep.contexthandler.PolicyDecisionPointImpl"
+		class="gov.samhsa.acs.contexthandler.PolicyDecisionPointImpl"
 		scope="prototype" autowire="constructor">
 	</bean>	
 	
 	<!-- ContextHandler -->
 	<!-- ContextHandler: context handler -->
 	<bean id="contextHandlerImpl"
-		class="gov.samhsa.ds4ppilot.pep.contexthandler.ContextHandlerImpl"
+		class="gov.samhsa.acs.contexthandler.ContextHandlerImpl"
 		scope="prototype" autowire="constructor">
 	</bean>
 	
 	<!-- BRMS -->
 	<!-- BRMS: Guvnor -->
 	<bean id="guvnorServiceImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.GuvnorServiceImpl"
+		class="gov.samhsa.acs.brms.guvnor.GuvnorServiceImpl"
 		scope="prototype"> 
 		<constructor-arg index="0" value="#{endpointAddressProperties.guvnorService}"  />
 		<constructor-arg index="1" value="#{endpointAddressProperties.guvnorServiceUsername}"  />
 		<constructor-arg index="2" value="#{endpointAddressProperties.guvnorServicePassword}"  />
 	</bean>
 	<bean id="ruleExecutionServiceImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionServiceImpl"
+		class="gov.samhsa.acs.brms.RuleExecutionServiceImpl"
 		scope="prototype" autowire="constructor" />
 	
 	<!-- DocumentSegmentation -->
 	<!-- DocumentSegmentation: audit -->
 	<bean id="auditServiceImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditServiceImpl"
+		class="gov.samhsa.acs.documentsegmentation.audit.AuditServiceImpl"
 		scope="prototype">
 		<constructor-arg value="#{endpointAddressProperties.auditService}" />
 	</bean>
 	<!-- DocumentSegmentation: tools -->
 	<bean id="documentEditorImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEditorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl"
 		scope="prototype" autowire="byType"/>
 	<bean id="documentEncrypterImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEncrypterImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypterImpl"
 		scope="prototype" autowire="byType"/>
 	<bean id="documentMaskerImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentMaskerImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentMaskerImpl"
 		scope="prototype" autowire="byType"/>
 	<bean id="documentRedactorImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentRedactorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl"
 		scope="prototype" autowire="byType"/>
 	<bean id="documentTaggerImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentTaggerImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl"
 		scope="prototype"/>
 	<bean id="metadataGeneratorImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MetadataGeneratorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl"
 		scope="prototype"/>
 	<bean id="documentFactModelExtractorImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentFactModelExtractorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentFactModelExtractorImpl"
 		scope="prototype"/>
 	<bean id="additionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
 		scope="prototype"/>
 	<!-- DocumentSegmentation: document segmentation -->		
 	<bean id="documentSegmentationImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.DocumentSegmentationImpl"
+		class="gov.samhsa.acs.documentsegmentation.DocumentSegmentationImpl"
 		scope="prototype" autowire="constructor" />	
 		
 	<!-- PEP -->
 	<!-- PEP: DataHandlerToBytesConverter -->	
 	<bean id="dataHandlerToBytesConverterImpl"
-		class="gov.samhsa.ds4ppilot.pep.DataHandlerToBytesConverterImpl"
+		class="gov.samhsa.acs.pep.DataHandlerToBytesConverterImpl"
 		scope="prototype">
 	</bean>
 	
 	<!-- PEP: pep -->
 	<bean id="policyEnforcementPointImpl"
-		class="gov.samhsa.ds4ppilot.pep.PolicyEnforcementPointImpl"
+		class="gov.samhsa.acs.pep.PolicyEnforcementPointImpl"
 		scope="prototype" autowire="constructor">
 		<property name="patientId" value="#{parameterConfigProperties.patientId}" />
 		<property name="recepientSubjectNPI" value="#{parameterConfigProperties.recepientSubjectNPI}" />
@@ -309,7 +306,7 @@
 	</bean>
 	<!-- PEP: pep-ws -->
 	<bean id="pepPortTypeImpl"
-		class="gov.samhsa.ds4ppilot.pep.ws.PepPortTypeImpl"
+		class="gov.samhsa.acs.pep.ws.PepPortTypeImpl"
 		scope="prototype" autowire="constructor" />
 		
 </beans>

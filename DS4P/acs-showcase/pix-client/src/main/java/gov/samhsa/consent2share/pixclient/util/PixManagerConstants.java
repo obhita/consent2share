@@ -25,12 +25,18 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.pixclient.util;
 
-public interface PixManagerConstants {
+public class PixManagerConstants {
 	
 	public static final String PIX_ADD = "Add";
 	public static final String PIX_UPDATE = "Update";
 	public static final String PIX_QUERY = "Query";
-	public static final  String ENCODE_STRING = "UTF-8";
-	public static final  String GLOBAL_ID_DOMAIN = "2.16.840.1.113883.4.357";
-
+	public static final String ENCODE_STRING = "UTF-8";
+	public static String GLOBAL_DOMAIN_ID;
+	public static String GLOBAL_DOMAIN_NAME;
+	
+	public PixManagerConstants(String globalDomainId, String globalDomainName)
+	{
+		PixManagerConstants.GLOBAL_DOMAIN_ID = globalDomainId;
+		PixManagerConstants.GLOBAL_DOMAIN_NAME = globalDomainName;
+	}
 }

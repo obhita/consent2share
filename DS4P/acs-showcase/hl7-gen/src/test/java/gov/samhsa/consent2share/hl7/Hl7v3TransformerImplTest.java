@@ -75,6 +75,27 @@ public class Hl7v3TransformerImplTest {
 		
 		// Assert
 		assertEquals(errorMsg, hl7v3.getMessage());	
-	}	
+	}
+	
+	@Test
+	public void testGetPixQueryXml() throws IOException, URISyntaxException, Hl7v3TransformerException, TransformerConfigurationException {
+		// Arrange
+		String mrnMock = "mrnMock";
+		String mrnDomainMock = "mrnDomainMock";
+		sut.setTransformerFactory( TransformerFactory.newInstance());
+		String picQueryxml = FileUtils.readFileToString(new File(getClass()
+				.getClassLoader()
+				.getResource("xml/c32ToHl7v3PixQuery.xsl")
+				.toURI()));			
+		//String picQueryxml = "xm/c32ToHl7v3PixQuery.xsl";
 
+		// Act
+		String hl7v3PixXML = sut.getPixQueryXml(mrnMock, mrnDomainMock, picQueryxml);
+		
+		// Assert
+		assertNotNull(hl7v3PixXML);	
+	}		
+
+
+	
 }

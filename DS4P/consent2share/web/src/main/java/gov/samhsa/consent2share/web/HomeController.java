@@ -25,12 +25,19 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.web;
 
+import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
+import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
+import gov.samhsa.consent2share.infrastructure.security.UserContext;
+
 import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +50,13 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Controller
 public class HomeController {
+	
+	/** The user context. */
+	@Autowired
+	private UserContext userContext;
+	
+	@Autowired
+	private UsersRepository usersRepository;
 
 	/**
 	 * Home.
@@ -54,7 +68,7 @@ public class HomeController {
 	public String home(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); 
         if (!(auth instanceof AnonymousAuthenticationToken)) { /*The user is logged in :)*/ 
-                        return "redirect:/patients/home.html";
+                        return "redirect:/defaultLoginPage.html";
         }
 		return "views/index";
 	}	
@@ -80,7 +94,25 @@ public class HomeController {
 		return "views/index";
 	}
 	
-
+	@RequestMapping(value = "defaultLoginPage.html", method = RequestMethod.GET)
+	public String roleDispatcher(Model model, HttpServletRequest request) {
+		AuthenticatedUser currentUser = userContext.getCurrentUser();
+		String notify = request.getParameter("notify");
+		if (notify!=null)
+			notify="?notify="+notify;
+		else
+			notify="";
+		if (!currentUser.getUsername().equals("anonymousUser")){
+			Users users=usersRepository.loadUserByUsername(currentUser.getUsername());
+			if(users!=null){
+				if(users.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")))
+					return "redirect:/Administrator/adminHome.html"+notify;
+				else if (users.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER")))
+					return "redirect:/patients/home.html"+notify;
+			}
+		}
+		return "redirect:/index.html";
+	}
 
 	/**
 	 * Error page.

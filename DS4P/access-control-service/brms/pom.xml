@@ -11,15 +11,13 @@
 
 	<artifactId>brms</artifactId>
 	<packaging>pom</packaging>
-	<name>BRMS</name>
+	<name>Business Rule Management System</name>
 
 	<modules>
 		<module>factmodel</module>
 		<module>tools</module>
 		<module>service</module>
-<!-- 	<module>war</module>
-		<module>client</module>
--->		
+		<!-- <module>war</module> <module>client</module> -->
 	</modules>
 
 </project>

@@ -63,6 +63,9 @@ function EhrNumOneController($scope, $http) {
 					$scope.ehrNumOne.selectedPatient.pixManagerBean = "";
 					$scope.ehrNumOne.selectedPatient.pixManagerBean.queryIdMap = null;
 					$scope.ehrNumOne.selectedPatient.hl7v3Xml = "";
+					$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = null;
+					$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = null;
+					$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = null;
 					
 					toastr.success("Parse C32 Succeeded");
 				}).error(function(data, status) {
@@ -99,6 +102,9 @@ function EhrNumOneController($scope, $http) {
 					$scope.ehrNumOne.selectedPatient.pixManagerBean = "";
 					$scope.ehrNumOne.selectedPatient.pixManagerBean.queryIdMap = null;
 					$scope.ehrNumOne.selectedPatient.pixAddMsg = "";		
+					$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = null;
+					$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = null;
+					$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = null;
 					toastr.success("Transform C32 Succeeded");
 				}).error(function(data, status) {
 					$scope.status = status;
@@ -127,6 +133,9 @@ function EhrNumOneController($scope, $http) {
 						$scope.ehrNumOne.selectedPatient.pixManagerBean = "";
 						$scope.ehrNumOne.selectedPatient.pixManagerBean.queryIdMap = null;
 						$scope.ehrNumOne.selectedPatient.hl7v3Xml = "";
+						$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = null;
 						if (data.indexOf("Failure!") !== -1) {
 							toastr.error("PixAdd Operation Failed");
 							$scope.ehrNumOne.selectedPatient.isError = true;
@@ -162,6 +171,9 @@ function EhrNumOneController($scope, $http) {
 						$scope.ehrNumOne.selectedPatient.pixManagerBean = "";
 						$scope.ehrNumOne.selectedPatient.pixManagerBean.queryIdMap = null;
 						$scope.ehrNumOne.selectedPatient.hl7v3Xml = "";
+						$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = null;
 						if (data.indexOf("Failure!") !== -1) {
 							toastr.error("PixUpdate Operation Failed");
 							$scope.ehrNumOne.selectedPatient.isError = true;
@@ -197,6 +209,9 @@ function EhrNumOneController($scope, $http) {
 						$scope.ehrNumOne.selectedPatient.greenCcd = "";
 						var queryBeanMsg = $scope.ehrNumOne.selectedPatient.pixManagerBean.queryMessage;
 						$scope.ehrNumOne.selectedPatient.hl7v3Xml = "";
+						$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = null;
 						if (queryBeanMsg.indexOf("Failure!") !== -1) {
 							toastr.error("PixQuery Operation Failed");
 							$scope.ehrNumOne.selectedPatient.isError = true;
@@ -211,7 +226,7 @@ function EhrNumOneController($scope, $http) {
 			});
 		};
 		
-		// Add patient info from REM to Open EMPI
+		// Add patient info from OpenEMPI to XDS.b
 		$scope.addXdsb = function() {
 			var c32Xml = $scope.ehrNumOne.selectedPatient.c32Xml;
 			var payload = $.param({
@@ -227,12 +242,14 @@ function EhrNumOneController($scope, $http) {
 			$http.post('api/xdsb/regAdd', payload, config).success(
 					function(data, status) {
 						$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = data;
+						$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = null;
 						$scope.ehrNumOne.selectedPatient.greenCcd = "";
 						$scope.ehrNumOne.selectedPatient.pixUpdateMsg = "";
 						$scope.ehrNumOne.selectedPatient.pixManagerBean = "";
 						$scope.ehrNumOne.selectedPatient.pixManagerBean.queryIdMap = null;
 						$scope.ehrNumOne.selectedPatient.hl7v3Xml = "";
-						if (data.indexOf("Failure!") !== -1) {
+						if (data.acknowledgement[0].typeCode.code =="CE") {
 							toastr.error("XdsbRegAdd Operation Failed");
 							$scope.ehrNumOne.selectedPatient.isError = true;
 						} else {
@@ -244,8 +261,81 @@ function EhrNumOneController($scope, $http) {
 				toastr.error("XdsbRegAdd Operation Failed");
 				$scope.ehrNumOne.selectedPatient.isError = true;
 			});
-		};	
-		
+		};
+
+		// Update patient info from OpenEMPI to XDS.b
+		$scope.updateXdsb = function() {
+			var c32Xml = $scope.ehrNumOne.selectedPatient.c32Xml;
+			var payload = $.param({
+				c32Xml : c32Xml
+			});
+	
+			var config = {
+				headers : {
+					'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'
+				}
+			};
+	
+			$http.post('api/xdsb/regUpdate', payload, config).success(
+					function(data, status) {
+						$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = data;
+						$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = null;
+						$scope.ehrNumOne.selectedPatient.greenCcd = "";
+						$scope.ehrNumOne.selectedPatient.pixUpdateMsg = "";
+						$scope.ehrNumOne.selectedPatient.pixManagerBean = "";
+						$scope.ehrNumOne.selectedPatient.pixManagerBean.queryIdMap = null;
+						$scope.ehrNumOne.selectedPatient.hl7v3Xml = "";
+						if (data.acknowledgement[0].typeCode.code =="CE") {
+							toastr.error("XdsbRegUpdate Operation Failed");
+							$scope.ehrNumOne.selectedPatient.isError = true;
+						} else {
+							toastr.success("XdsbRegUpdate Operation Succeeded");
+							$scope.ehrNumOne.selectedPatient.isError = false;
+						}
+					}).error(function(data, status) {
+				$scope.status = status;
+				toastr.error("XdsbRegUpdate Operation Failed");
+				$scope.ehrNumOne.selectedPatient.isError = true;
+			});
+		};
+
+		// Provide and Register clinical document from REM to XDS.b
+		$scope.addXdsbRepo = function() {
+			var c32Xml = $scope.ehrNumOne.selectedPatient.c32Xml;
+			var payload = $.param({
+				c32Xml : c32Xml
+			});
+	
+			var config = {
+				headers : {
+					'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'
+				}
+			};
+	
+			$http.post('api/xdsb/repProvide', payload, config).success(
+					function(data, status) {
+						$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = data;
+						$scope.ehrNumOne.selectedPatient.greenCcd = "";
+						$scope.ehrNumOne.selectedPatient.pixUpdateMsg = "";
+						$scope.ehrNumOne.selectedPatient.pixManagerBean = "";
+						$scope.ehrNumOne.selectedPatient.pixManagerBean.queryIdMap = null;
+						$scope.ehrNumOne.selectedPatient.hl7v3Xml = "";
+						if (data.status == "urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success") {
+							toastr.success("XdsbRepoProvideAndRegister Operation Succeeded");
+							$scope.ehrNumOne.selectedPatient.isError = false;
+						} else {
+							toastr.error("XdsbRepProvide Operation Failed");
+							$scope.ehrNumOne.selectedPatient.isError = true;
+						}
+					}).error(function(data, status) {
+				$scope.status = status;
+				toastr.error("XdsbRepoProvideAndRegister Operation Failed");
+				$scope.ehrNumOne.selectedPatient.isError = true;
+			});
+		};
 		
 		// Transforms C32.xml into pixadd
 		$scope.c32ToHL7Add = function() {
@@ -270,6 +360,9 @@ function EhrNumOneController($scope, $http) {
 						$scope.ehrNumOne.selectedPatient.pixManagerBean = "";
 						$scope.ehrNumOne.selectedPatient.pixManagerBean.queryIdMap = null;
 						$scope.ehrNumOne.selectedPatient.pixAddMsg = "";		
+						$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = null;
+						$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = null;
 						toastr.success("Transform C32 Succeeded");
 					}).error(function(data, status) {
 						$scope.status = status;
@@ -300,6 +393,9 @@ function EhrNumOneController($scope, $http) {
 							$scope.ehrNumOne.selectedPatient.pixManagerBean = "";
 							$scope.ehrNumOne.selectedPatient.pixManagerBean.queryIdMap = null;
 							$scope.ehrNumOne.selectedPatient.pixAddMsg = "";		
+							$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = null;
+							$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = null;
+							$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = null;
 							toastr.success("Transform C32 Succeeded");
 						}).error(function(data, status) {
 							$scope.status = status;
@@ -329,7 +425,10 @@ function EhrNumOneController($scope, $http) {
 								$scope.ehrNumOne.selectedPatient.pixUpdateMsg = "";
 								$scope.ehrNumOne.selectedPatient.pixManagerBean = "";
 								$scope.ehrNumOne.selectedPatient.pixManagerBean.queryIdMap = null;
-								$scope.ehrNumOne.selectedPatient.pixAddMsg = "";		
+								$scope.ehrNumOne.selectedPatient.pixAddMsg = "";
+								$scope.ehrNumOne.selectedPatient.xdsbRegAddMsg = null;
+								$scope.ehrNumOne.selectedPatient.xdsbRegUpdateMsg = null;
+								$scope.ehrNumOne.selectedPatient.xdsbRepoProvideMsg = null;
 								toastr.success("Transform C32 Succeeded");
 							}).error(function(data, status) {
 								$scope.status = status;

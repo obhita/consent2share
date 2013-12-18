@@ -146,15 +146,16 @@ public class AccountController extends AbstractController {
 		}
 
 		String handleTroublePage = null;
-		if (loginTroubleDto.getTroubleTypeId() == TroubleType.UNKNOWN_PASSWORD
-				.getValue()) {
+		
+		if (loginTroubleDto.getTroubleTypeId() == TroubleType.UNKNOWN_PASSWORD.getValue()){
 			handleTroublePage = "redirect:/loginTroublePassword.html";
-		} else if (loginTroubleDto.getTroubleTypeId() == TroubleType.UNKNOWN_USERNAME
-				.getValue())
-			handleTroublePage = "redirect:/views/underConstruction";
-		else if (loginTroubleDto.getTroubleTypeId() == TroubleType.DIFFICULTY_SIGNING_IN
-				.getValue())
-			handleTroublePage = "redirect:/views/underConstruction";
+		}else if (loginTroubleDto.getTroubleTypeId() == TroubleType.UNKNOWN_USERNAME.getValue()){
+			handleTroublePage = "redirect:/loginTroubleUsername.html";
+		}else if (loginTroubleDto.getTroubleTypeId() == TroubleType.DIFFICULTY_SIGNING_IN.getValue()){
+			handleTroublePage = "redirect:/loginTroubleOther.html";
+		}else{
+			handleTroublePage = null;
+		}
 
 		if (handleTroublePage ==  null){
 			result.addError(new ObjectError(StringUtils.uncapitalize(LoginTroubleDto.class
@@ -175,8 +176,7 @@ public class AccountController extends AbstractController {
 	@RequestMapping(value = "loginTroublePassword.html")
 	public String loginTroublePassword(Model model) {
 		LoginTroubleDto loginTroubleDto = new LoginTroubleDto();
-		loginTroubleDto.setTroubleTypeId(TroubleType.UNKNOWN_PASSWORD
-				.getValue());
+		loginTroubleDto.setTroubleTypeId(TroubleType.UNKNOWN_PASSWORD.getValue());
 		model.addAttribute(loginTroubleDto);
 		return "views/loginTroublePassword";
 	}
@@ -215,17 +215,13 @@ public class AccountController extends AbstractController {
 		String loginTroubleDtoObjectName = StringUtils.uncapitalize(LoginTroubleDto.class.getSimpleName());
 
 		try {
-			passwordResetService.createPasswordResetToken(
-					loginTroubleDto.getUsername(), loginTroubleDto.getEmail(),
-					linkUrl);
+			passwordResetService.createPasswordResetToken(loginTroubleDto.getUsername(), loginTroubleDto.getEmail(), linkUrl);
 		} catch (UsernameNotExistException ex) {
-			FieldError error = new FieldError(loginTroubleDtoObjectName, "username",
-					"Username does not exist");
+			FieldError error = new FieldError(loginTroubleDtoObjectName, "username", "Username does not exist");
 			result.addError(error);
 			return "views/loginTroublePassword";
 		} catch (EmailAddressNotExistException ex) {
-			FieldError error = new FieldError(loginTroubleDtoObjectName, "email",
-					"Email address does not exist");
+			FieldError error = new FieldError(loginTroubleDtoObjectName, "email", "Email address does not exist");
 			result.addError(error);
 			return "views/loginTroublePassword";
 		}
@@ -233,6 +229,43 @@ public class AccountController extends AbstractController {
 
 		return "redirect:/newPasswordRequested.html";
 	}
+	
+	
+	
+	/**
+	 * Login trouble username.
+	 * 
+	 * @param model
+	 *            the model
+	 * @return the string
+	 */
+	@RequestMapping(value = "loginTroubleUsername.html")
+	public String loginTroubleUsername(Model model) {
+		LoginTroubleDto loginTroubleDto = new LoginTroubleDto();
+		loginTroubleDto.setTroubleTypeId(TroubleType.UNKNOWN_USERNAME.getValue());
+		model.addAttribute(loginTroubleDto);
+		return "views/loginTroubleUsername";
+	}
+	
+	
+	
+	/**
+	 * Login trouble other.
+	 * 
+	 * @param model
+	 *            the model
+	 * @return the string
+	 */
+	@RequestMapping(value = "loginTroubleOther.html")
+	public String loginTroubleOther(Model model) {
+		LoginTroubleDto loginTroubleDto = new LoginTroubleDto();
+		loginTroubleDto.setTroubleTypeId(TroubleType.DIFFICULTY_SIGNING_IN.getValue());
+		model.addAttribute(loginTroubleDto);
+		return "views/loginTroubleOther";
+	}
+	
+	
+	
 
 	/**
 	 * New password requested.
@@ -412,6 +445,7 @@ public class AccountController extends AbstractController {
 		return "views/changePassword";
 	}
 	
+	
 	/**
 	 * Change Password.
 	 *
@@ -447,7 +481,7 @@ public class AccountController extends AbstractController {
 		
 		
 		if(isChangeSuccess == true){
-			return "redirect:patients/home.html?notify=passChangeSuccess";
+			return "redirect:defaultLoginPage.html?notify=passChangeSuccess";
 		}else{
 			FieldError error = new FieldError(passwordChangeDtoObjectName, "oldPassword", "Wrong password");
 			result.addError(error);

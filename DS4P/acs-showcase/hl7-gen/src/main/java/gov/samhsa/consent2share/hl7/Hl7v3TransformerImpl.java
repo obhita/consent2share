@@ -35,11 +35,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-@Component
 public class Hl7v3TransformerImpl implements Hl7v3Transformer {
 
 	/** The logger. */
@@ -49,8 +48,8 @@ public class Hl7v3TransformerImpl implements Hl7v3Transformer {
 	// Since Saxon is a dependency of this project, its
 	// TransformerFactory will be picked
 	private TransformerFactory transformerFactory = TransformerFactory
-			.newInstance();	
-	
+			.newInstance();
+
 	@Override
 	public String transformC32ToHl7v3PixXml(String c32xml, String XSLTURI)
 			throws Hl7v3TransformerException {
@@ -99,5 +98,34 @@ public class Hl7v3TransformerImpl implements Hl7v3Transformer {
 		this.transformerFactory = transformerFactory;
 	}
 
+	@Override
+	public String getPixQueryXml(String mrn, String mrnDomain, String xsltUri)
+			throws Hl7v3TransformerException {
+		String newxsltUri = "";
 
+		try {
+			String extension = "@extension";
+			String queryXML = xsltUri;
+			if (null != xsltUri && !xsltUri.startsWith("<?xml")) {
+				// read the xsl file from resources folder
+				InputStream styleIs = Thread.currentThread()
+						.getContextClassLoader().getResourceAsStream(xsltUri);
+				queryXML = IOUtils.toString(styleIs, "UTF-8");
+			}
+
+			newxsltUri = queryXML.replaceAll(extension, mrn);
+		} catch (Exception e) {
+
+			String errorMessage = "Error happended when trying to mrn data to hl7v3PixQuery";
+
+			logger.error(errorMessage, e);
+
+			Hl7v3TransformerException transformerException = new Hl7v3TransformerException(
+					errorMessage, e);
+
+			throw transformerException;
+		}
+
+		return newxsltUri;
+	}
 }

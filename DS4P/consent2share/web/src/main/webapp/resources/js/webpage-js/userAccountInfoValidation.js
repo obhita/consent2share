@@ -63,10 +63,35 @@ function validateProfileUpdateForm(){
 	preprocessInput();
 
 	var isFormValid = true;
+	var flagUserPassInvalid = false;
 	
 	$('#updatedMessage').attr('style', "display: none;");
-
+	
 	isFormValid = validateCommonFields(isFormValid);
+	
+	var isValidUname = chkUname($('#user_name').val());
+	
+	if(isValidUname !== true){
+		isFormValid = false;
+		flagUserPassInvalid = true;
+		$('#username_client_error_text').html(isValidUname);
+		$('#username_client_error_text').attr('style', "");
+	}else{
+		$('#username_client_error_text').text("");
+		$('#username_client_error_text').attr('style', "display: none;");
+	}
+	
+	var isValidPword = chkPword($('#password').val(), "");
+	
+	if(isValidPword !== true){
+		isFormValid = false;
+		flagUserPassInvalid = true;
+		$('#pwd_client_error_text').html("Invalid Password");
+		$('#pwd_client_error_text').attr('style', "");
+	}else{
+		$('#pwd_client_error_text').text("");
+		$('#pwd_client_error_text').attr('style', "display: none;");
+	}
 	
 	var isValidPhone = chkPhone($('#phone').val());
 
@@ -103,7 +128,12 @@ function validateProfileUpdateForm(){
 	
 	
 	if(isFormValid !== true){
+		if(flagUserPassInvalid === false){
+			$('#username_password_modal').modal('hide');
+		}
 		return false;
+	}else{
+		return true;
 	}
 }
 
@@ -165,9 +195,169 @@ function validateCommonFields(inFormValid){
 		$('#email_client_error_text').text("");
 		$('#email_client_error_text').attr('style', "display: none;");
 	}
+
+	/**	var isValidMrn = chkMrn($('#medicalRecordNumber').val());
+
+	if(isValidMrn !== true){
+		isFormValidSub = false;
+		$('#mrn_client_error_text').html(isValidMrn);
+		$('#mrn_client_error_text').attr('style', "");
+	}else{
+		$('#mrn_client_error_text').text("");
+		$('#mrn_client_error_text').attr('style', "display: none;");
+	}	*/
 	
 	return isFormValidSub;
 }
+
+
+
+
+/* Function to validate Create Patient Account form
+ * on Administrator/adminHome.html page */
+function validateCreatePatientAccount(){
+	preprocessInput();
+
+	var isFormValid = true;
+	
+	var isValidDate = isDate($('#date').val());
+
+	if(isValidDate !== true){
+		isFormValid = false;
+		$('#dob_client_error_text').html(isValidDate);
+		$('#dob_client_error_text').attr('style', "");
+	}else{
+		$('#dob_client_error_text').text("");
+		$('#dob_client_error_text').attr('style', "display: none;");
+	}
+
+	var isValidFname = chkFname($('#first_name').val());
+
+	if(isValidFname !== true){
+		isFormValid = false;
+		$('#fname_client_error_text').html(isValidFname);
+		$('#fname_client_error_text').attr('style', "");
+	}else{
+		$('#fname_client_error_text').text("");
+		$('#fname_client_error_text').attr('style', "display: none;");
+	}
+
+	var isValidLname = chkLname($('#last_name').val());
+
+	if(isValidLname !== true){
+		isFormValid = false;
+		$('#lname_client_error_text').html(isValidLname);
+		$('#lname_client_error_text').attr('style', "");
+	}else{
+		$('#lname_client_error_text').text("");
+		$('#lname_client_error_text').attr('style', "display: none;");
+	}
+
+	var isValidGender = chkGender($('#gender').val());
+
+	if(isValidGender !== true){
+		isFormValid = false;
+		$('#gender_client_error_text').html(isValidGender);
+		$('#gender_client_error_text').attr('style', "");
+	}else{
+		$('#gender_client_error_text').text("");
+		$('#gender_client_error_text').attr('style', "display: none;");
+	}
+	
+	return isFormValid;
+	
+}
+
+
+/* Function to validate update admin profile form
+ * on Administrator/editAdminProfile.html page */
+function validateUpdateAdminProfile(){
+
+	var isFormValid = true;
+	var flagUserPassInvalid = false;
+
+	var isValidFname = chkFname($('#first_name').val());
+
+	if(isValidFname !== true){
+		isFormValid = false;
+		$('#fname_client_error_text').html(isValidFname);
+		$('#fname_client_error_text').attr('style', "");
+	}else{
+		$('#fname_client_error_text').text("");
+		$('#fname_client_error_text').attr('style', "display: none;");
+	}
+
+	var isValidLname = chkLname($('#last_name').val());
+
+	if(isValidLname !== true){
+		isFormValid = false;
+		$('#lname_client_error_text').html(isValidLname);
+		$('#lname_client_error_text').attr('style', "");
+	}else{
+		$('#lname_client_error_text').text("");
+		$('#lname_client_error_text').attr('style', "display: none;");
+	}
+
+	var isValidGender = chkGender($('#gender').val());
+
+	if(isValidGender !== true){
+		isFormValid = false;
+		$('#gender_client_error_text').html(isValidGender);
+		$('#gender_client_error_text').attr('style', "");
+	}else{
+		$('#gender_client_error_text').text("");
+		$('#gender_client_error_text').attr('style', "display: none;");
+	}
+	
+	var isValidEmail = chkEmail($('#email').val());
+
+	if(isValidEmail !== true){
+		isFormValid = false;
+		$('#email_client_error_text').html(isValidEmail);
+		$('#email_client_error_text').attr('style', "");
+	}else{
+		$('#email_client_error_text').text("");
+		$('#email_client_error_text').attr('style', "display: none;");
+	}
+	
+	var isValidUname = chkUname($('#user_name').val());
+	
+	if(isValidUname !== true){
+		isFormValid = false;
+		flagUserPassInvalid = true;
+		$('#username_client_error_text').html(isValidUname);
+		$('#username_client_error_text').attr('style', "");
+	}else{
+		$('#username_client_error_text').text("");
+		$('#username_client_error_text').attr('style', "display: none;");
+	}
+	
+	/*
+	var isValidPword = chkPword($('#password').val(), "");
+	
+	if(isValidPword !== true){
+		isFormValid = false;
+		flagUserPassInvalid = true;
+		$('#pwd_client_error_text').html("Invalid Password");
+		$('#pwd_client_error_text').attr('style', "");
+	}else{
+		$('#pwd_client_error_text').text("");
+		$('#pwd_client_error_text').attr('style', "display: none;");
+	}
+	
+	*/
+	
+	if(isFormValid !== true){
+		if(flagUserPassInvalid === false){
+			$('#username_password_modal').modal('hide');
+		}
+		return false;
+	}else{
+		return true;
+	}
+	
+}
+
 
 
 function chkFname(inFname){
@@ -188,6 +378,18 @@ function chkLname(inLname){
 			return "Last Name is required";
 		}else{
 			return "Last Name must be between 2 and 30 characters long";
+		}
+	}else{
+		return true;
+	}
+}
+
+function chkMrn(inMrn){
+	if(2 > inMrn.length || inMrn.length > 30){
+		if(0 >= inMrn.length){
+			return "MRN is required";
+		}else{
+			return "MRN must be between 2 and 30 characters long";
 		}
 	}else{
 		return true;

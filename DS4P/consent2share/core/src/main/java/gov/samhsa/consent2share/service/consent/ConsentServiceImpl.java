@@ -59,6 +59,7 @@ import gov.samhsa.consent2share.infrastructure.EchoSignSignatureService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
+import gov.samhsa.consent2share.service.dto.AbstractPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
@@ -81,6 +82,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class ConsentServiceImpl.
  */
@@ -461,6 +463,9 @@ public class ConsentServiceImpl implements ConsentService {
 			consentListDto.setShareForPurposeOfUseCodes(consentShareForPurposeOfUseCode);
 			consentListDto.setDoNotShareSensitivityPolicyCodes(consentDoNotShareSensitivityPolicyCode);
 			
+			consentListDto.setConsentStart(consent.getStartDate());
+			consentListDto.setConsentEnd(consent.getEndDate());
+				
 			//Merge all Dtos
 			consentListDtos.add(consentListDto);
 		}
@@ -512,10 +517,9 @@ public class ConsentServiceImpl implements ConsentService {
 
     /**
      * Save consent.
-     * 
-     * @param consentDto
-     *            the consent dto
-     * @throws ConsentGenException 
+     *
+     * @param consentDto the consent dto
+     * @throws ConsentGenException the consent gen exception
      */
     public void saveConsent(ConsentDto consentDto) throws ConsentGenException {
 	Consent consent = makeConsent();
@@ -721,9 +725,9 @@ public class ConsentServiceImpl implements ConsentService {
     	    return false;
         }
 	
-	/** 
-	 * Returns consentDto based on consent id
-	 * 
+	/**
+	 * Returns consentDto based on consent id.
+	 *
 	 * @param consentId the consent id
 	 * @return ConsentDto
 	 */
@@ -867,6 +871,35 @@ public class ConsentServiceImpl implements ConsentService {
 		return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.consent.ConsentService#findConsentContentDto(java.lang.Long)
+	 */
+	public AbstractPdfDto findConsentContentDto(Long consentId){
+		Consent consent=findConsent(consentId);
+		AbstractPdfDto consentPdfDto;
+		if (consent.getSignedPdfConsent()!=null){
+			if (consent.getSignedPdfConsent().getSignedPdfConsentContent()!=null){
+				consentPdfDto=findConsentPdfDto(consent.getId());
+			}
+			else{
+				consentPdfDto=findConsentPdfDto(consent.getId());
+			}
+		}
+		else{
+			consentPdfDto=findConsentPdfDto(consent.getId());
+		}
 
+		if (consent.getSignedPdfConsentRevoke()!=null){
+				if(consent.getSignedPdfConsentRevoke().getSignedPdfConsentRevocationContent()!=null){
+					consentPdfDto=findConsentRevokationPdfDto(consent.getId());
+				}
+				else{
+					consentPdfDto=findConsentRevokationPdfDto(consent.getId());
+				}
+
+		}
+		return consentPdfDto;
+		
+	}
 
 }

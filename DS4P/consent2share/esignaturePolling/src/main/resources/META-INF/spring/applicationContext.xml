@@ -35,6 +35,7 @@
 		dependency inject an object into your class. -->
 	<context:component-scan base-package="gov.samhsa.consent2share.domain, gov.samhsa.consent2share.infrastructure, gov.samhsa.consent2share.esignaturepolling">
 		<context:exclude-filter type="assignable" expression="gov.samhsa.consent2share.infrastructure.security.UserContext"/>
+		<context:exclude-filter type="assignable" expression="gov.samhsa.consent2share.infrastructure.eventlistener.LoginFailureEventListener"/>
 	</context:component-scan>
 
 	<bean class="org.springframework.mail.javamail.JavaMailSenderImpl"

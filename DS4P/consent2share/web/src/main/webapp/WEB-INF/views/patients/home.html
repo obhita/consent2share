@@ -14,13 +14,11 @@
 	<!-- START: CSS -->
 	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css"
 		rel="stylesheet"/>
-	<link href="../../../resources/css/bootstrap-responsive.min.css"
-		rel="stylesheet"/>
-	<link href="../../../resources/css/themes-style.css" rel="stylesheet"/>
-	<link href="../../../resources/css/sentinel-style.css" rel="stylesheet"/>
 	<link href="../../../resources/css/bootstrap-toggle-buttons.css"
 		rel="stylesheet"/>
 	<link href="../../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
+	<link href="../../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../../resources/css/sentinel-style.css" rel="stylesheet"/>
 	<!-- END: CSS -->
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
@@ -30,77 +28,77 @@
 	<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
 	<!-- END: Favicon -->
 </head>
-<body>
-	<!-- !START: Patient Information -->
+<body id="myhome-page">
 
-	<div id="home-page" class="container-fluid">
-		<!-- !START: Page Header -->
-
-		<div class="navbar">
-			<div class="navbar-inner-header">
-
-				<!-- COMPONENT: Main Menu Dropdown-->
-				<div class="container-fluid">
-					<a class="btn btn-info btn-mainmenu" data-toggle="collapse"
-						data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
-						<span class="icon-reorder"></span>
+<div class="container outmost-holder">
+	<!-- !START: Page Header -->
+	<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='My Home',currentPageURI='/patients/home.html'">
+		<div class="container">
+			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/patient_fragments :: navbarHeaderFragment">
+			
+			<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE navbarHeaderFragment -->
+			<!-- The code below is here only to enhance source code readability -->
+			
+					<a th:include="fragment/common :: mobileMenuButtonFragment" class="btn btn-info btn-mainmenu" data-toggle="collapse" data-target=".top-nav.navbar-collapse,.sidebar-nav.navbar-collapse">
+						<span class="fa fa-reorder"></span>
 					</a>
-
 					<h1>
 						<span class="nav-title">My Home</span>
 					</h1>
-					
+
 					<span th:include="fragment/common :: logoFragment">
-						<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+						<div style="position: relative;">
+							<a id="logoFragment" class="navbar-brand brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+							<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
+						</div>
 					</span>
-
-					<!-- COMPONENT: Header Menu-->
-					<div class="btn-group btn-right-align">
-						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-							<span class="icon-flag"></span><span
-							class="hidden-phone hidden-tablet"> Language</span> <span
-							class="caret"></span>
-						</a>
-
-						<ul class="dropdown-menu" role="menu">
-							<li role="menuitem"><a th:href="@{'/patients/home.html?lang=en'}">English</a></li>
-							<li role="menuitem"><a th:href="@{'/patients/home.html?lang=cn'}">Chinese</a></li>
-						</ul>
-					</div>
 					
-					
-					<!-- COMPONENT: Header Menu-->
-
-					<div th:include="fragment/myaccount_menu :: myaccountMenuFragment" class="btn-group pull-right">
-					<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE myaccountMenuFragment -->
-					<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
-						<div>
-						<a class="btn" href="#">
-							<span class="icon-envelope"></span><span class="hidden-phone hidden-tablet"> Message Center</span> 
-							<span class="label label-warning hidden-phone">3</span> 
-							<!-- <span class="label label-success hidden-phone">1</span>
-							<span class="label label-important hidden-phone">2</span> -->
-						</a>
-					
-						<!-- COMPONENT: User Dropdown -->
-					
-						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-							<span class="icon-user">&nbsp;</span><span class="hidden-phone hidden-tablet" th:text="#{header_my_account}"> My Account</span>
+					<!-- COMPONENT: Language Menu Dropdown -->
+					<div th:include="fragment/myaccount_menu :: languageFragment" class="btn-group btn-right-align">
+						<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+							<span class="fa fa-flag"></span>
+							<span class="hidden-sm hidden-md"> Language</span>
 							<span class="caret"></span>
 						</a>
 						
-						<ul role="menu" class="dropdown-menu">
-							<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_my_profile}">My Profile</a></li>
-							<li role="menuitem"><a href="profile.html" th:href="@{/patients/profile.html}" th:text="#{header_change_password}">Change Password</a></li>
-							<li role="menuitem" aria-disabled="true" class="divider"></li>
-							<li role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" th:text="#{header_logout}">Logout</a></li>
+						<ul class="dropdown-menu" role="menu">
+							<li role="menuitem"><a th:href="@{'/patients/connectionMain.html?lang=en'}">English</a></li>
+							<li role="menuitem"><a th:href="@{'/patients/connectionMain.html?lang=cn'}">Chinese</a></li>
 						</ul>
-						</div>
-						
-					<!-- END OF SECTION REPLACED BY THYMELEAF -->
 					</div>
-					
-				</div>
+
+					<!-- COMPONENT: Header Menu-->
+
+					<div th:include="fragment/myaccount_menu :: myaccountMenuFragment"
+						class="btn-group pull-right">
+
+						<a class="btn btn-default" href="#"> <span class="glyphicon glyphicon-envelope"></span><span
+							class="hidden-sm hidden-md"> Message Center</span> <span
+							class="label label-warning hidden-sm">3</span>
+						</a>
+
+						<!-- COMPONENT: User Dropdown -->
+
+						<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+							<span class="glyphicon glyphicon-user">&nbsp;</span><span
+							class="hidden-sm hidden-md" th:text="#{header_my_account}">
+								My Account</span> <span class="caret"></span>
+						</a>
+
+						<ul role="menu" class="dropdown-menu">
+							<li role="menuitem"><a href="profile.html"
+								th:href="@{/patients/profile.html}"
+								th:text="#{header_my_profile}">My Profile</a></li>
+							<li role="menuitem"><a href="profile.html"
+								th:href="@{/patients/profile.html}"
+								th:text="#{header_change_password}">Change Password</a></li>
+							<li role="menuitem" aria-disabled="true" class="divider"></li>
+							<li role="menuitem"><a href="../index.html"
+								th:href="@{/resources/j_spring_security_logout}"
+								th:text="#{header_logout}">Logout</a></li>
+						</ul>
+					</div>
+			<!-- END OF SECTION REPLACED BY THYMELEAF -->
 			</div>
 			
 			
@@ -148,17 +146,18 @@
 							You have an unsigned consent. To sign your consent, Please check your <a href="../inbox/inboxMain.html"><strong>Message Center</strong></a> or the e-sign email sent to your email account.
 					</div>
 					</span>
-      
-
 			</div>
 				
 		</div>
+		</header>
 		<div id="under-header"></div>
 
 		<!-- END : Page Header -->
+	<div id="home-page" class="container">
 
-		<div class="row-fluid main-content-wrapper">
-			<div>
+		<div class="row main-content-wrapper">
+			<div class="top-margin10">
+				<!-- !START: Patient Information -->
 				<div id="section-header" th:object="${currentUser}">
 					<div>
 						<img class="dashboard-avatar" alt="Lucas" src="../../../resources/img/avatar.gif"
@@ -173,50 +172,45 @@
 
 			<!-- END: Patient Information -->
 
-
-
 			<div id="content">
-
-
-
 				<!-- START: Side Nav Menu -->
 
-				<div th:include="fragment/common :: sideNavMenuFragment" class="span2 main-menu-span">
+				<div th:substituteby="fragment/patient_fragments :: sideNavMenuFragment" class="col-md-2 col-sm-3 main-menu-span">
 				<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE sideNavMenuFragment -->
 					<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
 					
-					<div id="sidenavMenu" class="nav-collapse sidebar-nav">
+					<div id="sidenavMenu" class="navbar-collapse sidebar-nav">
 						<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
-							<li class="nav-header hidden-tablet" role="menuitem"></li>
+							<li class="nav-header hidden-md" role="menuitem"></li>
 							
 							<li class="active" role="menuitem"><a href="#">
-								<div class="icon-home icon-large"></div>
-									<span class= "hidden-tablet" th:text="#{sidebar_my_home}"> My Home</span></a></li>
+								<div class="glyphicon-home glyphicon-large"></div>
+									<span class= "hidden-md" th:text="#{sidebar_my_home}"> My Home</span></a></li>
 									
-							<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="icon-file"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
+							<li role="menuitem"><a href="../consents/listConsents.html" th:href="@{/consents/listConsents.html}"><div class="glyphicon-file"></div>
+									<span class="hidden-md" th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
 			
-							<li role="menuitem"><a href="connectionMain.html"><div class="icon-random"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
+							<li role="menuitem"><a href="connectionMain.html"><div class="glyphicon-random"></div>
+									<span class="hidden-md" th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
 			
-							<li role="menuitem"><a href="profile.html"><div class="icon-user"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_my_profile}"> My Profile</span></a></li>
+							<li role="menuitem"><a href="profile.html"><div class="glyphicon-user"></div>
+									<span class="hidden-md" th:text="#{sidebar_my_profile}"> My Profile</span></a></li>
 			
-							<li role="menuitem"><a href="../inbox/inboxMain.html" th:href="@{/inbox/inboxMain.html}"><div class="icon-inbox"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_in_box}"> Message Center</span></a></li>
+							<li role="menuitem"><a href="../inbox/inboxMain.html" th:href="@{/inbox/inboxMain.html}"><div class="glyphicon-inbox"></div>
+									<span class="hidden-md" th:text="#{sidebar_in_box}"> Message Center</span></a></li>
 			
 			
-							<li role="menuitem"><a href="activityHistory.html"><div class="icon-time"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_activity_history}"> Activity History</span></a></li>
+							<li role="menuitem"><a href="activityHistory.html"><div class="glyphicon-time"></div>
+									<span class="hidden-md" th:text="#{sidebar_activity_history}"> Activity History</span></a></li>
 			
-							<li role="menuitem"><a href="../clinicaldocuments/mymedicalinfo.html" th:href="@{/patients/medicalinfo.html}"><div class="icon-folder-open"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_medical_documents}"> Medical Documents</span></a></li>
+							<li role="menuitem"><a href="../clinicaldocuments/mymedicalinfo.html" th:href="@{/patients/medicalinfo.html}"><div class="glyphicon-folder-open"></div>
+									<span class="hidden-md" th:text="#{sidebar_medical_documents}"> Medical Documents</span></a></li>
 							
-							<li class="shortcut-button" role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}"><div class="icon-unlock-alt"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_change_password}"> Change Password</span></a></li>
+							<li class="shortcut-button" role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}"><div class="glyphicon-unlock-alt"></div>
+									<span class="hidden-md" th:text="#{sidebar_change_password}"> Change Password</span></a></li>
 							
-							<li class="shortcut-button" role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}"><div class="icon-off"></div>
-									<span class="hidden-tablet" th:text="#{sidebar_logout}"> Logout</span></a></li>
+							<li class="shortcut-button" role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}"><div class="glyphicon-off"></div>
+									<span class="hidden-md" th:text="#{sidebar_logout}"> Logout</span></a></li>
 						</ul>
 					</div>
 					
@@ -227,49 +221,44 @@
 
 
 				<!-- JavaScrip Enable Message -->
-				<noscript>
-					<div class="alert alert-block span10">
+				<noscript th:substituteby="fragment/common :: noscriptFragment">
+					<div class="alert alert-warning col-md-10 col-sm-9">
 						<p id="h4-style" class="alert-heading">Warning!</p>
-						<p>
-							You need to have <a
-								href="https://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a>
-							enabled to use this site.
-						</p>
+						<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
+						target="_blank">JavaScript</a>enabled to use this site.</p>
 					</div>
 				</noscript>
 
-
-
 				<!-- START: Content Region-->
 
-				<div class="span10">
-					<div class="row-fluid">
+				<div id="page-subcontent-holder" class="col-sm-9 col-md-10">
+					<div class="row">
 
 						<!-- COMPONENT: InBox -->
 
-						<div class="box span12">
+						<div class="box">
 							<div class="box-header">
 								<h2>
-									<span class="icon-inbox"></span><span class="break"></span>Message Center
+									<span class="glyphicon glyphicon-inbox"></span><span class="break"></span>Message Center
 								</h2>
 								<div class="box-icon"></div>
 							</div>
 							<div class="box-content">
 								<ul class="dashboard-list">
 									<li><a href="#">
-											<div class="icon-envelope" style="margin-right: 12px;"></div><span class="icon-paper-clip" style="width: 18px; margin-right: 1px;"></span>
+											<div class="fa fa-envelope" style="margin-right: 12px;"></div><span class="fa fa-paperclip" style="width: 18px; margin-right: 1px;"></span>
 											mastercareinc@consent2share.com
 										</a> 
 										<span style="font-size: small; font-weight: bold; color: #3e3e3e;"><span style="margin: 0 15px;">Subject: Please review</span><span>Fri 7/26/2013 1:12 PM</span>
 										<div style="margin-left: 30px; font-weight: normal;"><em>Dear Albert Smith, Please review your medical information and sign when ready.</em></div></span></li>
 									<li><a href="#">
-											<div class="icon-envelope" style="margin-right: 12px;"></div>
+											<div class="fa fa-envelope" style="margin-right: 12px;"></div>
 											michaelgrimes@consent2share.com
 										</a> 
 										<span style="font-size: small; font-weight: bold; color: #3e3e3e;"><span style="margin: 0 15px;">Subject: Please review</span><span>Fri 7/21/2013 4:37 PM</span>
 										<div style="margin-left: 30px; font-weight: normal;"><em>Dear Albert Smith, Please review your medical information and sign when ready.</em></div></span></li>
 									<li><a href="#">
-											<div class="icon-flag-alt" style="margin-right: 12px;"></div>
+											<div class="fa fa-flag-o" style="margin-right: 12px;"></div>
 											Consent2Share
 										</a> 
 										<span style="font-size: small; color: #3e3e3e; font-weight: bold;"><span style="margin: 0 15px;">Subject: Welcome!</span><span>Fri 7/10/2013 10:01 AM</span>
@@ -278,34 +267,14 @@
 							</div>
 						</div>
 
-						<!-- COMPONENT: Connections -->
-						<!--
-						<div id="connections-box" class="box span4">
-							<div class="box-header">
-								<h2>
-									<span class="icon-user"></span><span class="break"></span>Recent Providers
-								</h2>
-							</div>
-							<div class="box-content">
-								<ul class="dashboard-list">
-									<li><a href="#"><img class="dashboard-avatar"
-											alt="Lucas" src="../../../resources/img/avatar.gif" th:src="@{/resources/img/avatar.gif}"/></a> <strong>Name:</strong>
-										<a href="#">Washington MD</a><br/> <strong>Since:</strong>
-										17/05/2012<br/> <strong>Status:</strong> <span
-										class="label label-success">Approved</span></li>
-								</ul>
-							</div>
-						</div>
-						-->
-
-						<!-- COMPONENT: Education -->				
+			<!-- COMPONENT: Education -->				
 		
 			<div>
-				<div class="box span12">
+				<div class="box">
 					<div class="box-header">
 						<h2>
 							<span>
-								<span class="icon-bookmark"></span><span class="break"></span>
+								<span class="fa fa-bookmark"></span><span class="break"></span>
 							</span>
 							Learn about Privacy and Consent
 						</h2>
@@ -313,26 +282,26 @@
 						<div class="box-content">
 							<ul class="dashboard-list">
 								<li>
-									<a href="#what-is-a-consent-modal" data-toggle="modal">
-										<div class="icon-film"></div>                 
+									<a href="#" data-toggle="modal" data-target="#what-is-a-consent-modal">
+										<div class="fa fa-film" style="margin-right: 10px;"></div>                 
 										What is consent 2 share technology?                                   
 									</a>
 								</li>
 								<li>
 									<a href="#">
-										<div class="icon-info-sign"></div>                               
+										<div class="fa fa-info-circle" style="margin-right: 12px;"></div>                               
 										Why is my health privacy important?                                    
 									</a>
 								</li>
 								<li>
 									<a href="#">
-										<div class="icon-info-sign"></div>                               
+										<div class="fa fa-info-circle" style="margin-right: 12px;"></div>                               
 										How do I create a consent?                                    
 									</a>
 								</li>
 								<li>
 									<a href="#">
-										<div class="icon-info-sign"></div>                               
+										<div class="fa fa-info-circle" style="margin-right: 12px;"></div>                               
 										Why do you need to know my demographic information?                                    
 									</a>
 								</li>
@@ -342,53 +311,44 @@
 			</div>	
 							
 			<!-- Modal -->
-			<div id="what-is-a-consent-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="What is a Consent?" aria-hidden="true">
-				  <div class="modal-header">
-				    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-				    <h3 id="myModalLabel">What is Consent 2 Share technology?</h3>
+			<div id="what-is-a-consent-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="What is a Consent?" aria-hidden="true">
+				<div class="modal-dialog">
+				   <div class="modal-content">
+					  <div class="modal-header">
+					    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					    <h4 id="myModalLabel" class="modal-title">What is Consent 2 Share technology?</h4>
+					  </div>
+					  <div class="modal-body">
+					    <p><iframe src="https://www.youtube.com/embed/M7ttn21jVfI?feature=player_detailpage" allowfullscreen="true" style="border:none;"></iframe>
+						    <div>
+							    <strong>Media Type:</strong> <span class="label label-info">Video</span><br/>
+							    <strong>Length:</strong> 4:00 min <br/>
+							    <strong>Summary:</strong> At the conclusion of this video, viewers will understand how technology enables electronic care coordination using a fictitious patient's health privacy preferences and ultimately their health records between care providers.  
+						    </div>
+					    </p>
+					    
+					  </div>
+					  <div class="modal-footer">
+					    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+					  </div>
 				  </div>
-				  <div class="modal-body">
-				    <p><iframe src="https://www.youtube.com/embed/M7ttn21jVfI?feature=player_detailpage" frameborder="0" allowfullscreen="true"></iframe>
-					    <div>
-						    <strong>Media Type:</strong> <span class="label label-info">Video</span><br/>
-						    <strong>Length:</strong> 4:00 min <br/>
-						    <strong>Summary:</strong> At the conclusion of this video, viewers will understand how technology enables electronic care coordination using a fictitious patient's health privacy preferences and ultimately their health records between care providers.  
-					    </div>
-				    </p>
-				    
-				  </div>
-				  <div class="modal-footer">
-				    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-				  </div>
+				</div>
 			</div>
 		</div>
-	</div><!--/#content.span10-->
-</div><!--/fluid-row-->
+	</div><!--/#content.col-md-10-->
+			</div><!--/fluid-row-->
+<!-- END: Content Region -->
+</div>
+</div>
+<!-- START: Footer Region -->
+<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
 
-			<!-- END: Content Region -->
-
-		</div>
-		<!-- ELEMENT: Divider -->
-		<div class="clearfix"></div>
-
-		<!-- START: Footer Region -->
-		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
-		<!-- COMPONENT: Action Buttons -->
-				<!--
-				<a href="#" class="btn pull-left" data-dismiss="modal">Close</a>
-				<a href="#" class="btn btn-primary pull-right">Save changes</a>
-				-->
-				
-				<!-- COMPONENT: Copyright Information -->
-				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
-		</footer>
-		<!-- END: Footer Region -->
-
-	</div>
-
-	<!-- START: JavaScript-->
-	<script src="../../resources/js/bootstrap.js" th:src="@{/resources/js/bootstrap.js}" type="text/javascript"></script>
+		<!-- COMPONENT: Copyright Information -->
+		<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
+</footer>
+<!-- END: Footer Region -->
+</div>	
 	
-	<!-- END: JavaScript-->
+
 </body>
 </html>

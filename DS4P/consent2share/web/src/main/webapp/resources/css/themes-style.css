@@ -78,6 +78,7 @@ span:last-child .alert.rounded {
   font-weight: normal;
   line-height: 14px;
   color: #757575;
+  text-align: left;
   text-shadow: 1px 1px 1px rgba(60, 223, 245, 0.25); }
   #consent-current-active .badge:before, #share-all-med .badge:before {
     font-family: FontAwesome;
@@ -493,6 +494,9 @@ ul.dashboard-list li a span {
 .datepicker thead tr:first-child th:hover {
   background: #eeeeee; }
 
+.datepicker.dropdown-menu {
+  z-index: 1501; }
+
 .input-append.date .add-on i, .input-prepend.date .add-on i {
   display: block;
   cursor: pointer;
@@ -502,17 +506,26 @@ ul.dashboard-list li a span {
 /* AWESOME Theme END */
 /* OPTIMUS Theme START */
 /*=== Navigation Section ===*/
+/*Override bootstrap's default max-height setting for .navbar-collapse  */
+.navbar-collapse {
+  max-height: none; }
+
 @media only screen and (min-width: 980px) {
   .nav-tabs.nav-stacked > li.shortcut-button {
     display: none !important; } }
 /*.nav-tabs.nav-stacked > li.shortcut-button {
 			 margin-top: 10px !important;
 }*/
+.nav-tabs {
+  border-bottom: 0; }
+  .nav-tabs.nav-stacked > li + li {
+    margin-top: 0; }
+
 .nav-tabs.nav-stacked > li:nth-child(9) a {
   margin-top: 13px !important; }
 
 .nav-tabs.nav-stacked > li > a {
-  margin: 2px;
+  margin-bottom: 2px;
   color: #646464;
   border: 1px solid #ddd;
   background-color: #fafafa;
@@ -534,7 +547,7 @@ ul.dashboard-list li a span {
   line-height: 16px !important; }
 
 .nav-tabs.nav-stacked > li.active > a {
-  margin: 2px;
+  /*  margin: 2px;	*/
   border: 1px solid #3c4049;
   color: #fff;
   background-color: #4e525d;
@@ -573,7 +586,7 @@ ul.dashboard-list li a span {
   -moz-border-radius-bottomleft: 4px; }
 
 .nav-tabs.nav-stacked > li > a:hover {
-  margin: 2px;
+  /*  margin: 2px;	*/
   border: 1px solid #3c4049;
   color: #fff;
   background-color: #4e525d;

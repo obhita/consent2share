@@ -29,6 +29,7 @@ import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.SignedPDFConsent;
 import gov.samhsa.consent2share.domain.consent.SignedPDFConsentRevocation;
+import gov.samhsa.consent2share.service.dto.AbstractPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
@@ -44,7 +45,7 @@ import org.springframework.security.access.annotation.Secured;
 /**
  * The Interface ConsentService.
  */
-@Secured("ROLE_USER")
+@Secured ({"ROLE_USER", "ROLE_ADMIN"})
 public interface ConsentService {
 
 	/**
@@ -107,6 +108,15 @@ public interface ConsentService {
 	 * @return the consent pdf dto
 	 */
 	ConsentPdfDto findConsentPdfDto(Long consentId);
+	
+	
+	/**
+	 * Find consentPdfDto.
+	 *
+	 * @param consentId the consent id
+	 * @return the consent pdf dto
+	 */
+	AbstractPdfDto findConsentContentDto(Long consentId);
 	
 	/**
 	 * Make consentListDto Array.

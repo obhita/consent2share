@@ -12,10 +12,10 @@
 	<artifactId>context-handler</artifactId>
 	<packaging>pom</packaging>
 	<name>Context Handler</name>
-	
+
 	<modules>
 		<module>service</module>
- 		<module>client</module> 
+		<!-- <module>client</module> -->
 	</modules>
-	
+
 </project>

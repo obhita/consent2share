@@ -32,6 +32,7 @@ public interface Hl7v3Transformer {
 	public final static String XSLTPIXADDURI = "c32ToHl7v3Pixadd.xsl";
 	public final static String XSLTPIXUPDATEURI = "c32ToHl7v3PixUpdate.xsl";
 	public final static String XSLTPIXQUERYURI = "c32ToHl7v3PixQuery.xsl";	
+	public final static String XMLPIXQUERYURI = "Hl7v3PixQuery.xml";
 	/**
 	 * Transform c32 to green ccd.
 	 *
@@ -42,5 +43,14 @@ public interface Hl7v3Transformer {
 	public String transformC32ToHl7v3PixXml(String c32xml, String XSLTURI)
 			throws Hl7v3TransformerException;
 
-	
+	/**
+	 * Transform c32 to green ccd.
+	 *
+	 * @param mrn the medical record no of patient
+	 * @param mrnDomain the eHRdomain id
+	 * @param xsltUri the xsl for pixquery
+	 * @return the string
+	 * @throws C32ToGreenCcdTransformerException the c32 to green ccd transformer exception
+	 */	
+	public String getPixQueryXml(String mrn, String mrnDomain, String xsltUri) throws Hl7v3TransformerException ;	
 }

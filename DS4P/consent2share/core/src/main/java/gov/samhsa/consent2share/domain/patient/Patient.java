@@ -70,6 +70,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -85,6 +86,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * The Class Patient.
  */
 @Entity
+@XmlRootElement
 @Audited
 @AuditTable("PATIENT_AUDIT")
 public class Patient {
@@ -166,8 +168,8 @@ public class Patient {
     private String medicalRecordNumber;
 
     /** The patient id number. */
-    @Size(max = 30)
-    private String patientIdNumber;
+    @Size(max = 255)
+    private String enterpriseIdentifier;
 
     /** The consents. */
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "patient")
@@ -603,20 +605,21 @@ public class Patient {
 	/**
 	 * Gets the patient id number.
 	 *
-	 * @return the patient id number
-	 */
-	public String getPatientIdNumber() {
-        return this.patientIdNumber;
-    }
+	 * @return the enterprise id number
+	 */	
+	public String getEnterpriseIdentifier() {
+		return enterpriseIdentifier;
+	}
+
 
 	/**
 	 * Sets the patient id number.
 	 *
-	 * @param patientIdNumber the new patient id number
-	 */
-	public void setPatientIdNumber(String patientIdNumber) {
-        this.patientIdNumber = patientIdNumber;
-    }
+	 * @param enterpriseIdentifier the new enterprise id number
+	 */	
+	public void setEnterpriseIdentifier(String enterpriseIdentifier) {
+		this.enterpriseIdentifier = enterpriseIdentifier;
+	}
 
 	/**
 	 * Gets the consents.

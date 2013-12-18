@@ -9,6 +9,7 @@ import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
 import gov.samhsa.consent2share.domain.reference.AdministrativeGenderCodeRepository;
+import gov.samhsa.consent2share.hl7.Hl7v3TransformerException;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
@@ -60,7 +61,7 @@ public class AccountServiceImplTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testSignup_Throws_Exception_Given_Link_Url_Has_Whitespaces_Only()
 			throws MessagingException, UsernameNotExistException,
-			EmailAddressNotExistException {
+			EmailAddressNotExistException, Hl7v3TransformerException {
 		SignupDto signupDto = mock(SignupDto.class);
 		sut.signup(signupDto, " ");
 	}
@@ -68,7 +69,7 @@ public class AccountServiceImplTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testSignup_Throws_Exception_Given_Valid_Link_Url_And_Given_No_Email_Address()
 			throws MessagingException, UsernameNotExistException,
-			EmailAddressNotExistException {
+			EmailAddressNotExistException, Hl7v3TransformerException {
 		// Arrange
 		final String linkUrl = "linkUrl";
 		SignupDto signupDto = mock(SignupDto.class);

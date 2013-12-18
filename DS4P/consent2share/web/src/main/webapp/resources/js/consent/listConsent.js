@@ -72,6 +72,11 @@ function initRevokeModalListeners() {
 		}
 		
 	});
+	
+	//Bind hidden.bs.modal event handler to clear modal fields
+	$("#revoke-modal").on('hidden.bs.modal', function(){
+		document.getElementById("consentRevokationForm").reset();
+	});
 }
 
 

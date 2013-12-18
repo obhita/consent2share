@@ -64,7 +64,7 @@ public class PatientDataOnDemand {
         setFirstName(obj, index);
         setLastName(obj, index);
         setMedicalRecordNumber(obj, index);
-        setPatientIdNumber(obj, index);
+        setEnterpriseIdentifier(obj, index);
         setPrefix(obj, index);
         setSocialSecurityNumber(obj, index);
         setUsername(obj, index);
@@ -172,12 +172,12 @@ public class PatientDataOnDemand {
         obj.setMedicalRecordNumber(medicalRecordNumber);
     }
 
-	public void setPatientIdNumber(Patient obj, int index) {
-        String patientIdNumber = "patientIdNumber_" + index;
+	public void setEnterpriseIdentifier(Patient obj, int index) {
+        String patientIdNumber = "enterpriseIdentifier_" + index;
         if (patientIdNumber.length() > 30) {
             patientIdNumber = patientIdNumber.substring(0, 30);
         }
-        obj.setPatientIdNumber(patientIdNumber);
+        obj.setEnterpriseIdentifier(patientIdNumber);
     }
 
 	public void setPrefix(Patient obj, int index) {

@@ -8,14 +8,45 @@
 		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>c32-service-client</artifactId>
-	<name>C32 Service Client</name>
+	<name>C32 Web Service Client</name>
 	<packaging>jar</packaging>
 
 	<dependencies>
+
 		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<scope>runtime</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+
+		<!-- Testing -->
+
+		<!-- Web stack-specific dependencies that are internally needed by the 
+			Endpoint object as it exposes a web service -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http-jetty</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Below used by embedded Jetty (which implements Endpoint in CXF) -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -53,28 +84,6 @@
 						<goals>
 							<goal>wsdl2java</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Add generated sources - avoids having to copy generated sources to 
-				build location. When working in eclipse, use context menu -> New -> Source 
-				Folder to make generated source known to Eclipse -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${basedir}/target/generated-sources</source>
-							</sources>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

@@ -1,6 +1,5 @@
 @charset "UTF-8";
 /* CSS Document */
-/* line 1, ../scss/workfile.scss */
 .skip {
   margin: 0;
   width: 0;
@@ -8,7 +7,6 @@
   border: 0;
   line-height: 0; }
 
-/* line 1, ../scss/workfile.scss */
 div.question-white {
   display: inline-block;
   width: 16px;
@@ -23,7 +21,6 @@ div.question-white {
   background-repeat: no-repeat;
   opacity: .6; }
 
-/* line 1, ../scss/workfile.scss */
 p.house-white {
   display: inline-block;
   width: auto;
@@ -38,11 +35,9 @@ p.house-white {
   background-repeat: no-repeat;
   opacity: .6; }
 
-/* line 1, ../scss/workfile.scss */
 p.house-white:hover {
   opacity: 1; }
 
-/* line 1, ../scss/workfile.scss */
 p.question-white {
   display: inline-block;
   width: auto;
@@ -56,11 +51,9 @@ p.question-white {
   background-repeat: no-repeat;
   opacity: .6; }
 
-/* line 1, ../scss/workfile.scss */
 p.question-white:hover {
   opacity: 1; }
 
-/* line 1, ../scss/workfile.scss */
 p.info-white {
   display: inline-block;
   width: auto;
@@ -74,11 +67,9 @@ p.info-white {
   background-repeat: no-repeat;
   opacity: .6; }
 
-/* line 1, ../scss/workfile.scss */
 p.info-white:hover {
   opacity: 1; }
 
-/* line 1, ../scss/workfile.scss */
 p.plus-white {
   display: inline-block;
   width: auto;
@@ -93,11 +84,9 @@ p.plus-white {
   background-repeat: no-repeat;
   opacity: .6; }
 
-/* line 1, ../scss/workfile.scss */
 p.plus-white:hover {
   opacity: 1; }
 
-/* line 1, ../scss/workfile.scss */
 p.cancel-white {
   display: inline-block;
   width: auto;
@@ -112,6 +101,5 @@ p.cancel-white {
   background-repeat: no-repeat;
   opacity: .6; }
 
-/* line 1, ../scss/workfile.scss */
 p.cancel-white:hover {
   opacity: 1; }

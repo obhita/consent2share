@@ -25,25 +25,55 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.pixclient.service;
 
-import gov.samhsa.consent2share.pixclient.ws.MCCIIN000002UV01;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201301UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201302UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201304UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201309UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201310UV02;
+import org.hl7.v3.types.MCCIIN000002UV01;
+import org.hl7.v3.types.PRPAIN201301UV02;
+import org.hl7.v3.types.PRPAIN201302UV02;
+import org.hl7.v3.types.PRPAIN201304UV02;
+import org.hl7.v3.types.PRPAIN201309UV02;
+import org.hl7.v3.types.PRPAIN201310UV02;
 
+/**
+ * The Interface PixManagerService.
+ */
 public interface PixManagerService {
 
+	/**
+	 * Pix manager PRPAIN201301UV02 (Add).
+	 * 
+	 * @param body
+	 *            the body
+	 * @return the MCCIIN000002UV01 (Acknowledgement)
+	 */
 	public abstract MCCIIN000002UV01 pixManagerPRPAIN201301UV02(
 			PRPAIN201301UV02 body);
 
+	/**
+	 * Pix manager PRPAIN201302UV02 (Update).
+	 * 
+	 * @param body
+	 *            the body
+	 * @return the MCCIIN000002UV01 (Acknowledgement)
+	 */
 	public abstract MCCIIN000002UV01 pixManagerPRPAIN201302UV02(
 			PRPAIN201302UV02 body);
 
+	/**
+	 * Pix manager PRPAIN201304UV02 (Merge).
+	 * 
+	 * @param body
+	 *            the body
+	 * @return the MCCIIN000002UV01 (Acknowledgement)
+	 */
 	public abstract MCCIIN000002UV01 pixManagerPRPAIN201304UV02(
 			PRPAIN201304UV02 body);
 
+	/**
+	 * Pix manager PRPAIN201309UV02 (Query).
+	 * 
+	 * @param body
+	 *            the body
+	 * @return the PRPAIN201310UV02 (Query Response)
+	 */
 	public abstract PRPAIN201310UV02 pixManagerPRPAIN201309UV02(
 			PRPAIN201309UV02 body);
-	
 }

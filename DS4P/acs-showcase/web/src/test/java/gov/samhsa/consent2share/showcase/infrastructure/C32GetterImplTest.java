@@ -2,7 +2,7 @@ package gov.samhsa.consent2share.showcase.infrastructure;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-import gov.samhsa.schemas.client.C32WebServiceClient;
+import gov.samhsa.acs.c32.wsclient.C32WebServiceClient;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

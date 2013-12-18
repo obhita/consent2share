@@ -3,23 +3,34 @@ package gov.samhsa.consent2share.pixclient.service;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import gov.samhsa.consent2share.pixclient.ws.MCCIIN000002UV01;
-import gov.samhsa.consent2share.pixclient.ws.PIXManagerPortType;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201301UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201302UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201304UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201309UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201310UV02;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
+
+import org.hl7.v3.types.MCCIIN000002UV01;
+import org.hl7.v3.types.PRPAIN201301UV02;
+import org.hl7.v3.types.PRPAIN201302UV02;
+import org.hl7.v3.types.PRPAIN201304UV02;
+import org.hl7.v3.types.PRPAIN201309UV02;
+import org.hl7.v3.types.PRPAIN201310UV02;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openhie.openpixpdq.services.PIXManagerPortType;
+import org.openhie.openpixpdq.services.PIXManagerService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PixManagerServiceImplTest {
+
+	private URL wsdlURL;
+	private String address;
+	private QName serviceName;
 
 	@InjectMocks
 	PixManagerServiceImpl sut;
@@ -28,14 +39,19 @@ public class PixManagerServiceImplTest {
 	PIXManagerPortType pIXManagerPortTypeMock;
 
 	@Before
-	public void setup() {
+	public void setup() throws MalformedURLException {
+		serviceName = new QName("urn:org:openhie:openpixpdq:services",
+				"PIXManager_Service");
+
+		address = "http://localhost:9000/services/PIXManager_Service";
+		wsdlURL = ClassLoader.getSystemResource("PIXPDQManager.wsdl");
 		sut.setPort(pIXManagerPortTypeMock);
 	}
 
 	@Test
 	public void testPixManagerServiceImpl() {
 		// Act
-		PixManagerServiceImpl pmsImpl = new PixManagerServiceImpl();
+		PixManagerServiceImpl pmsImpl = new PixManagerServiceImpl("");
 
 		// Assert
 		assertEquals(sut.getClass(), pmsImpl.getClass());
@@ -44,19 +60,16 @@ public class PixManagerServiceImplTest {
 	@Test
 	public void testPixManagerServiceImplString() {
 		// Arrange
-		String endPtAddr = "http://obhitademoacs01:8090/openempi-admin/services/PIXManager_Port_Soap12";
+		String endPtAddr = address;
 
 		// Act
 		PixManagerServiceImpl pmsImpl = new PixManagerServiceImpl(endPtAddr);
-		sut.setEndpoint(endPtAddr);
-		
+
 		pmsImpl.setPort(pIXManagerPortTypeMock);
 
 		// Assert
 		assertEquals(sut.getClass(), pmsImpl.getClass());
-		assertEquals(pmsImpl.getEndpoint(), sut.getEndpoint());
 		assertEquals(pmsImpl.getPort(), sut.getPort());
-		
 	}
 
 	@Test
@@ -130,6 +143,13 @@ public class PixManagerServiceImplTest {
 		// Assert
 		assertEquals(pRPAIN201310UV02Mock, actualObj);
 	}
-	
 
+	private PIXManagerPortType createPort() {
+		PIXManagerPortType port = new PIXManagerService(wsdlURL, serviceName)
+				.getPIXManagerPortSoap12();
+		BindingProvider bp = (BindingProvider) port;
+		bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+				address);
+		return port;
+	}
 }

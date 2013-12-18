@@ -1,0 +1,643 @@
+<div id="content">
+				<!-- JavaScrip Enable Message -->
+				<noscript th:substituteby="fragment/common :: noscriptFragment">
+					<div class="alert alert-warning col-md-10 col-sm-10">
+						<p id="h4-style" class="alert-heading">Warning!</p>
+						<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript"
+						target="_blank">JavaScript</a>enabled to use this site.</p>
+					</div>
+				</noscript>
+				<!-- START: Content Region-->
+				<!-- AUTHORIZE PERSONS SECTION -->		
+					
+				<div class="col-md-10 col-md-offset-1">
+					<section class="top-margin10">
+						<div class="row">
+							<fieldset>
+							<legend><span>I</span>, <span>John Doe</span>, <span>hereby</span>... </legend>
+							</fieldset>
+						</div>
+					</section>
+					
+					<section id="consent-container" class="top-margin10 summary-container">
+						<a href="#authorize-modal" role="button" class="consent-authorize-box bottom-margin10" data-edit-button="#edit1,#content1" data-toggle="modal">
+								<div id="consent-from" class="summary-border">
+									<div class="form-inline">
+							        	<p class="no-click"><span> Authorize the following individual(s) and/or organization(s)</span>:</p>
+							        		<ul id="authorizers" class="provider-ul"></ul>
+							        </div>
+							    </div>
+							</a>
+						
+	<!-- AUTHORIZE MODAL - START -->
+						<div id="authorize-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="authorize-modal" aria-hidden="true">
+							<div class="modal-dialog">
+							<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+										<p class="h3-style">Authorize</p>
+									</div>
+							<div class="modal-body">
+								<div>
+									<div class="panel-heading">
+										
+											<div class="panel-body nomargin">
+												<form class="inputformPerson">
+													<div>
+														<label for="authorize-list">Select the individual(s) and or organization(s) authorized to share your information:</label>
+															
+															<div id="authorize-list" class="modal_checkbox_list">
+																<!-- adding new consent -->
+																<div>
+																	<div>
+														        		<label for="inidividualProvider" class="checkbox">
+																		<input class="toDiscloseList" id="inidividualProvider" value="1234567890" type="checkbox" name="individualConsentAuthorizedFrom" style="float: none;"/><span> Doe, John</span>
+																		</label>
+																	</div>
+																	<div>
+														        		<label for="organizationalProvider" class="checkbox">
+																		<input class="toDiscloseList" id="organizationalProvider" value="1234567890" type="checkbox" name="organizationalConsentAuthorizedFrom"  style="float: none;"/><span> Doe, John</span>
+																		</label>
+																	</div>
+																																						
+																</div>
+																
+																<!-- editing existing consent -->
+																<div>
+																	<div>
+														        		<label for="inidividualProvider" class="checkbox">
+																		<input class="toDiscloseList" id="inidividualProvider" value="1234567890"  type="checkbox" name="individualConsentAuthorizedFrom" style="float: none;"/><span> Doe, John</span>
+																		</label>
+																		<div >
+																			<input type="hidden" class="prov-npi-checked-input" />
+																		</div>
+																	</div>
+																	<div>
+														        		<label for="organizationalProvider" class="checkbox">
+																		<input class="toDiscloseList" id="organizationalProvider" value="1234567890" type="checkbox" name="organizationalConsentAuthorizedFrom"  style="float: none;"/><span> Doe, John</span>
+																		</label>
+																		<div>
+																			<input type="hidden" class="prov-npi-checked-input" />
+																		</div>																		
+																	</div>
+																</div>
+																
+																
+															</div>
+																<!-- <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save changes</button> -->
+															<span class="btn-left-align"><button id="saveauthorizer" class="btn btn-success btn-lrg" data-dismiss="modal" aria-hidden="true"><span class="fa fa-plus fa-white"></span></button></span>
+
+													</div>
+												</form>
+											</div>
+										
+									</div><!-- end accordian-heading -->
+								</div><!-- end --> 
+							</div><!-- end modal-body -->
+							</div>
+							</div>
+						</div>
+						
+	<!-- AUTHORIZE MODAL - END -->
+						
+						<div id="consent-right-arrow-container" style="vertical-align:top;"><div id="consent-arrow" class="fa fa-arrow-right"></div>
+						</div>
+				
+						
+						<a href="#disclose-modal" role="button" class="consent-disclose-box" data-edit-button="#edit1,#content1" data-toggle="modal">
+						   <div id="consent-to" class="summary-border">
+								<div class="form-inline">
+							        	<p><span>To disclose my information to</span>:</p>
+							        	<ul id="consentmadetodisplay" class="provider-ul"></ul>
+							   </div>
+						   </div>
+						   </a>
+	<!-- DISCLOSE MODAL-START -->
+						<div id="disclose-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="disclose-modal" aria-hidden="true">
+							<div class="modal-dialog">
+							<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+										<p class="h3-style">Disclosure</p>
+									</div>
+							<div class="modal-body">
+								<div>
+									<div class="panel-heading">
+										
+											<div class="panel-body nomargin">
+												<form class="inputformPerson">
+													<div>
+														<label for="disclose-list">Select the individual(s) and/or organization(s) for disclosure:</label>
+														<div id="disclose-list" class="modal_checkbox_list">
+														<!-- adding new consent -->
+															<div>
+																<div>
+													        		<label for="inidividualProvider" class="checkbox">
+																	<input class="isMadeToList" id="inidividualProvider" value="1234567890"type="checkbox" name="individualConsentMadeTo"  style="float: none;"/><span> Doe, John</span>
+																	</label>
+																</div>
+																<div>
+													        		<label for="organizationalProvider" class="checkbox">
+																	<input class="isMadeToList" id="organizationalProvider" value="1234567890" type="checkbox" name="organizationalConsentMadeTo" style="float: none;"/><span> Doe, John</span>
+																	</label>
+																</div>
+																
+															</div>
+															<!-- editing existing consent -->
+															<div>
+																<div>
+													        		<label for="individualProvider" class="checkbox">
+																	<input class="isMadeToList" id="individualProvider" value="1234567890" type="checkbox" name="individualConsentMadeTo"  style="float: none;"/><span> Doe, John</span>
+																	</label>
+																		<div>
+																			<input type="hidden" class="prov-npi-checked-input" />
+																		</div>
+																</div>
+																<div>
+													        		<label for="organizationalProvider" class="checkbox">
+																	<input class="isMadeToList" id="organizationalProvider" value="1234567890" type="checkbox" name="organizationalConsentMadeTo" style="float: none;"/><span> Doe, John</span>
+																	</label>
+																	<div>
+																		<input type="hidden" class="prov-npi-checked-input" />
+																	</div>																		
+																</div>
+																
+															</div>															
+														</div>
+											
+														<span class="btn-left-align"><button id="saveconsentmadeto" class="btn btn-success btn-lrg" data-dismiss="modal" aria-hidden="true"><span class="fa fa-plus fa-white"></span></button></span>
+													</div>
+												</form>
+											</div>
+										
+									</div><!-- end accordian-heading -->
+								</div><!-- end --> 
+							</div><!-- end modal-body -->
+							</div>
+							</div>
+						</div>
+		<!-- DISCLOSE MODAL - END -->
+		
+					</section>			
+					<div class="clearfix"></div>
+					
+<!-- SHARE ALL MEDICAL INFO SECTION -->			
+		
+					<section class="top-margin10 bottom-margin10">
+						<div id="share-all-med" class="summary-border top-margin10">
+							<p class="inline-block bottom-margin10"><strong><span>Medical Information</span></strong></p>
+							<hr></hr>
+							<p><span>Select how you would like to share your medical information.</span></p>
+							<!-- Button to trigger modal -->
+							<ul>
+								<li>
+									<div style="inline">
+										<div class="iradio_square-blue float-left"  >
+											<input id="allInfo"  title="share-settings-radio button" type="radio" name="medicalinfo"/>
+										</div>
+										<label for="allInfo">  <strong><span>SHARE</span></strong> <strong><span>ALL</span></strong>&nbsp;<span>information</span>&nbsp;<span>in my medical record.</span></label>
+									</div>
+								</li>
+								<li>
+									
+									<div class="iradio_square-blue float-left"  id="input-2" data-target="#share-settings-modal" data-edit-button="#edit1,#content1" data-toggle="modal">
+										<input title="share-settings-radio button" name="medicalinfo" id="selectInfo" type="radio"/>
+									</div>
+									<!-- Issue #145 Fix Start 
+										     C2S::Add Consent::Link Applied to Wrong Element(s)
+										     Changed the label for to input:radio id 
+									-->
+									<label for="selectInfo" style="display:inline;"><strong><span>SHARE</span></strong>&nbsp;<span>my medical information </span>&nbsp;<strong><span >with exception</span></strong>&nbsp;<span>of specific</span>&nbsp;<span>information</span><span>.</span></label>
+									
+									<div style="display: inline;">
+										<a id="edit1" href="#share-settings-modal" role="button" class="btn btn-xs btn-info edit" data-toggle="modal">
+											Edit
+										</a>
+										<!-- Issue #145 Fix End -->
+									</div>
+									
+									<div id="content1" class="edit top-margin10">
+										<div class="inline-block">
+											<div id="notsharedmainpage">
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+						
+<!-- SHARE SETTINGS MODAL - START -->
+						<div id="share-settings-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="share-settings-modal" aria-hidden="true">
+						<div class="modal-dialog">
+						<div class="modal-content">
+								<div class="modal-header">
+									<button id="btn_close_selected_medinfo" type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+									<p class="h3-style">Privacy Settings</p>
+								</div>
+								<div class="modal-body">
+									<div>
+										<section class="top-margin10">                   
+							                <fieldset>
+								                    <div class="privacy-settings-input-group"> 
+									                    <div class="panel-group" id="accordion2">
+										                    <div class="panel panel-default">
+											                    <div class="panel-heading">
+											                    
+												                <div class="panel-title accordion-header-style">    
+													                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+													                Sensitive Information Categories
+												                    </a>
+																</div>						            	 
+																	<div id="collapseOne" class="panel-collapse collapse">
+																      <div class="panel-body"> 
+																        <div>
+																	        <div class="alert alert-warning">
+																	         <strong><span>DO NOT</span></strong>&nbsp;share the following areas of potentially sensitive information.
+																		    </div>
+																	        
+																	        <div class="consent-select">
+																	        	<div>
+																	        		<button id="btn_sensitivity_select_all" class="btn btn-default btn-xs btn-sel-all-tab" type="button">Select All</button>
+																	        	</div>
+																	        	<div>
+																	        		<button id="btn_sensitivity_deselect_all" class="btn btn-default btn-xs btn-desel-all-tab" type="button">Deselect All</button>
+																	        	</div>
+																	        </div>
+																	        
+																	        <form id="sensitivityinfo" class="inputform">
+																	        	<div>
+																	        		<span>
+																		        		<label for="Substance-Abuse" class="checkbox checkedCheckbox1">
+																							<input id="Substance-Abuse" class="checkBoxClass1" type="checkbox" name="sensitivityPolicyInput" checked="checked"> Substance Abuse </input>
+																						</label>
+																					</span>
+																					<span>
+																		        		<label for="Substance-Abuse" class="checkbox checkedCheckbox1">
+																							<input id="Substance-Abuse" class="checkBoxClass1" type="checkbox" name="sensitivityPolicyInput"> Substance Abuse </input>
+																						</label>																					
+																						<span>
+																							<input type="hidden" class="sensitivity-policy-code-checked-input" />
+																						</span>																					
+																					</span>
+																					<a href="#" data-trigger="click" data-toggle="popover" data-placement="bottom"
+																					 data-content="icon context" data-title="title" >
+																					<span style="margin-left: 5px;" class="fa fa-info-circle"></span>
+																					</a>
+																					<input class="input_i-text" type="hidden" />
+																	        	</div>
+																			</form>												     	
+																	        </div>
+																        </div>
+																      </div>
+																    </div>
+											                    </div>
+									                         
+										                    <div class="panel panel-default">
+											                    <div class="panel-heading">
+											                    
+												                <div class="panel-title accordion-header-style">
+												                	<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" >
+													                Medical Information Categories
+												                    </a>
+												               </div>
+												                    
+												                    <div id="collapseTwo" class="panel-collapse collapse">
+																      <div class="panel-body">
+																        <div>
+																	        <div class="alert alert-warning">
+																	         Select the medical information that you <strong>DO NOT</strong> wish to share.
+																		    </div>
+																		
+																		<div class="consent-select">
+																			<div>
+																				<button id="btn_med_info_select_all" class="btn btn-default btn-xs btn-sel-all-tab" type="button">Select All</button>
+																			</div>
+																			<div>
+																				<button id="btn_med_info_deselect_all" class="btn btn-default btn-xs btn-desel-all-tab" type="button">Deselect All</button>
+																			</div>
+																		</div>
+																		
+																		    <form class="inputform">
+																	        <div id="medicalinfo">
+																				<div>
+																	        		<span>																				
+																		        		<label for="conditions" class="checkbox checkedCheckbox1">
+																						<input id="conditions" class="checkBoxClass1" type="checkbox" name="clinicalDocumentSectionTypeInput" checked="checked"> Medical Information Categories</input>
+																						</label>
+																					</span>
+																	        		<span>																				
+																		        		<label for="conditions" class="checkbox checkedCheckbox1">
+																						<input id="conditions" class="checkBoxClass1" type="checkbox" name="clinicalDocumentSectionTypeInput"> Medical Information Categories</input>
+																						</label>
+																						<span>
+																							<input type="hidden" class="doc-sec-type-code-checked-input" />
+																						</span>																					
+																					</span>	
+																																									
+																					<a href="#" data-trigger="click" data-toggle="popover" data-placement="bottom"
+																					  data-content="icon content" data-title="title" >
+																					<span style="margin-left: 5px;" class="fa fa-info-circle"></span>
+																					</a>
+																					<input class="input_i-text" type="hidden" />
+																	        	</div>
+																	        </div>
+																	        </form>
+																        </div>
+							
+																      </div>
+																    </div>
+											                    </div>
+										                    </div> 
+										                    
+										                    <div class="panel panel-default">
+											                    <div class="panel-heading">
+											                    
+												                <div class="panel-title accordion-header-style">
+												                	<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree" >
+													                Clinical Document Type
+												                    </a>
+												               </div>
+												                    
+												                    <div id="collapseThree" class="panel-collapse collapse">
+																      <div class="panel-body">
+																        <div>
+																	        <div class="alert alert-warning">
+																	         Select the clinical document types you <strong>DO NOT</strong> wish to share.
+																		    </div>
+																		    
+																		    <div class="consent-select">
+																		    	<div>
+																		    		<button id="btn_clinical_doc_select_all" class="btn btn-default btn-xs btn-sel-all-tab" type="button">Select All</button>
+																		    	</div>
+																		    	<div>
+																		    		<button id="btn_clinical_doc_deselect_all" class="btn btn-default btn-xs btn-desel-all-tab" type="button">Deselect All</button>
+																		    	</div>
+																		    </div>
+																		    
+																		    <form class="inputform">
+																	        <div id="clinicalDocumentType">
+																	        
+																				<div>
+																					<span>
+																		        		<label for="summarizationOfEpisodeNote" class="checkbox checkedCheckbox1">
+																						<input id="summarizationOfEpisodeNote" class="checkBoxClass1" type="checkbox" name="clinicalDocumentTypeInput" checked="checked"> Summarization of Episode Note</input>
+																						</label>
+																					</span>
+																	        		<span>																				
+																		        		<label for="summarizationOfEpisodeNote" class="checkbox checkedCheckbox1">
+																						<input id="summarizationOfEpisodeNote" class="checkBoxClass1" type="checkbox" name="clinicalDocumentTypeInput"> Summarization of Episode Note</input>
+																						</label>
+																						<span>
+																							<input type="hidden" class="doc-sec-code-checked-input" />
+																						</span>																					
+																					</span>																						
+																					<a href="#" data-trigger="click" data-toggle="popover" data-placement="bottom"
+																					  data-content="icon context" data-title="title">
+																					<span style="margin-left: 5px;" class="fa fa-info-circle"></span>
+																					</a>
+																					<input class="input_i-text" type="hidden" />
+																	        	</div>
+																	        </div>
+																	        </form>
+																        </div>
+																      </div>
+																    </div>
+											                    </div>
+										                    </div> 
+										                    
+										           
+										                    <div class="panel panel-default">
+											                    <div class="panel-heading">
+												                    
+												                    <div class="panel-title accordion-header-style">
+												                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour">
+													                    Specific Medical Information
+												                    </a>
+												                    </div>
+												                    <div id="collapseFour" class="panel-collapse collapse" >
+																      <div class="panel-body">
+																      <div class="alert alert-warning">
+																	         Enter any specific medical information you <strong><span>DO NOT</span></strong>&nbsp; wish to share.
+																		    </div>
+																        
+																        <div  class="ui-widget" id="autocomplete">
+																        	<label for="condition">Enter a condition:</label>
+																 
+																	        <input id="condition" type="text"  class="condition-input"></input>
+																	        <span class="btn-left-align" ><button id="addspecmedi" class="btn btn-success btn-lrg"><span class="fa fa-plus fa-white"></span></button></span>
+																	        <p style="font-size:small;"><em>If you do not know the correct name of the condition, please leave this field empty.</em></p>
+																	    
+																        </div>
+																        <form>
+																        <hr class="spacing"/>
+																        <div>
+																	        <ul id="specmedinfo">
+																		        <li class="spacing">
+																		        </li>
+																	        </ul>
+																	        <br/><br/><br/>
+																        </div>
+																        </form>
+																      </div>
+																    </div>
+											                    </div>
+										                    </div>
+										                </div>
+								                    </div>
+							               </fieldset>
+							            </section>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button id="btn_cancel_selected_medinfo" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Cancel</button>
+									<button id="btn_save_selected_medinfo" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save changes</button>
+								</div>
+								</div>
+								</div>
+							</div><!-- end of share-settings-modal -->
+						
+				<!-- felix modal -->
+						<div id="felix" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+								<h3 id="myModalLabel">Substance Abuse</h3>
+							</div>
+							<div class="modal-body">
+								<p>Substance abuse, also known as drug abuse, is a patterned use of a substance (drug) in which the user consumes the substance in amounts or with methods neither approved nor advised by medical professionals. Substance abuse/drug abuse is not limited to mood-altering or psycho-active drugs. If an activity is performed using the objects against the rules and policies of the matter (as in steroids for performance enhancement in sports), it is also called substance abuse.</p>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>											    
+							</div>
+							</div>
+							</div>
+						</div>
+				<!-- end felix modal -->    
+					</section>
+					
+<!-- SHARE FOR PURPOSES SECTION -->		
+					
+					<section class="bottom-margin10">
+						<div id="share-for-purpose" class="summary-border">
+									<p class="inline-block bottom-margin10"><strong><span>Purpose of Use</span></strong></p>
+									<hr></hr>
+									<p><span>Choose for what purposes your medical information may be used</span></p>
+							
+							<ul>
+								<li>
+								</li>
+								<li>
+								<div>
+									<div class="radio-label-align">
+										<!-- Issue #145 Fix Start 
+											     C2S::Add Consent::Link Applied to Wrong Element(s)
+											     Changed the label for to input:radio id
+										-->
+										<label for="selectPurposes"><strong><span>Share</span></strong>&nbsp;<span>my medical record</span><strong>&nbsp;<span>ONLY</span></strong>&nbsp;<span>for the</span>&nbsp;<span>selected purpose(s) of use.</span><span><a id="edit2" href="#selected-purposes-modal" role="button" class="btn btn-xs btn-info edit" data-toggle="modal">
+											Edit
+									</a> </span>
+										</label>
+										<!-- Issue #145 Fix End -->
+									</div>
+									<div>
+									</div>
+								</div> 
+								</li>
+							</ul> 
+														
+							<div id="content2" class="edit top-margin10">
+								<div class="inline-block">
+									<div id="sharedpurpose">
+									</div>
+								</div>
+							</div>
+ 
+					
+							
+						</div><!-- end modal2 -->
+						
+						<!-- Modal2 -->
+							<div id="selected-purposes-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selected-purposes-modal" aria-hidden="true">
+							<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+									<p class="h3-style">Share for selected purpose(s) only</p>
+								</div>
+								
+								<div class="modal-body">
+								<fieldset>
+								    <div> 
+								    	<div class="panel-heading">
+								    		<div class="panel-body nomargin"> 
+								    			<form class="purposeofshareform">
+								    				<div class="alert alert-warning">Share my information&nbsp;<strong>only</strong>&nbsp;for specified purpose(s) of use.</div>
+								    												    				
+								    				<div class="consent-select">
+								    					<div>
+								    						<button id="btn_share_purposes_select_all" class="btn btn-default btn-xs btn-sel-all-tab" type="button">Select All</button>
+								    					</div>
+								    					<div>
+								    						<button id="btn_share_purposes_deselect_all" class="btn btn-default btn-xs btn-desel-all-tab" type="button">Deselect All</button>
+								    					</div>
+								    				</div>
+								    				
+													<div id="purposeOfSharingInputs">
+								    					<div>
+															<span>
+									    						<label for="emergency" class="checkbox checkedCheckbox2">
+																<input id="emergency" type="checkbox" name="purposeOfUseInput" checked="checked"> Emergency</input>
+																</label>
+															</span>
+															<span>
+									    						<label for="emergency" class="checkbox checkedCheckbox2">
+																<input id="emergency" type="checkbox" name="purposeOfUseInput" checked="checked"> Emergency</input>
+																</label>
+																<span>
+																	<input type="hidden" class="purpose-use-code-checked-input" />
+																</span>																	
+															</span>															
+																					<a href="#" data-trigger="click" data-toggle="popover" data-placement="bottom"
+																					  data-content="icon context" data-title="title">
+																					<span style="margin-left: 5px;" class="fa fa-info-circle"></span>
+																					</a>
+																					<input class="input_i-text" type="hidden" />
+								    					</div>
+								    				</div>
+<!-- 									    			<label for="emergency" class="checkbox"> -->
+<!-- 										    			<input id="emergency" type="checkbox" name="conditions" th:field="*{emergency}" checked="checked"/> Emergency -->
+<!-- 										    		</label>												     	 -->
+												</form>												     	
+											</div>
+										</div>
+								    </div>
+								</fieldset>
+								</div>
+								<div class="modal-footer">
+									<button id="btn_cancel_selected_purposes" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Cancel</button>
+									<button id="btn_save_selected_purposes" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save changes</button>
+								</div>
+								</div>
+								</div>
+							</div>
+					</section>
+					
+<!-- CONSENT DATES START -->		
+<section class="bottom-margin10">
+		<div id="consent-date-fill" class="summary-border">
+		<p class="inline-block bottom-margin10"><strong><span>Consent Term</span></strong></p>
+		<hr></hr>
+		<p><span>Enter a start and end date during wich your medical records will be shared.</span></p>
+				<section id="consent-date" class="bottom-margin10">
+					<div>
+						<section id="consent-start-date">
+							<form class="summary-container inputformDate">
+								<fieldset>
+									<label for="date-picker-start"><span>Consent Start</span></label>
+									<div class="input-group datepicker" data-date-format="mm/dd/yyyy">
+										<span>
+											<input class="datepicker" id="date-picker-start" name="consentStart" style="z-index: 100;" value="" />
+										</span>
+										<span>
+											<input class="datepicker" id="date-picker-start" name="consentStart" style="z-index: 100;" />
+										</span>										
+									</div>
+								</fieldset>
+							</form>
+							</section>
+							
+						<section id="consent-end-date">
+							<form class="summary-container inputformDate">
+								<fieldset>
+									<label for="date-picker-end"><span>Consent End</span></label>
+									<div class="input-group datepicker date"  data-date-format="mm/dd/yyyy">
+										<span>
+											<input class="datepicker" id="date-picker-end" name="consentEnd" style="z-index: 100;" value="" />
+										</span>
+										<span>
+											<input class="datepicker" id="date-picker-end" name="consentEnd" style="z-index: 100;" />
+										</span>
+									</div>
+								</fieldset>
+							</form>
+							</section>
+						<div class="clearfix"></div>	
+					</div>
+				</section>
+		</div>
+</section>
+
+<!-- CONSENT DATES END --> 				
+				<section class="save-cancel-buttons-group top-margin10">
+					<div class="controls" style="padding-top: 15px">
+						<button id="consent-add-cancel" type="button" class="btn btn-default" style="margin: 0 10px 0 0;" onclick="window.location.href='listConsents.html'"><span>Cancel</span></button>
+						<button id="consent-add-save" type="submit" class="btn btn-primary"><span>Save</span></button>
+					</div>         		
+				</section>
+					
+									
+					
+				</div>
+							
+			</div>

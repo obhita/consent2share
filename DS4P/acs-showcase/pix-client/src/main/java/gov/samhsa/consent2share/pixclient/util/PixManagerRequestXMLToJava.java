@@ -25,44 +25,124 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.pixclient.util;
 
-import gov.samhsa.consent2share.pixclient.ws.ObjectFactory;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201301UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201302UV02;
-import gov.samhsa.consent2share.pixclient.ws.PRPAIN201309UV02;
+import gov.samhsa.acs.common.tool.SimpleMarshaller;
 
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
+import org.apache.commons.io.IOUtils;
+import org.hl7.v3.types.PRPAIN201301UV02;
+import org.hl7.v3.types.PRPAIN201302UV02;
+import org.hl7.v3.types.PRPAIN201309UV02;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-@Component
+/**
+ * The Class PixManagerRequestXMLToJava.
+ */
 public class PixManagerRequestXMLToJava {
 
+	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private JAXBContext jaxbContext = null;
+	/** The marshaller. */
+	private SimpleMarshaller marshaller;
 
-	public PixManagerRequestXMLToJava() throws JAXBException {
-		// 1. We need to create JAXContext instance
-
-		if (jaxbContext == null) {
-			jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-		}
+	/**
+	 * Instantiates a new pix manager request xml to java.
+	 */
+	public PixManagerRequestXMLToJava() {
 	}
 
+	/**
+	 * Instantiates a new pix manager request xml to java.
+	 * 
+	 * @param marshaller
+	 *            the marshaller
+	 */
+	public PixManagerRequestXMLToJava(SimpleMarshaller marshaller) {
+		this.marshaller = marshaller;
+	}
+
+	/**
+	 * Gets the pIX add req object.
+	 * 
+	 * @param reqXMLFilePath
+	 *            the req xml file path
+	 * @param encodeString
+	 *            the encode string
+	 * @return the pIX add req object
+	 * @throws JAXBException
+	 *             the jAXB exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	public PRPAIN201301UV02 getPIXAddReqObject(String reqXMLFilePath,
-			String encodeString) throws JAXBException {
-
-		// 2. Use JAXBContext instance to create the Unmarshaller.
-		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
+			String encodeString) throws JAXBException, IOException {
 		PRPAIN201301UV02 reqObj = null;
+		reqObj = getPIXReqObject(PRPAIN201301UV02.class, reqXMLFilePath);
+		return reqObj;
+	}
+
+	/**
+	 * Gets the pIX update req object.
+	 * 
+	 * @param reqXMLFilePath
+	 *            the req xml file path
+	 * @param encodeString
+	 *            the encode string
+	 * @return the pIX update req object
+	 * @throws JAXBException
+	 *             the jAXB exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	public PRPAIN201302UV02 getPIXUpdateReqObject(String reqXMLFilePath,
+			String encodeString) throws JAXBException, IOException {
+		PRPAIN201302UV02 reqObj = null;
+		reqObj = getPIXReqObject(PRPAIN201302UV02.class, reqXMLFilePath);
+		return reqObj;
+	}
+
+	/**
+	 * Gets the pIX query req object.
+	 * 
+	 * @param reqXMLFilePath
+	 *            the req xml file path
+	 * @param encodeString
+	 *            the encode string
+	 * @return the pIX query req object
+	 * @throws JAXBException
+	 *             the jAXB exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	public PRPAIN201309UV02 getPIXQueryReqObject(String reqXMLFilePath,
+			String encodeString) throws JAXBException, IOException {
+		PRPAIN201309UV02 reqObj = null;
+		reqObj = getPIXReqObject(PRPAIN201309UV02.class, reqXMLFilePath);
+		return reqObj;
+	}
+
+	/**
+	 * Gets the pIX req object.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param clazz
+	 *            the clazz
+	 * @param reqXMLFilePath
+	 *            the req xml file path
+	 * @return the pIX req object
+	 * @throws JAXBException
+	 *             the jAXB exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	private <T> T getPIXReqObject(Class<T> clazz, String reqXMLFilePath)
+			throws JAXBException, IOException {
+		T reqObj = null;
 		if (reqXMLFilePath == null) {
 			throw new JAXBException("input is null");
 		}
@@ -75,88 +155,28 @@ public class PixManagerRequestXMLToJava {
 			// 4. Get the instance of the required JAXB Root Class from the
 			// JAXBElement.
 			try {
-				reqObj = (PRPAIN201301UV02) unmarshaller
-						.unmarshal(new ByteArrayInputStream(reqXMLFilePath
-								.getBytes(encodeString)));
-			} catch (UnsupportedEncodingException e) {
+				reqObj = marshaller.unmarshallFromXml(clazz, reqXMLFilePath);
+			} catch (JAXBException e) {
 				logger.error(e.getMessage(), e);
-				throw new JAXBException(e.getMessage(), e);
+				throw e;
 			}
 		} else {
 			// 3. Use the Unmarshaller to unmarshal the XML document to get an
 			// instance of JAXBElement.
 			// 4. Get the instance of the required JAXB Root Class from the
 			// JAXBElement.
-			reqObj = (PRPAIN201301UV02) unmarshaller.unmarshal(getClass()
-					.getClassLoader().getResourceAsStream(reqXMLFilePath));
-		}
-
-		return reqObj;
-	}
-
-	public PRPAIN201302UV02 getPIXUpdateReqObject(String reqXMLFilePath,
-			String encodeString) throws JAXBException {
-
-		// 2. Use JAXBContext instance to create the Unmarshaller.
-		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-		PRPAIN201302UV02 reqObj = null;
-
-		if (reqXMLFilePath == null) {
-			throw new JAXBException("input is null");
-		}
-
-		// 3. Use the Unmarshaller to unmarshal the XML document to get an
-		// instance of JAXBElement.
-		// 4. Get the instance of the required JAXB Root Class from the
-		// JAXBElement.
-		if (reqXMLFilePath.startsWith("<?xml")) {
 			try {
-				reqObj = (PRPAIN201302UV02) unmarshaller
-						.unmarshal(new ByteArrayInputStream(reqXMLFilePath
-								.getBytes(encodeString)));
-			} catch (UnsupportedEncodingException e) {
+				reqObj = marshaller.unmarshallFromXml(clazz, IOUtils
+						.toString(getClass().getClassLoader()
+								.getResourceAsStream(reqXMLFilePath)));
+			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
-				throw new JAXBException(e.getMessage(), e);
+				throw e;
+			} catch (JAXBException e) {
+				logger.error(e.getMessage(), e);
+				throw e;
 			}
-		} else {
-
-			reqObj = (PRPAIN201302UV02) unmarshaller.unmarshal(getClass()
-					.getClassLoader().getResourceAsStream(reqXMLFilePath));
 		}
 		return reqObj;
 	}
-
-	public PRPAIN201309UV02 getPIXQueryReqObject(String reqXMLFilePath,
-			String encodeString) throws JAXBException {
-
-		// 2. Use JAXBContext instance to create the Unmarshaller.
-		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-		PRPAIN201309UV02 reqObj = null;
-		if (reqXMLFilePath == null) {
-			throw new JAXBException("input is null");
-		}
-
-		// 3. Use the Unmarshaller to unmarshal the XML document to get an
-		// instance of JAXBElement.
-		// 4. Get the instance of the required JAXB Root Class from the
-		// JAXBElement.
-		if (reqXMLFilePath.startsWith("<?xml")) {
-			try {
-				reqObj = (PRPAIN201309UV02) unmarshaller
-						.unmarshal(new ByteArrayInputStream(reqXMLFilePath
-								.getBytes(encodeString)));
-			} catch (UnsupportedEncodingException e) {
-				logger.error(e.getMessage(), e);
-				throw new JAXBException(e.getMessage(), e);
-			}
-		} else {
-
-			reqObj = (PRPAIN201309UV02) unmarshaller.unmarshal(getClass()
-					.getClassLoader().getResourceAsStream(reqXMLFilePath));
-		}
-		return reqObj;
-	}
-
 }

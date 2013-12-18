@@ -228,6 +228,14 @@
 			<groupId>gov.samhsa.consent</groupId>
 			<artifactId>consent-gen</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>pix-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>hl7-gen</artifactId>
+		</dependency>		
 		<!-- Our own projects End -->
 
 	</dependencies>

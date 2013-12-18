@@ -21,7 +21,7 @@
     <jaxws:endpoint 
         id="documentsegmentationservice"
         implementor="#documentSegmentationServiceImpl"
-        wsdlLocation="classpath:DocumentSegmentationService.wsdl"
+        wsdlLocation="classpath:wsdl/DocumentSegmentationService.wsdl"
         address="/DocumentSegmentationService">
         <jaxws:properties>
 			<entry key="mtom-enabled" value="true" />
@@ -29,49 +29,49 @@
     </jaxws:endpoint>
     
     <bean id="documentSegmentationServiceImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.ws.DocumentSegmentationServiceImpl"
+		class="gov.samhsa.acs.documentsegmentation.ws.DocumentSegmentationServiceImpl"
 		scope="prototype" autowire="byType" />
 
 	<bean id="documentSegmentationImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.DocumentSegmentationImpl"
+		class="gov.samhsa.acs.documentsegmentation.DocumentSegmentationImpl"
 		scope="prototype" autowire="constructor" />
 		
 	<bean id="ruleExecutionServiceClientImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.brms.RuleExecutionServiceClientImpl"
+		class="gov.samhsa.acs.documentsegmentation.brms.RuleExecutionServiceClientImpl"
 		scope="prototype">
 		<constructor-arg value="#{endpointAddressProperties.ruleExecutionService}" />
 	</bean>
 
 	<bean id="auditServiceImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.audit.AuditServiceImpl"
+		class="gov.samhsa.acs.documentsegmentation.audit.AuditServiceImpl"
 		scope="prototype">
 		<constructor-arg value="#{endpointAddressProperties.auditService}" />
 	</bean>
 	
 	<!-- Tools for Document Segmentation Service -->
 	<bean id="documentEditorImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEditorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl"
 		scope="prototype" autowire="byType"/>
 	<bean id="documentEncrypterImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentEncrypterImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypterImpl"
 		scope="prototype"/>
 	<bean id="documentMaskerImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentMaskerImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentMaskerImpl"
 		scope="prototype"/>
 	<bean id="documentRedactorImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentRedactorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl"
 		scope="prototype" autowire="byType"/>
 	<bean id="documentTaggerImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentTaggerImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl"
 		scope="prototype"/>
 	<bean id="metadataGeneratorImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.MetadataGeneratorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl"
 		scope="prototype"/>
 	<bean id="documentFactModelExtractorImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.DocumentFactModelExtractorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentFactModelExtractorImpl"
 		scope="prototype"/>
 	<bean id="additionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
 		scope="prototype"/>
 	
 	<!-- Tools used from common-library -->

@@ -25,8 +25,8 @@
  ******************************************************************************/
 package gov.va.ds4p.registry.xdsbregistry;
 
-import gov.samhsa.consent2share.accesscontrolservice.xdsb.registry.XdsbRegistryWebServiceClient;
-import gov.samhsa.ds4ppilot.common.exception.DS4PException;
+import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 

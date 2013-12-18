@@ -28,8 +28,10 @@ package gov.samhsa.consent2share.service.patient;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.AddConsentOrganizationalProviderDto;
+import gov.samhsa.consent2share.service.dto.PatientAdminDto;
 import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
+import gov.samhsa.consent2share.service.dto.RecentPatientDto;
 
 import java.util.List;
 
@@ -38,7 +40,7 @@ import org.springframework.security.access.annotation.Secured;
 /**
  * The Interface PatientService.
  */
-@Secured("ROLE_USER")
+@Secured({"ROLE_USER","ROLE_ADMIN"})
 public interface PatientService {
 
 	/**
@@ -139,4 +141,21 @@ public interface PatientService {
 	 * @return true, if is legal rep for current user
 	 */
 	boolean isLegalRepForCurrentUser(Long legalRepId);
+	
+	/**
+	 * Find patient by first name and last name.
+	 *
+	 * @param firstName the first name
+	 * @param lastName the last name
+	 * @return the patient profile dto
+	 */
+	public List<PatientAdminDto> findAllPatientByFirstNameAndLastName(String firstName,String lastName);
+	
+	/**
+	 * Find recent patient dtos by id.
+	 *
+	 * @param ids the ids
+	 * @return the list
+	 */
+	public List<RecentPatientDto> findRecentPatientDtosById(List<String> ids);
 }

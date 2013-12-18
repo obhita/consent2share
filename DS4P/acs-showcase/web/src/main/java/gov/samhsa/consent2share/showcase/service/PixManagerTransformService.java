@@ -26,10 +26,12 @@
 package gov.samhsa.consent2share.showcase.service;
 
 import gov.samhsa.consent2share.hl7.Hl7v3TransformerException;
+import gov.samhsa.consent2share.showcase.infrastructure.PixOperation;
 
 public interface PixManagerTransformService {	
 	public String getPixAddXml(String c32xml) throws Hl7v3TransformerException;
 	public String getPixUpdateXml(String c32xml) throws Hl7v3TransformerException;
-	public String getPixQueryXml(String c32xml) throws Hl7v3TransformerException;	
+	public String getPixQueryXml(String c32xml) throws Hl7v3TransformerException;
+	public String getPixXml(PixOperation operation, String c32xml) throws Hl7v3TransformerException;
 
 }

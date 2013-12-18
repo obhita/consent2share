@@ -17,6 +17,5 @@ $(document).ready(function() {
 
 	setDOBfromTxt();
 	
-	$('.toggleButton').toggleButtons();
 	$('#password').pstrength();
 });

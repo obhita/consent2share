@@ -14,10 +14,12 @@
 
 	<artifactId>access-control-service</artifactId>
 	<packaging>pom</packaging>
-	<name>access control services</name>
+	<name>Access Control Services</name>
 
 	<modules>
-		<module>common-library</module>		
+		<module>common-library</module>	
+		
+		<module>c32-service-client</module>	
 		
 		<module>brms</module>
 		
@@ -25,104 +27,14 @@
 		
 		<module>document-segmentation</module>	
 			
-		<module>c32-service-client</module>
-		
-		<module>secured-context-handler</module>
-		
 		<module>xdsb-common</module>
 		<module>xdsb-registry-client</module>
-		<module>xdsb-repository-client</module>				
+		<module>xdsb-repository-client</module>	
+		
+		<module>secured-context-handler</module>			
 				
 		<module>pep</module>
 	</modules>
-
-	<dependencies>
-
-		<!-- XML security -->
-
-		<dependency>
-			<groupId>xml-apis</groupId>
-			<artifactId>xml-apis</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>xalan</groupId>
-			<artifactId>xalan</artifactId>
-		</dependency>
-
-		<!-- Apache CXF dependencies -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-frontend-jaxws</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-transports-http</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-ws-security</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>commons-logging</artifactId>
-					<groupId>commons-logging</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-ws-policy</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-ws-addr</artifactId>
-		</dependency>
-		<!-- Web stack-specific dependencies that are internally needed by the 
-			Endpoint object as it exposes a web service -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-transports-http-jetty</artifactId>
-		</dependency>
-		
-		<!-- Below used by embedded Jetty (which implements Endpoint in CXF) -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-		</dependency>
-		
-		<!-- Spring dependencies -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-		</dependency>
-
-		<!-- JAXB dependencies -->
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-		</dependency>
-
-		<!-- xstream dependencies -->
-		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-		</dependency>
-
-		<!-- Saxon-HE dependencies -->
-		<dependency>
-			<groupId>net.sf.saxon</groupId>
-			<artifactId>Saxon-HE</artifactId>
-		</dependency>
-
-	</dependencies>
 
 	<build>
 		<resources>

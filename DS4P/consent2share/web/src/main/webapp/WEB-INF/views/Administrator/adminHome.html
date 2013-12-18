@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/common :: headerFragment" > 
+	<meta charset="utf-8" />
+	<!-- title needs to be dynamic -->
+	<title>Consent2Share</title>
+	<meta name="description" content="Consent Management System" />
+	<meta name="author" content="FEiSystems" />
+	<!-- END: Meta -->
+	<!-- START: Mobile Specific -->
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- END: Mobile Specific -->
+	
+	<!-- Bootstrap related CSS files -->
+<link id="bootstrap-style" href="../../../resources/css/bootstrap.css"
+	rel="stylesheet" th:href="@{/resources/css/bootstrap.css}" />
+<link href="../../../resources/css/font-awesome.css"
+	th:href="@{/resources/css/font-awesome.css}"
+	rel="stylesheet"/>
+
+<!-- Plug-in Stylesheets -->	
+<link href="../../../resources/css/joyride-2.0.3.css" rel="stylesheet"
+	th:href="@{/resources/css/joyride-2.0.3.css}" />
+
+<!-- Custom CSS Files -->
+<link href="../../../resources/css/themes-style.css" rel="stylesheet"
+	th:href="@{/resources/css/themes-style.css}" />
+<link href="../../../resources/css/sentinel-style.css" rel="stylesheet"
+	th:href="@{/resources/css/sentinel-style.css}" />
+	
+<!-- END: CSS -->
+	
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
+	<!-- START: Favicon -->
+	<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
+	<!-- END: Favicon -->
+</head>
+<head>
+<style>
+tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; } 
+</style>
+<link href="../../../resources/css/jquery-ui.css" rel="stylesheet" th:href="@{/resources/css/jquery-ui.css}"/>
+</head>
+<body id="adminHome-page" class="admin-pages">
+
+<div class="container outmost-holder">
+	<!-- !START: Page Header -->
+	<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='Administrator Home'">
+		<div class="container">
+			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/admin_fragments :: admin-navbarHeaderFragment">
+			
+			<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE navbarHeaderFragment -->
+			<!-- The code below is here only to enhance source code readability -->
+			
+					<!-- <a class="btn btn-info btn-mainmenu" data-toggle="collapse" data-target=".top-nav.navbar-collapse,.sidebar-nav.navbar-collapse">
+						<span class="fa fa-reorder"></span>
+					</a> -->
+					<h1>
+						<span class="nav-title">Administrator</span>
+					</h1>
+					
+					
+
+					<span>
+						<div style="position: relative;">
+							<a id="logoFragment" class="navbar-brand brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+<!-- WATERMARK -->
+<!-- 						<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>    -->
+<!-- END WATERMARK -->						
+						</div>
+					</span>
+					
+					
+				
+					<div id="adminHome-navbar-buttons" class="pull-right">
+							<!-- COMPONENT: User Dropdown -->
+						<p><strong>Medical Facility Name</strong></p>
+						<div class="btn-group btn-group-sm">
+							<div class="btn-group btn-group-sm">
+								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+									<span class="fa fa-user"></span><span class="hidden-sm hidden-md force-inline">Leo Smith</span>
+									<span class="caret"></span>
+								</a>
+							
+								<ul role="menu" class="dropdown-menu">
+									<li role="menuitem"><a href="editAdminProfile.html">My Profile</a></li>
+									<li role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}" th:text="#{header_change_password}">Change Password</a></li>
+									<li role="menuitem" aria-disabled="true" class="divider"></li>
+									<li role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" th:text="#{header_logout}">Logout</a></li>
+								</ul>
+							</div>
+							<a class="btn btn-default myaccount-buttons" href="#">
+								<span class="fa fa-envelope force-inline"></span><span class="hidden-sm hidden-md force-inline"> Message Center</span> 
+								<span class="label label-warning hidden-sm force-inline">3</span>
+							</a>
+						</div>
+					</div>
+			</div>
+			<!-- END OF SECTION REPLACED BY THYMELEAF -->
+			
+			<div id="event_notification_bar" th:switch="${notifyevent}">
+				<span th:case="'passChangeSuccess'">
+					<div class="alert alert-success rounded">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    			You have successfully changed your password!
+					</div>
+				</span>
+			</div>
+			
+		</div>
+	</header>
+	<div id="under-header"></div>
+
+		<!-- END : Page Header -->
+	<div class="container">
+		<div class="row main-content-wrapper">
+			
+			<div class="col-md-12 top-margin10">
+				<form id="adminHomeSearchBar" class="summary-border" role="search">
+      				
+      				<div class="">
+    					<div class="input-group input-group-sm">
+      						<input id="searchTextBox" type="text" placeholder="Search" class="form-control" />
+      						<span class="input-group-btn">
+        						<button class="btn btn-default" type="button"><span class="fa fa-search"></span><span class="hidden-xs"> Advanced Search</span></button>
+      						</span> 
+						   	<span title="plus button" id="patient-Account-btn">
+								<button id="consent-main-plus-btn" class="btn btn-primary btn-sm add-btn" data-toggle="modal" data-target="#createPatient" onclick="window.location = '#';">
+									<span class="fa fa-plus fa-white"></span><span class="hidden-479" style="padding-left: 5px;">Patient Account</span>
+								</button>
+							</span>
+    					</div><!-- /input-group -->
+  					</div><!-- /.col-lg-6 -->
+      				
+    			</form><div class="clearfix"></div>
+			</div>
+
+<!-- MODAL -->
+			<div class="modal fade" id="createPatient" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+					<form id="admin_create_patient_acct_form" th:object="${basicPatientAccountDto}" th:action="@{adminCreatePatientAccount.html}" onsubmit="return validateCreatePatientAccount('admin_create_patient_acct_form')" method="post">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+							<p class="h3-style" id="myModalLabel">Create Patient Account</p>
+						</div>
+					
+						<div class="modal-body">
+							<section class="row">
+								<div class="form-group col-md-6 col-sm-6">
+									<label>First Name</label>
+									<input id="first_name" type="text" th:field="*{firstName}" class="form-control" placeholder="First Name" />
+								</div>
+				
+								<div class="form-group col-md-6 col-sm-6">
+									<label>Last Name</label>
+									<input id="last_name" type="text" th:field="*{lastName}" class="form-control" placeholder="Last Name" />
+								</div>
+							</section>
+					
+							<section class="row" id="create-patient-dob">
+								<div class="form-group col-md-4 col-sm-4">
+									<div>
+										<label for="gender">Gender</label>
+									</div>
+									<div class="gender-select-controls">
+										<!-- TODO: Add Thymeleaf integration with administrativeGenderCode field -->
+										<select id="gender" class="form-control inline-block">
+											<option selected="selected" value="">--- Please Select ---</option>
+											<option value="F">Female</option>
+											<option value="M">Male</option>
+										</select>
+										<span id="gender_error_text" class="required-text" style="display:none;">Gender Selection is required.</span>
+										<span id="gender_client_error_text" class="required-text" style="display: none;">Gender Selection is required.</span>
+									</div>
+								</div>
+						
+								<div class="form-group col-md-6 col-sm-6">
+									<div>
+										<label class="control-label">Date of Birth</label>
+									</div>
+									<div id="dob" class="dob-select-controls inline-block">
+										<input type="text" id="date" th:field="*{birthDate}" data-format="MM/DD/YYYY" data-template="MMM D YYYY"
+											name="date" style="display: none;" class="form-control" />
+										<select id="month" class="form-control">
+											<option selected="selected" value="  ">Month</option>
+											<option value="01">January</option>
+											<option value="02">February</option>
+											<option value="03">March</option>
+											<option value="04">April</option>
+											<option value="05">May</option>
+											<option value="06">June</option>
+											<option value="07">July</option>
+											<option value="08">August</option>
+											<option value="09">September</option>
+											<option value="10">October</option>
+											<option value="11">November</option>
+											<option value="12">December</option>
+										</select>
+										<select id="day" class="form-control">
+											<option selected="selected" value="  ">Day</option>
+											<option value="01">01</option>
+											<option value="02">02</option>
+											<option value="03">03</option>
+											<option value="04">04</option>
+											<option value="05">05</option>
+											<option value="06">06</option>
+											<option value="07">07</option>
+											<option value="08">08</option>
+											<option value="09">09</option>
+											<option value="10">10</option>
+											<option value="11">11</option>
+											<option value="12">12</option>
+											<option value="13">13</option>
+											<option value="14">14</option>
+											<option value="15">15</option>
+											<option value="16">16</option>
+											<option value="17">17</option>
+											<option value="18">18</option>
+											<option value="19">19</option>
+											<option value="20">20</option>
+											<option value="21">21</option>
+											<option value="22">22</option>
+											<option value="23">23</option>
+											<option value="24">24</option>
+											<option value="25">25</option>
+											<option value="26">26</option>
+											<option value="27">27</option>
+											<option value="28">28</option>
+											<option value="29">29</option>
+											<option value="30">30</option>
+											<option value="31">31</option>
+										</select>
+										<select id="year" class="form-control">
+											<option selected="selected" value="    ">Year</option>
+										</select>
+										<span id="dob_error_text" class="required-text" style="display:none;">Date of Birth is required.</span>
+										<span id="dob_client_error_text" class="required-text"
+											style="display: none;">Date of Birth is required.</span>
+									</div>
+								</div>
+							</section>
+						</div>
+					
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" style="float:left;" data-dismiss="modal">Cancel</button>
+							<button type="submit" class="btn btn-primary">Create Account</button>
+						</div>
+					</form>
+			    </div><!-- /.modal-content -->
+			  </div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
+
+
+
+<!-- END MODAL -->			
+						
+			<div class="row">
+				<section class="col-md-12 col-sm-12">
+					<div class="box">
+						<div class="box-header">
+								<h2>
+									<span class="fa fa-user"></span><span class="break"></span>Recent Patients
+								</h2>
+								<div class="box-icon"></div>
+						</div>
+						<div class="box-content">
+                        	<table class="table table-striped" >
+                            	<tbody>
+                                 	<tr>
+				                   		<td><b>First Name</b></td>
+				                   		<td><b>Last Name</b></td>
+				                   		<td><b>Gender</b></td>
+				                   		<td><b>DOB</b></td>
+				                   		<td><b>Date Created</b></td>
+									</tr> 
+			                   		
+			                 		<tr class="tr-highlight" onclick="document.location = 'adminPatientView.html?id=1';" style="">
+			                   		 	<td>Albert</td>
+			                   		 	<td>Smith</td>
+			                   		 	<td>M</td>
+			              		     	<td>02/19/1983 </td>
+			              		     	<td>01/02/2013 </td>
+                                  	</tr> 
+                                  	
+                            <!--      	<tr th:each="recentPatient:${recentVisits}" class="tr-highlight" th:href="@{'adminPatientView.html?id='+${recentPatient.id}}" onclick="document.location = adminPatientView.html?id=2;" th:onclick="'document.location=\'adminPatientView.html?id=' + ${recentPatient.id} + '\';'" method="get">
+			                   		 	<td th:text="${recentPatient.firstName}"></td>
+			                   		 	<td th:text="${recentPatient.lastName}"></td>
+			                   		 	<td th:text="${recentPatient.administrativeGenderCode}"></td>
+			              		     	<td th:text="${recentPatient.birthDate==null}? '' : *{#dates.format((recentPatient.birthDate), 'MM/dd/yyyy')}"></td>
+			              		     	<td>01/02/2013 </td>  
+                                  	</tr> --> 
+                                  	   
+                              	</tbody>
+                       		</table> 
+                		</div>
+                	</div>
+				</section>
+			
+<!-- 				<section class="col-md-6 col-sm-6"> -->
+<!-- 					<div class="box"> -->
+<!-- 						<div class="box-header"> -->
+<!-- 								<h2> -->
+<!-- 									<span class="fa fa-list-alt"></span><span class="break"></span>Recent Consents -->
+<!-- 								</h2> -->
+<!-- 								<div class="box-icon"></div> -->
+<!-- 						</div> -->
+<!-- 						<div class="box-content"> -->
+<!--                         	<table class="table table-striped" > -->
+<!--                             	<thead> -->
+<!--                             		<tr > -->
+<!-- 				            			<td><b>Consent</b></td> -->
+<!-- 				            			<td><b>Patient</b></td> -->
+<!-- 				            			<td><b>Status</b></td> -->
+<!-- 				            			<td><b>Date Created</b></td>				                   						                   								  	  -->
+<!-- 									</tr> -->
+<!-- 								</thead> -->
+<!-- 								<tbody> -->
+<!-- 			                		<tr > -->
+<!-- 			                			<td>32-CFR</td> -->
+<!-- 			                			<td>John Doe</td> -->
+<!-- 			                			<td><span class="label label-warning">Pending</span></td> -->
+<!-- 			              				<td>01/02/2013</td>  -->
+<!--                             		</tr>     -->
+<!--                             	</tbody> -->
+<!--                             </table> -->
+<!--                 		</div> -->
+<!--                 	</div> -->
+<!-- 				</section>			 -->
+			</div>
+			
+<!-- 		<div class="row">
+			<section class="col-md-12 col-sm-12">
+						COMPONENT: InBox
+
+						<div class="box">
+							<div class="box-header">
+								<h2>
+									<span class="fa fa-inbox"></span><span class="break"></span>Message Center
+								</h2>
+								<div class="box-icon"></div>
+							</div>
+							<div class="box-content">
+								<ul class="dashboard-list">
+									<li><a href="#">
+											<div class="fa fa-envelope" style="margin-right: 12px;"></div><span class="fa fa-paperclip" style="width: 18px; margin-right: 1px;"></span>
+											mastercareinc@consent2share.com
+										</a> 
+										<span style="font-size: small; font-weight: bold; color: #3e3e3e;"><span style="margin: 0 15px;">Subject: Please review</span><span>Fri 7/26/2013 1:12 PM</span>
+										<div style="margin-left: 30px; font-weight: normal;"><em>Dear Albert Smith, Please review your medical information and sign when ready.</em></div></span></li>
+									<li><a href="#">
+											<div class="fa fa-envelope" style="margin-right: 12px;"></div>
+											michaelgrimes@consent2share.com
+										</a> 
+										<span style="font-size: small; font-weight: bold; color: #3e3e3e;"><span style="margin: 0 15px;">Subject: Please review</span><span>Fri 7/21/2013 4:37 PM</span>
+										<div style="margin-left: 30px; font-weight: normal;"><em>Dear Albert Smith, Please review your medical information and sign when ready.</em></div></span></li>
+									<li><a href="#">
+											<div class="fa fa-flag-o" style="margin-right: 12px;"></div>
+											Consent2Share
+										</a> 
+										<span style="font-size: small; color: #3e3e3e; font-weight: bold;"><span style="margin: 0 15px;">Subject: Welcome!</span><span>Fri 7/10/2013 10:01 AM</span>
+										<div style="margin-left: 30px; font-weight: normal;"><em>Welcome Albert Smith! Log in to begin using your Consent2Share.</em></div></span></li>
+								</ul>
+							</div>
+						</div>
+			</section>
+			</div> 						-->
+			
+			<div class="row">
+				<section class="col-md-12 col-sm-12 box">
+					<div class="box-header">
+						<h2>
+							<span class="fa fa-inbox"></span><span class="break"></span>Message Center
+						</h2>
+					</div>
+					<div class="box-content">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Type</th>
+									<th>To Patient:</th>
+									<th>From:</th>
+									<th>Message</th>
+									<th>Created</th>                                          
+								</tr>
+							</thead>   
+							<tbody>
+								<tr>
+									<td class="center"><span class="fa fa-envelope"></span></td>
+									<td class="center">Mary Doe</td>
+									<td>Dr. Washington, George - Primary Health</td>
+									<td>Please call to schedule an appointment...</td>
+									<td class="center">2012/01/01</td>								                                       
+								</tr>
+								<tr>
+									<td class="center"><span class="fa fa-envelope"></span></td>
+									<td class="center">Tom Jones</td>
+									<td>Dr. FRANKLIN, Benjamin - Optomitrist</td>
+									<td>Consent has been accepted.</td>
+									<td class="center">2012/10/13</td>	                                     
+								</tr>
+								<tr>
+									<td class="center"><span class="fa fa-comment"></span></td>
+									<td>Jane Smith</td>
+									<td class="center">Goodhope Regional Center</td>    
+									<td>Consent for Dr. Connie White is set to expire...</td>
+									<td class="center">2012/01/01</td>
+									                                   
+								</tr>					   
+							</tbody>
+						</table>
+					</div>  
+				</section>
+			</div>
+
+		</div>
+	</div>
+<!-- START: Footer Region -->
+<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
+
+		<!-- COMPONENT: Copyright Information -->
+		<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
+</footer>
+<!-- END: Footer Region -->
+</div>	
+
+<!-- START: JavaScript -->	
+<script src="../../../resources/js/dateValidator.js"
+	th:src="@{/resources/js/dateValidator.js}"
+	type="text/javascript"></script>
+
+<!-- Custom JavaScript -->
+<script src="../../../resources/js/jquery-ui.min.js"
+				th:src="@{/resources/js/jquery-ui.min.js}"
+				type="text/javascript"></script>
+<script src="../../../resources/js/webpage-js/profile_registration.js"
+	th:src="@{/resources/js/webpage-js/profile_registration.js}"
+	type="text/javascript"></script>
+<script src="../../../resources/js/webpage-js/userAccountInfoValidation.js"
+	th:src="@{/resources/js/webpage-js/userAccountInfoValidation.js}"
+	type="text/javascript"></script>
+<script src="../../../resources/js/webpage-js/Administrator/adminHome.js"
+	th:src="@{/resources/js/webpage-js/Administrator/adminHome.js}"
+	type="text/javascript"></script>
+	
+<!-- END: JavaScript -->
+</body>
+</html>

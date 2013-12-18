@@ -34,18 +34,16 @@ import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 /**
  * The Class GreenCcdSerializerImpl.
  */
-@Component
 public class GreenCcdSerializerImpl implements GreenCcdSerializer {
 
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -66,7 +64,7 @@ public class GreenCcdSerializerImpl implements GreenCcdSerializer {
 			reader.close();
 
 			return greenCcd;
-			
+
 		} catch (Exception ex) {
 			String erroMessage = "Error occured when trying to serialize Green CCD XML";
 			logger.error(erroMessage, ex);

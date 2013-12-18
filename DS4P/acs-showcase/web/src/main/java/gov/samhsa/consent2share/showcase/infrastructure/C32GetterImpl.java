@@ -25,7 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.showcase.infrastructure;
 
-import gov.samhsa.schemas.client.C32WebServiceClient;
+import gov.samhsa.acs.c32.wsclient.C32WebServiceClient;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

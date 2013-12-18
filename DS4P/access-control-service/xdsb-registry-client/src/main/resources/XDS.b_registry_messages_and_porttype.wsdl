@@ -48,25 +48,25 @@
 		<wsdl:part name="DeleteDocumentSetResult" type="xsd:anyType" />
 	</wsdl:message>
 	<wsdl:message name="XDSRegistry_PatientRegistryRecordAdded_InputMessage">
-		<wsdl:part name="input" element="hl7v3:PRPA_IN201302UV02" />
+		<wsdl:part name="input" element="hl7v3:PRPA_IN201301UV02" />
 	</wsdl:message>
 	<wsdl:message name="XDSRegistry_PatientRegistryRecordAdded_OutputMessage">
-		<wsdl:part name="PatientRegistryRecordAddedResult" type="xsd:anyType" />
+		<wsdl:part name="PatientRegistryRecordAddedResult" element="hl7v3:MCCI_IN000002UV01" />
 	</wsdl:message>
 	<wsdl:message name="XDSRegistry_PatientRegistryRecordRevised_InputMessage">
-		<wsdl:part name="input" element="message:RegistryRequest" />
+		<wsdl:part name="input" element="hl7v3:PRPA_IN201302UV02" />
 	</wsdl:message>
 	<wsdl:message name="XDSRegistry_PatientRegistryRecordRevised_OutputMessage">
-		<wsdl:part name="PatientRegistryRecordRevisedResult" type="xsd:anyType" />
+		<wsdl:part name="PatientRegistryRecordRevisedResult" element="hl7v3:MCCI_IN000002UV01" />
 	</wsdl:message>
 	<wsdl:message
 		name="XDSRegistry_PatientRegistryDuplicatesResolved_InputMessage">
-		<wsdl:part name="input" element="message:RegistryRequest" />
+		<wsdl:part name="input" element="hl7v3:PRPA_IN201304UV02" />
 	</wsdl:message>
 	<wsdl:message
 		name="XDSRegistry_PatientRegistryDuplicatesResolved_OutputMessage">
 		<wsdl:part name="PatientRegistryDuplicatesResolvedResult"
-			type="xsd:anyType" />
+			element="hl7v3:MCCI_IN000002UV01" />
 	</wsdl:message>
 	<wsdl:portType name="XDSRegistry">
 		<wsdl:operation name="RegistryStoredQuery">

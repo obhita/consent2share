@@ -20,7 +20,7 @@ import com.jerichosystems.esds.evaluation.xacml.policy.PolicySetType;
 import com.jerichosystems.services.xacmlpolicyevaluationservice._1.XACMLPolicyEvaluationService;
 import com.jerichosystems.services.xacmlpolicyevaluationservice._1.XACMLPolicyEvaluationServiceService;
 
-import gov.samhsa.ds4ppilot.common.exception.DS4PException;
+import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.ds4ppilot.schema.pep.RegisteryStoredQueryResponse;
 import gov.samhsa.ds4ppilot.schema.pep.RetrieveDocumentSetResponse;
 import gov.va.ds4p.cas.constants.DS4PConstants;

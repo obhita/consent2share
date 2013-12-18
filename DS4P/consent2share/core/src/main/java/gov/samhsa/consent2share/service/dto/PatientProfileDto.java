@@ -102,6 +102,8 @@ public class PatientProfileDto {
 	/** The social security number. */
 	@Pattern(regexp = "(\\d{3}-?\\d{2}-?\\d{4})*")
 	private String socialSecurityNumber;
+	
+	
 
 	/**
 	 * Gets the individual providers.
@@ -174,8 +176,8 @@ public class PatientProfileDto {
 	private String medicalRecordNumber;
 
 	/** The patient id number. */
-	@Size(max = 30)
-	private String patientIdNumber;
+	@Size(max = 255)
+	private String enterpriseIdentifier;
 
 	/**
 	 * Gets the prefix.
@@ -342,19 +344,19 @@ public class PatientProfileDto {
 	/**
 	 * Gets the patient id number.
 	 *
-	 * @return the patient id number
-	 */
-	public String getPatientIdNumber() {
-		return patientIdNumber;
+	 * @return the enterprise id number
+	 */	
+	public String getEnterpriseIdentifier() {
+		return enterpriseIdentifier;
 	}
 
 	/**
 	 * Sets the patient id number.
 	 *
-	 * @param patientIdNumber the new patient id number
+	 * @param enterpriseIdentifier the new enterprise id number
 	 */
-	public void setPatientIdNumber(String patientIdNumber) {
-		this.patientIdNumber = patientIdNumber;
+	public void setEnterpriseIdentifier(String enterpriseIdentifier) {
+		this.enterpriseIdentifier = enterpriseIdentifier;
 	}
 
 	/**

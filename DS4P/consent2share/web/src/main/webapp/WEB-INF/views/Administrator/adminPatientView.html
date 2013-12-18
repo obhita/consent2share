@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/common :: headerFragment" > 
+	<meta charset="utf-8" />
+	<!-- title needs to be dynamic -->
+	<title>Consent2Share</title>
+	<meta name="description" content="Consent Management System" />
+	<meta name="author" content="FEiSystems" />
+	<!-- END: Meta -->
+	<!-- START: Mobile Specific -->
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- END: Mobile Specific -->
+	<!-- START: CSS -->
+	<link id="bootstrap-style" href="../../../resources/css/bootstrap.css"
+		rel="stylesheet"/>
+	<link href="../../../resources/css/bootstrap-toggle-buttons.css"
+		rel="stylesheet"/>
+	<link href="../../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
+	<link href="../../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../../resources/css/sentinel-style.css" rel="stylesheet"/>
+	<link href="../../../resources/css/blue.css" rel="stylesheet"/>
+	
+	<!-- END: CSS -->
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
+	<!-- START: Favicon -->
+	<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
+	<!-- END: Favicon -->
+</head>
+
+<head>
+	<!-- START: CSS -->
+	<link href="../../../resources/css/aero.css" th:href="@{/resources/css/aero.css}" rel="stylesheet"/>
+	<link href="../../../resources/css/blue.css" th:href="@{/resources/css/blue.css}" rel="stylesheet"/>
+	<link href="../../../resources/css/sidebar.css" rel="stylesheet" th:href="@{/resources/css/sidebar.css}"/>
+	<link href="../../../resources/css/jquery-ui.css" rel="stylesheet" th:href="@{/resources/css/jquery-ui.css}"/>
+	
+	<style type="text/css">
+		.modal_checkbox_list {
+			margin-bottom: 5px;
+		}
+	
+		tr.tr-highlight:hover, .table-striped > tbody > tr.tr-highlight:hover > td { 
+			background-color: #faf2c9 !important;
+			font-weight: 500; 
+		} 
+	</style>
+	<!-- END: CSS -->
+</head>
+
+<body id="adminPatientView-page" class="admin-pages">
+
+<div class="container outmost-holder">
+	<!-- !START: Page Header -->
+	<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='Patient View',backPageURI='/Administrator/adminHome.html'">
+		<div class="container">
+			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/admin_fragments :: admin-navbarHeaderFragmentBackButtonNoFacilityName">
+		
+				<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE navbarHeaderFragment -->
+				<!-- The code below is here only to enhance source code readability -->
+				
+				<a th:substituteby="fragment/common :: backButtonFragment" id="bread-crumb-btn" th:href="@{${backPageURI}}" href="#" class="btn btn-info">
+					<span class="fa fa-chevron-left fa-white"></span>
+				</a>
+				
+				<div id="page-title-left">
+					<h1 class="nav-title" th:text="${currentPageTitle}">Patient View</h1>
+					<span id="facility-name">Medical Facility Name</span>
+				</div>
+				
+				<span th:substituteby="fragment/common :: logoFragment">
+					<div style="position: relative;">
+						<a id="logoFragment" class="navbar-brand brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+						<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
+					</div>
+				</span>
+				
+				<!-- COMPONENT: Header Menu-->
+			
+				<span th:substituteby="fragment/myaccount_menu :: adminMyAccountMenuFragment"
+					id="adminHome-navbar-buttons">
+					
+					<!-- COMPONENT: User Dropdown -->
+					<div class="btn-group btn-group-sm">
+						<span class="btn-group btn-group-sm">
+							<a class="btn btn-default myaccount-buttons dropdown-toggle" data-toggle="dropdown" href="#">
+								<span class="fa fa-user" style="margin-right: 2px;"></span>
+								<span class="hidden-xs inline-block">Leo Smith</span>
+								<span class="caret inline-block"></span>
+							</a>
+							
+							<ul role="menu" class="dropdown-menu">
+								<li role="menuitem"><a href="profile.html" th:href="@{/Administrator/editAdminProfile.html}" th:text="#{header_my_profile}">My Profile</a></li>
+								<li role="menuitem"><a href="../changePassword.html" th:href="@{/changePassword.html}" th:text="#{header_change_password}">Change Password</a></li>
+								<li role="menuitem" aria-disabled="true" class="divider"></li>
+								<li role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" th:text="#{header_logout}">Logout</a></li>
+							</ul>
+						</span>
+						
+						<a class="btn btn-default" href="#">
+							<span class="fa fa-envelope force-inline"></span><span class="force-inline"> Message Center</span> 
+							<span class="label label-warning hidden-sm force-inline">3</span>
+						</a>
+					</div>
+					
+				</span>
+
+
+				<!-- END OF SECTION REPLACED BY THYMELEAF -->
+			</div>
+
+			
+<!-- ************* Notification Bars ************** -->
+<!--  			
+			<div id="event_notification_bar" th:switch="${notifyevent}">
+				<span th:case="'passChangeSuccess'">
+					<div class="alert alert-success rounded">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    			You have successfully changed your password!
+					</div>
+				</span>
+			</div>
+
+			
+			<div id="notification_bar" th:switch="${notification}">
+				<span th:case="'notification_add_provider'">
+					<div class="alert alert-info rounded">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    			<strong>Welcome <span th:object="${currentUser}" th:text="*{firstName + ' ' + lastName}"></span> to Consent2Share!</strong> To create and manage your consents, you must add at least two providers. Please go to <a href="connectionMain.html"><strong>My Providers</strong></a> to begin this process.
+					</div>
+				</span>
+				
+				<span th:case="'notification_add_second_provider'">
+						<div class="alert alert-info rounded">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+	  		    			Before you can create consents, you need to add a second provider. Please go to <a href="../patients/connectionMain.html"><strong>My Providers</strong></a> to begin this process.
+						</div>
+				</span>
+				
+				<span th:case="'notification_add_consent'">
+					<div class="alert alert-success rounded">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    		To create your consent, go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to add a new consent.
+					</div>
+				</span>
+				<span th:case="'notification_review_sign_consent'">
+					<div class="alert alert-success rounded">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+	  		    	You have an unsigned consent.  Please go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to review and sign your consent.
+				    </div>
+				</span>
+			    
+					<span th:case="'notification_sign_consent'">
+				    <div class="alert alert-info rounded">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							You have an unsigned consent. To sign your consent, Please check your <a href="../inbox/inboxMain.html"><strong>Message Center</strong></a> or the e-sign email sent to your email account.
+					</div>
+					</span>
+			</div>
+-->		<!-- ************ End Notification Bars ************ -->
+		</div>
+	</header>
+		<div id="under-header"></div>
+
+		<!-- END : Page Header -->
+	<div id="home-page" class="container">
+
+		<div class="row main-content-wrapper">
+			<div>
+				<!-- !START: Patient Information -->
+				<div id="section-header"><!-- <div id="section-header" th:object="${currentUser}"> -->
+				<div class="container">
+					<div class="row">
+					
+						<div id="patient-info" class="box col-med-4 col-sm-3" th:object="${patientProfileDto}">
+							<div id="patient-photo">
+								<img class="dashboard-avatar" alt="Lucas" src="../../../resources/img/avatar.gif" th:src="@{/resources/img/avatar.gif}"/>
+							</div>
+							<div class="patient-profile">
+								<div class="person" th:text="*{firstName + ' ' + lastName}"> John Doe</div>
+								<div class="gender" th:text="*{administrativeGenderCode}"> Male</div>
+								<div class="birth-date" th:text="*{birthDate==null}?  '' : *{#dates.format(birthDate, 'MM/dd/yyyy')}"> 10/20/1980</div>
+							</div>				
+							<div class="edit-profile">
+								<button  type="button" class="btn btn-default" data-toggle="modal" data-target="#editPatient">
+									<span class="glyphicon glyphicon-pencil"></span> Edit Profile
+								</button>
+							</div>
+						</div>
+						
+						<!-- EDIT PATIENT MODAL -->
+						<div  id="editPatient" class="modal fade"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+			        <p class="h3-style" id="myModalLabel">Edit Patient Profile</p>
+			      </div>
+			      <div class="modal-body">
+			      <form id="edit_patient_form">
+			        
+			        <section class="row">
+			        		<div class="form-group col-md-6 col-sm-6">
+			        			<label>First Name</label>
+			        			<input type="text" class="form-control" placeholder="First Name" />
+			        		</div>
+
+			        		<div class="form-group col-md-6 col-sm-6">
+			        			<label>Last Name</label>
+			        			<input type="text" class="form-control" placeholder="Last Name" />
+			        		</div>
+			        </section>
+			        
+			        <section class="row" id="create-patient-dob">
+							<div class="form-group col-md-6">
+								<div>
+									<label for="gender">Gender</label>
+								</div>
+								<div class="controls">
+									<select id="gender" class="form-control inline-block">
+										<option>--- Please Select ---</option>
+										<option>Male</option>
+										<option>Female</option>
+										<option>Other</option>													
+									</select>
+									<span class="required-text">Gender Selection is required.</span>
+									<span id="gender_client_error_text" class="required-text" style="display: none;">Gender Selection is required.</span>
+								</div>
+							</div>
+					</section>
+					
+					<section class="row">
+							<div class="form-group col-md-6">
+								<div>
+									<label class="control-label">Date of Birth</label>
+								</div>
+								<div id="dob" class="controls inline-block">
+									<input type="text" id="date" data-format="MM/DD/YYYY" data-template="MMM D YYYY"
+										name="date" style="display: none;" class="form-control" />
+									<select id="month" class="form-control">
+										<option selected="selected" value="  ">Month</option>
+										<option value="01">January</option>
+										<option value="02">February</option>
+										<option value="03">March</option>
+										<option value="04">April</option>
+										<option value="05">May</option>
+										<option value="06">June</option>
+										<option value="07">July</option>
+										<option value="08">August</option>
+										<option value="09">September</option>
+										<option value="10">October</option>
+										<option value="11">November</option>
+										<option value="12">December</option>
+									</select>
+									<select id="day" class="form-control">
+										<option selected="selected" value="  ">Day</option>
+										<option value="01">01</option>
+										<option value="02">02</option>
+										<option value="03">03</option>
+										<option value="04">04</option>
+										<option value="05">05</option>
+										<option value="06">06</option>
+										<option value="07">07</option>
+										<option value="08">08</option>
+										<option value="09">09</option>
+										<option value="10">10</option>
+										<option value="11">11</option>
+										<option value="12">12</option>
+										<option value="13">13</option>
+										<option value="14">14</option>
+										<option value="15">15</option>
+										<option value="16">16</option>
+										<option value="17">17</option>
+										<option value="18">18</option>
+										<option value="19">19</option>
+										<option value="20">20</option>
+										<option value="21">21</option>
+										<option value="22">22</option>
+										<option value="23">23</option>
+										<option value="24">24</option>
+										<option value="25">25</option>
+										<option value="26">26</option>
+										<option value="27">27</option>
+										<option value="28">28</option>
+										<option value="29">29</option>
+										<option value="30">30</option>
+										<option value="31">31</option>
+									</select>
+									<select id="year" class="form-control">
+										<option selected="selected" value="    ">Year</option>
+									</select>
+									<span id="dob_error_text" class="required-text">Date of Birth is required.</span>
+									<span id="dob_client_error_text" class="required-text"
+											style="display: none;">Date of Birth is required.</span>
+								</div>
+							</div>
+					</section>
+					
+					<section class="row">
+			        		<fieldset id="contact-info" class="form-group col-md-12 col-sm-12">
+								<legend>Contact Info</legend>
+							</fieldset>
+			        		<div class="form-group col-md-6 col-sm-6">
+			        			<label>Email</label>
+			        			<input type="email" class="form-control" placeholder="Email Address" />
+			        		</div>
+			        	
+			        		<div class="form-group col-md-6 col-sm-6">
+			        			<label>Phone Number</label>
+			        			<input type="tel" class="form-control" placeholder="Phone Number" />
+			        		</div>
+			        		<div style="clear: both"></div>     		
+			        </section>
+			        
+			        <section class="row">
+			        		<fieldset id="demographics" class="form-group col-md-12 col-sm-12">
+								<legend>Demographics</legend>
+							</fieldset>
+			        		<div class="form-group col-md-10 col-sm-10">
+			        			<label>Street Address 1</label>
+			        			<input type="text" class="form-control" placeholder="Street Address 1" />
+			        		</div>
+			        	
+			        		<div class="form-group col-md-10 col-sm-10">
+			        			<label>Street Address 2</label>
+			        			<input type="text" class="form-control" placeholder="Street Address 2" />
+			        		</div>
+			        		
+			        		<div class="form-group col-md-10 col-sm-10">
+			        			<label>City</label>
+			        			<input type="text" class="form-control" placeholder="City" />
+			        		</div>
+			        		
+			        		<div class="form-group col-md-6 col-sm-6">
+								<div>
+									<label for="state">State</label>
+								</div>
+								<div class="controls">
+									<select id="state" class="form-control inline-block">
+										<option selected="selected" value="">--- Please Select ---</option>
+										<option>Alabama</option>
+									</select>
+								</div>
+							</div>
+							
+							<div class="form-group col-md-3 col-sm-3"> 
+								<div>
+									<label for="zip">Zip Code</label>
+								</div>
+								<div class="inline-block">
+									<input id="zip" name="postalCode" type="text" class="form-control" placeholder="Zip Code" />
+									<span class="required-text" style="display: none;">Please provide a valid zip code</span>
+									<span id="zip_client_error_text" class="required-text" style="display: none;">
+										Please provide a valid zip code</span>
+								</div>
+							</div>
+			        			        		
+			        		<div style="clear: both"></div>
+			        </section>
+			    </form>
+				</div>
+
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-default" style="float:left;" data-dismiss="modal">Cancel</button>
+			        <button type="button" class="btn btn-primary">Update Profile</button>
+			      </div>
+			    </div><!-- /.modal-content -->
+			  </div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
+						<!-- END EDIT PATIENT MODAL -->
+						
+						<div class="box well col-lg-8 col-md-8 col-sm-8 col-xs-12 btn-bar">
+							<a th:href="@{/Administrator/adminPatientViewCreateConsent.html}+'?id='+${patientProfileDto.id}"  type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Consent</a>
+							<button  type="button" class="btn btn-primary"><span class="glyphicon glyphicon-cloud-download"></span> Upload File</button>
+						</div>
+											
+						
+				</div>
+			</div>
+			<span class="divide"> </span>
+		</div>
+	</div>
+
+
+
+
+
+			<!-- END: Patient Information -->
+
+			<div id="content">
+
+
+				<!-- JavaScrip Enable Message -->
+				<noscript th:substituteby="fragment/common :: noscriptFragment">
+					<div class="alert alert-warning col-md-10 col-sm-10">
+						<p id="h4-style" class="alert-heading">Warning!</p>
+						<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
+						target="_blank">JavaScript</a>enabled to use this site.</p>
+					</div>
+				</noscript>
+
+				<!-- START: Content Region-->
+				
+				<!-- GRID: Patient Cosent -->
+
+				<div class="row grid-layout">
+					<div class="box col-md-6 col-xs">
+					<div class="box-header">
+						<h2>
+							<span class="glyphicon glyphicon-list"></span><span class="break"></span>Patient Consents
+						</h2>
+					</div>
+					
+				
+					
+					<div class="box-content">
+						<table id="patient_consents_list" class="table table-striped">
+							  <thead>
+								  <tr>
+									  <th>Consent</th>
+									   <th>Status</th>
+									   <th>Created</th>									                                           
+								  </tr>
+							  </thead>   
+							  <tbody>
+							  
+							  <tr th:each="consentEntry:${consentListDto}" class="tr-highlight" >
+									<input type="hidden" class="input_hidden" th:id="'consentId_'+${consentEntry.id}" th:value="${consentEntry.id}" value="" />
+
+									<td class="center"> 
+										   <li style="list-style-type: none;" th:each="discloseName:${consentEntry.toDiscloseName}">
+										  		 			<span th:text="${discloseName}">
+																Washington, George</span>
+																</li>
+										 
+		 	
+									  </td>
+									<td class="center" th:switch="${consentEntry.consentStage}" >
+										<span th:case="${0}" class="label label-warning">pending</span>
+										<span th:case="${1}" class="label label-warning">pending</span>
+										<span th:case="${2}"> 
+												<span th:switch="${consentEntry.revokeStage}">
+													<span th:case="${0}" class="label label-primary">Signed</span>
+													<span th:case="${1}" class="label label-warning">Withdrawal pending</span>
+													<span th:case="${2}" class="label label-default">Revoked</span>
+												</span>
+										</span>
+										
+									</td>
+									<td class="center" th:text="${consentEntry.consentStart==null}? '' : *{#dates.format((consentEntry.consentStart), 'MM/dd/yyyy')}">2012/01/01</td>
+							     
+								</tr>
+								
+								
+								
+								 <!-- <tr class="tr-highlight">
+									<td class="center">Fairfax Medical Center</td>
+									<td class="center">
+										<span class="label label-primary">Signed</span>
+									</td>  
+									<td class="center">2012/01/01</td>							                                     
+								</tr>
+								<tr class="tr-highlight">
+									<td class="center">Community Memorial Health Center</td>
+									<td class="center">
+										<span class="label label-warning">Pending</span>
+									</td> 
+									<td class="center">2012/01/01</td>			                                      
+								</tr>
+								<tr class="tr-highlight">
+									<td class="center">David Davidson, Psy.D</td>
+									<td class="center">
+										<span class="label label-warning">Pending</span>
+									</td> 
+									<td class="center">2012/01/01</td>								                                      
+								</tr>
+								<tr class="tr-highlight">
+									<td class="center"> George Washington Hospital</td>
+									<td class="center">
+										<span class="label label-default">Revoked</span>
+									</td>  
+									<td class="center">2012/01/01</td>									                                     
+								</tr>	  -->					   
+							  </tbody>
+						 </table>  
+					</div>
+				</div>
+				
+				<!-- GRID: Message Center -->
+					<div class="box col-md-6 col-xs">
+					<div class="box-header">
+						<h2>
+							<span class="glyphicon glyphicon-inbox"></span><span class="break"></span>Message Center
+						</h2>
+					</div>
+					<div class="box-content">
+						<table class="table table-striped">
+							  <thead>
+								  <tr>
+									  <th>Type</th>
+									  <th>Message</th>
+									  <th>Created</th>
+									  <th>Status</th>                                          
+								  </tr>
+							  </thead>   
+							  <tbody>
+								<tr>
+									<td class="center"> <span class="fa fa-envelope"></span></td>
+									<td>Please see call to schedule an appointment...</td>
+									<td class="center">2012/01/01</td>
+									<td class="center">
+										<span class="label label-success">New</span>
+									</td>                                       
+								</tr>
+									<tr>
+									<td class="center"><span class="fa fa-envelope"></span></td>
+									<td>Your consent has been accepted, call to...</td>
+									<td class="center">2012/01/01</td>
+									<td class="center">
+										<span class="label label-success">New</span>
+									</td>                                       
+								</tr>
+									<tr>
+									<td class="center"><span class="fa fa-comment"></span></td>
+									<td>Consent for Dr. Connie White is set to expire...</td>
+									<td class="center">2012/01/01</td>
+									<td class="center">
+										<span class="label label-warning">Alert</span>
+									</td>                                       
+								</tr>
+									<tr>
+									<td class="center"><span class="fa fa-envelope"></span></td>
+									<td>Your provider request that you review and...</td>
+									<td class="center">2012/01/01</td>
+									<td class="center">
+										<span class="label label-default">Read</span>
+									</td>                                       
+								</tr>
+									<tr>
+									<td class="center"><span class="fa fa-envelope"></span></td>
+									<td>Adobe Echo Sign - Your document is ready...</td>
+									<td class="center">2012/01/01</td>
+									<td class="center">
+										<span class="label label-default">Read</span>
+									</td>                                       
+								</tr>							   
+							  </tbody>
+						 </table>  
+					</div>
+		</div>	
+				</div>
+			<!-- GRID: Patient Medical Documents -->	
+				<div class="row grid-layout">
+				<div class="clearfix visible-xs">
+					
+				</div>
+				  	<div class="box col-md-12">
+					<div class="box-header">
+						<h2>
+							<span>
+								<span class="glyphicon glyphicon-download"></span><span class="break"></span>
+							</span>
+							Medical Documents
+						</h2>
+					</div>
+				<div class="box-content">
+					<table class="table table-striped">
+							  <thead>
+								  <tr>
+								  	<th>File</th>
+									<th>Description</th>
+									<th>Uploaded</th>
+									<th>Size</th>
+									<th>Action</th>                                          
+								  </tr>
+							  </thead>   
+							  <tbody>
+								<tr>
+								<td class="center"><span class="fa fa-file"> XML</span></td>
+								<td>Patient-History CCDA for 10-20-2010 to 10-20-2012</td>
+								
+
+									<td class="center">01/02/2012</td>
+									<td class="center">
+										<span>20 kb</span>
+									</td>
+									<td class="center">
+										<button type="button" class="btn  btn-xs btn-danger btn-round"><span class="glyphicon glyphicon-minus"></span></button>
+									</td>                                          
+								</tr>
+							  </tbody>
+						 </table>  
+				</div>
+
+					
+				</div>
+			</div><!--/row-->
+			<!-- END: Content Region -->
+</div>
+				</div>
+				</div>
+<!-- START: Footer Region -->
+<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
+
+		<!-- COMPONENT: Copyright Information -->
+		
+</footer>
+<!-- END: Footer Region -->
+
+</div>
+
+<!-- START: JavaScript -->
+
+<!-- Custom JavaScript -->
+<script src="../../../resources/js/webpage-js/Administrator/adminPatientView.js"
+	th:src="@{/resources/js/webpage-js/Administrator/adminPatientView.js}"
+	type="text/javascript" th:inline="javascript"></script>
+	
+<!-- END: JavaScript -->
+
+</body>
+</html>

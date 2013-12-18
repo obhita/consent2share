@@ -120,27 +120,44 @@ function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 	//Initialize page for adding/editing consent
 	initAddConsent(addConsent, specMedSet);
 
+	//Initialize popovers
 	$('[data-toggle=popover]').popover();
+	
+	//Close all currently showing popovers when user clicks the page outside of a popover
 	$('html').on('mouseup', function(e) {
 	    if((!$(e.target).closest('.popover').length)) {
 	    	if((!$(e.target).closest('[data-toggle=popover]').length)){
-	        	$('.popover').each(function(){
-	            	$(this.previousSibling).popover('hide');
+	        	$('.popover-showing').each(function(){
+	            	$(this).popover('toggle');
 	        	});
 			}
 	    }
 	});
 	
-	/* avoid popover to open more than on at the same time */
-	$('[data-toggle=popover]').click(function(){
-	    $('[data-toggle=popover]').not(this).popover('hide'); //all but this
+	
+	
+	/* When show.bs.popover event is thrown, close any other visible popovers, then flag triggered
+	 * popover element with popover-showing class.
+	 * 		show.bs.popover event is thrown immediately when show instance method is called.
+	 *   	It will not wait for the popover's CSS transitions to complete first.   */
+	$('[data-toggle=popover]').on('show.bs.popover', function(e){
+		$('[data-toggle=popover].popover-showing').not(this).popover('toggle'); //all but this
+		$(this).addClass('popover-showing');
 	});
-
+	
+	/* When hide.bs.popover event is thrown, remove popover-showing class from popover element.
+	 * 		hide.bs.popover event is thrown immediately when hide instance method is called.
+	 *   	It will not wait for the popover's CSS transitions to complete first.   */
+	$('[data-toggle=popover]').on('hide.bs.popover', function(e){
+		$(this).removeClass('popover-showing');
+	});
+	
+	
 	// populate for edit consent page
 	$("#authorizers").empty();
 	$("#authorize-list input").each(function() {
 		if($(this).attr("checked")=="checked"){
-			$("#authorizers").append('<li class="uneditable-input"><span class="icon-user"></span>'
+			$("#authorizers").append('<li class="uneditable-input"><span class="fa fa-user"></span>'
 					+$(this).parent().parent().children("span").text()
 					+'</li>');
 		}
@@ -148,31 +165,16 @@ function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 	$("#consentmadetodisplay").empty();
 	$("#disclose-list input").each(function() {
 		if($(this).attr("checked")=="checked"){
-			$("#consentmadetodisplay").append('<li class="uneditable-input" ><span class="icon-user"></span>'
+			$("#consentmadetodisplay").append('<li class="uneditable-input" ><span class="fa fa-user"></span>'
 					+$(this).parent().parent().children("span").text()
 					+'</li>');
 		}
 	});
-	
-	//
-	
-	$('.toggleButton').toggleButtons();
-	$('.modal-toggle-button').toggleButtons(
-	{
-		onChange: function(e,active) {
-		if(!active){
-			$(e.parent().attr('data-edit-button')).show();
-			e.trigger('click');
-			}
-			else{
-			$(e.parent().attr('data-edit-button')).hide();
-				
-			}
-		}
-	});
 
+	
 	$("body").removeClass('fouc_loading');
 
+	
 	$("ul#pulldown_menu").sidebar({
 		position:"top",
 		open:"click",
@@ -211,7 +213,7 @@ function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 		    var li_field_id = $('#tourtest li').get(int_next_index);
 		    var isShowDelayedNext = $(li_field_id).hasClass('show-delayed-next');
 		    var str_field_id = $(li_field_id).data("id");
-		    var tempVarIconUser = $('div#' + str_field_id).find('.icon-user');
+		    var tempVarIconUser = $('div#' + str_field_id).find('.fa-user');
 		    var tempVarBadge = $('div#' + str_field_id).find('.badge');
 		    var isDataPopulated = false;
 
@@ -233,12 +235,7 @@ function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 		    }
 		},
 		'postRideCallback': function() {
-			if($('#btn_guide_off').hasClass('active') === false){
-				$('#btn_guide_on').removeClass('active');
-				$('#btn_guide_off').addClass('active');
-			}
-
-			jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
+			setGuideButtonStateOff();
 		}
 	});
 	
@@ -255,12 +252,6 @@ function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 			turnGuideOff();
 		}
 	}
-	
-	
-	$('.modal-toggle-button span').on('click', function(e){
-		e.preventDefault();
-		e.stopImmediatePropagation();
-	});
 	
 	
 	$('#btn_guide_OnOff').click(function() {
@@ -500,7 +491,7 @@ function initAddConsent(addConsent, specMedSet) {
 				 * EVENT HANDLERS
 				*******************************************************************************************/
 				
-				$(".removeEntry").live("click",function(){
+				$(".removeEntry").on("click",function(){
 						var entryId=$(this).attr("id").substr(11,$(this).attr("id").length-11);
 						delete specmedinfoary[entryId];
 						$("#TagSpec"+entryId).remove();
@@ -587,7 +578,7 @@ function initAddConsent(addConsent, specMedSet) {
 						});	
 						//#ISSUE 138 Fix End						
 					}else{
-						$('div.navbar-inner-header').after("<div class='validation-alert'><span><div class='alert alert-error rounded'><button type='button' class='close' data-dismiss='alert'>&times;</button>You must add provider(s).</div></span></div>");
+						$('div.navbar-inner-header').after("<div class='validation-alert'><span><div class='alert alert-danger rounded'><button type='button' class='close' data-dismiss='alert'>&times;</button>You must add provider(s).</div></span></div>");
 					}
 					
 					
@@ -647,7 +638,7 @@ function initAddConsent(addConsent, specMedSet) {
 					},300);
 				});
 				
-				$("#selected-purposes-modal").on('hidden',function(event){
+				$("#selected-purposes-modal").on('hide.bs.modal',function(event){
 					if(event.target.id == "selected-purposes-modal"){
 						setTimeout(function(){
 							handleLastStoredStates();
@@ -659,7 +650,7 @@ function initAddConsent(addConsent, specMedSet) {
 					}
 				});
 				
-				$("#authorize-modal,#disclose-modal").on('hidden',function(event){
+				$("#authorize-modal,#disclose-modal").on('hide.bs.modal',function(event){
 					if((event.target.id == "authorize-modal") || (event.target.id == "disclose-modal")){
 						setTimeout(function(){
 							handleLastStoredStates();
@@ -674,7 +665,7 @@ function initAddConsent(addConsent, specMedSet) {
 					$("#authorizers").empty();
 					$("#authorize-list input").each(function() {
 						if($(this).attr("checked")=="checked"){
-							$("#authorizers").append('<li class="uneditable-input"><span class="icon-user"></span>'
+							$("#authorizers").append('<li class="uneditable-input"><span class="fa fa-user"></span>'
 		 							+$(this).parent().parent().children("span").text()
 		 							+'</li>');
 						}
@@ -687,7 +678,7 @@ function initAddConsent(addConsent, specMedSet) {
 					$("#consentmadetodisplay").empty();
 					$("#disclose-list input").each(function() {
 						if($(this).attr("checked")=="checked"){
-							$("#consentmadetodisplay").append('<li class="uneditable-input"><span class="icon-user"></span>'
+							$("#consentmadetodisplay").append('<li class="uneditable-input"><span class="fa fa-user"></span>'
 		 							+$(this).parent().parent().children("span").text()
 		 							+'</li>');
 						}
@@ -1075,8 +1066,8 @@ function initAddConsent(addConsent, specMedSet) {
 								'"><div><span>'+
 								specmedinfoary[specmedinfoary.length-1].displayName+
 								'</span><span>'+
-								'<button id="specmedinfo'+specmedinfoid +'" class="btn btn-danger btn-mini list-btn removeEntry">'+
-								'<span class="icon-minus icon-white"></span></button></span></div></li>');
+								'<button id="specmedinfo'+specmedinfoid +'" class="btn btn-danger btn-xs list-btn removeEntry">'+
+								'<span class="fa fa-minus fa-white"></span></button></span></div></li>');
 						$("#condition").val("");
 						specmedinfoary[specmedinfoid].added=true;
 						specmedinfoid=specmedinfoid+1;
@@ -1126,17 +1117,28 @@ function showShareSettingsModal(){
 
 //Turn Joyride Guide Off
 function turnGuideOff(){
+	$('#tourtest').joyride('end');
+	setGuideButtonStateOff();
+}
+
+//Set Joyride Guide Button State Off
+function setGuideButtonStateOff(){
 	$('#btn_guide_OnOff').addClass('guide-off-flag');
 	
 	jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
 
 	$('#btn_guide_OnOff').text("Guide On");
-	
-	$('#tourtest').joyride('end');
 }
 
 //Turn Joyride Guide On
 function turnGuideOn(){
+	$('#tourtest').joyride('end');
+	$('#tourtest').joyride();
+	setGuideButtonStateOn();
+}
+
+//Set Joyride Guide Button State On
+function setGuideButtonStateOn(){
 	if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
 		$('#btn_guide_OnOff').removeClass('guide-off-flag');
 	}
@@ -1144,9 +1146,6 @@ function turnGuideOn(){
 	jQuery.storage.setItem('guideStatus', 'on', 'sessionStorage');
 	
 	$('#btn_guide_OnOff').text("Guide Off");
-	
-	$('#tourtest').joyride('end');
-	$('#tourtest').joyride();
 }
 
 

@@ -25,6 +25,10 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.web;
 
+import java.util.Iterator;
+
+import gov.samhsa.consent2share.domain.account.Users;
+import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
@@ -43,6 +47,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -115,7 +121,6 @@ public class PatientController extends AbstractController{
 		String notification=notificationService.notificationStage(username,null);
 		model.addAttribute("currentUser", currentUser);
 		model.addAttribute("notification", notification);
-		
 		return "views/patients/home";
 	}
 	

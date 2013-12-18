@@ -12,34 +12,11 @@
 	<artifactId>document-segmentation</artifactId>
 	<packaging>pom</packaging>
 	<name>Document Segmentation</name>
-	
+
 	<modules>
 		<module>service</module>
-<!-- 		<module>war</module> -->
-<!-- 		<module>client</module> -->
+		<!-- <module>war</module>
+		<module>client</module> -->
 	</modules>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
-					<downloadSources>true</downloadSources>
-					<!--downloadJavadocs>true</downloadJavadocs -->
-					<!--useProjectReferences>false</useProjectReferences -->
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	<profiles>
-		<profile>
-			<id>CXF</id>
-			<!-- To use Metro by default, move activation element to its profile below -->
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-		</profile>
-	</profiles>
-	
 </project>

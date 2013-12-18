@@ -1,15 +1,70 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
 	<context:property-placeholder location="classpath*:META-INF/spring/*.properties" />
+
+	<util:properties id="openEmpiProperties"
+		location="/WEB-INF/classes/META-INF/spring/openEMPI.properties" />
+	<util:properties id="webServiceEndpointsProperties"
+		location="/WEB-INF/classes/META-INF/spring/webServiceEndpoints.properties" />
 
 	<mvc:annotation-driven />
 
 	<context:component-scan base-package="gov.samhsa.consent2share" />
+
+	<!-- Common Tools -->
+	<bean id="documentXmlConverterImpl" class="gov.samhsa.acs.common.tool.DocumentXmlConverterImpl"
+		scope="prototype" />
+	<bean id="simpleMarshallerImpl" class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl"
+		scope="prototype" />
+
+	<!-- XDS.b: adapters -->
+	<bean id="retrieveDocumentSetResponseFilter"
+		class="gov.samhsa.acs.xdsb.repository.wsclient.adapter.RetrieveDocumentSetResponseFilter"
+		scope="prototype" autowire="constructor">
+	</bean>
+
+	<!-- C32 Parser Beans -->
+	<bean id="c32ParserImpl" class="gov.samhsa.consent2share.c32.C32ParserImpl"
+		scope="prototype" autowire="constructor" />
+	<bean id="c32ToGreenCcdTransformerImpl"
+		class="gov.samhsa.consent2share.c32.C32ToGreenCcdTransformerImpl"
+		scope="prototype" />
+	<bean id="greenCcdSerializerImpl" class="gov.samhsa.consent2share.c32.GreenCcdSerializerImpl"
+		scope="prototype" />
+
+	<!-- HL7 Transformer -->
+	<bean id="hl7v3TransformerImpl" class="gov.samhsa.consent2share.hl7.Hl7v3TransformerImpl"
+		scope="prototype" />
+
+	<!-- PIX Manager -->
+	<bean id="pixManagerServiceImpl"
+		class="gov.samhsa.consent2share.pixclient.service.PixManagerServiceImpl"
+		scope="singleton">
+		<constructor-arg index="0"
+			value="#{webServiceEndpointsProperties.openEMPIWebServiceEndpointAddress}" />
+	</bean>
+	<bean id="pixManagerBean"
+		class="gov.samhsa.consent2share.pixclient.util.PixManagerBean"
+		scope="prototype" />
+	<bean id="pixManagerConstants"
+		class="gov.samhsa.consent2share.pixclient.util.PixManagerConstants"
+		scope="singleton">
+		<constructor-arg index="0"
+			value="#{openEmpiProperties.openEMPIDomainId}" />
+		<constructor-arg index="1"
+			value="#{openEmpiProperties.openEMPIDomainName}" />
+	</bean>
+	<bean id="pixManagerRequestXMLToJava"
+		class="gov.samhsa.consent2share.pixclient.util.PixManagerRequestXMLToJava"
+		scope="prototype" autowire="constructor">
+	</bean>
 
 </beans>

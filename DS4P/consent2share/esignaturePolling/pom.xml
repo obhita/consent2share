@@ -223,15 +223,17 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.echosign</groupId>
-			<artifactId>adobe-ecosign</artifactId>
-		</dependency>
 
 		<!-- Our own projects -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>consent2share-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons</groupId>
+					<artifactId>XmlSchema</artifactId>				
+				</exclusion>
+			</exclusions>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -266,5 +268,7 @@
 
 		</plugins>
 	</build>
+
+
 
 </project>

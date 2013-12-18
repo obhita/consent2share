@@ -12,12 +12,10 @@
 	<!-- END: Mobile Specific -->
 	<!-- START: CSS -->
 	<link id="bootstrap-style" href="../../resources/css/bootstrap.css" rel="stylesheet"/>
-	<link href="../../resources/css/bootstrap-responsive.min.css" rel="stylesheet"/>
-	<link href="../../resources/css/themes-style.css" rel="stylesheet"/>
-	<link href="../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
-	<link href="../../resources/css/sentinel-style.css" rel="stylesheet"/>
-	<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet" />
 	<link href="../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+	<link href="../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
+	<link href="../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../resources/css/sentinel-style.css" rel="stylesheet"/>
 
 	<!-- END: CSS -->
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -32,126 +30,111 @@
 </head>
 
 <body>
-		
+
+<div id="signup1-main" class="container outmost-holder">
 	<!-- !START: Page Header -->
-	
-	<!-- END : Page Header -->
-	
-	<div id="signup1-main" class="container-fluid">
-	<div role="navigation" class="navbar">
-		<div class="navbar-inner-header">
-			<div class="container-fluid">
-				 <!-- <a id="bread-crumb-btn" href="index-landing.html" class="btn  btn-info" ><span class="icon-chevron-left icon-white"></span></a>  -->
-				<h1><span class="nav-title">Share with confidence.</span></h1>
+	<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='Share with confidence.'">
+		<div class="container">
+			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/common :: navbarHeaderFragmentBasic">
+			<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE navbarHeaderFragmentBasic -->
+			<!-- The code below is here only to enhance source code readability -->
+				<h1>
+					<span class="nav-title" th:text="${currentPageTitle}">Share with confidence.</span>
+				</h1>
 				
-				<span th:include="fragment/common :: logoFragment">
-					<a class="brand" th:href="@{/index.html}"  href="index.html"> <!-- <img alt="Logo Goes Here" src="" /> --> <span id="brand-gray"></span><div id="brand-circle"><span id="brand-blue-2"></span></div><span id="brand-blue"></span></a>
+				<span th:substituteby="fragment/common :: logoFragment">
+					<div style="position: relative;">
+						<a id="logoFragment" class="navbar-brand brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+						<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
+					</div>
 				</span>
-           		
+			<!-- END OF SECTION REPLACED BY THYMELEAF -->
 			</div>
 		</div>
-	</div>
+	</header>
 	<div id="under-header"></div>
-		<div class="row-fluid main-content-wrapper">					
-			<div id="content">
-
+	<!-- END : Page Header -->
+	
+	<div class="row main-content-wrapper">
 	
 	<!-- JavaScrip Enable Message -->		
-			<noscript>
-				<div class="alert alert-block span10">
-					<p id="h4-style" class="alert-heading">Warning!</p>
-					<p>You need to have <a href="http://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a> enabled to use this site.</p>
-				</div>
-			</noscript>
-			
-
-				
-	<!-- !START: Content Region-->
+	<noscript th:substituteby="fragment/common :: noscriptFragment">
+		<div class="alert alert-warning col-md-10 col-sm-10">
+			<p id="h4-style" class="alert-heading">Warning!</p>
+			<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
+			target="_blank">JavaScript</a>enabled to use this site.</p>
+		</div>
+	</noscript>
 	
-	<div role="main" class="span10 offset1">			
-		<div class="row-fluid">			
+	
+	<!-- !START: Content Region-->
+	<div id="page-fullcontent-holder" role="main" class="col-xs-12 col-sm-10 col-sm-offset-1">			
+		<div class="row">			
 
 		<!-- !COMPONENT: Create CMS Account -->
 	
-			<div class="span9">
+			<div class="col-sm-9">
 				
 				 <section class="top-margin10">
 					
-							<fieldset id="login-thirdparty" class="row-fluid">
+							<fieldset id="login-thirdparty" class="row">
 			                    
 								<legend>Are you having <b>trouble accessing your account?</b> </legend>				 
 								<div class="alert alert-info top-margin10">To better help you, tell us what your having problems with?</div>
-								 <form id="trouble" th:action="@{/loginTrouble.html}" th:object="${loginTroubleDto}" method="post">
-								 <ul th:if="${#fields.hasErrors('*')}" >
-            						<li th:each="err : ${#fields.errors('*')}" th:text="${err}" style="color: red;">Please make a selection before clicking 'Next'.</li>
-          						</ul><p/>
-                                	<label for="password" class="radio">
-	                                <input id="password" type="radio" name="optionRadio" value="login-trouble-password.html" th:field="*{troubleTypeId}" th:value="1"/> I do not know my password.
-	                                </label>												     	
-	                                <label for="user-name" class="radio top-margin10">
-		                            <input id="user-name" type="radio" name="optionRadio" value="login-trouble-username.html" th:field="*{troubleTypeId}" th:value="2"/> I do not know my username.
-		                            </label>
-		                            <label for="other" class="radio top-margin10">
-		                            <input id="other" type="radio" name="optionRadio" value="login-trouble-other.html" th:field="*{troubleTypeId}" th:value="3"/> I'm having other difficulties signing in.
-		                            </label>
-		                            <div style="clear:both"></div>
-
-                            	<div class="control-group bottom-btn-group">
-                                	<div class="controls">
-                                            <button type="button" class="btn" onClick="window.location.href='index.html'" style="margin: 0 10px 0 0;">Cancel</button>
-                                            <input type="submit" value="Next" class="btn btn-primary" />
-                                    </div>
-                                </div>	
+								 <form id="trouble" th:action="@{/loginTrouble.html}" th:object="${loginTroubleDto}" method="post" class="form-horizontal">
+								 	<ul th:if="${#fields.hasErrors('*')}" >
+            							<li th:each="err : ${#fields.errors('*')}" th:text="${err}" style="color: red;">Please make a selection before clicking 'Next'.</li>
+          							</ul>
+          							
+          							<p />
+          							
+          							<div class="radio col-sm-12">
+          								<label>
+	                                		<input id="password" type="radio" name="optionRadio" value="login-trouble-password.html" th:field="*{troubleTypeId}" th:value="1"/>
+	                                		I do not know my password.
+	                                	</label>
+	                                </div>
+	                                
+	                                <div class="radio col-sm-12">
+	                                	<label>
+		                            		<input id="user-name" type="radio" name="optionRadio" value="login-trouble-username.html" th:field="*{troubleTypeId}" th:value="2"/>
+		                            		I do not know my username.
+		                            	</label>
+		                            </div>
+		                            
+		                            <div class="radio col-sm-12">
+		                            	<label>
+		                            		<input id="other" type="radio" name="optionRadio" value="login-trouble-other.html" th:field="*{troubleTypeId}" th:value="3"/>
+		                            		I'm having other difficulties signing in.
+		                            	</label>
+		                            </div>
+		                            
+	                            	<div class="bottom-btn-group">
+	                            		<div class="submit-cancel-controls">
+	                                		<button type="button" class="btn btn-default" onClick="window.location.href='index.html'" style="margin: 0 10px 0 0;">Cancel</button>
+	                                		<button type="submit" value="Next" class="btn btn-primary">Next</button>
+	                                    </div>
+	                                </div>
                                 </form>
 	                      </fieldset>
-                  
                </section>
-               
 			</div>
-
-		</div><!--/#content.span10-->
-	</div><!--/row-fluid-->
-	</div>
+		</div><!--/#content.col-md-10-->
+	</div><!--/row-->
 	<!-- END: Content Region -->
 
 
 	</div>
-		<!-- ELEMENT: Divider -->
-		
-	    
-		<div class="clearfix"></div>	
 	
 	<!-- !START: Footer Region -->
 		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
-		<!-- COMPONENT: Action Buttons -->
-				<!--
-				<a href="#" class="btn pull-left" data-dismiss="modal">Close</a>
-				<a href="#" class="btn btn-primary pull-right">Save changes</a>
-				-->
 				
 				<!-- COMPONENT: Copyright Information -->
 				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
 		</footer>
 	</div>
+	
 	<!-- START: JavaScript-->
-		<script src="../../resources/js/bootstrap.min.js"
-				th:src="@{/resources/js/bootstrap.min.js}" 
-				type="text/javascript"></script>
-		<script src="../../resources/js/jquery.toggle.buttons.js"
-				th:src="@{/resources/js/jquery.toggle.buttons.js}" 
-				type="text/javascript"></script>
-		<script src="../../resources/js/bootstrap-datepicker.js"
-				th:src="@{/resources/js/bootstrap-datepicker.js}" 
-				type="text/javascript"></script>
-		<script src="../../resources/js/bootstrap-popover.js"
-				th:src="@{/resources/js/bootstrap-popover.js}"
-				type="text/javascript"></script>
-		<script src="../../resources/js/jquery.joyride-2.0.3.js" 
-				th:src="@{/resources/js/jquery.joyride-2.0.3.js}"
-				type="text/javascript"></script>
-		<script src="../../resources/js/jquery.cookie.js" 
-				th:src="@{/resources/js/jquery.cookie.js}"
-				type="text/javascript"></script>
 		<script src="../../resources/js/modernizr.mq.js" 
 				th:src="@{/resources/js/modernizr.mq.js}"
 				type="text/javascript"></script>

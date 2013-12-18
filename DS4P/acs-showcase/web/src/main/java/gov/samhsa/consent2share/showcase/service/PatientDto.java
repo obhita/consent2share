@@ -25,6 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.showcase.service;
 
+import org.hl7.v3.types.MCCIIN000002UV01;
+
+import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
 import gov.samhsa.consent2share.c32.dto.GreenCCD;
 import gov.samhsa.consent2share.pixclient.util.PixManagerBean;
 
@@ -41,7 +44,18 @@ public class PatientDto {
 	private String pixUpdateMsg;
 	private PixManagerBean pixManagerBean;
 	private boolean isError;
-	private String xdsbRegAddMsg;
+	private MCCIIN000002UV01 xdsbRegAddMsg;
+	private MCCIIN000002UV01 xdsbRegUpdateMsg;
+	private RegistryResponse xdsbRepoProvideMsg;
+	private String eId;
+
+	public String geteId() {
+		return eId;
+	}
+
+	public void seteId(String eId) {
+		this.eId = eId;
+	}
 
 	public String getC32Xml() {
 		return c32Xml;
@@ -85,12 +99,6 @@ public class PatientDto {
 
 	public String getPixUpdateMsg() {
 		return pixUpdateMsg;
-	}
-
-
-
-	public String getXdsbRegAddMsg() {
-		return xdsbRegAddMsg;
 	}
 
 	public boolean isError() {
@@ -145,8 +153,27 @@ public class PatientDto {
 		this.pixUpdateMsg = pixUpdateMsg;
 	}
 
-	public void setXdsbRegAddMsg(String xdsbRegAddMsg) {
+	public MCCIIN000002UV01 getXdsbRegAddMsg() {
+		return xdsbRegAddMsg;
+	}
+
+	public void setXdsbRegAddMsg(MCCIIN000002UV01 xdsbRegAddMsg) {
 		this.xdsbRegAddMsg = xdsbRegAddMsg;
 	}
-	
+
+	public MCCIIN000002UV01 getXdsbRegUpdateMsg() {
+		return xdsbRegUpdateMsg;
+	}
+
+	public void setXdsbRegUpdateMsg(MCCIIN000002UV01 xdsbRegUpdateMsg) {
+		this.xdsbRegUpdateMsg = xdsbRegUpdateMsg;
+	}
+
+	public RegistryResponse getXdsbRepoProvideMsg() {
+		return xdsbRepoProvideMsg;
+	}
+
+	public void setXdsbRepoProvideMsg(RegistryResponse xdsbRepoProvideMsg) {
+		this.xdsbRepoProvideMsg = xdsbRepoProvideMsg;
+	}
 }

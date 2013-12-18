@@ -25,8 +25,12 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.dto;
 
+import java.util.Date;
 import java.util.Set;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+// TODO: Auto-generated Javadoc
 /**
  * The Class ConsentListDto.
  */
@@ -61,7 +65,53 @@ public class ConsentListDto {
 
 	/** The revoke stage. */
 	private int revokeStage;
+	
+	// Consent Sharing date
+	/** The consent start. */
+	private Date consentStart;
 
+	
+	/** The consent end. */
+	private Date consentEnd;
+	
+	/**
+	 * Gets the consent start.
+	 *
+	 * @return the consent start
+	 */
+	
+	public Date getConsentStart() {
+		return consentStart;
+	}
+
+	/**
+	 * Sets the consent start.
+	 *
+	 * @param string the new consent start
+	 */
+	public void setConsentStart(Date consentStart) {
+		this.consentStart = consentStart;
+	}
+
+	/**
+	 * Gets the consent end.
+	 *
+	 * @return the consent end
+	 */
+	public Date getConsentEnd() {
+		return consentEnd;
+	}
+
+	/**
+	 * Sets the consent end.
+	 *
+	 * @param consentEnd the new consent end
+	 */
+	public void setConsentEnd(Date consentEnd) {
+		this.consentEnd = consentEnd;
+	}
+
+	
 	/**
 	 * Gets the id.
 	 * 
@@ -190,9 +240,8 @@ public class ConsentListDto {
 
 	/**
 	 * Sets the do not share for purpose of use codes.
-	 * 
-	 * @param doNotShareForPurposeOfUseCodes
-	 *            the new do not share for purpose of use codes
+	 *
+	 * @param shareForPurposeOfUseCodes the new share for purpose of use codes
 	 */
 	public void setShareForPurposeOfUseCodes(
 			Set<String> shareForPurposeOfUseCodes) {

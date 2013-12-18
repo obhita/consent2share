@@ -251,12 +251,12 @@ function getResultRowHtmStr( i, rs, addable )
 		addable=="true" ?	
 			(
 				showOrg== true  ?	
-					'<p class="result_row add_button_space"><span class="result_field"><button class="addOrganizationalProviderButton btn btn-mini btn-success" id="addOrganizationalProviderButton'+i+'"><span class="icon-plus icon-white"></span></button></span> Add this provider.</p></div>'
+					'<p class="result_row add_button_space"><span class="result_field"><button class="addOrganizationalProviderButton btn btn-xs btn-success" id="addOrganizationalProviderButton'+i+'"><span class="fa fa-plus"></span></button></span> Add this provider.</p></div>'
 				:
-					'<p class="result_row add_button_space"><span class="result_field"><button class="addIndividualProviderButton btn btn-mini btn-success" id="addIndividualProviderButton'+i+'"><span class="icon-plus icon-white"></span></button></span> Add this provider.</p></div>'  
+					'<p class="result_row add_button_space"><span class="result_field"><button class="addIndividualProviderButton btn btn-xs btn-success" id="addIndividualProviderButton'+i+'"><span class="fa fa-plus"></span></button></span> Add this provider.</p></div>'  
 			)
 		:
-					'<p class="result_row add_button_space" style="color: black;"><span class="result_field"><button class="btn btn-mini" disabled="true"><span class="icon-plus icon-white"></span></button></span> Provider already added.</p></div>'  
+					'<p class="result_row add_button_space" style="color: black;"><span class="result_field"><button class="btn btn-xs" disabled="true"><span class="fa fa-plus"></span></button></span> Provider already added.</p></div>'  
 	) +	
 	'<p class="result_row"><span class="result_field provider_specialty_field">' + rs["healthcareProviderTaxonomy_1"] + '</span></p>' + 
 	'<p class="result_row"><span class="result_field">' + rs["providerFirstLineBusinessPracticeLocationAddress"] + ', ' +

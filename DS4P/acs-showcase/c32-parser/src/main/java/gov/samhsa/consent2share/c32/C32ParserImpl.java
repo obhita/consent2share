@@ -29,14 +29,11 @@ import gov.samhsa.consent2share.c32.dto.GreenCCD;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 /**
  * The Class C32ParserImpl.
  */
-@Component
 public class C32ParserImpl implements C32Parser {
 
 	/** The logger. */
@@ -44,33 +41,42 @@ public class C32ParserImpl implements C32Parser {
 
 	/** The c32 to green ccd transformer. */
 	private C32ToGreenCcdTransformer c32ToGreenCcdTransformer;
-	
+
 	/** The green ccd serializer. */
 	private GreenCcdSerializer greenCcdSerializer;
 
 	/**
 	 * Instantiates a new c32 parser impl.
-	 *
-	 * @param c32ToGreenCcdTransformer the c32 to green ccd transformer
-	 * @param greenCcdSerializern the green ccd serializern
 	 */
-	@Autowired
-	public C32ParserImpl(C32ToGreenCcdTransformer c32ToGreenCcdTransformer,
-			GreenCcdSerializer greenCcdSerializern) {
-		Assert.notNull(c32ToGreenCcdTransformer);
-		Assert.notNull(greenCcdSerializern);
-
-		this.c32ToGreenCcdTransformer = c32ToGreenCcdTransformer;
-		this.greenCcdSerializer = greenCcdSerializern;
+	public C32ParserImpl() {
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Instantiates a new c32 parser impl.
+	 * 
+	 * @param c32ToGreenCcdTransformer
+	 *            the c32 to green ccd transformer
+	 * @param greenCcdSerializer
+	 *            the green ccd serializer
+	 */
+	public C32ParserImpl(C32ToGreenCcdTransformer c32ToGreenCcdTransformer,
+			GreenCcdSerializer greenCcdSerializer) {
+		Assert.notNull(c32ToGreenCcdTransformer);
+		Assert.notNull(greenCcdSerializer);
+
+		this.c32ToGreenCcdTransformer = c32ToGreenCcdTransformer;
+		this.greenCcdSerializer = greenCcdSerializer;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see gov.samhsa.consent2share.c32.C32Parser#ParseC32(java.lang.String)
 	 */
 	@Override
 	public GreenCCD ParseC32(String c32xml) throws C32ParserException {
 		Assert.hasText(c32xml);
-		
+
 		try {
 			String greenCcdXml = c32ToGreenCcdTransformer
 					.TransformC32ToGreenCcd(c32xml);

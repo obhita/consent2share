@@ -37,26 +37,29 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 /**
  * The Class C32ToGreenCcdTransformerImpl.
  */
-@Component
 public class C32ToGreenCcdTransformerImpl implements C32ToGreenCcdTransformer {
 
 	/** The Constant XSLTURI. */
 	private final static String XSLTURI = "C32ToGreenCcd/C32toGreenCCD.xslt";
-	
+
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.c32.C32ToGreenCcdTransformer#TransformC32ToGreenCcd(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent2share.c32.C32ToGreenCcdTransformer#TransformC32ToGreenCcd
+	 * (java.lang.String)
 	 */
 	@Override
-	public String TransformC32ToGreenCcd(String c32xml) throws C32ToGreenCcdTransformerException {
+	public String TransformC32ToGreenCcd(String c32xml)
+			throws C32ToGreenCcdTransformerException {
 		Assert.hasText(c32xml);
 
 		try {
@@ -73,45 +76,48 @@ public class C32ToGreenCcdTransformerImpl implements C32ToGreenCcdTransformer {
 
 			Transformer transformer = transformerFactory
 					.newTransformer(styleSource);
-			
-			/* // Transformer using DOMSource
-			DocumentBuilderFactory dFactory = DocumentBuilderFactory.newInstance();
-			dFactory.setNamespaceAware(true);
-			DocumentBuilder dBuilder = dFactory.newDocumentBuilder();
-			InputSource xslInputSource = new InputSource(styleIs);
-			Document xslDoc = dBuilder.parse(xslInputSource);
-			DOMSource xslDomSource = new DOMSource(xslDoc);
-			Transformer transformer = transformerFactory.newTransformer(xslDomSource);*/
-			
+
+			/*
+			 * // Transformer using DOMSource DocumentBuilderFactory dFactory =
+			 * DocumentBuilderFactory.newInstance();
+			 * dFactory.setNamespaceAware(true); DocumentBuilder dBuilder =
+			 * dFactory.newDocumentBuilder(); InputSource xslInputSource = new
+			 * InputSource(styleIs); Document xslDoc =
+			 * dBuilder.parse(xslInputSource); DOMSource xslDomSource = new
+			 * DOMSource(xslDoc); Transformer transformer =
+			 * transformerFactory.newTransformer(xslDomSource);
+			 */
+
 			transformer.setOutputProperty(OutputKeys.INDENT, "no");
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-			
+
 			// Get xml source
 			StringReader xmlReader = new StringReader(c32xml);
-			StreamSource xmlSource = new StreamSource(xmlReader); 
-			
+			StreamSource xmlSource = new StreamSource(xmlReader);
+
 			// Transform
 			StringWriter writer = new StringWriter();
 			StreamResult streamResult = new StreamResult(writer);
-				transformer.transform(xmlSource, streamResult);
-			
+			transformer.transform(xmlSource, streamResult);
+
 			String greenCcd = writer.toString();
-			
+
 			styleIs.close();
 			xmlReader.close();
 			writer.close();
-			
+
 			return greenCcd;
-			
+
 		} catch (Exception e) {
-			
+
 			String errorMessage = "Error happended when trying to transform C32 to Green CCD";
-			
+
 			logger.error(errorMessage, e);
-			
-			C32ToGreenCcdTransformerException transformerException = new C32ToGreenCcdTransformerException(errorMessage, e);
-			
+
+			C32ToGreenCcdTransformerException transformerException = new C32ToGreenCcdTransformerException(
+					errorMessage, e);
+
 			throw transformerException;
-		} 
+		}
 	}
 }

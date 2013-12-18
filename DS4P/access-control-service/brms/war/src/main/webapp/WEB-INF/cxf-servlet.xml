@@ -20,20 +20,20 @@
 	
     <jaxws:endpoint id="RuleExecutionService"
 		implementor="#ruleExecutionServiceWsImpl"
-		wsdlLocation="classpath:RuleExecutionService.wsdl"
+		wsdlLocation="classpath:wsdl/RuleExecutionService.wsdl"
 		address="/RuleExecutionService">
 	</jaxws:endpoint>    
     
      <bean id="ruleExecutionServiceWsImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.brms.ws.RuleExecutionServiceWsImpl"
+		class="gov.samhsa.acs.brms.ws.RuleExecutionServiceWsImpl"
 		scope="prototype" autowire="byType" />
 		
 	<bean id="ruleExecutionServiceImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.brms.service.RuleExecutionServiceImpl"
+		class="gov.samhsa.acs.brms.RuleExecutionServiceImpl"
 		scope="prototype" autowire="constructor" /> 
 		
 	<bean id="guvnorServiceImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.GuvnorServiceImpl"
+		class="gov.samhsa.acs.brms.guvnor.GuvnorServiceImpl"
 		scope="prototype"> 
 		<constructor-arg index="0" value="#{endpointAddressProperties.guvnorService}"  />
 		<constructor-arg index="1" value="#{endpointAddressProperties.guvnorServiceUsername}"  />
@@ -41,7 +41,7 @@
 	</bean>
 	
 	<bean id="simpleMarshallerImpl"
-		class="gov.samhsa.consent2share.accesscontrolservice.common.tool.SimpleMarshallerImpl"
+		class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl"
 		scope="prototype" />
 		
 </beans>

@@ -47,8 +47,10 @@ import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.AddConsentOrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
+import gov.samhsa.consent2share.service.dto.PatientAdminDto;
 import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
+import gov.samhsa.consent2share.service.dto.RecentPatientDto;
 import gov.samhsa.consent2share.infrastructure.EmailType;
 
 import java.util.ArrayList;
@@ -125,6 +127,12 @@ public class PatientServiceImpl implements PatientService {
 		PatientProfileDto patientDto = modelMapper.map(patient,
 				PatientProfileDto.class);
 		return patientDto;
+	}
+	
+	public List<PatientAdminDto> findAllPatientByFirstNameAndLastName(String firstName,String lastName){
+		List<Patient> patients=patientRepository.findAllByFirstNameContainsAndLastNameContains(firstName, lastName);
+		List<PatientAdminDto> PatientAdminDtoList=mapPatientListToPatientAdminDtoList(patients);
+		return PatientAdminDtoList;
 	}
 
 	/* (non-Javadoc)
@@ -348,5 +356,24 @@ public class PatientServiceImpl implements PatientService {
 			}
 		}
 		return false;
+	}
+	
+	public List<RecentPatientDto> findRecentPatientDtosById(List<String> ids){
+		List<RecentPatientDto> patients=new ArrayList<RecentPatientDto>();
+		for (String id:ids){
+			patients.add(modelMapper.map(patientRepository.findOne(Long.parseLong(id)), RecentPatientDto.class));
+		}
+		
+		return patients;
+	}
+	
+	private List<PatientAdminDto> mapPatientListToPatientAdminDtoList(List<Patient> patients){
+		List<PatientAdminDto> patientAdminDtoList= new ArrayList<PatientAdminDto>();
+		for (Patient patient:patients){
+			PatientAdminDto patientAdminDto=modelMapper.map(patient, PatientAdminDto.class);
+			patientAdminDtoList.add(patientAdminDto);
+		}
+		return patientAdminDtoList;
+		
 	}
 }

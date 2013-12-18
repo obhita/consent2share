@@ -8,8 +8,9 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import gov.samhsa.consent2share.accesscontrolservice.xdsb.registry.XdsbRegistryWebServiceClient;
-import gov.samhsa.ds4ppilot.common.exception.DS4PException;
+import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.acs.pep.PepImpl;
+import gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient;
 import gov.samhsa.ds4ppilot.schema.pep.FilterC32Response;
 
 import java.io.BufferedReader;

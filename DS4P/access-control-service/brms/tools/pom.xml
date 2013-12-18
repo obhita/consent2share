@@ -28,13 +28,13 @@
 			<!-- need to build factmodel before deployment -->
 			
 			<!-- dev deployment -->
-			<!-- mvn clean install exec:java -Denvironment.type=dev -Dexec.mainClass="gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.upload.FactModelUploader" -->
+			<!-- mvn clean install exec:java -Denvironment.type=dev -Dexec.mainClass="gov.samhsa.acs.brms.tool.FactModelGuvnorUploader" -->
 			
 			<!-- qa deployment -->
-			<!-- mvn clean install exec:java -Denvironment.type=qa -Dexec.mainClass="gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.upload.FactModelUploader" -->
+			<!-- mvn clean install exec:java -Denvironment.type=qa -Dexec.mainClass="gov.samhsa.acs.brms.tool.FactModelGuvnorUploader" -->
 			
 			<!-- demo deployment -->
-			<!-- mvn clean install exec:java -Denvironment.type=demo -Dexec.mainClass="gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.upload.FactModelUploader" -->
+			<!-- mvn clean install exec:java -Denvironment.type=demo -Dexec.mainClass="gov.samhsa.acs.brms.tool.FactModelGuvnorUploader" -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -46,7 +46,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>gov.samhsa.consent2share.accesscontrolservice.brms.guvnor.upload.FactModelUploader</mainClass>
+					<mainClass>gov.samhsa.acs.brms.tool.FactModelGuvnorUploader</mainClass>
 					<arguments>
 						<argument>${maven.guvnor.username}</argument>
 						<argument>${maven.guvnor.password}</argument>

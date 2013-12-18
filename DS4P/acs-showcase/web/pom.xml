@@ -81,6 +81,10 @@
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>xdsb-registry-client</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>xdsb-repository-client</artifactId>
+		</dependency>		
 				
 	</dependencies>
 

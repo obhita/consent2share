@@ -65,6 +65,10 @@
 					<artifactId>xfire-generator</artifactId>
 					<groupId>org.codehaus.xfire</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>XmlSchema</artifactId>
+					<groupId>org.apache.ws.commons</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 

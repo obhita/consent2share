@@ -27,7 +27,7 @@ public class HomeControllerTest {
 	@Test
 	public void testHome() throws Exception {
 		mockMvc.perform(get("/"))
-			.andExpect(view().name("redirect:/patients/home.html"));
+			.andExpect(view().name("redirect:/defaultLoginPage.html"));
 	}
 
 	@Test
