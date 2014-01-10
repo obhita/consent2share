@@ -143,10 +143,11 @@ public class DocumentSegmentationImplTest {
 				ruleExecutionServiceClientMock
 						.assertAndExecuteClinicalFacts(testFactModel_xml))
 				.thenReturn(mock(AssertAndExecuteClinicalFactsResponse.class));
-		
-		when(ruleExecutionServiceClientMock
-						.assertAndExecuteClinicalFacts(testFactModel_xml).getRuleExecutionResponseContainer())
-						.thenReturn(testExecutionResponseContainer_xml);
+
+		when(
+				ruleExecutionServiceClientMock.assertAndExecuteClinicalFacts(
+						testFactModel_xml).getRuleExecutionResponseContainer())
+				.thenReturn(testExecutionResponseContainer_xml);
 
 		// Marshaller mock
 		marshallerMock = mock(SimpleMarshallerImpl.class);
@@ -243,10 +244,9 @@ public class DocumentSegmentationImplTest {
 		// Arrange
 		boolean xdm = true;
 		boolean ecrypt = true;
-		DocumentEditorImpl realDocumentEditorImpl = new DocumentEditorImpl();
-		realDocumentEditorImpl.setFileReader(new FileReaderImpl());
-		realDocumentEditorImpl
-				.setMetadataGenerator(new MetadataGeneratorImpl());
+		DocumentEditorImpl realDocumentEditorImpl = new DocumentEditorImpl(
+				new MetadataGeneratorImpl(), new FileReaderImpl(),
+				new DocumentXmlConverterImpl());
 
 		DocumentSegmentationImpl documentSegmentationWithRealDocumentEditor = new DocumentSegmentationImpl(
 				ruleExecutionServiceClientMock, auditServiceMock,
@@ -265,7 +265,8 @@ public class DocumentSegmentationImplTest {
 	}
 
 	@Test
-	public void testSegmentDocument_Given_XdmTrue_EncryptTrue() throws IOException {
+	public void testSegmentDocument_Given_XdmTrue_EncryptTrue()
+			throws IOException {
 		boolean xdm = true;
 		boolean ecrypt = true;
 		// Act
@@ -278,7 +279,8 @@ public class DocumentSegmentationImplTest {
 	}
 
 	@Test
-	public void testSegmentDocument_Given_XdmFalse_EncryptTrue() throws IOException {
+	public void testSegmentDocument_Given_XdmFalse_EncryptTrue()
+			throws IOException {
 		// Arrange
 		boolean xdm = false;
 		boolean ecrypt = true;
@@ -293,7 +295,8 @@ public class DocumentSegmentationImplTest {
 	}
 
 	@Test
-	public void testSegmentDocument_Given_XdmTrue_EncryptFalse() throws IOException {
+	public void testSegmentDocument_Given_XdmTrue_EncryptFalse()
+			throws IOException {
 		// Arrange
 		boolean xdm = true;
 		boolean ecrypt = false;
@@ -308,7 +311,8 @@ public class DocumentSegmentationImplTest {
 	}
 
 	@Test
-	public void testSegmentDocument_Given_XdmFalse_EncryptFalse() throws IOException {
+	public void testSegmentDocument_Given_XdmFalse_EncryptFalse()
+			throws IOException {
 		// Arrange
 		boolean xdm = false;
 		boolean ecrypt = false;

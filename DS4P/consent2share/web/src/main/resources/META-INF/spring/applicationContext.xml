@@ -130,5 +130,29 @@
 	<bean id="consentDtoFactory"
 		class="gov.samhsa.consent2share.service.consentexport.ConsentDtoFactoryImpl" />
 	<!-- consent gen project beans End -->
-	
+
+	<!-- ACS Beans Start -->
+	<!-- Common Tools -->
+	<bean id="simpleMarshallerImpl" class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl"
+		scope="prototype" />
+	<!-- HL7 Transformer -->
+	<bean id="hl7v3TransformerImpl" class="gov.samhsa.consent2share.hl7.Hl7v3TransformerImpl"
+		scope="prototype" />
+	<!-- PIX Manager (PixQueryService dependencies) -->
+	<bean id="pixManagerServiceImpl" class="gov.samhsa.consent2share.pixclient.service.PixManagerServiceImpl"
+		scope="singleton">
+		<constructor-arg index="0" value="${openEMPIWebServiceEndpointAddress}" />
+	</bean>
+	<bean id="pixManagerConstants"
+		class="gov.samhsa.consent2share.pixclient.util.PixManagerConstants"
+		scope="singleton">
+		<constructor-arg index="0" value="${openEMPIDomainId}" />
+		<constructor-arg index="1" value="${openEMPIDomainName}" />
+	</bean>
+	<bean id="pixManagerRequestXMLToJava"
+		class="gov.samhsa.consent2share.pixclient.util.PixManagerRequestXMLToJava"
+		scope="prototype" autowire="constructor">
+	</bean>
+	<!-- ACS Beans End -->
+
 </beans>

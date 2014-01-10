@@ -111,8 +111,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.pep.PolicyEnforcementPoint#registryStoredQuery(oasis
+	 * @see gov.samhsa.acs.pep.PolicyEnforcementPoint#registryStoredQuery(oasis
 	 * .names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest)
 	 */
 	@Override
@@ -188,8 +187,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.pep.PolicyEnforcementPoint#retrieveDocumentSet(ihe
+	 * @see gov.samhsa.acs.pep.PolicyEnforcementPoint#retrieveDocumentSet(ihe
 	 * .iti.xds_b._2007.RetrieveDocumentSetRequest)
 	 */
 	@Override
@@ -259,8 +257,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.pep.PolicyEnforcementPoint#directEmailSend(gov.samhsa
+	 * @see gov.samhsa.acs.pep.PolicyEnforcementPoint#directEmailSend(gov.samhsa
 	 * .ds4ppilot.schema.pep.DirectEmailSendRequest)
 	 */
 	@Override
@@ -370,7 +367,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	 * 
 	 * @return the xacml request
 	 */
-	private XacmlRequest setXacmlRequest() {
+	XacmlRequest setXacmlRequest() {
 		XacmlRequest xacmlRequest = new XacmlRequest();
 		xacmlRequest.setHomeCommunityId(homeCommunityId);
 		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
@@ -390,7 +387,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	 *            the req
 	 * @return true, if successful
 	 */
-	private boolean validateAdhocQueryRequest(AdhocQueryRequest req) {
+	boolean validateAdhocQueryRequest(AdhocQueryRequest req) {
 		String formatCode = xdsbRegistry.extractFormatCode(req);
 		String pid = xdsbRegistry.extractPatientId(req);
 		String status = xdsbRegistry.extractDocumentEntryStatus(req);

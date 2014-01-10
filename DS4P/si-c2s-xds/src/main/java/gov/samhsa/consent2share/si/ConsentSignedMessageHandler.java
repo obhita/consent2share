@@ -1,45 +1,99 @@
+/*******************************************************************************
+ * Open Behavioral Health Information Technology Architecture (OBHITA.org)
+ *   
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions are met:
+ *       * Redistributions of source code must retain the above copyright
+ *         notice, this list of conditions and the following disclaimer.
+ *       * Redistributions in binary form must reproduce the above copyright
+ *         notice, this list of conditions and the following disclaimer in the
+ *         documentation and/or other materials provided with the distribution.
+ *       * Neither the name of the <organization> nor the
+ *         names of its contributors may be used to endorse or promote products
+ *         derived from this software without specific prior written permission.
+ *   
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *   DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+ *   DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ *   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ *   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ *   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ******************************************************************************/
 package gov.samhsa.consent2share.si;
 
-import gov.samhsa.consent2share.domain.consent.ConsentRepository;
-import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
-import gov.samhsa.schemas.client.XdsDocumentWebServiceClient;
+import gov.samhsa.acs.common.tool.DocumentXmlConverter;
+import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
+import gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter;
+
+import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+/**
+ * The Class ConsentSignedMessageHandler.
+ */
 public class ConsentSignedMessageHandler {
-	
-	@Autowired
-	private ConsentExportService consentExportService;
-	
-	@Autowired
-	private ConsentRepository consentRepository; 
-	
-	@Autowired
-	@Value("${endpointAddress.XDSDocumentService}") 
-	private String xdsDocumentServiceEndpointAddress;
 
+	/** The Constant URN_RESPONSE_SUCCESS. */
+	public static final String URN_RESPONSE_SUCCESS = "urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success";
+
+	/** The consent getter. */
+	@Autowired
+	private ConsentGetter consentGetter;
+
+	/** The xdsb repository. */
+	@Autowired
+	private XdsbRepositoryAdapter xdsbRepository;
+
+	/** The document xml converter. */
+	@Autowired
+	private DocumentXmlConverter documentXmlConverter;
+
+	/** The domain id. */
+	@Autowired
+	@Value("${domainId}")
+	private String domainId;
+
+	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
+	/**
+	 * Handle message.
+	 * 
+	 * @param data
+	 *            the data
+	 * @return the string
+	 */
 	public String handleMessage(String data) {
-		logger.debug("Consent Signed Message Received: ConsentId" + new String(data));
-		
+		logger.debug("Consent Signed Message Received: ConsentId"
+				+ new String(data));
+
 		Long consentId = Long.parseLong(data);
-		
-		XdsDocumentWebServiceClient xdsService = new XdsDocumentWebServiceClient(xdsDocumentServiceEndpointAddress);
-		
-		// Save cdar2
-		String cdar2 = consentExportService.exportCDAR2Consent(consentId);
-		boolean result = xdsService.saveDocumentSetToXdsRepository(cdar2);
-		
-		
-		if (result){
-			return "Saved in xds.b repository";
+
+		// Get consent
+		SimpleConsentDto consentDto = consentGetter.getConsent(consentId);
+
+		// Save to XDS.b repository
+		RegistryResponse response = null;
+		try {
+			response = xdsbRepository.provideAndRegisterDocumentSet(
+					consentDto.getConsent(), domainId,
+					XdsbDocumentType.PRIVACY_CONSENT);
+		} catch (Throwable e) {
+			logger.error("Failed to save in xds.b repository", e);
 		}
-		else {
-			return "Failed to save in xds.b repository";
+		if (response != null
+				&& URN_RESPONSE_SUCCESS.equals(response.getStatus())) {
+			return "Saved in XDS.b repository";
+		} else {
+			return "Failed to save in XDS.b repository";
 		}
 	}
 }

@@ -62,7 +62,7 @@ public class ConsentBuilderImplTest {
 		ConsentDto consentDtoMock = mock(ConsentDto.class);
 		when(consentDtoFactoryMock.createConsentDto(anyLong())).thenReturn(consentDtoMock);
 		String cdar2Mock = "cdar2";
-		when(consentTransformerMock.transform(consentDtoMock,"c2cdar2.xsl")).thenReturn(cdar2Mock);
+		when(consentTransformerMock.transform(consentDtoMock,"c2cdar2.xsl",null)).thenReturn(cdar2Mock);
 		
 		// Act
 		String cdar2 = sut.buildConsent2Cdar2(consentId);
@@ -78,7 +78,7 @@ public class ConsentBuilderImplTest {
 		long consentId = 1;
 		ConsentDto consentDtoMock = mock(ConsentDto.class);
 		when(consentDtoFactoryMock.createConsentDto(anyLong())).thenReturn(consentDtoMock);
-		when(consentTransformerMock.transform(consentDtoMock,"c2cdar2.xsl")).thenThrow( new ConsentGenException("Error in saxon transform"));
+		when(consentTransformerMock.transform(consentDtoMock,"c2cdar2.xsl",null)).thenThrow( new ConsentGenException("Error in saxon transform"));
 		
 		// Act
 		sut.buildConsent2Cdar2(consentId);
@@ -91,11 +91,15 @@ public class ConsentBuilderImplTest {
 	@Test
 	public void testBuildConsent2Xacml() throws ConsentGenException {
 		// Arrange
+		String eidMock = "eidMock";
 		Long consentId = new Long(1);
 		ConsentDto consentDtoMock = mock(ConsentDto.class);
+		PatientDto patientDtoMock = mock(PatientDto.class);
 		when(consentDtoFactoryMock.createConsentDto(consentId)).thenReturn(consentDtoMock);
+		when(consentDtoMock.getPatientDto()).thenReturn(patientDtoMock);
+		when(patientDtoMock.getEnterpriseIdentifier()).thenReturn(eidMock);
 		String xacmlMock = "xacml";
-		when(consentTransformerMock.transform(consentDtoMock,"c2xacml.xsl")).thenReturn(xacmlMock);
+		when(consentTransformerMock.transform(consentDtoMock,"c2xacml.xsl",eidMock)).thenReturn(xacmlMock);
 		
 		// Act
 		String xacml = sut.buildConsent2Xacml(consentId);
@@ -107,11 +111,15 @@ public class ConsentBuilderImplTest {
 	@Test
 	public void testBuildConsent2Xacml_ConsentGenException() throws  ConsentGenException {
 		// Arrange
+		String eidMock = "eidMock";
 		thrown.expect(ConsentGenException.class);
 		Long consentId = new Long(1);
 		ConsentDto consentDtoMock = mock(ConsentDto.class);
+		PatientDto patientDtoMock = mock(PatientDto.class);
+		when(consentDtoMock.getPatientDto()).thenReturn(patientDtoMock);
+		when(patientDtoMock.getEnterpriseIdentifier()).thenReturn(eidMock);
 		when(consentDtoFactoryMock.createConsentDto(consentId)).thenReturn(consentDtoMock);
-		when(consentTransformerMock.transform(consentDtoMock,"c2xacml.xsl")).thenThrow( new ConsentGenException("Error in saxon transform"));
+		when(consentTransformerMock.transform(consentDtoMock,"c2xacml.xsl",eidMock)).thenThrow( new ConsentGenException("Error in saxon transform"));
 		
 		// Act
 		sut.buildConsent2Xacml(consentId);

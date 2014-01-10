@@ -54,6 +54,7 @@ import gov.samhsa.consent2share.service.dto.RecentPatientDto;
 import gov.samhsa.consent2share.infrastructure.EmailType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -129,8 +130,19 @@ public class PatientServiceImpl implements PatientService {
 		return patientDto;
 	}
 	
-	public List<PatientAdminDto> findAllPatientByFirstNameAndLastName(String firstName,String lastName){
-		List<Patient> patients=patientRepository.findAllByFirstNameContainsAndLastNameContains(firstName, lastName);
+	@Override
+	public List<PatientAdminDto> findAllPatientByFirstNameAndLastName(
+			String[] tokens) {
+		List<Patient> patients;
+		if (tokens.length==1){
+			patients=patientRepository.findAllByFirstNameLikesAndLastNameLikes("%"+tokens[0]+"%");
+		}
+		else if (tokens.length>=2){
+			patients=patientRepository.findAllByFirstNameLikesAndLastNameLikes("%"+tokens[0]+"%","%"+tokens[1]+"%");
+		}
+		else{
+			patients=new ArrayList<Patient>();
+		}
 		List<PatientAdminDto> PatientAdminDtoList=mapPatientListToPatientAdminDtoList(patients);
 		return PatientAdminDtoList;
 	}

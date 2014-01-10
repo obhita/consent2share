@@ -55,6 +55,13 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 		</dependency>
+		
+		<!-- Test -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- Persistence -->
 		<dependency>
@@ -217,6 +224,12 @@
 		<dependency>
 			<groupId>com.echosign</groupId>
 			<artifactId>adobe-ecosign</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>XmlSchema</artifactId>
+					<groupId>org.apache.ws.commons</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -235,10 +248,19 @@
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>hl7-gen</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-library</artifactId>
 		</dependency>		
 		<!-- Our own projects End -->
 
+		<!-- xmlschema-core (required by pix-client) -->
+		<dependency>
+			<groupId>org.apache.ws.xmlschema</groupId>
+			<artifactId>xmlschema-core</artifactId>
+		</dependency>
+		
 	</dependencies>
-
 
 </project>

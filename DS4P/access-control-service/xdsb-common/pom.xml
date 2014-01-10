@@ -18,7 +18,11 @@
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-		</dependency>			
+		</dependency>
+		<dependency>
+			<groupId>xmlunit</groupId>
+			<artifactId>xmlunit</artifactId>
+		</dependency>					
 	</dependencies>
 
 	<build>
@@ -62,6 +66,27 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+					<instrumentation>
+						<excludes>
+							<exclude>ihe/iti/xds_b/_2007/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/lcm/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/query/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/rim/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/rs/_3/*.class</exclude>
+							<exclude>org/xmlsoap/schemas/soap/envelope/*.class</exclude>
+						</excludes>
+					</instrumentation>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

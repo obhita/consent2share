@@ -225,6 +225,7 @@ the page. Do not use class or ID selectors with Base Rules.
 	
 	/* Override Bootstrap 3 default behavior for the following selector (btn-default) */
 	.btn.btn-default {
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6'); /* for IE */
 		background-image: linear-gradient(to bottom, #ffffff, #e6e6e6)
 	}
 	
@@ -425,6 +426,11 @@ used more than once per page.
 			.modal-footer {
 				margin-top: 0 !important;
 			}
+		}
+		
+		/* Set display to block for date of birth date-picker error message fields */
+		div#dob > span.required-text {
+			display: block;
 		}
 	}
 
@@ -1081,7 +1087,7 @@ used more than once per page.
 		    	padding-left: 25px;
 		    }
 			label {
-				display: inline;
+				display: inline-block;
 				padding-left: 0;
 				input {
 					margin-left: -25px
@@ -2199,15 +2205,15 @@ Media Query - defines how things should be styles under defined criteria
 		margin-top: 20px !important;
 	}
 	
-	[class*="col-md-"],.uneditable-input[class*="col-md-"],.row [class*="col-md-"] {
+/*	[class*="col-md-"],.uneditable-input[class*="col-md-"],.row [class*="col-md-"] {
 		display:block;
 		float:none;
-		width:100%;
+		width:100%; */
 /*		margin-left:2.7624309392265%; */
-		-webkit-box-sizing:border-box;
+/*		-webkit-box-sizing:border-box;
 		-moz-box-sizing:border-box;
 		box-sizing:border-box;
-	}
+	}*/
 	
 	#connections-box.box {
 		margin-left: 0px;
@@ -2440,7 +2446,11 @@ Min Width 480px to Max Width 768px Wide - MOBILE - Landscape, Tablet Portrait (d
 			font-size: 13px;
 		}
 	}
-	
+	#consent-container {
+		a.consent-disclose-box {
+		width: 45%;
+		}
+	}
 	#consent-from, #consent-to {
 			p {
 				font-size: 13px;
@@ -2456,12 +2466,12 @@ Min Width 480px to Max Width 768px Wide - MOBILE - Landscape, Tablet Portrait (d
 	
 	.summary-record-details-container {
 		#consent-right-arrow-container {
-		margin-left: 2%;
+		margin-left: 1%;
 		}
 		ul {
-			width: 42%;
+			width: 45%;
 			&.summary-border {
-				padding: 8px 1% 4px;
+				padding: 8px 2% 4px;
 				}
 			}
 	}

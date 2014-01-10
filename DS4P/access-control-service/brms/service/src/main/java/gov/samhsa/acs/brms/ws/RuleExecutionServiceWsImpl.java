@@ -25,70 +25,54 @@
  ******************************************************************************/
 package gov.samhsa.acs.brms.ws;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-
-import gov.samhsa.consent2share.contract.ruleexecutionservice.RuleExecutionService;
 import gov.samhsa.consent2share.contract.ruleexecutionservice.RuleExecutionServicePortType;
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsRequest;
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
 
+import javax.jws.WebService;
+
 /**
  * The Class RuleExecutionServiceWsImpl.
  */
-@WebService( targetNamespace = "http://www.samhsa.gov/consent2share/contract/RuleExecutionService",
-portName="RuleExecutionServicePort", serviceName="RuleExecutionService",
-endpointInterface="gov.samhsa.consent2share.contract.ruleexecutionservice.RuleExecutionServicePortType")
+@WebService(targetNamespace = "http://www.samhsa.gov/consent2share/contract/RuleExecutionService", portName = "RuleExecutionServicePort", serviceName = "RuleExecutionService", endpointInterface = "gov.samhsa.consent2share.contract.ruleexecutionservice.RuleExecutionServicePortType")
+public class RuleExecutionServiceWsImpl implements RuleExecutionServicePortType {
 
-public class RuleExecutionServiceWsImpl implements RuleExecutionServicePortType {	
-	
 	/** The rule execution service. */
 	private gov.samhsa.acs.brms.RuleExecutionService ruleExecutionService;
-	
+
 	/**
 	 * Instantiates a new rule execution service ws impl.
 	 */
-	public RuleExecutionServiceWsImpl()
-	{}
-	
+	public RuleExecutionServiceWsImpl() {
+	}
+
 	/**
 	 * Instantiates a new rule execution service ws impl.
-	 *
-	 * @param ruleExecutionService the rule execution service
+	 * 
+	 * @param ruleExecutionService
+	 *            the rule execution service
 	 */
-	public RuleExecutionServiceWsImpl(gov.samhsa.acs.brms.RuleExecutionService ruleExecutionService)
-	{
+	public RuleExecutionServiceWsImpl(
+			gov.samhsa.acs.brms.RuleExecutionService ruleExecutionService) {
 		this.ruleExecutionService = ruleExecutionService;
-	}	
-	
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.contract.ruleexecutionservice.RuleExecutionServicePortType#assertAndExecuteClinicalFacts(gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsRequest)
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see gov.samhsa.consent2share.contract.ruleexecutionservice.
+	 * RuleExecutionServicePortType
+	 * #assertAndExecuteClinicalFacts(gov.samhsa.consent2share
+	 * .schema.ruleexecutionservice.AssertAndExecuteClinicalFactsRequest)
 	 */
 	@Override
 	public AssertAndExecuteClinicalFactsResponse assertAndExecuteClinicalFacts(
 			AssertAndExecuteClinicalFactsRequest parameters) {
 		AssertAndExecuteClinicalFactsResponse response = new AssertAndExecuteClinicalFactsResponse();
-		
-		response = ruleExecutionService.assertAndExecuteClinicalFacts(parameters.getClinicalFactXmlString());		
+
+		response = ruleExecutionService
+				.assertAndExecuteClinicalFacts(parameters
+						.getClinicalFactXmlString());
 		return response;
 	}
-
-	/**
-	 * Gets the rule execution service.
-	 *
-	 * @return the rule execution service
-	 */
-	public gov.samhsa.acs.brms.RuleExecutionService getRuleExecutionService() {
-		return ruleExecutionService;
-	}
-
-	/**
-	 * Sets the rule execution service.
-	 *
-	 * @param ruleExecutionService the new rule execution service
-	 */
-	public void setRuleExecutionService(
-			gov.samhsa.acs.brms.RuleExecutionService ruleExecutionService) {
-		this.ruleExecutionService = ruleExecutionService;
-	}	
 }

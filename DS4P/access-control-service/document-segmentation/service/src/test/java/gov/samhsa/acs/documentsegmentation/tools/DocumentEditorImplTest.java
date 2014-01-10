@@ -50,10 +50,7 @@ public class DocumentEditorImplTest {
 				metadataGeneratorMock.generateMetadataXml(anyString(),
 						anyString(), anyString(), anyString(), anyString()))
 				.thenReturn(fileReader.readFile("testMetadata.xml"));
-		documentEditor = new DocumentEditorImpl();
-		documentEditor.setDocumentXmlConverter(documentXmlConverter);
-		documentEditor.setFileReader(fileReader);
-		documentEditor.setMetadataGenerator(metadataGeneratorMock);
+		documentEditor = new DocumentEditorImpl(metadataGeneratorMock, fileReader, documentXmlConverter);
 
 		c32 = fileReader.readFile("c32.xml");
 		c32Document = documentXmlConverter.loadDocument(c32);

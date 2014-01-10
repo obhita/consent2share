@@ -102,16 +102,11 @@ public class PepImplIT {
 
 		fileReader = new FileReaderImpl();
 		metadataGenerator = new MetadataGeneratorImpl();
-		documentEditor = new DocumentEditorImpl();
-		documentEditor.setFileReader(fileReader);
-		documentEditor.setMetadataGenerator(metadataGenerator);
+		documentEditor = new DocumentEditorImpl(metadataGenerator, fileReader, new DocumentXmlConverterImpl());
 		marshaller = new SimpleMarshallerImpl();
 		documentTagger = new DocumentTaggerImpl();
 		documentEncrypter = new DocumentEncrypterImpl();
-		documentRedactor = new DocumentRedactorImpl();
-		documentRedactor.setDocumentEditor(documentEditor);
-		documentRedactor
-				.setDocumentXmlConverter(new DocumentXmlConverterImpl());
+		documentRedactor = new DocumentRedactorImpl(documentEditor, new DocumentXmlConverterImpl());
 		documentMasker = new DocumentMaskerImpl();
 		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
 		additionalMetadataGeneratorForSegmentedClinicalDocumentImpl = new AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl();;
@@ -226,7 +221,7 @@ public class PepImplIT {
 		// pep
 		PepImpl pep = new PepImpl(contextHandler,
 				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
-				xdsbRepository, xdsbRegistry);		
+				xdsbRepository, xdsbRegistry, marshaller);		
 //		pep.setSubjectPurposeOfUse("TREAT");
 		pep.setSubjectPurposeOfUse(purposeOfUse);
 		pep.setSubjectLocality("2.16.840.1.113883.3.467");
@@ -348,7 +343,7 @@ public class PepImplIT {
 		// pep
 		PepImpl pep = new PepImpl(contextHandler,
 				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
-				xdsbRepository, xdsbRegistry);
+				xdsbRepository, xdsbRegistry, marshaller);
 //		pep.setSubjectPurposeOfUse("TREAT");
 		pep.setSubjectPurposeOfUse(purposeOfUse);
 		pep.setSubjectLocality("2.16.840.1.113883.3.467");

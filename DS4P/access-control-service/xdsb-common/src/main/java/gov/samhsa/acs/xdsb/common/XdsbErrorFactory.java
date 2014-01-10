@@ -25,21 +25,74 @@
  ******************************************************************************/
 package gov.samhsa.acs.xdsb.common;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest.DocumentRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
-import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A factory for creating XdsbError objects.
  */
 public class XdsbErrorFactory {
+
+	/** The logger. */
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	/** The registry error list setter. */
+	private RegistryErrorListSetter registryErrorListSetter;
+
+	/**
+	 * Instantiates a new xdsb error factory.
+	 */
+	public XdsbErrorFactory() {
+	}
+
+	/**
+	 * Instantiates a new xdsb error factory.
+	 * 
+	 * @param registryErrorListSetter
+	 *            the registry error list setter
+	 */
+	public XdsbErrorFactory(RegistryErrorListSetter registryErrorListSetter) {
+		super();
+		this.registryErrorListSetter = registryErrorListSetter;
+	}
+
+	/**
+	 * Sets the retrieve document set response registry error list.
+	 * 
+	 * @param response
+	 *            the retrieve document set response that will have the new
+	 *            registry error list with error message
+	 * @param numRemoved
+	 *            the number of removed documents after filtering by author
+	 * @param patientId
+	 *            the patient id
+	 * @param authorNPI
+	 *            the author npi
+	 * @return the retrieve document set response
+	 */
+	public RetrieveDocumentSetResponse setRetrieveDocumentSetResponseRegistryErrorListFilteredByPatientAndAuthor(
+			RetrieveDocumentSetResponse response, int numRemoved,
+			String patientId, String authorNPI) {
+		String codeContext = numRemoved
+				+ " document(s) is/are not authored by " + authorNPI
+				+ " or does/do not belong to the patient " + patientId
+				+ " and removed from the response.";
+		String errorCode = "XDSRepositoryError";
+		boolean isPartial = response.getDocumentResponse().size() > 0;
+		setErrorRegistryResponse(codeContext, errorCode, isPartial, response);
+		return response;
+	}
 
 	/**
 	 * Error retrieve document set response multiple repository id.
@@ -49,8 +102,10 @@ public class XdsbErrorFactory {
 	public RetrieveDocumentSetResponse errorRetrieveDocumentSetResponseMultipleRepositoryId() {
 		String codeContext = "All repository ids in RetrieveDocumentSetRequest need to be same.";
 		String errorCode = "XDSRepositoryError";
+		boolean isPartial = false;
 
-		return createRetrieveDocumentSetResponseError(codeContext, errorCode);
+		return createRetrieveDocumentSetResponseError(codeContext, errorCode,
+				isPartial);
 	}
 
 	/**
@@ -67,11 +122,14 @@ public class XdsbErrorFactory {
 			list.add(req.getDocumentUniqueId() + ":"
 					+ req.getRepositoryUniqueId());
 		}
-		String codeContext = "The document(s) " + list.toString()
-				+ " do not exist or access denied by Policy Decision Point.";
+		String codeContext = "The document(s) "
+				+ list.toString()
+				+ " does/do not exist or access denied by Policy Decision Point.";
 		String errorCode = "XDSRepositoryError";
+		boolean isPartial = false;
 
-		return createRetrieveDocumentSetResponseError(codeContext, errorCode);
+		return createRetrieveDocumentSetResponseError(codeContext, errorCode,
+				isPartial);
 	}
 
 	/**
@@ -82,8 +140,10 @@ public class XdsbErrorFactory {
 	public RetrieveDocumentSetResponse errorRetrieveDocumentSetResponseRepositoryNotAvailable() {
 		String codeContext = "Policy Enforcement Point is unable to access the XDS.b Repository.";
 		String errorCode = "XDSRepositoryError";
+		boolean isPartial = false;
 
-		return createRetrieveDocumentSetResponseError(codeContext, errorCode);
+		return createRetrieveDocumentSetResponseError(codeContext, errorCode,
+				isPartial);
 	}
 
 	/**
@@ -94,8 +154,10 @@ public class XdsbErrorFactory {
 	public RetrieveDocumentSetResponse errorRetrieveDocumentSetResponseInternalPEPError() {
 		String codeContext = "An internal error occured in Policy Enforcement Point.";
 		String errorCode = "XDSRepositoryError";
+		boolean isPartial = false;
 
-		return createRetrieveDocumentSetResponseError(codeContext, errorCode);
+		return createRetrieveDocumentSetResponseError(codeContext, errorCode,
+				isPartial);
 	}
 
 	/**
@@ -106,8 +168,10 @@ public class XdsbErrorFactory {
 	public RetrieveDocumentSetResponse errorRetrieveDocumentSetResponseAccessDeniedByPDP() {
 		String codeContext = "The access to patient documents is denied by Policy Decision Point.";
 		String errorCode = "XDSRepositoryError";
+		boolean isPartial = false;
 
-		return createRetrieveDocumentSetResponseError(codeContext, errorCode);
+		return createRetrieveDocumentSetResponseError(codeContext, errorCode,
+				isPartial);
 	}
 
 	/**
@@ -200,7 +264,8 @@ public class XdsbErrorFactory {
 	public AdhocQueryResponse errorAdhocQueryResponseUnsupportedResponseOptionType(
 			String supportedResponseOptionType) {
 		String codeContext = "Policy Enforcement Point only supports '"
-				+ supportedResponseOptionType + "' response option return type.";
+				+ supportedResponseOptionType
+				+ "' response option return type.";
 		String errorCode = "XDSRegistryError";
 
 		return createAdhocQueryResponseError(codeContext, errorCode);
@@ -247,21 +312,36 @@ public class XdsbErrorFactory {
 	 *            the code context
 	 * @param errorCode
 	 *            the error code
+	 * @param isPartial
+	 *            the is partial
 	 * @return the retrieve document set response
 	 */
 	private RetrieveDocumentSetResponse createRetrieveDocumentSetResponseError(
-			String codeContext, String errorCode) {
+			String codeContext, String errorCode, boolean isPartial) {
 		RetrieveDocumentSetResponse errorRetrieveDocumentSetResponse = new RetrieveDocumentSetResponse();
-		RegistryResponse errorResponse = errorRetrieveDocumentSetResponse
-				.getRegistryResponse();
-		errorResponse
-				.setStatus("urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Failure");
+		setErrorRegistryResponse(codeContext, errorCode, isPartial,
+				errorRetrieveDocumentSetResponse);
+		return errorRetrieveDocumentSetResponse;
+	}
 
+	/**
+	 * Sets the error registry response.
+	 * 
+	 * @param codeContext
+	 *            the code context
+	 * @param errorCode
+	 *            the error code
+	 * @param isPartial
+	 *            the is partial
+	 * @param response
+	 *            the response
+	 */
+	private void setErrorRegistryResponse(String codeContext, String errorCode,
+			boolean isPartial, RetrieveDocumentSetResponse response) {
 		RegistryErrorList registryErrorList = createRegistryErrorList(
 				codeContext, errorCode);
-
-		errorResponse.setRegistryErrorList(registryErrorList);
-		return errorRetrieveDocumentSetResponse;
+		this.registryErrorListSetter.setRegistryErrorList(response,
+				registryErrorList, isPartial);
 	}
 
 	/**

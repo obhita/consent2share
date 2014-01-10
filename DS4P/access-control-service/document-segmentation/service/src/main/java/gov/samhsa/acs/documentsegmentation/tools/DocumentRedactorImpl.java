@@ -50,6 +50,27 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 	/** The document xml converter. */
 	private DocumentXmlConverter documentXmlConverter;
 
+	/**
+	 * Instantiates a new document redactor impl.
+	 */
+	public DocumentRedactorImpl() {
+	}
+
+	/**
+	 * Instantiates a new document redactor impl.
+	 * 
+	 * @param documentEditor
+	 *            the document editor
+	 * @param documentXmlConverter
+	 *            the document xml converter
+	 */
+	public DocumentRedactorImpl(DocumentEditor documentEditor,
+			DocumentXmlConverter documentXmlConverter) {
+		super();
+		this.documentEditor = documentEditor;
+		this.documentXmlConverter = documentXmlConverter;
+	}
+
 	// commented out for redact-only application
 	// /** The pdp obligation prefix for redact. */
 	// private final String PDP_OBLIGATION_PREFIX_REDACT =
@@ -58,8 +79,7 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.documentsegmentation.tools
+	 * @see gov.samhsa.acs.documentsegmentation.tools
 	 * .DocumentRedactor#redactDocument(java.lang.String,
 	 * gov.samhsa.acs.common.bean.RuleExecutionContainer,
 	 * gov.samhsa.acs.common.bean.XacmlResult)
@@ -137,44 +157,5 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 						response.getSensitivity())));
 		return xacmlResult.getPdpObligations().contains(
 				response.getSensitivity());
-	}
-
-	/**
-	 * Gets the document editor.
-	 * 
-	 * @return the document editor
-	 */
-	public DocumentEditor getDocumentEditor() {
-		return documentEditor;
-	}
-
-	/**
-	 * Sets the document editor.
-	 * 
-	 * @param documentEditor
-	 *            the new document editor
-	 */
-	public void setDocumentEditor(DocumentEditor documentEditor) {
-		this.documentEditor = documentEditor;
-	}
-
-	/**
-	 * Gets the document xml converter.
-	 * 
-	 * @return the document xml converter
-	 */
-	public DocumentXmlConverter getDocumentXmlConverter() {
-		return documentXmlConverter;
-	}
-
-	/**
-	 * Sets the document xml converter.
-	 * 
-	 * @param documentXmlConverter
-	 *            the new document xml converter
-	 */
-	public void setDocumentXmlConverter(
-			DocumentXmlConverter documentXmlConverter) {
-		this.documentXmlConverter = documentXmlConverter;
 	}
 }

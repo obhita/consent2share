@@ -182,17 +182,7 @@ public class XdsbRegistryWebServiceClient {
 		return port;
 	}
 
-	/**
-	 * Gets the raw response payload.
-	 * 
-	 * @param operationName
-	 *            the operation name
-	 * @param justPayloadXml
-	 *            the just payload xml
-	 * @return the raw response payload
-	 * @throws Throwable
-	 *             the throwable
-	 */
+	/*
 	@SuppressWarnings("unused")
 	private String getRawResponsePayload(QName operationName,
 			String justPayloadXml) throws Throwable {
@@ -230,15 +220,9 @@ public class XdsbRegistryWebServiceClient {
 
 		return responsePayload;
 	}
+	*/
 
-	/**
-	 * The main method.
-	 * 
-	 * @param args
-	 *            the arguments
-	 * @throws Throwable
-	 *             the throwable
-	 */
+	/*
 	public static void main(String[] args) throws Throwable {
 		final String demoEndpoint = "http://obhidevacs001:9080/axis2/services/xdsregistryb";
 		// final String javaVmEndpoint =
@@ -377,6 +361,7 @@ public class XdsbRegistryWebServiceClient {
 		System.out.println(xdsService
 				.revisePatientRegistryRecord(prpain201302uv));
 	}
+	*/
 
 	/**
 	 * Marshall.

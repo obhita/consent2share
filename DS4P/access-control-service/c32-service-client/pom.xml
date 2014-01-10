@@ -87,6 +87,24 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+					<instrumentation>
+						<excludes>
+							<exclude>com/microsoft/schemas/_2003/_10/serialization/*.class</exclude>
+							<exclude>gov/samhsa/schemas/c32service/IC32Service_BasicHttpBindingIC32Service_Client.class</exclude>
+							<exclude>gov/samhsa/acs/c32/wsclient/XTrustProvider*.class</exclude>
+						</excludes>
+					</instrumentation>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+				</configuration>
+			</plugin>
 
 		</plugins>
 

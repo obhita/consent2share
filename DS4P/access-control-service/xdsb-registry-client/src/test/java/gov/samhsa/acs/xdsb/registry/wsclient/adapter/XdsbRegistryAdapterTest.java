@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReader;
@@ -14,10 +15,12 @@ import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentReference;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient;
-import gov.samhsa.acs.xdsb.registry.wsclient.adapter.AdhocQueryResponseFilter;
-import gov.samhsa.acs.xdsb.registry.wsclient.adapter.XdsbRegistryAdapter;
+import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 
+import java.io.IOException;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
@@ -72,7 +75,8 @@ public class XdsbRegistryAdapterTest {
 
 		MockitoAnnotations.initMocks(this);
 		XdsbRegistryAdapter xdsbRegistryAdapter = new XdsbRegistryAdapter(
-				xdsbRegistryMock, responseFilterMock, marshallerMock, documentXmlConverterMock);
+				xdsbRegistryMock, responseFilterMock, marshallerMock,
+				documentXmlConverterMock);
 		xdsbRegistryAdapterSpy = spy(xdsbRegistryAdapter);
 	}
 
@@ -243,5 +247,138 @@ public class XdsbRegistryAdapterTest {
 		// Assert
 		assertNotNull(actualValue);
 		assertEquals(expectedValue, actualValue);
+	}
+
+	@Test
+	public void testExtractXdsbDocumentReferenceListAsRetrieveDocumentSetRequest()
+			throws Exception, Throwable {
+		// Arrange
+		AdhocQueryResponse responseMock = mock(AdhocQueryResponse.class);
+		String marshalledXmlStringMock = "marshalledXmlStringMock";
+		XdsbDocumentReference ref1 = new XdsbDocumentReference(
+				"41421263015.98411.41414.91230.401390172014139",
+				"1.3.6.1.4.1.21367.2010.1.2.1040");
+		XdsbDocumentReference ref2 = new XdsbDocumentReference(
+				"1513150391310.11184.4632.11139.05080551281557",
+				"1.3.6.1.4.1.21367.2010.1.2.1040");
+		when(marshallerMock.marshall(responseMock)).thenReturn(
+				marshalledXmlStringMock);
+		when(documentXmlConverterMock.loadDocument(marshalledXmlStringMock))
+				.thenReturn(
+						documentXmlConverter.loadDocument(fileReader
+								.readFile("adhocQueryResponseClinicalDocument.xml")));
+
+		// Act
+		RetrieveDocumentSetRequest actualResponse = xdsbRegistryAdapterSpy
+				.extractXdsbDocumentReferenceListAsRetrieveDocumentSetRequest(responseMock);
+
+		// Assert
+		assertTrue(actualResponse.getDocumentRequest().contains(ref1));
+		assertTrue(actualResponse.getDocumentRequest().contains(ref2));
+	}
+
+	@Test
+	public void testGetPatientUniqueId() {
+		// Arrange
+		String patientIdMock = "patientIdMock";
+		String domainIdMock = "domainIdMock";
+		String expectedResponse = "'patientIdMock^^^&domainIdMock&ISO'";
+
+		// Act
+		String actualResponse = xdsbRegistryAdapterSpy.getPatientUniqueId(
+				patientIdMock, domainIdMock);
+
+		// Assert
+		assertEquals(expectedResponse, actualResponse);
+	}
+
+	@Test
+	public void testExtractFormatCode() throws JAXBException, IOException {
+		// Arrange
+		String expectedResponse = "'2.16.840.1.113883.10.20.1^^HITSP'";
+		AdhocQueryRequest requestMock = marshaller.unmarshallFromXml(
+				AdhocQueryRequest.class,
+				fileReader.readFile("unitTestAdhocQueryRequest.xml"));
+
+		// Act
+		String actualResponse = xdsbRegistryAdapterSpy
+				.extractFormatCode(requestMock);
+
+		// Assert
+		assertEquals(expectedResponse, actualResponse);
+	}
+
+	@Test
+	public void testExtractPatientId() throws JAXBException, IOException {
+		// Arrange
+		String expectedResponse = "'1c5c59f0-5788-11e3-84b3-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO'";
+		AdhocQueryRequest requestMock = marshaller.unmarshallFromXml(
+				AdhocQueryRequest.class,
+				fileReader.readFile("unitTestAdhocQueryRequest.xml"));
+
+		// Act
+		String actualResponse = xdsbRegistryAdapterSpy
+				.extractPatientId(requestMock);
+
+		// Assert
+		assertEquals(expectedResponse, actualResponse);
+	}
+
+	@Test
+	public void testExtractResponseOptionReturnType() throws JAXBException,
+			IOException {
+		// Arrange
+		String expectedResponse = "LeafClass";
+		AdhocQueryRequest requestMock = marshaller.unmarshallFromXml(
+				AdhocQueryRequest.class,
+				fileReader.readFile("unitTestAdhocQueryRequest.xml"));
+
+		// Act
+		String actualResponse = xdsbRegistryAdapterSpy
+				.extractResponseOptionReturnType(requestMock);
+
+		// Assert
+		assertEquals(expectedResponse, actualResponse);
+	}
+
+	@Test
+	public void testExtractDocumentEntryStatus() throws JAXBException,
+			IOException {
+		// Arrange
+		String expectedResponse = "('urn:oasis:names:tc:ebxml-regrep:StatusType:Approved')";
+		AdhocQueryRequest requestMock = marshaller.unmarshallFromXml(
+				AdhocQueryRequest.class,
+				fileReader.readFile("unitTestAdhocQueryRequest.xml"));
+
+		// Act
+		String actualResponse = xdsbRegistryAdapterSpy
+				.extractDocumentEntryStatus(requestMock);
+
+		// Assert
+		assertEquals(expectedResponse, actualResponse);
+	}
+
+	@Test
+	public void testRegistryStoredQuery() throws Exception, Throwable {
+		// Arrange
+		String patientIdMock = "patientIdMock";
+		String domainIdMock = "domainIdMock";
+		String authorIdMock = "authorIdMock";
+		XdsbDocumentType xdsbDocumentTypeMock = XdsbDocumentType.CLINICAL_DOCUMENT;
+		boolean serviceTimeAwareMock = false;
+		AdhocQueryResponse responseMock = new AdhocQueryResponse();
+		AdhocQueryResponse filteredResponseMock = new AdhocQueryResponse();
+		when(xdsbRegistryMock.registryStoredQuery(isA(AdhocQueryRequest.class)))
+				.thenReturn(responseMock);
+		when(responseFilterMock.filterByAuthor(responseMock, authorIdMock))
+				.thenReturn(filteredResponseMock);
+
+		// Act
+		AdhocQueryResponse actualResponse = xdsbRegistryAdapterSpy
+				.registryStoredQuery(patientIdMock, domainIdMock, authorIdMock,
+						xdsbDocumentTypeMock, serviceTimeAwareMock);
+
+		//
+		assertEquals(filteredResponseMock, actualResponse);
 	}
 }

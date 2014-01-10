@@ -33,19 +33,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gov.samhsa.consent2share.dao.audit.JdbcAuditDao;
+import gov.samhsa.consent2share.infrastructure.FieldValidator;
+import gov.samhsa.consent2share.infrastructure.PixQueryService;
+import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
+import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
+import gov.samhsa.consent2share.service.admin.AdminService;
+import gov.samhsa.consent2share.service.audit.AdminAuditService;
 import gov.samhsa.consent2share.service.consent.ConsentService;
 import gov.samhsa.consent2share.service.dto.AbstractPdfDto;
+import gov.samhsa.consent2share.service.dto.AdminProfileDto;
 import gov.samhsa.consent2share.service.dto.BasicPatientAccountDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.PatientAdminDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
-import gov.samhsa.consent2share.service.dto.RecentPatientDto;
+import gov.samhsa.consent2share.service.dto.RecentAcctivityDto;
 import gov.samhsa.consent2share.service.patient.PatientService;
+import gov.samhsa.consent2share.service.reference.AdministrativeGenderCodeService;
+import gov.samhsa.consent2share.service.reference.LanguageCodeService;
+import gov.samhsa.consent2share.service.reference.MaritalStatusCodeService;
+import gov.samhsa.consent2share.service.reference.RaceCodeService;
+import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeService;
+import gov.samhsa.consent2share.service.reference.StateCodeService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -54,6 +68,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -61,6 +76,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class AdminController.
  */
@@ -68,9 +84,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @RequestMapping("/Administrator")
 public class AdminController extends AbstractController {
 	
+	/** The patient service. */
 	@Autowired
 	PatientService patientService;
 	
+	/** The admin service. */
+	@Autowired
+	AdminService adminService;
+	
+	/** The consent service. */
 	@Autowired
 	ConsentService consentService;
 	
@@ -78,10 +100,51 @@ public class AdminController extends AbstractController {
 	@Autowired
 	UserContext adminUserContext;
 	
+	/** The jdbc audit dao. */
 	@Autowired
 	JdbcAuditDao jdbcAuditDao;
 	
+	/** The patient audit service. */
+	@Autowired
+	AdminAuditService adminAuditService;
+	
+	/** The administrative gender code service. */
+	@Autowired
+	AdministrativeGenderCodeService administrativeGenderCodeService;
+	
+	/** The language code service. */
+	@Autowired
+	LanguageCodeService languageCodeService;
+
+	/** The marital status code service. */
+	@Autowired
+	MaritalStatusCodeService maritalStatusCodeService;
+
+	/** The race code service. */
+	@Autowired
+	RaceCodeService raceCodeService;
+	
+
+	/** The religious affiliation code service. */
+	@Autowired
+	ReligiousAffiliationCodeService religiousAffiliationCodeService;
+
+	
+	/** The state code service. */
+	@Autowired
+	StateCodeService stateCodeService;
+	
+	/** The field validator. */
+	@Autowired
+	private FieldValidator fieldValidator;
+	
+	/** The maximum number of recent patient. */
 	int maximumNumberOfRecentPatient=5;
+	
+	
+	/** The PIX Query Service. */
+	@Autowired
+	private PixQueryService pixQueryService;
 	
 	/** The logger. */
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -90,23 +153,25 @@ public class AdminController extends AbstractController {
 	 * Admin Home Page.
 	 * 
 	 * NOTE: THIS FUNCTION IS A TEMPORARY FUNCTION TO DISPLAY THE ADMIN HOME PAGE
-	 *       IT MUST BE MODIFIED BEFORE IT IS INTEGREATED WITH THE BACK-END CODE
-	 * 
+	 * IT MUST BE MODIFIED BEFORE IT IS INTEGREATED WITH THE BACK-END CODE
+	 *
 	 * @param model the model
+	 * @param request the request
+	 * @param recentVisits the recent visits
 	 * @return the string
 	 */
 	@RequestMapping(value = "adminHome.html")
-	public String adminHome(Model model, HttpServletRequest request, 
-			@CookieValue(value = "recent_visit", required = false) List<String> recentVisits) {
-		List<RecentPatientDto> recentPatientDtos=new ArrayList<RecentPatientDto>();
-		if(recentVisits!=null)
-			recentPatientDtos=patientService.findRecentPatientDtosById(recentVisits);
+	public String adminHome(Model model, HttpServletRequest request) {
+		AuthenticatedUser currentUser = adminUserContext.getCurrentUser();
 		String notify = request.getParameter("notify");
 		BasicPatientAccountDto basicPatientAccountDto = new BasicPatientAccountDto();
 		
+		List<RecentAcctivityDto> recentActivityDtos = adminAuditService.findAdminHistoryByUsername(currentUser.getUsername());
+		
 		model.addAttribute("notifyevent", notify);
 		model.addAttribute(basicPatientAccountDto);
-		model.addAttribute("recentVisits", recentPatientDtos);
+		model.addAttribute("recentActivityDtos", recentActivityDtos);
+		
 		
 		return "views/Administrator/adminHome";
 	}
@@ -116,76 +181,139 @@ public class AdminController extends AbstractController {
 	 * Admin Patient View Page.
 	 * 
 	 * NOTE: THIS FUNCTION IS A TEMPORARY FUNCTION TO DISPLAY THE ADMIN PATIENT VIEW PAGE.
-	 * 		 IT MUST BE MODIFIED BEFORE IT IS INTEGREATED WITH THE BACK-END CODE
-	 * 
+	 * IT MUST BE MODIFIED BEFORE IT IS INTEGREATED WITH THE BACK-END CODE
+	 *
 	 * @param model the model
+	 * @param request the request
+	 * @param response the response
+	 * @param recentVisits the recent visits
 	 * @return the string
 	 */
 	@RequestMapping(value = "adminPatientView.html")
-	public String adminPatientView(Model model, HttpServletRequest request, HttpServletResponse response,
-			@CookieValue(value = "recent_visit", required = false) List<String> recentVisits) {
-		if(request.getParameter("id")!=null){
-			//response.addCookie(new Cookie("recent_visit", buildRecentPatientsCookie(recentVisits,request.getParameter("id"))));
-			long patientId=Long.parseLong(request.getParameter("id"));
-			PatientProfileDto patientProfileDto=patientService.findPatient((long) patientId);
-			List<ConsentListDto> consentListDto=consentService.findAllConsentsDtoByPatient((long) patientId);
+	public String adminPatientView(Model model, @RequestParam("id") long patientId) {
+		    PatientProfileDto patientProfileDto=patientService.findPatient(patientId);
+			List<ConsentListDto> consentListDto=consentService.findAllConsentsDtoByPatient(patientId);
 							
 			model.addAttribute("patientProfileDto", patientProfileDto);
 			model.addAttribute("consentListDto", consentListDto);
+			populateLookupCodes(model);
 							
 			return "views/Administrator/adminPatientView";
-		}else{
-			return "redirect:/Administrator/adminHome.html";
+		
+	}
+	
+	/**
+	 * Admin edit patient profile.
+	 *
+	 * @param patientProfileDto the patient profile dto
+	 * @param bindingResult the binding result
+	 * @param model the model
+	 * @return the string
+	 */
+	@RequestMapping(value = "adminEditPatientProfile.html", method = RequestMethod.POST)
+	public String adminEditPatientProfile(@Valid PatientProfileDto patientProfileDto, BindingResult bindingResult, Model model) {
+			fieldValidator.validate(patientProfileDto, bindingResult);
+			Long pateintId=patientProfileDto.getId();
+		
+		if (bindingResult.hasErrors()) {
+
+			return "redirect:/Administrator/adminPatientView.html?id="+pateintId;
+		} else {
+			
+			patientProfileDto.setAddressCountryCode("US");
+			patientProfileDto.setUsername(patientService.findPatient(pateintId).getUsername());
+			String mrn = patientProfileDto.getMedicalRecordNumber();
+			String eId = null;
+			if(mrn != null && !"".equals(mrn)){
+				eId = pixQueryService.getEid(patientProfileDto.getMedicalRecordNumber());
+			}
+			patientProfileDto.setEnterpriseIdentifier(eId);
+			
+				adminService.updatePatient(patientProfileDto);
+				model.addAttribute("updatedMessage", "Updated your profile successfully!");
+			
+			
+		    return "redirect:/Administrator/adminPatientView.html?id="+pateintId;
 		}
+		
 	}
 	
 	/**
 	 * Admin Patient View Create Consent Page.
 	 * 
 	 * NOTE: THIS FUNCTION IS A TEMPORARY FUNCTION TO DISPLAY THE ADMIN PATIENT VIEW CREATE CONSENT PAGE.
-	 * 		 IT MUST BE MODIFIED BEFORE IT IS INTEGREATED WITH THE BACK-END CODE
-	 * 
+	 * IT MUST BE MODIFIED BEFORE IT IS INTEGREATED WITH THE BACK-END CODE
+	 *
 	 * @param model the model
+	 * @param request the request
 	 * @return the string
 	 */
 	@RequestMapping(value = "adminPatientViewCreateConsent.html")
-	public String adminPatientViewCreateConsent(Model model, HttpServletRequest request) {
-		if(request.getParameter("id") != null){
-			//Initialize patientId variable to -1
-			long patientID = -1;
-			
-			try{
-				patientID = Long.parseLong(request.getParameter("id"));
-			}catch(NumberFormatException e){
-				patientID = -1;
-				logger.warn("NumberFormatException caught by adminPatientViewCreateConsent function in AdminController.");
-				logger.warn("	Caught NumberFormatException stack trace: ", e);
-				
-				//TODO: Change redirect location to a more appropriate error page
-				return "redirect:/Administrator/adminHome.html";
-			}
-			
-			model.addAttribute("patientIdLink", "?id=" + patientID);
+	public String adminPatientViewCreateConsent(@RequestParam(value = "id", defaultValue = "-1") long patientID, Model model) {
+		if(patientID <= -1){
+			throw new ResourceNotFoundException();
 		}else{
-			model.addAttribute("patientIdLink", "");
+			model.addAttribute("patientID", patientID);
+			return "views/Administrator/adminPatientViewCreateConsent";
 		}
-		
-		return "views/Administrator/adminPatientViewCreateConsent";
 	}
 	
 	
+	/**
+	 * Edits the admin profile.
+	 *
+	 * @param model the model
+	 * @return the string
+	 */
 	@RequestMapping(value = "editAdminProfile.html")
 	public String editAdminProfile(Model model) {
-		/*
 		AuthenticatedUser currentUser = adminUserContext.getCurrentUser();
-		PatientProfileDto patientProfileDto = patientService.findPatientProfileByUsername(currentUser
+		AdminProfileDto adminProfileDto = adminService.findAdminProfileByUsername(currentUser
 				.getUsername());
-
-		model.addAttribute("patientProfileDto", patientProfileDto);
+		model.addAttribute("adminProfileDto", adminProfileDto);
 		model.addAttribute("currentUser", currentUser);
+		
 		populateLookupCodes(model);
-		*/
+		
 		return "views/Administrator/editAdminProfile";
+	}
+	
+	
+	/**
+	 * Profile.
+	 *
+	 * @param adminProfileDto the admin profile dto
+	 * @param bindingResult the binding result
+	 * @param model the model
+	 * @return the string
+	 */
+	@RequestMapping(value = "editAdminProfile.html", method = RequestMethod.POST)
+	public String profile(@Valid AdminProfileDto adminProfileDto,
+			BindingResult bindingResult, Model model) {
+		
+		fieldValidator.validate(adminProfileDto, bindingResult);
+		
+		if (bindingResult.hasErrors()) {
+
+			populateLookupCodes(model);
+			return "views/Administrator/editAdminProfile";
+		} else {
+			AuthenticatedUser currentUser = adminUserContext.getCurrentUser();
+			model.addAttribute("currentUser", currentUser);
+			try {
+				adminService.updateAdministrator(adminProfileDto);
+				model.addAttribute("updatedMessage", "Updated your profile successfully!");
+			} catch (AuthenticationFailedException e) {
+				model.addAttribute("updatedMessage", "Failed. Please check your username and password and try again.");
+				AdminProfileDto originalAdminProfileDto=adminService.findAdminProfileByUsername(currentUser
+						.getUsername());
+				model.addAttribute("adminProfileDto", originalAdminProfileDto);
+			}
+			
+			populateLookupCodes(model);
+
+			return "views/Administrator/editAdminProfile";
+		}
 	}
 	
 	
@@ -221,56 +349,68 @@ public class AdminController extends AbstractController {
 	
 	
 	/**
-	 * 
 	 * NOTE: THIS FUNCTION IS A TEMPORARY FUNCTION TO DISPLAY THE ADMIN HOME PAGE
-	 *       IT MUST BE MODIFIED BEFORE IT IS INTEGREATED WITH THE BACK-END CODE
-	 * 
-	 * @param basicPatientAccountDto
-	 * @param request
-	 * @param model
-	 * @return
+	 * IT MUST BE MODIFIED BEFORE IT IS INTEGREATED WITH THE BACK-END CODE.
+	 *
+	 * @param basicPatientAccountDto the basic patient account dto
+	 * @param request the request
+	 * @param model the model
+	 * @return the string
 	 */
 	@RequestMapping(value = "adminCreatePatientAccount.html", method = RequestMethod.POST)
-	public String adminHome(BasicPatientAccountDto basicPatientAccountDto, HttpServletRequest request, Model model) {
+	public String adminCreatePatientAccount(BasicPatientAccountDto basicPatientAccountDto, HttpServletRequest request, Model model) {
 		System.out.println("FUNCTION NOT YET CREATED TO PROCESS THIS FORM");
 		return "redirect:/Administrator/adminHome.html";
 	}
 	
 	
+	
+	/**
+	 * Gets the by first and last name.
+	 *
+	 * @param firstName the first name
+	 * @param lastName the last name
+	 * @return the by first and last name
+	 */
 	@RequestMapping("/patientlookup/query")
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody List<PatientAdminDto> getByFirstAndLastName(@RequestParam(value="firstname",required=false) String firstName,
-			@RequestParam(value="lastname",required=false) String lastName){
-		if (firstName==null)
-			firstName="";
-		if (lastName==null)
-			lastName="";
-		return patientService.findAllPatientByFirstNameAndLastName(firstName, lastName);
+	public @ResponseBody List<PatientAdminDto> getByFirstAndLastName(@RequestParam(value="token",required=true) String token){
+		String[] tokens=token.split("\\s*(=>|,|\\s)\\s*");
+		return patientService.findAllPatientByFirstNameAndLastName(tokens);
 	}
 	
 	//For prove of concept purpose
+	/**
+	 * Test read patient audit rev.
+	 *
+	 * @return the string
+	 */
 	@RequestMapping("/testjdbc/readPatientAuditRev")
 	public String testReadPatientAuditRev(){
 		jdbcAuditDao.readPatientAuditRev();
 		return "redirect:/Administrator/adminHome.html";
 	}
 	
-	private String buildRecentPatientsCookie(List<String> recentVisits, String id){
-		StringBuilder toBeAddedToCookie=new StringBuilder();
-		if (recentVisits==null){
-			toBeAddedToCookie.append(id);
-		}
-		else{
-			if (recentVisits.contains(id))
-				recentVisits.remove(id);
-			toBeAddedToCookie.append(id+",");
-			toBeAddedToCookie.append(recentVisits.get(0));
-			int listLength=recentVisits.size()>maximumNumberOfRecentPatient?maximumNumberOfRecentPatient:recentVisits.size();
-			for(int i=1;i<listLength-1;i++){
-				toBeAddedToCookie.append(","+recentVisits.get(i));
-			}
-		}
-		return toBeAddedToCookie.toString();
+	/**
+	 * Populate lookup codes.
+	 *
+	 * @param model the model
+	 */
+	private void populateLookupCodes(Model model) {
+
+		model.addAttribute("administrativeGenderCodes",
+				administrativeGenderCodeService
+						.findAllAdministrativeGenderCodes());
+		model.addAttribute("maritalStatusCodes",
+				maritalStatusCodeService.findAllMaritalStatusCodes());
+		model.addAttribute("religiousAffiliationCodes",
+				religiousAffiliationCodeService
+						.findAllReligiousAffiliationCodes());
+		model.addAttribute("raceCodes", raceCodeService.findAllRaceCodes());
+		model.addAttribute("languageCodes",
+				languageCodeService.findAllLanguageCodes());
+
+		model.addAttribute("stateCodes", stateCodeService.findAllStateCodes());
 	}
 
 }

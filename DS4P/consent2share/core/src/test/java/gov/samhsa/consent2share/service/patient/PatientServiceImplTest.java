@@ -22,7 +22,6 @@ import gov.samhsa.consent2share.domain.patient.PatientRepository;
 import gov.samhsa.consent2share.domain.provider.IndividualProvider;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
 import gov.samhsa.consent2share.infrastructure.DtoToDomainEntityMapper;
-import gov.samhsa.consent2share.infrastructure.EmailType;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
@@ -44,12 +43,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PatientServiceImplTest {
@@ -494,11 +490,11 @@ public class PatientServiceImplTest {
 		Patient patient2=mock(Patient.class);
 		patients.add(patient);
 		patients.add(patient2);
-		when(patientRepository.findAllByFirstNameContainsAndLastNameContains("john", "smith")).thenReturn(patients);
+		when(patientRepository.findAllByFirstNameLikesAndLastNameLikes("%john%", "%smith%")).thenReturn(patients);
 		PatientAdminDto patientAdminDto=mock(PatientAdminDto.class);
 		PatientAdminDto patientAdminDto2=mock(PatientAdminDto.class);
 		when(modelMapper.map(patient, PatientAdminDto.class)).thenReturn(patientAdminDto);
 		when(modelMapper.map(patient2, PatientAdminDto.class)).thenReturn(patientAdminDto2);
-		assertEquals(Arrays.asList(patientAdminDto,patientAdminDto2),sut.findAllPatientByFirstNameAndLastName("john", "smith"));
+		assertEquals(Arrays.asList(patientAdminDto,patientAdminDto2),sut.findAllPatientByFirstNameAndLastName(new String[] {"john", "smith"}));
 	}
 }

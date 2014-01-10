@@ -29,9 +29,7 @@
 			
 		<module>xdsb-common</module>
 		<module>xdsb-registry-client</module>
-		<module>xdsb-repository-client</module>	
-		
-		<module>secured-context-handler</module>			
+		<module>xdsb-repository-client</module>			
 				
 		<module>pep</module>
 	</modules>

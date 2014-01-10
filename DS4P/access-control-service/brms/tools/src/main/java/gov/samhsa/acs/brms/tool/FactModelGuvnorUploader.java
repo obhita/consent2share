@@ -25,7 +25,6 @@
  ******************************************************************************/
 package gov.samhsa.acs.brms.tool;
 
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,54 +37,110 @@ import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
 import com.googlecode.sardine.util.SardineException;
 
-
 /**
- * The Class FactModelGuvnorUploader uploads the fact model jar to given Guvnor factmodel URI.
+ * The Class FactModelGuvnorUploader uploads the fact model jar to given Guvnor
+ * factmodel URI.
  */
 public class FactModelGuvnorUploader {
-	
+
 	/** The Constant FACTMODEL_JAR_PATH. */
 	private final static String FACTMODEL_JAR_PATH = "../factmodel/target/brms-factmodel.jar";
-	
+
 	/** The Constant LOGGER. */
-	private static final Logger LOGGER = LoggerFactory.getLogger(FactModelGuvnorUploader.class);
-	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(FactModelGuvnorUploader.class);
+
 	/**
 	 * The main method.
-	 *
-	 * @param args need 3 the arguments (username, password and factmodel-put-url)
+	 * 
+	 * @param args
+	 *            need 3 the arguments (username, password and
+	 *            factmodel-put-url)
 	 */
-	public static void main(String[] args)
-	{		
-		if(args.length!=3)
-		{
-			LOGGER.error("ERROR: FactModelGuvnorUploader needs 3 arguments: username, password, factmodel-put-url");
+	public static void main(String[] args) {
+		if (!isValid(args)) {
 			System.exit(1);
 		}
-	
+
+		Sardine sardine = begin(args[0], args[1]);
+
+		byte[] data = getFileBytes(FACTMODEL_JAR_PATH);
+
+		put(sardine, args[2], data);
+	}
+
+	/**
+	 * Checks if is valid.
+	 * 
+	 * @param args
+	 *            the args
+	 * @return true, if is valid
+	 */
+	static boolean isValid(String[] args) {
+		if (args.length != 3) {
+			LOGGER.error("ERROR: FactModelGuvnorUploader needs 3 arguments: username, password, factmodel-put-url");
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Begin.
+	 * 
+	 * @param username
+	 *            the username
+	 * @param password
+	 *            the password
+	 * @return the sardine
+	 */
+	static Sardine begin(String username, String password) {
 		Sardine sardine = null;
 		try {
-			sardine = SardineFactory.begin(args[0], args[1]);
+			sardine = SardineFactory.begin(username, password);
 		} catch (SardineException e) {
 			LOGGER.error("ERROR: Connection couldn't be opened.");
-			LOGGER.error(e.getMessage(),e);			
+			LOGGER.error(e.getMessage(), e);
 		}
+		return sardine;
+	}
+
+	/**
+	 * Gets the file bytes.
+	 * 
+	 * @param filePath
+	 *            the file path
+	 * @return the file bytes
+	 */
+	static byte[] getFileBytes(String filePath) {
 		byte[] data = null;
 		try {
-			data = IOUtils.toByteArray(new FileInputStream(FACTMODEL_JAR_PATH));
+			data = IOUtils.toByteArray(new FileInputStream(filePath));
 		} catch (FileNotFoundException e) {
 			LOGGER.error("ERROR: File not found");
-			LOGGER.error(e.getMessage(),e);
+			LOGGER.error(e.getMessage(), e);
 		} catch (IOException e) {
 			LOGGER.error("ERROR: IOException");
-			LOGGER.error(e.getMessage(),e);
+			LOGGER.error(e.getMessage(), e);
 		}
+		return data;
+	}
+
+	/**
+	 * Put.
+	 * 
+	 * @param sardine
+	 *            the sardine
+	 * @param putUrl
+	 *            the put url
+	 * @param data
+	 *            the data
+	 */
+	static void put(Sardine sardine, String putUrl, byte[] data) {
 		try {
-			sardine.put(args[2], data);
+			sardine.put(putUrl, data);
 		} catch (SardineException e) {
 			LOGGER.error("ERROR: File couldn't be put.");
-			LOGGER.error(e.getMessage(),e);
+			LOGGER.error(e.getMessage(), e);
 		}
-	
 	}
 }

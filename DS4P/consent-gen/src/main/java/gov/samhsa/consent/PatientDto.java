@@ -46,7 +46,7 @@ public class PatientDto {
 
 	/** The first name. */
 	private String firstName;
-	
+
 	/** The last name. */
 	private String lastName;
 
@@ -56,29 +56,29 @@ public class PatientDto {
 
 	/** The address street address line. */
 	private String addressStreetAddressLine;
-	
+
 	/** The address city. */
 	private String addressCity;
-	
+
 	/** The address state code. */
 	private String addressStateCode;
 
 	/** The address postal code. */
 	@Pattern(regexp = "(^\\d{5}$|^\\d{5}-\\d{4})*")
 	private String addressPostalCode;
-	
+
 	/** The address country code. */
 	private String addressCountryCode;
 
 	/** The birth date. */
 	@Past
-	@DateTimeFormat(pattern = "MM/dd/yyyy")
-	@XmlJavaTypeAdapter(XMLDateAdapter.class)	
+	@DateTimeFormat(pattern = "yyyyMMdd")
+	@XmlJavaTypeAdapter(XMLIntegerDateAdapter.class)
 	private Date birthDate;
 
 	/**
 	 * Gets the address street address line.
-	 *
+	 * 
 	 * @return the address street address line
 	 */
 	public String getAddressStreetAddressLine() {
@@ -87,8 +87,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the address street address line.
-	 *
-	 * @param addressStreetAddressLine the new address street address line
+	 * 
+	 * @param addressStreetAddressLine
+	 *            the new address street address line
 	 */
 	public void setAddressStreetAddressLine(String addressStreetAddressLine) {
 		this.addressStreetAddressLine = addressStreetAddressLine;
@@ -96,7 +97,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the address city.
-	 *
+	 * 
 	 * @return the address city
 	 */
 	public String getAddressCity() {
@@ -105,8 +106,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the address city.
-	 *
-	 * @param addressCity the new address city
+	 * 
+	 * @param addressCity
+	 *            the new address city
 	 */
 	public void setAddressCity(String addressCity) {
 		this.addressCity = addressCity;
@@ -114,7 +116,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the address state code.
-	 *
+	 * 
 	 * @return the address state code
 	 */
 	public String getAddressStateCode() {
@@ -123,8 +125,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the address state code.
-	 *
-	 * @param addressStateCode the new address state code
+	 * 
+	 * @param addressStateCode
+	 *            the new address state code
 	 */
 	public void setAddressStateCode(String addressStateCode) {
 		this.addressStateCode = addressStateCode;
@@ -132,7 +135,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the address postal code.
-	 *
+	 * 
 	 * @return the address postal code
 	 */
 	public String getAddressPostalCode() {
@@ -141,8 +144,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the address postal code.
-	 *
-	 * @param addressPostalCode the new address postal code
+	 * 
+	 * @param addressPostalCode
+	 *            the new address postal code
 	 */
 	public void setAddressPostalCode(String addressPostalCode) {
 		this.addressPostalCode = addressPostalCode;
@@ -150,7 +154,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the address country code.
-	 *
+	 * 
 	 * @return the address country code
 	 */
 	public String getAddressCountryCode() {
@@ -159,8 +163,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the address country code.
-	 *
-	 * @param addressCountryCode the new address country code
+	 * 
+	 * @param addressCountryCode
+	 *            the new address country code
 	 */
 	public void setAddressCountryCode(String addressCountryCode) {
 		this.addressCountryCode = addressCountryCode;
@@ -184,13 +189,17 @@ public class PatientDto {
 	@Size(max = 30)
 	private String medicalRecordNumber;
 
+	/** The enterprise identifier. */
+	@Size(max = 255)
+	private String enterpriseIdentifier;
+
 	/** The patient id number. */
 	@Size(max = 30)
 	private String patientIdNumber;
 
 	/**
 	 * Gets the first name.
-	 *
+	 * 
 	 * @return the first name
 	 */
 	public String getFirstName() {
@@ -199,8 +208,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the first name.
-	 *
-	 * @param firstName the new first name
+	 * 
+	 * @param firstName
+	 *            the new first name
 	 */
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
@@ -208,7 +218,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the last name.
-	 *
+	 * 
 	 * @return the last name
 	 */
 	public String getLastName() {
@@ -217,8 +227,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the last name.
-	 *
-	 * @param lastName the new last name
+	 * 
+	 * @param lastName
+	 *            the new last name
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
@@ -226,7 +237,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the prefix.
-	 *
+	 * 
 	 * @return the prefix
 	 */
 	public String getPrefix() {
@@ -235,8 +246,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the prefix.
-	 *
-	 * @param prefix the new prefix
+	 * 
+	 * @param prefix
+	 *            the new prefix
 	 */
 	public void setPrefix(String prefix) {
 		this.prefix = prefix;
@@ -244,7 +256,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the birth date.
-	 *
+	 * 
 	 * @return the birth date
 	 */
 	public Date getBirthDate() {
@@ -253,8 +265,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the birth date.
-	 *
-	 * @param birthDate the new birth date
+	 * 
+	 * @param birthDate
+	 *            the new birth date
 	 */
 	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
@@ -262,7 +275,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the administrative gender code.
-	 *
+	 * 
 	 * @return the administrative gender code
 	 */
 	public String getAdministrativeGenderCode() {
@@ -271,8 +284,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the administrative gender code.
-	 *
-	 * @param administrativeGenderCode the new administrative gender code
+	 * 
+	 * @param administrativeGenderCode
+	 *            the new administrative gender code
 	 */
 	public void setAdministrativeGenderCode(String administrativeGenderCode) {
 		this.administrativeGenderCode = administrativeGenderCode;
@@ -280,7 +294,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the telephone type telephone.
-	 *
+	 * 
 	 * @return the telephone type telephone
 	 */
 	public String getTelephoneTypeTelephone() {
@@ -289,8 +303,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the telephone type telephone.
-	 *
-	 * @param telephoneTypeTelephone the new telephone type telephone
+	 * 
+	 * @param telephoneTypeTelephone
+	 *            the new telephone type telephone
 	 */
 	public void setTelephoneTypeTelephone(String telephoneTypeTelephone) {
 		this.telephoneTypeTelephone = telephoneTypeTelephone;
@@ -298,7 +313,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the email.
-	 *
+	 * 
 	 * @return the email
 	 */
 	public String getEmail() {
@@ -307,8 +322,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the email.
-	 *
-	 * @param email the new email
+	 * 
+	 * @param email
+	 *            the new email
 	 */
 	public void setEmail(String email) {
 		this.email = email;
@@ -316,7 +332,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the social security number.
-	 *
+	 * 
 	 * @return the social security number
 	 */
 	public String getSocialSecurityNumber() {
@@ -325,8 +341,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the social security number.
-	 *
-	 * @param socialSecurityNumber the new social security number
+	 * 
+	 * @param socialSecurityNumber
+	 *            the new social security number
 	 */
 	public void setSocialSecurityNumber(String socialSecurityNumber) {
 		this.socialSecurityNumber = socialSecurityNumber;
@@ -334,7 +351,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the medical record number.
-	 *
+	 * 
 	 * @return the medical record number
 	 */
 	public String getMedicalRecordNumber() {
@@ -343,8 +360,9 @@ public class PatientDto {
 
 	/**
 	 * Sets the medical record number.
-	 *
-	 * @param medicalRecordNumber the new medical record number
+	 * 
+	 * @param medicalRecordNumber
+	 *            the new medical record number
 	 */
 	public void setMedicalRecordNumber(String medicalRecordNumber) {
 		this.medicalRecordNumber = medicalRecordNumber;
@@ -352,7 +370,7 @@ public class PatientDto {
 
 	/**
 	 * Gets the patient id number.
-	 *
+	 * 
 	 * @return the patient id number
 	 */
 	public String getPatientIdNumber() {
@@ -361,11 +379,30 @@ public class PatientDto {
 
 	/**
 	 * Sets the patient id number.
-	 *
-	 * @param patientIdNumber the new patient id number
+	 * 
+	 * @param patientIdNumber
+	 *            the new patient id number
 	 */
 	public void setPatientIdNumber(String patientIdNumber) {
 		this.patientIdNumber = patientIdNumber;
 	}
 
+	/**
+	 * Gets the enterprise identifier.
+	 * 
+	 * @return the enterprise identifier
+	 */
+	public String getEnterpriseIdentifier() {
+		return enterpriseIdentifier;
+	}
+
+	/**
+	 * Sets the enterprise identifier.
+	 * 
+	 * @param enterpriseIdentifier
+	 *            the new enterprise identifier
+	 */
+	public void setEnterpriseIdentifier(String enterpriseIdentifier) {
+		this.enterpriseIdentifier = enterpriseIdentifier;
+	}
 }

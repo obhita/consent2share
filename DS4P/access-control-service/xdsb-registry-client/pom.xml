@@ -96,6 +96,28 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+					<instrumentation>
+						<excludes>
+							<exclude>gov/samhsa/ds4p/xdsbregistry/*.class</exclude>
+							<exclude>gov/samhsa/schema/ds4p/xdsbregistry/message/*.class</exclude>
+							<exclude>ihe/iti/xds_b/_2007/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/query/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/rim/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/rs/_3/*.class</exclude>
+							<exclude>org/hl7/v3/*.class</exclude>
+						</excludes>
+					</instrumentation>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+				</configuration>
+			</plugin>
 
 		</plugins>
 

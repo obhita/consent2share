@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.infrastructure;
 
+import gov.samhsa.consent2share.service.dto.AdminProfileDto;
 import gov.samhsa.consent2share.service.dto.LegalRepresentativeDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.SignupDto;
@@ -67,7 +68,7 @@ public class FieldValidator implements Validator {
 		try {
 			if (target instanceof SignupDto
 					|| target instanceof PatientProfileDto
-					|| target instanceof LegalRepresentativeDto
+					|| target instanceof LegalRepresentativeDto || target instanceof AdminProfileDto
 					) {
 
 				// First name
@@ -98,6 +99,9 @@ public class FieldValidator implements Validator {
 				}
 
 				// Date of Birth
+				if(target instanceof SignupDto
+						|| target instanceof PatientProfileDto
+						|| target instanceof LegalRepresentativeDto ){
 				Date birthDate = (Date) PropertyUtils.getProperty(target,
 						"birthDate");
 				if (birthDate == null) {
@@ -116,6 +120,7 @@ public class FieldValidator implements Validator {
 					errors.rejectValue("birthDate", "Pattern." + targetDtoName
 							+ ".birthDate");
 				}
+				}
 
 				// Email
 				String email = (String) PropertyUtils.getProperty(target,
@@ -129,6 +134,17 @@ public class FieldValidator implements Validator {
 								.matches("^[\\w-]+(\\.[\\w-]+)*@([a-z0-9-]+(\\.[a-z0-9-]+)*?\\.[a-z]{2,6}|(\\d{1,3}\\.){3}\\d{1,3})(:\\d{4})?$")) {
 					errors.rejectValue("email", "Pattern." + targetDtoName
 							+ ".email");
+				}
+				
+				if(target instanceof PatientProfileDto){
+					// medicalRecordNumber
+					String medicalRecordNumber = (String) PropertyUtils.getProperty(target,
+							"medicalRecordNumber");
+					if (StringUtils.hasText(medicalRecordNumber)
+							&& (medicalRecordNumber.length() < 0 || medicalRecordNumber.length() > 30)) {
+						errors.rejectValue("medicalRecordNumber", "Size." + targetDtoName
+								+ ".medicalRecordNumber");
+					}
 				}
 
 				if (target instanceof LegalRepresentativeDto) {

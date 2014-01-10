@@ -27,8 +27,11 @@ package gov.samhsa.acs.xdsb.repository.wsclient.adapter;
 
 import gov.samhsa.acs.common.namespace.PepNamespaceContext;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
+import gov.samhsa.acs.xdsb.common.XdsbErrorFactory;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
+
+import java.util.LinkedList;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -46,6 +49,9 @@ public class RetrieveDocumentSetResponseFilter {
 	/** The converter. */
 	private DocumentXmlConverter converter;
 
+	/** The xdsb error factory. */
+	private XdsbErrorFactory xdsbErrorFactory;
+
 	/**
 	 * Instantiates a new retrieve document set response filter.
 	 */
@@ -58,10 +64,14 @@ public class RetrieveDocumentSetResponseFilter {
 	 * 
 	 * @param converter
 	 *            the converter
+	 * @param xdsbErrorFactory
+	 *            the xdsb error factory
 	 */
-	public RetrieveDocumentSetResponseFilter(DocumentXmlConverter converter) {
+	public RetrieveDocumentSetResponseFilter(DocumentXmlConverter converter,
+			XdsbErrorFactory xdsbErrorFactory) {
 		super();
 		this.converter = converter;
+		this.xdsbErrorFactory = xdsbErrorFactory;
 	}
 
 	/**
@@ -80,6 +90,7 @@ public class RetrieveDocumentSetResponseFilter {
 	public RetrieveDocumentSetResponse filterByPatientAndAuthor(
 			RetrieveDocumentSetResponse response, String patientId,
 			String authorNPI) throws Throwable {
+		LinkedList<DocumentResponse> removeList = new LinkedList<DocumentResponse>();
 		for (DocumentResponse docResponse : response.getDocumentResponse()) {
 			String docString = new String(docResponse.getDocument());
 
@@ -95,8 +106,14 @@ public class RetrieveDocumentSetResponseFilter {
 
 			if (!patientId.equals(docPatientId)
 					|| !authorNPI.equals(docAuthorNPI)) {
-				response.getDocumentResponse().remove(docResponse);
+				removeList.add(docResponse);
 			}
+		}
+		if (removeList.size() > 0) {
+			response.getDocumentResponse().removeAll(removeList);
+			response = xdsbErrorFactory
+					.setRetrieveDocumentSetResponseRegistryErrorListFilteredByPatientAndAuthor(
+							response, removeList.size(), patientId, authorNPI);
 		}
 		return response;
 	}

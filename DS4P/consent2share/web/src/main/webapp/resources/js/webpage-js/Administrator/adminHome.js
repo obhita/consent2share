@@ -6,8 +6,7 @@ $(document).ready(function(){
 	$( "#searchTextBox" )
     .autocomplete({source: function( request, response ) {
         $.getJSON( "patientlookup/query", {
-          firstname: getFirstName(request.term),
-          lastname:getLastName(request.term)
+          token:request.term
         }, function (data) {
                response($.map(data, function (item) {
                    return {
@@ -31,20 +30,6 @@ $(document).ready(function(){
       }
     });
 	
-	function getFirstName(fullName){
-		if(fullName.indexOf(" ")>=0)
-			return fullName.substring(0,fullName.indexOf(" "));
-		else
-			return fullName;
-	}
-	
-	function getLastName(fullName){
-		if(fullName.indexOf(" ")>=0)
-			return fullName.substring(fullName.indexOf(" ")+1);
-		else
-			return "";
-	}
-	
 	//Bind hidden.bs.modal event handler to clear create patient account modal fields & error messages
 	$('#createPatient').on('hidden.bs.modal', function(){
 		clearCreatePatientAccountModal();
@@ -54,16 +39,12 @@ $(document).ready(function(){
 /*  Clear create patient account modal input field values & error messages. */
 function clearCreatePatientAccountModal(){
 	$('input#first_name').val("");
-	/* FIXME: Add code to clear error message value & set display:none
-	 * for first_name once the element for that field's error message
-	 * is created.
-	 */
+	$('#fname_client_error_text').text("");
+	$('#fname_client_error_text').attr('style', "display: none;");
 	
 	$('input#last_name').val("");
-	/* FIXME: Add code to clear error message value & set display:none
-	 * for last_name once the element for that field's error message
-	 * is created.
-	 */
+	$('#lname_client_error_text').text("");
+	$('#lname_client_error_text').attr('style', "display: none;");
 	
 	$('select#gender').val("");
 	$('#gender_client_error_text').text("");

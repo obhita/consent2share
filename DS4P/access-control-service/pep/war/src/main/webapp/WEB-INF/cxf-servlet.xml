@@ -36,15 +36,6 @@
 	</jaxws:endpoint>
 	
     <!--
-	<jaxws:endpoint id="securedfilterc32service"
-		implementor="#securedfilterC32ServiceImpl" wsdlLocation="classpath:wsdl/SecuredFilterC32Service.wsdl"
-		address="/securedfilterc32service">
-		<jaxws:properties>
-          <entry key="ws-security.signature.properties" value="crypto.properties"/>
-           <entry key="ws-security.callback-handler" value="gov.samhsa.acs.pep.ws.ServerPasswordCallback"/>
-        </jaxws:properties>
-	</jaxws:endpoint>		
-    
 	<jaxws:endpoint id="pushfilterc32service" implementor="#pushfilterC32ServiceImpl"
 		wsdlLocation="classpath:wsdl/PushFilterC32Service.wsdl" address="/pushfilterc32service">
 		<jaxws:properties>
@@ -57,29 +48,12 @@
 		wsdlLocation="classpath:wsdl/XDSDocumentService.wsdl" address="/xdsdocumentservice">
 	</jaxws:endpoint>
 
-	<!-- Old beans -->
-	<!--  WSS4JInInterceptor for decrypting and validating the signature of inbound SOAP -->
-    <!-- <bean id="inbound-security" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-        <constructor-arg>
-            <map>
-                <entry key="action" value="Timestamp Signature Encrypt"/>
-                <entry key="signaturePropFile" value="crypto.properties"/>
-                <entry key="decryptionPropFile" value="crypto.properties"/>
-                <entry key="passwordCallbackClass" value="gov.samhsa.acs.pep.ws.ServerPasswordCallback"/>
-            </map>
-        </constructor-arg>
-    </bean> -->
-
 	<bean id="XDSDocumentServiceImpl"
 		class="gov.samhsa.acs.pep.ws.XDSDocumentServiceImpl"
 		scope="prototype" autowire="byType" />
 
 	<bean id="filterC32ServiceImpl"
 		class="gov.samhsa.acs.pep.ws.FilterC32ServiceImpl"
-		scope="prototype" autowire="byType" />
-
-	<bean id="securedfilterC32ServiceImpl"
-		class="gov.samhsa.acs.pep.ws.SecuredFilterC32ServiceImpl"
 		scope="prototype" autowire="byType" />
 
 	<bean id="pushfilterC32ServiceImpl"
@@ -94,6 +68,7 @@
 		<constructor-arg ref="dataHandlerToBytesConverterImpl" />
 		<constructor-arg ref="xdsbRepositoryImpl" />
 		<constructor-arg ref="xdsbRegistryImpl" />
+		<constructor-arg ref="simpleMarshallerImpl"/>
 		<property name="subjectPurposeOfUse"
 			value="#{parameterConfigProperties.subjectPurposeOfUse}" />
 		<property name="subjectLocality" value="#{parameterConfigProperties.subjectLocality}" />
@@ -102,29 +77,6 @@
 		<property name="resourceName" value="#{parameterConfigProperties.resourceName}" />
 		<property name="resourceType" value="#{parameterConfigProperties.resourceType}" />
 		<property name="resourceAction" value="#{parameterConfigProperties.resourceAction}" />
-	</bean>
-
-	<bean id="securedPepImpl"
-		class="gov.samhsa.acs.pep.SecuredPepImpl"
-		scope="prototype">
-		<constructor-arg ref="c32GetterImpl" />
-		<constructor-arg ref="contextHandlerImpl" />
-		<constructor-arg ref="documentSegmentationImpl" />
-		<constructor-arg ref="dataHandlerToBytesConverterImpl" />
-		<constructor-arg ref="xdsbRepositoryImpl" />
-		<constructor-arg ref="xdsbRegistryImpl" />
-		<constructor-arg ref="auditServiceImpl"/>
-		<property name="subjectPurposeOfUse"
-			value="#{parameterConfigProperties.subjectPurposeOfUse}" />
-		<property name="subjectLocality" value="#{parameterConfigProperties.subjectLocality}" />
-		<property name="organization" value="#{parameterConfigProperties.organization}" />
-		<property name="organizationId" value="#{parameterConfigProperties.organizationId}" />
-		<property name="resourceName" value="#{parameterConfigProperties.resourceName}" />
-		<property name="resourceType" value="#{parameterConfigProperties.resourceType}" />
-		<property name="resourceAction" value="#{parameterConfigProperties.resourceAction}" />
-		<property name="homeCommunityId" value="#{parameterConfigProperties.homeCommunityId}" />
-		<property name="repositoryUniqueId" value="#{parameterConfigProperties.repositoryUniqueId}" />
-		<property name="subjectEmailAddress" value="#{parameterConfigProperties.subjectEmailAddress}" />
 	</bean>
 
 	<bean id="c32GetterImpl"
@@ -148,9 +100,13 @@
 		
 	<!-- XDS.b -->
 	<!-- XDS.b: common -->
+	<bean id="registryErrorListSetterPepImpl"
+		class="gov.samhsa.acs.pep.xdsb.RegistryErrorListSetterPepImpl"
+		scope="prototype">
+	</bean>	
 	<bean id="xdsbErrorFactory"
 		class="gov.samhsa.acs.xdsb.common.XdsbErrorFactory"
-		scope="prototype">
+		scope="prototype" autowire="constructor">
 	</bean>	
 	<!-- XDS.b: clients -->
 	<bean id="xdsbRegistryWebServiceClient"
@@ -260,16 +216,16 @@
 	<!-- DocumentSegmentation: tools -->
 	<bean id="documentEditorImpl"
 		class="gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl"
-		scope="prototype" autowire="byType"/>
+		scope="prototype" autowire="constructor"/>
 	<bean id="documentEncrypterImpl"
 		class="gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypterImpl"
-		scope="prototype" autowire="byType"/>
+		scope="prototype" autowire="constructor"/>
 	<bean id="documentMaskerImpl"
 		class="gov.samhsa.acs.documentsegmentation.tools.DocumentMaskerImpl"
-		scope="prototype" autowire="byType"/>
+		scope="prototype" autowire="constructor"/>
 	<bean id="documentRedactorImpl"
 		class="gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl"
-		scope="prototype" autowire="byType"/>
+		scope="prototype" autowire="constructor"/>
 	<bean id="documentTaggerImpl"
 		class="gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl"
 		scope="prototype"/>

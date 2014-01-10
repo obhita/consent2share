@@ -44,7 +44,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @XmlRootElement(name = "ConsentExport")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ConsentDto {
-	
+
 	/** The consent referenceid. */
 	@XmlElement(name = "id")
 	private String consentReferenceid;
@@ -74,23 +74,23 @@ public class ConsentDto {
 	private Set<OrganizationalProviderDto> organizationalProvidersDisclosureIsMadeTo;
 
 	/** The consent start. */
-	@DateTimeFormat(pattern = "MM/dd/yyyy")
-	@XmlJavaTypeAdapter(XMLDateAdapter.class)	
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+	@XmlJavaTypeAdapter(XMLDateAdapter.class)
 	private Date consentStart;
 
 	/** The consent end. */
-	@DateTimeFormat(pattern = "MM/dd/yyyy")
-	@XmlJavaTypeAdapter(XMLDateAdapter.class)	
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+	@XmlJavaTypeAdapter(XMLDateAdapter.class)
 	private Date consentEnd;
 
 	/** The signed date. */
-	@DateTimeFormat(pattern = "MM/dd/yyyy")
-	@XmlJavaTypeAdapter(XMLDateAdapter.class)	
- 	private Date signedDate;
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+	@XmlJavaTypeAdapter(XMLDateAdapter.class)
+	private Date signedDate;
 
 	/** The revocation date. */
-	@DateTimeFormat(pattern = "MM/dd/yyyy")
-	@XmlJavaTypeAdapter(XMLDateAdapter.class)	
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+	@XmlJavaTypeAdapter(XMLDateAdapter.class)
 	private Date revocationDate;
 
 	/** The version. */
@@ -120,7 +120,6 @@ public class ConsentDto {
 	@XmlElementWrapper(name = "doNotShareClinicalConceptCodesList")
 	private Set<TypeCodesDto> doNotShareClinicalConceptCodes;
 
-
 	public PatientDto getPatientDto() {
 		return patientDto;
 	}
@@ -131,7 +130,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the providers permitted to disclose.
-	 *
+	 * 
 	 * @return the providers permitted to disclose
 	 */
 	public Set<IndividualProviderDto> getProvidersPermittedToDisclose() {
@@ -140,8 +139,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the providers permitted to disclose.
-	 *
-	 * @param providersPermittedToDisclose the new providers permitted to disclose
+	 * 
+	 * @param providersPermittedToDisclose
+	 *            the new providers permitted to disclose
 	 */
 	public void setProvidersPermittedToDisclose(
 			Set<IndividualProviderDto> providersPermittedToDisclose) {
@@ -150,7 +150,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the providers disclosure is made to.
-	 *
+	 * 
 	 * @return the providers disclosure is made to
 	 */
 	public Set<IndividualProviderDto> getProvidersDisclosureIsMadeTo() {
@@ -159,8 +159,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the providers disclosure is made to.
-	 *
-	 * @param providersDisclosureIsMadeTo the new providers disclosure is made to
+	 * 
+	 * @param providersDisclosureIsMadeTo
+	 *            the new providers disclosure is made to
 	 */
 	public void setProvidersDisclosureIsMadeTo(
 			Set<IndividualProviderDto> providersDisclosureIsMadeTo) {
@@ -169,7 +170,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the organizational providers permitted to disclose.
-	 *
+	 * 
 	 * @return the organizational providers permitted to disclose
 	 */
 	public Set<OrganizationalProviderDto> getOrganizationalProvidersPermittedToDisclose() {
@@ -178,8 +179,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the organizational providers permitted to disclose.
-	 *
-	 * @param organizationalProvidersPermittedToDisclose the new organizational providers permitted to disclose
+	 * 
+	 * @param organizationalProvidersPermittedToDisclose
+	 *            the new organizational providers permitted to disclose
 	 */
 	public void setOrganizationalProvidersPermittedToDisclose(
 			Set<OrganizationalProviderDto> organizationalProvidersPermittedToDisclose) {
@@ -188,7 +190,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the organizational providers disclosure is made to.
-	 *
+	 * 
 	 * @return the organizational providers disclosure is made to
 	 */
 	public Set<OrganizationalProviderDto> getOrganizationalProvidersDisclosureIsMadeTo() {
@@ -197,8 +199,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the organizational providers disclosure is made to.
-	 *
-	 * @param organizationalProvidersDisclosureIsMadeTo the new organizational providers disclosure is made to
+	 * 
+	 * @param organizationalProvidersDisclosureIsMadeTo
+	 *            the new organizational providers disclosure is made to
 	 */
 	public void setOrganizationalProvidersDisclosureIsMadeTo(
 			Set<OrganizationalProviderDto> organizationalProvidersDisclosureIsMadeTo) {
@@ -207,7 +210,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the consent start.
-	 *
+	 * 
 	 * @return the consent start
 	 */
 	public Date getConsentStart() {
@@ -216,8 +219,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the consent start.
-	 *
-	 * @param consentStart the new consent start
+	 * 
+	 * @param consentStart
+	 *            the new consent start
 	 */
 	public void setConsentStart(Date consentStart) {
 		this.consentStart = consentStart;
@@ -225,7 +229,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the consent end.
-	 *
+	 * 
 	 * @return the consent end
 	 */
 	public Date getConsentEnd() {
@@ -234,8 +238,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the consent end.
-	 *
-	 * @param consentEnd the new consent end
+	 * 
+	 * @param consentEnd
+	 *            the new consent end
 	 */
 	public void setConsentEnd(Date consentEnd) {
 		this.consentEnd = consentEnd;
@@ -243,7 +248,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the do not share clinical document type codes.
-	 *
+	 * 
 	 * @return the do not share clinical document type codes
 	 */
 	public Set<TypeCodesDto> getDoNotShareClinicalDocumentTypeCodes() {
@@ -252,8 +257,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the do not share clinical document type codes.
-	 *
-	 * @param doNotShareClinicalDocumentTypeCodes the new do not share clinical document type codes
+	 * 
+	 * @param doNotShareClinicalDocumentTypeCodes
+	 *            the new do not share clinical document type codes
 	 */
 	public void setDoNotShareClinicalDocumentTypeCodes(
 			Set<TypeCodesDto> doNotShareClinicalDocumentTypeCodes) {
@@ -262,7 +268,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the do not share clinical document section type codes.
-	 *
+	 * 
 	 * @return the do not share clinical document section type codes
 	 */
 	public Set<TypeCodesDto> getDoNotShareClinicalDocumentSectionTypeCodes() {
@@ -271,8 +277,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the do not share clinical document section type codes.
-	 *
-	 * @param doNotShareClinicalDocumentSectionTypeCodes the new do not share clinical document section type codes
+	 * 
+	 * @param doNotShareClinicalDocumentSectionTypeCodes
+	 *            the new do not share clinical document section type codes
 	 */
 	public void setDoNotShareClinicalDocumentSectionTypeCodes(
 			Set<TypeCodesDto> doNotShareClinicalDocumentSectionTypeCodes) {
@@ -281,7 +288,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the do not share sensitivity policy codes.
-	 *
+	 * 
 	 * @return the do not share sensitivity policy codes
 	 */
 	public Set<TypeCodesDto> getDoNotShareSensitivityPolicyCodes() {
@@ -290,8 +297,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the do not share sensitivity policy codes.
-	 *
-	 * @param doNotShareSensitivityPolicyCodes the new do not share sensitivity policy codes
+	 * 
+	 * @param doNotShareSensitivityPolicyCodes
+	 *            the new do not share sensitivity policy codes
 	 */
 	public void setDoNotShareSensitivityPolicyCodes(
 			Set<TypeCodesDto> doNotShareSensitivityPolicyCodes) {
@@ -300,7 +308,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the do not share for purpose of use codes.
-	 *
+	 * 
 	 * @return the do not share for purpose of use codes
 	 */
 	public Set<TypeCodesDto> getShareForPurposeOfUseCodes() {
@@ -309,8 +317,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the do not share for purpose of use codes.
-	 *
-	 * @param doNotShareForPurposeOfUseCodes the new do not share for purpose of use codes
+	 * 
+	 * @param doNotShareForPurposeOfUseCodes
+	 *            the new do not share for purpose of use codes
 	 */
 	public void setShareForPurposeOfUseCodes(
 			Set<TypeCodesDto> shareForPurposeOfUseCodes) {
@@ -319,7 +328,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the signed date.
-	 *
+	 * 
 	 * @return the signed date
 	 */
 	public Date getSignedDate() {
@@ -328,8 +337,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the signed date.
-	 *
-	 * @param signedDate the new signed date
+	 * 
+	 * @param signedDate
+	 *            the new signed date
 	 */
 	public void setSignedDate(Date signedDate) {
 		this.signedDate = signedDate;
@@ -337,7 +347,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the revocation date.
-	 *
+	 * 
 	 * @return the revocation date
 	 */
 	public Date getRevocationDate() {
@@ -346,8 +356,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the revocation date.
-	 *
-	 * @param revocationDate the new revocation date
+	 * 
+	 * @param revocationDate
+	 *            the new revocation date
 	 */
 	public void setRevocationDate(Date revocationDate) {
 		this.revocationDate = revocationDate;
@@ -355,7 +366,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the version.
-	 *
+	 * 
 	 * @return the version
 	 */
 	public Integer getVersion() {
@@ -364,8 +375,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the version.
-	 *
-	 * @param version the new version
+	 * 
+	 * @param version
+	 *            the new version
 	 */
 	public void setVersion(Integer version) {
 		this.version = version;
@@ -373,7 +385,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the legal representative.
-	 *
+	 * 
 	 * @return the legal representative
 	 */
 	public PatientDto getLegalRepresentative() {
@@ -382,8 +394,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the legal representative.
-	 *
-	 * @param legalRepresentative the new legal representative
+	 * 
+	 * @param legalRepresentative
+	 *            the new legal representative
 	 */
 	public void setLegalRepresentative(PatientDto legalRepresentative) {
 		this.legalRepresentative = legalRepresentative;
@@ -391,7 +404,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the do not share clinical concept codes.
-	 *
+	 * 
 	 * @return the do not share clinical concept codes
 	 */
 	public Set<TypeCodesDto> getDoNotShareClinicalConceptCodes() {
@@ -400,8 +413,9 @@ public class ConsentDto {
 
 	/**
 	 * Sets the do not share clinical concept codes.
-	 *
-	 * @param doNotShareClinicalConceptCodes the new do not share clinical concept codes
+	 * 
+	 * @param doNotShareClinicalConceptCodes
+	 *            the new do not share clinical concept codes
 	 */
 	public void setDoNotShareClinicalConceptCodes(
 			Set<TypeCodesDto> doNotShareClinicalConceptCodes) {
@@ -410,7 +424,7 @@ public class ConsentDto {
 
 	/**
 	 * Gets the consent referenceid.
-	 *
+	 * 
 	 * @return the consent referenceid
 	 */
 	public String getConsentReferenceid() {
@@ -419,14 +433,11 @@ public class ConsentDto {
 
 	/**
 	 * Sets the consent referenceid.
-	 *
-	 * @param consentReferenceid the new consent referenceid
+	 * 
+	 * @param consentReferenceid
+	 *            the new consent referenceid
 	 */
 	public void setConsentReferenceid(String consentReferenceid) {
 		this.consentReferenceid = consentReferenceid;
 	}
-	
-	
-
-
 }

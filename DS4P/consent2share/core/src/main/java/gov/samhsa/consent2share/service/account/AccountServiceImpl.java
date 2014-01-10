@@ -35,7 +35,6 @@ import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
 import gov.samhsa.consent2share.domain.reference.AdministrativeGenderCodeRepository;
-import gov.samhsa.consent2share.hl7.Hl7v3TransformerException;
 import gov.samhsa.consent2share.infrastructure.EmailType;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
@@ -94,9 +93,6 @@ public class AccountServiceImpl implements AccountService {
 	
 	/** The users repository. */
 	private UsersRepository usersRepository;
-	
-	//@Autowired
-	private PixQueryService pixQueryService;
 
 	/**
 	 * Instantiates a new account service impl.
@@ -135,7 +131,7 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	@Transactional
-	public void signup(SignupDto signupDto, String linkUrl) throws MessagingException, UsernameNotExistException, EmailAddressNotExistException, Hl7v3TransformerException {
+	public void signup(SignupDto signupDto, String linkUrl) throws MessagingException, UsernameNotExistException, EmailAddressNotExistException {
 
 		if (!StringUtils.hasText(linkUrl)) {
 			throw new IllegalArgumentException("Email link is required.");
@@ -155,12 +151,6 @@ public class AccountServiceImpl implements AccountService {
 					.findByCode(signupDto.getGenderCode()));
 		}
 
-		String mrn = signupDto.getMedicalRecordNumber();
-		/*if(null != mrn && mrn.length() > 0){
-			patient.setMedicalRecordNumber(signupDto.getMedicalRecordNumber());
-			
-			patient.setEnterpriseIdentifier(pixQueryService.getEid(signupDto.getMedicalRecordNumber()));
-		}*/
 		patientRepository.save(patient);
 
 		Set<GrantedAuthority> authorities = UsersAuthorityUtils.createAuthoritySet("ROLE_USER");

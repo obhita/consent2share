@@ -56,9 +56,8 @@ public class DocumentRedactorImplTest {
 		// Arrange
 		fileReader = new FileReaderImpl();
 
-		documentEditor = new DocumentEditorImpl();
-		documentEditor.setFileReader(fileReader);
-		documentEditor.setMetadataGenerator(new MetadataGeneratorImpl());
+		documentEditor = new DocumentEditorImpl(new MetadataGeneratorImpl(),
+				fileReader, new DocumentXmlConverterImpl());
 
 		ruleExecutionContainer = setRuleExecutionContainer();
 		xacmlResultMock = setMockXacmlResult();
@@ -67,10 +66,8 @@ public class DocumentRedactorImplTest {
 		documentXmlConverterSpy = setSpyDocumentXmlConverter();
 		documentEditorMock = setMockDocumentEditor();
 
-		documentRedactor = new DocumentRedactorImpl();
-
-		documentRedactor.setDocumentEditor(documentEditorMock);
-		documentRedactor.setDocumentXmlConverter(documentXmlConverterSpy);
+		documentRedactor = new DocumentRedactorImpl(documentEditorMock,
+				documentXmlConverterSpy);
 	}
 
 	@Test

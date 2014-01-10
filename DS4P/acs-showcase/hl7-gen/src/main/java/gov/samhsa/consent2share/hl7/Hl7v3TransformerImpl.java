@@ -105,6 +105,7 @@ public class Hl7v3TransformerImpl implements Hl7v3Transformer {
 
 		try {
 			String extension = "@extension";
+			String root = "@root";
 			String queryXML = xsltUri;
 			if (null != xsltUri && !xsltUri.startsWith("<?xml")) {
 				// read the xsl file from resources folder
@@ -114,6 +115,7 @@ public class Hl7v3TransformerImpl implements Hl7v3Transformer {
 			}
 
 			newxsltUri = queryXML.replaceAll(extension, mrn);
+			newxsltUri = newxsltUri.replaceAll(root, mrnDomain);
 		} catch (Exception e) {
 
 			String errorMessage = "Error happended when trying to mrn data to hl7v3PixQuery";

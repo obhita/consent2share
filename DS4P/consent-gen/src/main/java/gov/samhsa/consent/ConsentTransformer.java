@@ -25,11 +25,24 @@
  ******************************************************************************/
 package gov.samhsa.consent;
 
-
-
-
+/**
+ * The Interface ConsentTransformer.
+ */
 public interface ConsentTransformer {
-	
-	public String transform(ConsentDto dto, String xslFileName) throws ConsentGenException;
-	
+
+	/**
+	 * Transform.
+	 * 
+	 * @param dto
+	 *            the dto
+	 * @param xslFileName
+	 *            the xsl file name
+	 * @param enterpriseIdentifier
+	 *            the enterprise identifier
+	 * @return the string
+	 * @throws ConsentGenException
+	 *             the consent gen exception
+	 */
+	public String transform(ConsentDto dto, String xslFileName,
+			String enterpriseIdentifier) throws ConsentGenException;
 }

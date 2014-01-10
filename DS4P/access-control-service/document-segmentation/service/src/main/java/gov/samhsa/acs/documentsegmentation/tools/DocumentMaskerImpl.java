@@ -58,6 +58,23 @@ public class DocumentMaskerImpl implements DocumentMasker {
 	/** The document xml converter. */
 	private DocumentXmlConverter documentXmlConverter;
 
+	/**
+	 * Instantiates a new document masker impl.
+	 */
+	public DocumentMaskerImpl() {
+	}
+
+	/**
+	 * Instantiates a new document masker impl.
+	 * 
+	 * @param documentXmlConverter
+	 *            the document xml converter
+	 */
+	public DocumentMaskerImpl(DocumentXmlConverter documentXmlConverter) {
+		super();
+		this.documentXmlConverter = documentXmlConverter;
+	}
+
 	// commented out for redact-only application
 	//
 	// /** The pdp obligation prefix for mask. */
@@ -67,8 +84,7 @@ public class DocumentMaskerImpl implements DocumentMasker {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.documentsegmentation.tools
+	 * @see gov.samhsa.acs.documentsegmentation.tools
 	 * .DocumentMasker#maskDocument(java.lang.String, java.security.Key,
 	 * gov.samhsa.acs.common.bean.RuleExecutionContainer,
 	 * gov.samhsa.acs.common.bean.XacmlResult)
@@ -142,26 +158,6 @@ public class DocumentMaskerImpl implements DocumentMasker {
 			throw new DS4PException(e.toString(), e);
 		}
 		return xmlString;
-	}
-
-	/**
-	 * Gets the document xml converter.
-	 * 
-	 * @return the document xml converter
-	 */
-	public DocumentXmlConverter getDocumentXmlConverter() {
-		return documentXmlConverter;
-	}
-
-	/**
-	 * Sets the document xml converter.
-	 * 
-	 * @param documentXmlConverter
-	 *            the new document xml converter
-	 */
-	public void setDocumentXmlConverter(
-			DocumentXmlConverter documentXmlConverter) {
-		this.documentXmlConverter = documentXmlConverter;
 	}
 
 	// commented out for redact-only application

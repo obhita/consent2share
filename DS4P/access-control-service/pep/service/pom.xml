@@ -49,13 +49,6 @@
 			<artifactId>document-segmentation-service</artifactId>
 		</dependency>
 
-		<!-- TODO: Remove secured-context-handler all together -->
-		<dependency>
-			<groupId>gov.samhsa.consent2share</groupId>
-			<artifactId>secured-context-handler</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -139,11 +132,6 @@
 										${wsdl-folder}/PushFilterC32Service.wsdl
 									</wsdl>
 								</wsdlOption>
-								<wsdlOption>
-									<wsdl>
-										${wsdl-folder}/SecuredFilterC32Service.wsdl
-									</wsdl>
-								</wsdlOption>
 							</wsdlOptions>
 						</configuration>
 						<goals>
@@ -151,6 +139,44 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+					<instrumentation>
+						<excludes>
+							<exclude>org/hl7/v3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/lcm/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/query/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/rim/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/rs/_3/*.class</exclude>
+							<exclude>ihe/iti/xds_b/_2007/*.class</exclude>
+							<exclude>gov/va/ehtac/ds4p/ws/*.class</exclude>
+							<exclude>gov/samhsa/schema/ds4p/xdsbregistry/message/*.class</exclude>
+							<exclude>gov/samhsa/ds4ppilot/schema/pushpep/*.class</exclude>
+							<exclude>gov/samhsa/ds4ppilot/schema/pep/*.class</exclude>
+							<exclude>gov/samhsa/ds4ppilot/contract/**/*.class</exclude>
+							
+<!-- 							The following class are excluded because they're not used and may be removed in the future. -->
+							<exclude>gov/samhsa/acs/pep/PepImpl.class</exclude>
+							<exclude>gov/samhsa/acs/pep/c32getter/C32GetterImpl.class</exclude>
+							<exclude>gov/samhsa/acs/pep/c32getter/DataHandlerToBytesConverterImpl.class</exclude>
+							<exclude>gov/samhsa/acs/pep/ws/PushFilterC32ServiceImpl.class</exclude>
+							<exclude>gov/samhsa/acs/pep/ws/XDSDocumentServiceImpl.class</exclude>
+							<exclude>gov/samhsa/acs/pep/xdsbregistry/*.class</exclude>
+							<exclude>gov/samhsa/acs/pep/xdsbrepository/*.class</exclude>
+							<exclude>gov/samhsa/acs/pep/audit/*.class</exclude>
+							
+							
+						</excludes>
+					</instrumentation>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+				</configuration>
 			</plugin>
 
 		</plugins>

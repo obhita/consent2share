@@ -30,7 +30,6 @@ import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 
-import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -43,7 +42,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * The Class HomeController.

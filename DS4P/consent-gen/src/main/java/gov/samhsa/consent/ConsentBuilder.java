@@ -25,10 +25,30 @@
  ******************************************************************************/
 package gov.samhsa.consent;
 
+/**
+ * The Interface ConsentBuilder.
+ */
 public interface ConsentBuilder {
-	
-	public String buildConsent2Cdar2(long consentId) throws ConsentGenException;
-	
-	public String buildConsent2Xacml(Object obj) throws ConsentGenException;
 
+	/**
+	 * Builds the consent2 cdar2.
+	 * 
+	 * @param consentId
+	 *            the consent id
+	 * @return the string
+	 * @throws ConsentGenException
+	 *             the consent gen exception
+	 */
+	public String buildConsent2Cdar2(long consentId) throws ConsentGenException;
+
+	/**
+	 * Builds the consent2 xacml.
+	 * 
+	 * @param obj
+	 *            the obj
+	 * @return the string
+	 * @throws ConsentGenException
+	 *             the consent gen exception
+	 */
+	public String buildConsent2Xacml(Object obj) throws ConsentGenException;
 }

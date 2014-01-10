@@ -1,5 +1,7 @@
 //Code to execute on document.ready event for index.html page
 $(document).ready(function() {
+			$("body").removeClass('fouc_loading');
+			
 			$("#loginForm").validate({
 				onfocusout: false,
 			    onkeyup: false,

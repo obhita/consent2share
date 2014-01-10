@@ -25,6 +25,16 @@
 	<bean id="simpleMarshallerImpl" class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl"
 		scope="prototype" />
 
+	<!-- XDS.b: common -->	
+	<bean id="registryErrorListSetterImpl"
+		class="gov.samhsa.acs.xdsb.common.RegistryErrorListSetterImpl"
+		scope="prototype">
+	</bean>
+	<bean id="xdsbErrorFactory"
+		class="gov.samhsa.acs.xdsb.common.XdsbErrorFactory"
+		scope="prototype" autowire="constructor">
+	</bean>
+
 	<!-- XDS.b: adapters -->
 	<bean id="retrieveDocumentSetResponseFilter"
 		class="gov.samhsa.acs.xdsb.repository.wsclient.adapter.RetrieveDocumentSetResponseFilter"

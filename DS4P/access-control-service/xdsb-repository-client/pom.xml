@@ -98,6 +98,28 @@
 				</executions>
 			</plugin>
 			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+					<instrumentation>
+						<excludes>
+							<exclude>org/hl7/v3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/lcm/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/query/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/rim/_3/*.class</exclude>
+							<exclude>oasis/names/tc/ebxml_regrep/xsd/rs/_3/*.class</exclude>
+							<exclude>ihe/iti/xds_b/_2007/*.class</exclude>
+							<exclude>org/tempuri/*.class</exclude>
+						</excludes>
+					</instrumentation>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+				</configuration>
+			</plugin>
+			
 		</plugins>
 		
 	</build>

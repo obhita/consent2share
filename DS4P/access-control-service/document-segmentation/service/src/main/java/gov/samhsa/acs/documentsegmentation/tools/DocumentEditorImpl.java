@@ -62,11 +62,34 @@ public class DocumentEditorImpl implements DocumentEditor {
 	/** The document xml converter. */
 	private DocumentXmlConverter documentXmlConverter;
 
+	/**
+	 * Instantiates a new document editor impl.
+	 */
+	public DocumentEditorImpl() {
+	}
+
+	/**
+	 * Instantiates a new document editor impl.
+	 * 
+	 * @param metadataGenerator
+	 *            the metadata generator
+	 * @param fileReader
+	 *            the file reader
+	 * @param documentXmlConverter
+	 *            the document xml converter
+	 */
+	public DocumentEditorImpl(MetadataGenerator metadataGenerator,
+			FileReader fileReader, DocumentXmlConverter documentXmlConverter) {
+		super();
+		this.metadataGenerator = metadataGenerator;
+		this.fileReader = fileReader;
+		this.documentXmlConverter = documentXmlConverter;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.documentsegmentation.util
+	 * @see gov.samhsa.acs.documentsegmentation.util
 	 * .DocumentEditor#setDocumentCreationDate(java.lang.String)
 	 */
 	@Override
@@ -90,8 +113,7 @@ public class DocumentEditorImpl implements DocumentEditor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.documentsegmentation.util
+	 * @see gov.samhsa.acs.documentsegmentation.util
 	 * .DocumentEditor#getElement(org.w3c.dom.Document, java.lang.String)
 	 */
 	@Override
@@ -113,12 +135,10 @@ public class DocumentEditorImpl implements DocumentEditor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.documentsegmentation.util
+	 * @see gov.samhsa.acs.documentsegmentation.util
 	 * .DocumentEditor#setDocumentPayloadRawData(java.lang.Object,
 	 * java.lang.String, boolean, java.lang.String, java.lang.String,
-	 * gov.samhsa.acs.common.bean.XacmlResult, java.lang.String, byte[],
-	 * byte[])
+	 * gov.samhsa.acs.common.bean.XacmlResult, java.lang.String, byte[], byte[])
 	 */
 	@Override
 	public ByteArrayDataSource setDocumentPayloadRawData(String document,
@@ -148,63 +168,5 @@ public class DocumentEditorImpl implements DocumentEditor {
 
 		rawData = new ByteArrayDataSource(documentPayload);
 		return rawData;
-	}
-
-	/**
-	 * Gets the metadata generator.
-	 * 
-	 * @return the metadata generator
-	 */
-	public MetadataGenerator getMetadataGenerator() {
-		return metadataGenerator;
-	}
-
-	/**
-	 * Sets the metadata generator.
-	 * 
-	 * @param metadataGenerator
-	 *            the new metadata generator
-	 */
-	public void setMetadataGenerator(MetadataGenerator metadataGenerator) {
-		this.metadataGenerator = metadataGenerator;
-	}
-
-	/**
-	 * Gets the file reader.
-	 * 
-	 * @return the file reader
-	 */
-	public FileReader getFileReader() {
-		return fileReader;
-	}
-
-	/**
-	 * Sets the file reader.
-	 * 
-	 * @param fileReader
-	 *            the new file reader
-	 */
-	public void setFileReader(FileReader fileReader) {
-		this.fileReader = fileReader;
-	}
-
-	/**
-	 * Gets the document xml converter.
-	 * 
-	 * @return the document xml converter
-	 */
-	public DocumentXmlConverter getDocumentXmlConverter() {
-		return documentXmlConverter;
-	}
-
-	/**
-	 * Sets the document xml converter.
-	 * 
-	 * @param documentXmlConverter
-	 *            the new document xml converter
-	 */
-	public void setDocumentXmlConverter(
-			DocumentXmlConverter documentXmlConverter) {
-		this.documentXmlConverter = documentXmlConverter;
 	}
 }

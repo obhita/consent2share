@@ -29,6 +29,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -45,5 +47,9 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
 	 */
 	public abstract Patient findByUsername(String username); 
 	
-	public abstract List<Patient> findAllByFirstNameContainsAndLastNameContains(String firstName,String lastName);
+	@Query("select p from Patient p where p.firstName like ?1 or p.lastName like ?1")
+	public abstract List<Patient> findAllByFirstNameLikesAndLastNameLikes(String token1);
+	
+	@Query("select p from Patient p where (p.firstName like ?1 or p.firstName like ?2) and (p.lastName like ?1 or p.lastName like ?2)")
+	public abstract List<Patient> findAllByFirstNameLikesAndLastNameLikes(String token1,String token2);
 }

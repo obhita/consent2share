@@ -902,7 +902,7 @@ function initAddConsent(addConsent, specMedSet) {
 				}
 				
 				function uncheckAllSharePreferences(callback){
-					$(".checkedCheckbox1 input").iCheck('uncheck');
+					$("input.checkBoxClass1").iCheck('uncheck');
 					if(typeof callback === 'function')
 						callback();
 				}
@@ -932,7 +932,7 @@ function initAddConsent(addConsent, specMedSet) {
 				}
 				
 				function uncheckAllMedicalInfo(callback){
-					$(".checkedCheckbox1 input").iCheck('uncheck');
+					$("input.checkBoxClass1").iCheck('uncheck');
 					if(typeof callback === 'function')
 						callback();
 				}
@@ -942,9 +942,7 @@ function initAddConsent(addConsent, specMedSet) {
 					for(var key in lastInfoState){
 						if (lastInfoState.hasOwnProperty(key)) {
 						    if (lastInfoState[key]==true){
-						    	var description=$("#"+key).parent().text();
-						    	if (description=="")
-						    		description=$("#"+key).parent().parent().text();
+						    	var description=$('label[for="' + key + '"]').text();
 						    	var toAppendMain='<div id="TagMain'+ 
 								key+ 
 								'" class="badge">'+
@@ -975,9 +973,7 @@ function initAddConsent(addConsent, specMedSet) {
 					for(var key in lastPurposeState){
 						if (lastPurposeState.hasOwnProperty(key)) {
 						    if (lastPurposeState[key]==true){
-						    	var description=$("#"+key).parent().text();
-						    	if (description=="")
-						    		description=$("#"+key).parent().parent().text();
+						    	var description=$('label[for="' + key + '"]').text();
 						    	var toAppendMain='<div id="TagMain'+ 
 								key+ 
 								'" class="badge">'+

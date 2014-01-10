@@ -152,6 +152,7 @@
 		<spring-webflow.version>2.3.0.RELEASE</spring-webflow.version>
 		<spring-security.version>3.2.0.RC2</spring-security.version>
 		<spring-data.version>1.2.0.RELEASE</spring-data.version>
+		<spring.integration.version>2.2.4.RELEASE</spring.integration.version>
 
 		<thymeleaf.version>2.1.0.RELEASE</thymeleaf.version>
 		<thymeleafspringsecurity3.version>2.0.0</thymeleafspringsecurity3.version>
@@ -203,7 +204,7 @@
 
 		<!-- Access Control Service -->
 		<axiom-api.version>1.2.5</axiom-api.version>
-		<xmlsec.version>1.5.2</xmlsec.version>
+		<xmlsec.version>1.5.6</xmlsec.version>
 		<xml-security-impl.version>1.0</xml-security-impl.version>
 		<drools.version>5.4.0.Final</drools.version>
 		<jaxb-api.version>2.2</jaxb-api.version>
@@ -222,6 +223,7 @@
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 
 		<xws-security.version>3.0</xws-security.version>
+		<xmlschema-core.version>2.0.3</xmlschema-core.version>
 
 	</properties>
 
@@ -304,7 +306,11 @@
 				<version>${logback.version}</version>
 				<scope>runtime</scope>
 			</dependency>
-
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
 			<!-- consent2Share Project Dependencies Start -->
 			<!-- Test -->
 			<dependency>
@@ -431,6 +437,43 @@
 				<version>${spring-security.version}</version>
 			</dependency>
 
+			<!-- Spring Integration -->
+			<dependency>
+				<groupId>org.springframework.integration</groupId>
+				<artifactId>spring-integration-core</artifactId>
+				<version>${spring.integration.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.integration</groupId>
+				<artifactId>spring-integration-amqp</artifactId>
+				<version>${spring.integration.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.integration</groupId>
+				<artifactId>spring-integration-file</artifactId>
+				<version>${spring.integration.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.integration</groupId>
+				<artifactId>spring-integration-stream</artifactId>
+				<version>${spring.integration.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.integration</groupId>
+				<artifactId>spring-integration-jdbc</artifactId>
+				<version>${spring.integration.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.integration</groupId>
+				<artifactId>spring-integration-ws</artifactId>
+				<version>${spring.integration.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.integration</groupId>
+				<artifactId>spring-integration-http</artifactId>
+				<version>${spring.integration.version}</version>
+			</dependency>
+
 			<!-- Persistence -->
 			<dependency>
 				<groupId>mysql</groupId>
@@ -518,6 +561,13 @@
 				<groupId>org.springframework.amqp</groupId>
 				<artifactId>spring-amqp</artifactId>
 				<version>${spring-amqp.version}</version>
+			</dependency>
+
+			<!-- xmlschema-core -->
+			<dependency>
+				<groupId>org.apache.ws.xmlschema</groupId>
+				<artifactId>xmlschema-core</artifactId>
+				<version>${xmlschema-core.version}</version>
 			</dependency>
 
 			<!-- TODO: Go over the following dependencies -->
@@ -785,11 +835,6 @@
 			<dependency>
 				<groupId>gov.samhsa.consent2share.accesscontrolservice.contexthandler</groupId>
 				<artifactId>context-handler-service</artifactId>
-				<version>${acs-components.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>secured-context-handler-jar-with-dependencies</groupId>
-				<artifactId>secured-context-handler-jar-with-dependencies</artifactId>
 				<version>${acs-components.version}</version>
 			</dependency>
 			<dependency>
@@ -1439,6 +1484,12 @@
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.owasp</groupId>
+					<artifactId>dependency-check-maven</artifactId>
+					<version>1.0.7</version>
 				</plugin>
 
 			</plugins>

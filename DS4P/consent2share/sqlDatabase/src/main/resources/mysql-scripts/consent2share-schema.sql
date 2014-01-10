@@ -655,10 +655,10 @@ create unique index ix_auth_username on authorities
         street_address_line varchar(255),
         birth_day datetime,
         email varchar(255),
+        enterprise_identifier varchar(255),
         first_name varchar(30) not null,
         last_name varchar(30) not null,
         medical_record_number varchar(30),
-        enterprise_identifier varchar(255)  NULL,
         prefix varchar(30),
         social_security_number varchar(255),
         telephone varchar(255),
@@ -687,10 +687,10 @@ create unique index ix_auth_username on authorities
         street_address_line varchar(255),
         birth_day datetime,
         email varchar(255),
+        enterprise_identifier varchar(255),
         first_name varchar(30),
         last_name varchar(30),
         medical_record_number varchar(30),
-        enterprise_identifier varchar(255),
         prefix varchar(30),
         social_security_number varchar(255),
         telephone varchar(255),
@@ -837,6 +837,33 @@ create unique index ix_auth_username on authorities
         original_text varchar(250),
         version integer,
         primary key (id)
+    ) ENGINE=InnoDB
+;
+
+    create table provider_admin (
+        id bigint not null auto_increment,
+        email varchar(255),
+        employeeid varchar(255),
+        first_name varchar(30) not null,
+        last_name varchar(30) not null,
+        username varchar(30),
+        version integer,
+        administrative_gender_code bigint,
+        primary key (id)
+    ) ENGINE=InnoDB
+;
+
+    create table provider_admin_aud (
+        id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        email varchar(255),
+        employeeid varchar(255),
+        first_name varchar(30),
+        last_name varchar(30),
+        username varchar(30),
+        administrative_gender_code bigint,
+        primary key (id, rev)
     ) ENGINE=InnoDB
 ;
 
@@ -1577,6 +1604,20 @@ create unique index ix_auth_username on authorities
         references procedure_observation (id)
 ;
 
+    alter table provider_admin 
+        add index FK4DAC7381185F3145 (administrative_gender_code), 
+        add constraint FK4DAC7381185F3145 
+        foreign key (administrative_gender_code) 
+        references administrative_gender_code (id)
+;
+
+    alter table provider_admin_aud 
+        add index FKF38174F2CDA971CE (rev), 
+        add constraint FKF38174F2CDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
     alter table result_observation 
         add index FKF0BB0AB2036D5 (patient), 
         add constraint FKF0BB0AB2036D5 
@@ -1625,3 +1666,4 @@ create unique index ix_auth_username on authorities
         foreign key (social_history_status_code) 
         references social_history_status_code (id)
 ;
+

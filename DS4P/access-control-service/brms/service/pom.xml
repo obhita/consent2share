@@ -110,6 +110,22 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+					<instrumentation>
+						<excludes>
+							<exclude>gov/samhsa/consent2share/schema/ruleexecutionservice/*.class</exclude>
+							<exclude>gov/samhsa/consent2share/contract/ruleexecutionservice/*.class</exclude>
+						</excludes>
+					</instrumentation>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+				</configuration>
+			</plugin>			
 		</plugins>
 
 	</build>

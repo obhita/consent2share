@@ -25,11 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.web;
 
-import java.util.Iterator;
 
-import gov.samhsa.consent2share.domain.account.Users;
-import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
+import gov.samhsa.consent2share.infrastructure.PixQueryService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
@@ -47,8 +45,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -101,6 +97,10 @@ public class PatientController extends AbstractController{
 	/** The field validator. */
 	@Autowired
 	private FieldValidator fieldValidator;
+	
+	/** The PIX Query Service. */
+	@Autowired
+	private PixQueryService pixQueryService;
 	
 	
 	/**
@@ -167,7 +167,12 @@ public class PatientController extends AbstractController{
 			
 			model.addAttribute("currentUser", currentUser);
 			patientProfileDto.setAddressCountryCode("US");
-			patientProfileDto.setUsername(currentUser.getUsername());
+			String mrn = patientProfileDto.getMedicalRecordNumber();
+			String eId = null;
+			if(mrn != null && !"".equals(mrn)){
+				eId = pixQueryService.getEid(patientProfileDto.getMedicalRecordNumber());
+			}
+			patientProfileDto.setEnterpriseIdentifier(eId);
 			try {
 				patientService.updatePatient(patientProfileDto);
 				model.addAttribute("updatedMessage", "Updated your profile successfully!");

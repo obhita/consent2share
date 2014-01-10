@@ -139,6 +139,20 @@ public class PatientProfileDtoToPatientMapper implements
 		} else {
 			patient.setSocialSecurityNumber(null);
 		}
+		
+		if (StringUtils.hasText(patientDto.getMedicalRecordNumber())) {
+			patient.setMedicalRecordNumber(patientDto
+					.getMedicalRecordNumber());
+		} else {
+			patient.setMedicalRecordNumber(null);
+		}
+		
+		if (StringUtils.hasText(patientDto.getEnterpriseIdentifier())) {
+			patient.setEnterpriseIdentifier(patientDto
+					.getEnterpriseIdentifier());
+		} else {
+			patient.setEnterpriseIdentifier(null);
+		}
 
 		if (StringUtils.hasText(patientDto.getTelephoneTelephone())) {
 			Telephone telephone = new Telephone();

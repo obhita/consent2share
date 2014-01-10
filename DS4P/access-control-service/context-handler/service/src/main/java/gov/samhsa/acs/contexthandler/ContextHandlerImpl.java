@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
+import gov.samhsa.acs.common.cobertura.*;
 import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource;
 import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xspasubject;
 import gov.va.ehtac.ds4p.ws.EnforcePolicyResponse.Return;
@@ -76,6 +77,7 @@ public class ContextHandlerImpl implements ContextHandler {
 	 * gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource)
 	 */
 	@Override
+	@CoverageIgnore
 	public Return enforcePolicy(Xspasubject xspasubject,
 			Xsparesource xsparesource) {
 
@@ -126,6 +128,7 @@ public class ContextHandlerImpl implements ContextHandler {
 
 	// ///////////////////////////////////////////////////////////
 	// TODO The code below is written for demo
+	@CoverageIgnore
 	private void setObligations(Return result, List<String> obligations) {
 		Field field = null;
 		try {
@@ -144,7 +147,8 @@ public class ContextHandlerImpl implements ContextHandler {
 			LOGGER.error(e.getMessage(), e);
 		}
 	}
-
+	
+	@CoverageIgnore
 	private void makeAccessible(Field field) {
 		if (!Modifier.isPublic(field.getModifiers())
 				|| !Modifier.isPublic(field.getDeclaringClass().getModifiers())) {

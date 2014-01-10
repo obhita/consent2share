@@ -59,7 +59,7 @@
 	<!-- END: CSS -->
 </head>
 
-<body class="fouc_loading">
+<body id="addConsent-page" class="fouc_loading">
 	<form style="display: none;" id="formToBeSubmitted" action="#" th:action="@{/consents/addConsent.html}" th:Object="${consentDto}" method="post" >
 		<!-- Save on Edit requires Id to update the consent --> 
 		<div th:if="${consentDto.id}!='null'"> 
@@ -146,7 +146,7 @@
 			
 <!-- AUTHORIZE PERSONS SECTION -->		
 					
-				<div class="col-sm-10 col-sm-offset-1">
+				<div>
 					<section class="top-margin10">
 						<div class="row">
 							<fieldset>
@@ -175,9 +175,6 @@
 									</div>
 							<div class="modal-body">
 								<div>
-									<div class="panel-heading">
-										
-											<div class="panel-body nomargin">
 												<form class="inputformPerson" th:object="${consentDto}">
 													<div>
 														<label for="authorize-list">Select the individual(s) and or organization(s) authorized to share your information:</label>
@@ -186,12 +183,12 @@
 																<!-- adding new consent -->
 																<div th:if="${addConsent}">
 																	<div th:each="individualProvider:${individualProvidersDto}">
-														        		<label for="inidividualProvider" th:for="'from'+${individualProvider.npi}" class="checkbox">
+														        		<label for="inidividualProvider" th:for="'from'+${individualProvider.npi}" class="">
 																		<input class="toDiscloseList" id="inidividualProvider" th:field="*{providersPermittedToDisclose}" th:id="'from'+${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" type="checkbox" name="individualConsentAuthorizedFrom" style="float: none;"/><span th:text="${individualProvider.lastName+', '+individualProvider.firstName}"> Doe, John</span>
 																		</label>
 																	</div>
 																	<div th:each="organizationalProvider:${organizationalProvidersDto}">
-														        		<label for="organizationalProvider" th:for="'from'+${organizationalProvider.npi}" class="checkbox">
+														        		<label for="organizationalProvider" th:for="'from'+${organizationalProvider.npi}" class="">
 																		<input class="toDiscloseList" id="organizationalProvider" th:field="*{organizationalProvidersPermittedToDisclose}" th:id="'from'+${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" type="checkbox" name="organizationalConsentAuthorizedFrom"  style="float: none;"/><span th:text="${organizationalProvider.orgName}"> Doe, John</span>
 																		</label>
 																	</div>
@@ -201,7 +198,7 @@
 																<!-- editing existing consent -->
 																<div th:if="${!addConsent}">
 																	<div th:each="individualProvider:${individualProvidersDto}">
-														        		<label for="inidividualProvider" th:for="'from'+${individualProvider.npi}" class="checkbox">
+														        		<label for="inidividualProvider" th:for="'from'+${individualProvider.npi}" class="">
 																		<input class="toDiscloseList" id="inidividualProvider" th:field="*{providersPermittedToDisclose}" th:id="'from'+${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" type="checkbox" name="individualConsentAuthorizedFrom" style="float: none;"/><span th:text="${individualProvider.lastName+', '+individualProvider.firstName}"> Doe, John</span>
 																		</label>
 																		<div th:if="${consentDto.providersPermittedToDiscloseNpi.contains(individualProvider.npi)}">
@@ -209,7 +206,7 @@
 																		</div>
 																	</div>
 																	<div th:each="organizationalProvider:${organizationalProvidersDto}">
-														        		<label for="organizationalProvider" th:for="'from'+${organizationalProvider.npi}" class="checkbox">
+														        		<label for="organizationalProvider" th:for="'from'+${organizationalProvider.npi}" class="">
 																		<input class="toDiscloseList" id="organizationalProvider" th:field="*{organizationalProvidersPermittedToDisclose}" th:id="'from'+${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" type="checkbox" name="organizationalConsentAuthorizedFrom"  style="float: none;"/><span th:text="${organizationalProvider.orgName}"> Doe, John</span>
 																		</label>
 																		<div th:if="${consentDto.organizationalProvidersPermittedToDiscloseNpi.contains(organizationalProvider.npi)}">
@@ -237,9 +234,7 @@
 
 													</div>
 												</form>
-											</div>
-										
-									</div><!-- end accordian-heading -->
+											
 								</div><!-- end --> 
 							</div><!-- end modal-body -->
 							</div>
@@ -270,9 +265,6 @@
 									</div>
 							<div class="modal-body">
 								<div>
-									<div class="panel-heading">
-										
-											<div class="panel-body nomargin">
 												<form class="inputformPerson" th:object="${consentDto}">
 													<div>
 														<label for="disclose-list">Select the individual(s) and/or organization(s) for disclosure:</label>
@@ -280,12 +272,12 @@
 														<!-- adding new consent -->
 															<div th:if="${addConsent}">
 																<div th:each="individualProvider:${individualProvidersDto}">
-													        		<label for="inidividualProvider" th:for="'to'+${individualProvider.npi}" class="checkbox">
+													        		<label for="inidividualProvider" th:for="'to'+${individualProvider.npi}" class="">
 																	<input class="isMadeToList" id="inidividualProvider" th:field="*{providersDisclosureIsMadeTo}" th:id="'to'+${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" type="checkbox" name="individualConsentMadeTo"  style="float: none;"/><span th:text="${individualProvider.lastName+', '+individualProvider.firstName}"> Doe, John</span>
 																	</label>
 																</div>
 																<div th:each="organizationalProvider:${organizationalProvidersDto}">
-													        		<label for="organizationalProvider" th:for="'to'+${organizationalProvider.npi}" class="checkbox">
+													        		<label for="organizationalProvider" th:for="'to'+${organizationalProvider.npi}" class="">
 																	<input class="isMadeToList" id="organizationalProvider" th:field="*{organizationalProvidersDisclosureIsMadeTo}" th:id="'to'+${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" type="checkbox" name="organizationalConsentMadeTo" style="float: none;"/><span th:text="${organizationalProvider.orgName}"> Doe, John</span>
 																	</label>
 																</div>
@@ -294,7 +286,7 @@
 															<!-- editing existing consent -->
 															<div th:if="${!addConsent}">
 																<div th:each="individualProvider:${individualProvidersDto}">
-													        		<label for="inidividualProvider" th:for="'to'+${individualProvider.npi}" class="checkbox">
+													        		<label for="inidividualProvider" th:for="'to'+${individualProvider.npi}" class="">
 																	<input class="isMadeToList" id="inidividualProvider" th:field="*{providersDisclosureIsMadeTo}" th:id="'to'+${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" type="checkbox" name="individualConsentMadeTo"  style="float: none;"/><span th:text="${individualProvider.lastName+', '+individualProvider.firstName}"> Doe, John</span>
 																	</label>
 																		<div th:if="${consentDto.providersDisclosureIsMadeToNpi.contains(individualProvider.npi)}">
@@ -302,7 +294,7 @@
 																		</div>
 																</div>
 																<div th:each="organizationalProvider:${organizationalProvidersDto}">
-													        		<label for="organizationalProvider" th:for="'to'+${organizationalProvider.npi}" class="checkbox">
+													        		<label for="organizationalProvider" th:for="'to'+${organizationalProvider.npi}" class="">
 																	<input class="isMadeToList" id="organizationalProvider" th:field="*{organizationalProvidersDisclosureIsMadeTo}" th:id="'to'+${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" type="checkbox" name="organizationalConsentMadeTo" style="float: none;"/><span th:text="${organizationalProvider.orgName}"> Doe, John</span>
 																	</label>
 																	<div th:if="${consentDto.organizationalProvidersDisclosureIsMadeToNpi.contains(organizationalProvider.npi)}">
@@ -319,9 +311,7 @@
 														<span class="btn-left-align"><button id="saveconsentmadeto" class="btn btn-success btn-lrg" data-dismiss="modal" aria-hidden="true"><span class="fa fa-plus fa-white"></span></button></span>
 													</div>
 												</form>
-											</div>
-										
-									</div><!-- end accordian-heading -->
+
 								</div><!-- end --> 
 							</div><!-- end modal-body -->
 							</div>
@@ -361,14 +351,19 @@
 										     Changed the label for to input:radio id 
 									-->
 									<div style="overflow: hidden;">
-										<label for="selectInfo" style="display:inline;"><strong><span th:text="#{share}">SHARE</span></strong>&nbsp;<span th:text="#{my_medical_record}">my medical information </span>&nbsp;<strong><span th:text="#{exception}">with exception</span></strong>&nbsp;<span th:text="#{of_specific}">of specific</span>&nbsp;<span th:text="#{information}">information</span><span>.</span></label>
+										<label for="selectInfo" style="display:inline;">
+											<strong><span th:text="#{share}">SHARE</span></strong>&nbsp;<span th:text="#{my_medical_record}">my medical information </span>&nbsp;<strong><span th:text="#{exception}">with exception</span></strong>&nbsp;<span th:text="#{of_specific}">of specific</span>&nbsp;<span th:text="#{information}">information</span><span>.</span>
+										</label>
+										<span>
+											<a id="edit1" href="#share-settings-modal" role="button" class="btn btn-xs btn-info edit" data-toggle="modal">Edit</a>
+										</span>
 									</div>
-									<div style="display: inline;">
+									<!-- <div style="display: inline;">
 										<a id="edit1" href="#share-settings-modal" role="button" class="btn btn-xs btn-info edit" data-toggle="modal">
 											Edit
 										</a>
-										<!-- Issue #145 Fix End -->
-									</div>
+										Issue #145 Fix End
+									</div> -->
 									
 									<div id="content1" class="edit top-margin10">
 										<div class="inline-block">
@@ -390,18 +385,18 @@
 								</div>
 								<div class="modal-body">
 									<div>
-										<section class="top-margin10">                   
+										<section>                   
 							                <fieldset>
 								                    <div class="privacy-settings-input-group"> 
 									                    <div class="panel-group" id="accordion2">
 										                    <div class="panel panel-default">
-											                    <div class="panel-heading">
-											                    
-												                <div class="panel-title accordion-header-style">    
-													                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne" th:text="#{sensitive_information}">
-													                Sensitive Information Categories
-												                    </a>
-																</div></div>						            	 
+											                    <div class="panel-heading">										                 
+													                <div class="panel-title accordion-header-style">    
+														                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne" th:text="#{sensitive_information}">
+														                Sensitive Information Categories
+													                    </a>
+																	</div>
+																</div>						            	 
 																	<div id="collapseOne" class="panel-collapse collapse">
 																      <div class="panel-body"> 
 																        <div>
@@ -420,15 +415,22 @@
 																	        
 																	        <form id="sensitivityinfo" class="inputform" th:object="${consentDto}">
 																	        	<div th:each="SensitivityPolicyCode:${sensitivityPolicy}">
-																	        		<span th:if="${addConsent}">
-																		        		<label for="Substance-Abuse" th:for="${SensitivityPolicyCode.code}" class="checkbox checkedCheckbox1">
-																							<input id="Substance-Abuse" class="checkBoxClass1" th:field="*{doNotShareSensitivityPolicyCodes}" th:id="${SensitivityPolicyCode.code}" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}" type="checkbox" name="sensitivityPolicyInput" checked="checked" th:value="${SensitivityPolicyCode.code}"> Substance Abuse </input>
-																						</label>
+																	        		<span th:if="${addConsent}">											       																		        	
+																						<span>
+																							<input id="Substance-Abuse" class="checkBoxClass1" th:field="*{doNotShareSensitivityPolicyCodes}" th:id="${SensitivityPolicyCode.code}" type="checkbox" name="sensitivityPolicyInput" checked="checked" th:value="${SensitivityPolicyCode.code}" /> 
+																						</span>
+																						<span>
+																							<label for="Substance-Abuse" th:for="${SensitivityPolicyCode.code}" class="checkbox checkedCheckbox1" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}">Substance Abuse</label>
+																						</span>
 																					</span>
 																					<span th:if="${!addConsent}">
-																		        		<label for="Substance-Abuse" th:for="${SensitivityPolicyCode.code}" class="checkbox checkedCheckbox1">
-																							<input id="Substance-Abuse" class="checkBoxClass1" th:field="*{doNotShareSensitivityPolicyCodes}" th:id="${SensitivityPolicyCode.code}" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}" type="checkbox" name="sensitivityPolicyInput" th:value="${SensitivityPolicyCode.code}"> Substance Abuse </input>
-																						</label>																					
+																		        		<span>
+																							<input id="Substance-Abuse" class="checkBoxClass1" th:field="*{doNotShareSensitivityPolicyCodes}" th:id="${SensitivityPolicyCode.code}" type="checkbox" name="sensitivityPolicyInput" checked="checked" th:value="${SensitivityPolicyCode.code}" /> 
+																						</span>
+																						<span>
+																							<label for="Substance-Abuse" th:for="${SensitivityPolicyCode.code}" class="checkbox checkedCheckbox1" th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}">Substance Abuse</label>
+																						</span>
+																																																																																						
 																						<span th:if="${consentDto.doNotShareSensitivityPolicyCodes.contains(SensitivityPolicyCode.displayName)}">
 																							<input type="hidden" class="sensitivity-policy-code-checked-input" th:value="${SensitivityPolicyCode.code}" />
 																						</span>																					
@@ -449,14 +451,13 @@
 											                    </div>
 									                         
 										                    <div class="panel panel-default">
-											                    <div class="panel-heading">
-											                    
-												                <div class="panel-title accordion-header-style">
-												                	<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" >
-													                Medical Information Categories
-												                    </a>
-												               </div>
-												                    
+											                	<div class="panel-heading">										                    
+													                <div class="panel-title accordion-header-style">
+													                	<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" >
+														                Medical Information Categories
+													                    </a>
+													            	</div>
+												               	</div>   
 												                    <div id="collapseTwo" class="panel-collapse collapse">
 																      <div class="panel-body">
 																        <div>
@@ -477,14 +478,21 @@
 																	        <div id="medicalinfo">
 																				<div th:each="clinicalDocumentSectionTypeCode:${clinicalDocumentSectionType}">
 																	        		<span th:if="${addConsent}">																				
-																		        		<label for="conditions" th:for="${clinicalDocumentSectionTypeCode.code}" class="checkbox checkedCheckbox1">
-																						<input id="conditions" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentSectionTypeCodes}" th:id="${clinicalDocumentSectionTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentSectionTypeCode.code}" type="checkbox" name="clinicalDocumentSectionTypeInput" checked="checked"> Medical Information Categories</input>
-																						</label>
+																		        		<span>
+																							<input id="conditions" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentSectionTypeCodes}" th:id="${clinicalDocumentSectionTypeCode.code}" th:value="${clinicalDocumentSectionTypeCode.code}" type="checkbox" name="clinicalDocumentSectionTypeInput" checked="checked" />
+																						</span>
+																						<span>
+																							<label for="conditions" class="checkbox checkedCheckbox1" th:for="${clinicalDocumentSectionTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}">Medical Information Categories</label>
+																						</span>
 																					</span>
 																	        		<span th:if="${!addConsent}">																				
-																		        		<label for="conditions" th:for="${clinicalDocumentSectionTypeCode.code}" class="checkbox checkedCheckbox1">
-																						<input id="conditions" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentSectionTypeCodes}" th:id="${clinicalDocumentSectionTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentSectionTypeCode.code}" type="checkbox" name="clinicalDocumentSectionTypeInput"> Medical Information Categories</input>
-																						</label>
+																		        		<span>
+																							<input id="conditions" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentSectionTypeCodes}" th:id="${clinicalDocumentSectionTypeCode.code}" th:value="${clinicalDocumentSectionTypeCode.code}" type="checkbox" name="clinicalDocumentSectionTypeInput" checked="checked" />
+																						</span>
+																						<span>
+																							<label for="conditions" class="checkbox checkedCheckbox1" th:for="${clinicalDocumentSectionTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentSectionTypeCode.displayName, ' ', '_')}}">Medical Information Categories</label>
+																						</span>
+																						
 																						<span th:if="${consentDto.doNotShareClinicalDocumentSectionTypeCodes.contains(clinicalDocumentSectionTypeCode.displayName)}">
 																							<input type="hidden" class="doc-sec-type-code-checked-input" th:value="${clinicalDocumentSectionTypeCode.code}" />
 																						</span>																					
@@ -504,17 +512,17 @@
 							
 																      </div>
 																    </div>
-											                    </div>
+											                    
 										                    </div> 
 										                    
 										                    <div class="panel panel-default">
-											                    <div class="panel-heading">
-											                    
-												                <div class="panel-title accordion-header-style">
-												                	<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree" >
-													                Clinical Document Type
-												                    </a>
-												               </div>
+											                    <div class="panel-heading">										                    
+													                <div class="panel-title accordion-header-style">
+													                	<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree" >
+														                Clinical Document Type
+													                    </a>
+													               </div>
+												                </div>
 												                    
 												                    <div id="collapseThree" class="panel-collapse collapse">
 																      <div class="panel-body">
@@ -537,14 +545,21 @@
 																	        
 																				<div th:each="clinicalDocumentTypeCode:${clinicalDocumentType}">
 																					<span th:if="${addConsent}">
-																		        		<label for="summarizationOfEpisodeNote" th:for="${clinicalDocumentTypeCode.code}" class="checkbox checkedCheckbox1">
-																						<input id="summarizationOfEpisodeNote" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentTypeCodes}" th:id="${clinicalDocumentTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentTypeCode.code}" type="checkbox" name="clinicalDocumentTypeInput" checked="checked"> Summarization of Episode Note</input>
-																						</label>
+																		        		<span>
+																							<input id="summarizationOfEpisodeNote" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentTypeCodes}" th:id="${clinicalDocumentTypeCode.code}" th:value="${clinicalDocumentTypeCode.code}" type="checkbox" name="clinicalDocumentTypeInput" checked="checked" />
+																						</span>
+																						<span>
+																							<label for="summarizationOfEpisodeNote" th:for="${clinicalDocumentTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}" class="checkbox checkedCheckbox1">Summarization of Episode Note</label>
+																						</span>
 																					</span>
 																	        		<span th:if="${!addConsent}">																				
-																		        		<label for="summarizationOfEpisodeNote" th:for="${clinicalDocumentTypeCode.code}" class="checkbox checkedCheckbox1">
-																						<input id="summarizationOfEpisodeNote" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentTypeCodes}" th:id="${clinicalDocumentTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}" th:value="${clinicalDocumentTypeCode.code}" type="checkbox" name="clinicalDocumentTypeInput"> Summarization of Episode Note</input>
-																						</label>
+																		        		<span>
+																							<input id="summarizationOfEpisodeNote" class="checkBoxClass1" th:field="*{doNotShareClinicalDocumentTypeCodes}" th:id="${clinicalDocumentTypeCode.code}" th:value="${clinicalDocumentTypeCode.code}" type="checkbox" name="clinicalDocumentTypeInput" checked="checked" />
+																						</span>
+																						<span>
+																							<label for="summarizationOfEpisodeNote" th:for="${clinicalDocumentTypeCode.code}" th:text="#{${#strings.replace(clinicalDocumentTypeCode.displayName, ' ', '_')}}" class="checkbox checkedCheckbox1">Summarization of Episode Note</label>
+																						</span>
+																						
 																						<span th:if="${consentDto.doNotShareClinicalDocumentTypeCodes.contains(clinicalDocumentTypeCode.displayName)}">
 																							<input type="hidden" class="doc-sec-code-checked-input" th:value="${clinicalDocumentTypeCode.code}" />
 																						</span>																					
@@ -562,18 +577,18 @@
 																        </div>
 																      </div>
 																    </div>
-											                    </div>
+											                   
 										                    </div> 
 										                    
 										           
 										                    <div class="panel panel-default">
 											                    <div class="panel-heading">
-												                    
 												                    <div class="panel-title accordion-header-style">
-												                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour">
+												        	            <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour">
 													                    Specific Medical Information
-												                    </a>
+												        	            </a>
 												                    </div>
+												              	 </div>
 												                    <div id="collapseFour" class="panel-collapse collapse" >
 																      <div class="panel-body">
 																      <div class="alert alert-warning">
@@ -600,7 +615,7 @@
 																        </form>
 																      </div>
 																    </div>
-											                    </div>
+											                   
 										                    </div>
 										                </div>
 								                    </div>
@@ -654,9 +669,10 @@
 											     C2S::Add Consent::Link Applied to Wrong Element(s)
 											     Changed the label for to input:radio id
 										-->
-										<label for="selectPurposes"><strong><span th:text="#{share}">Share</span></strong>&nbsp;<span th:text="#{my_medical_record}">my medical record</span><strong>&nbsp;<span th:text="#{only}">ONLY</span></strong>&nbsp;<span th:text="#{for_the}">for the</span>&nbsp;<span th:text="#{selected_purposes}">selected purpose(s) of use.</span><span><a id="edit2" href="#selected-purposes-modal" role="button" class="btn btn-xs btn-info edit" data-toggle="modal">
-											Edit
-									</a> </span>
+										<label for="selectPurposes"><strong><span th:text="#{share}">Share</span></strong>&nbsp;<span th:text="#{my_medical_record}">my medical record</span><strong>&nbsp;<span th:text="#{only}">ONLY</span></strong>&nbsp;<span th:text="#{for_the}">for the</span>&nbsp;<span th:text="#{selected_purposes}">selected purpose(s) of use.</span>
+											<span><a id="edit2" href="#selected-purposes-modal" role="button" class="btn btn-xs btn-info edit" data-toggle="modal">
+												Edit</a>
+											</span>
 										</label>
 										<!-- Issue #145 Fix End -->
 									</div>
@@ -675,7 +691,7 @@
  
 					
 							
-						</div><!-- end modal2 -->
+						</div>
 						
 						<!-- Modal2 -->
 							<div id="selected-purposes-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selected-purposes-modal" aria-hidden="true">
@@ -689,8 +705,8 @@
 								<div class="modal-body">
 								<fieldset>
 								    <div> 
-								    	<div class="panel-heading">
-								    		<div class="panel-body nomargin"> 
+								    	
+								    		 
 								    			<form class="purposeofshareform" th:object="${consentDto}">
 								    				<div class="alert alert-warning">Share my information&nbsp;<strong>only</strong>&nbsp;for specified purpose(s) of use.</div>
 								    												    				
@@ -706,14 +722,21 @@
 													<div id="purposeOfSharingInputs">
 								    					<div th:each="purposeOfUseItem:${purposeOfUse}">
 															<span th:if="${addConsent}">
-									    						<label for="emergency" th:for="${purposeOfUseItem.code}" class="checkbox checkedCheckbox2">
-																<input id="emergency" th:field="*{shareForPurposeOfUseCodes}" th:id="${purposeOfUseItem.code}" th:text="#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}" th:value="${purposeOfUseItem.code}" type="checkbox" name="purposeOfUseInput" checked="checked"> Emergency</input>
-																</label>
+									    						<span>
+																	<input id="emergency" th:field="*{shareForPurposeOfUseCodes}" th:id="${purposeOfUseItem.code}" th:value="${purposeOfUseItem.code}" type="checkbox" name="purposeOfUseInput" checked="checked" />
+																</span>
+																<span>
+																	<label for="emergency" th:for="${purposeOfUseItem.code}" th:text="#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}" class="checkbox checkedCheckbox2">Emergency</label>
+																</span>
 															</span>
 															<span th:if="${!addConsent}">
-									    						<label for="emergency" th:for="${purposeOfUseItem.code}" class="checkbox checkedCheckbox2">
-																<input id="emergency" th:field="*{shareForPurposeOfUseCodes}" th:id="${purposeOfUseItem.code}" th:text="#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}" th:value="${purposeOfUseItem.code}" type="checkbox" name="purposeOfUseInput" checked="checked"> Emergency</input>
-																</label>
+									    						<span>
+																	<input id="emergency" th:field="*{shareForPurposeOfUseCodes}" th:id="${purposeOfUseItem.code}" th:value="${purposeOfUseItem.code}" type="checkbox" name="purposeOfUseInput" checked="checked" />
+																</span>
+																<span>
+																	<label for="emergency" th:for="${purposeOfUseItem.code}" th:text="#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}" class="checkbox checkedCheckbox2">Emergency</label>
+																</span>
+																
 																<span th:if="${consentDto.shareForPurposeOfUseCodes.contains(purposeOfUseItem.displayName)}">
 																	<input type="hidden" class="purpose-use-code-checked-input" th:value="${purposeOfUseItem.code}" />
 																</span>																	
@@ -731,8 +754,8 @@
 <!-- 										    			<input id="emergency" type="checkbox" name="conditions" th:field="*{emergency}" checked="checked"/> Emergency -->
 <!-- 										    		</label>												     	 -->
 												</form>												     	
-											</div>
-										</div>
+											
+										
 								    </div>
 								</fieldset>
 								</div>
@@ -743,6 +766,7 @@
 								</div>
 								</div>
 							</div>
+						<!-- end modal2 -->
 					</section>
 					
 <!-- CONSENT DATES START -->		

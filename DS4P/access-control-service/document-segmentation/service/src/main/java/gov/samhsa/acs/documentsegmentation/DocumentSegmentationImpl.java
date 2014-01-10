@@ -96,44 +96,6 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 	private final AdditionalMetadataGeneratorForSegmentedClinicalDocument additionalMetadataGeneratorForSegmentedClinicalDocument;
 
 	/**
-	 * Gets the de sede encrypt key.
-	 * 
-	 * @return the de sede encrypt key
-	 */
-	public Key getDeSedeEncryptKey() {
-		return deSedeEncryptKey;
-	}
-
-	/**
-	 * Sets the de sede encrypt key.
-	 * 
-	 * @param deSedeEncryptKey
-	 *            the new de sede encrypt key
-	 */
-	public void setDeSedeEncryptKey(Key deSedeEncryptKey) {
-		this.deSedeEncryptKey = deSedeEncryptKey;
-	}
-
-	/**
-	 * Gets the de sede mask key.
-	 * 
-	 * @return the de sede mask key
-	 */
-	public Key getDeSedeMaskKey() {
-		return deSedeMaskKey;
-	}
-
-	/**
-	 * Sets the de sede mask key.
-	 * 
-	 * @param deSedeMaskKey
-	 *            the new de sede mask key
-	 */
-	public void setDeSedeMaskKey(Key deSedeMaskKey) {
-		this.deSedeMaskKey = deSedeMaskKey;
-	}
-
-	/**
 	 * Instantiates a new document processor impl.
 	 * 
 	 * @param ruleExecutionWebServiceClient
@@ -226,7 +188,8 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 
 			// get execution response container
 			String executionResponseContainer = ruleExecutionService
-					.assertAndExecuteClinicalFacts(factModel).getRuleExecutionResponseContainer();
+					.assertAndExecuteClinicalFacts(factModel)
+					.getRuleExecutionResponseContainer();
 
 			// unmarshall from xml to RuleExecutionContainer
 			ruleExecutionContainer = marshaller.unmarshallFromXml(

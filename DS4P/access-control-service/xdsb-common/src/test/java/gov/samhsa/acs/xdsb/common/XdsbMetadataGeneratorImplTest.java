@@ -1,91 +1,131 @@
 package gov.samhsa.acs.xdsb.common;
 
-import gov.samhsa.acs.common.exception.DS4PException;
-import gov.samhsa.acs.xdsb.common.UniqueOidProviderImpl;
-import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
-import gov.samhsa.acs.xdsb.common.XdsbMetadataGeneratorImpl;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import gov.samhsa.acs.common.tool.FileReaderImpl;
+import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
+import java.util.LinkedList;
 
 import oasis.names.tc.ebxml_regrep.xsd.lcm._3.SubmitObjectsRequest;
 
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 public class XdsbMetadataGeneratorImplTest {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(XdsbMetadataGeneratorImplTest.class);
+	private FileReaderImpl fileReader = new FileReaderImpl();
+	private SimpleMarshallerImpl marshaller = new SimpleMarshallerImpl();
+
+	private XdsbMetadataGeneratorImpl sut;
 
 	@Test
-	public void testgenerateMetadataXml_C32() {
-		testgenerateMetadataXml("remC32.xml");
+	public void testGenerateMetadataXml_RemC32() throws Throwable {
+		initClinical();
+		String c32FileName = "remC32.xml";
+		String expectedMetadataFileName = "unitTestMetaRemC32.xml";
+		testGenerateMetadataXml(c32FileName, expectedMetadataFileName, createIgnorableXPathRegexList());
 	}
 
 	@Test
-	public void testgenerateMetadataXml_CdaR2() {
-		testgenerateMetadataXml("cdaR2Consent.xml");
+	public void testGenerateMetadataXml_CdaR2() throws Throwable {
+		initClinical();
+		String c32FileName = "cdaR2Consent.xml";
+		String expectedMetadataFileName = "unitTestMetaCdaR2Consent.xml";
+		testGenerateMetadataXml(c32FileName, expectedMetadataFileName, createIgnorableXPathRegexList());
+	}
+	
+	@Test
+	public void testGenerateMetadataXml_Xacml() throws Throwable {
+		initPrivacy();
+		String c32FileName = "xacml_policy.xml";
+		String expectedMetadataFileName = "unitTestMetaXacml.xml";
+		testGenerateMetadataXml(c32FileName, expectedMetadataFileName, createIgnorableXPathRegexList());
 	}
 
-	private void testgenerateMetadataXml(String fileName) {
-		XdsbMetadataGeneratorImpl xdsbMetadataGeneratorImpl = new XdsbMetadataGeneratorImpl(
-				new UniqueOidProviderImpl(), XdsbDocumentType.CLINICAL_DOCUMENT);
-		InputStream is = xdsbMetadataGeneratorImpl.getClass().getClassLoader()
-				.getResourceAsStream(fileName);
-
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-		StringBuilder c32Document = new StringBuilder();
-		String line;
-		try {
-			while ((line = br.readLine()) != null) {
-				c32Document.append(line);
-			}
-
-			br.close();
-			is.close();
-		} catch (IOException e) {
-			throw new DS4PException(e.toString(), e);
-		}
-
-		String meta = xdsbMetadataGeneratorImpl.generateMetadataXml(
-				c32Document.toString(), "1.1.1.1.1");
-
-		LOGGER.debug(meta);
-
-		SubmitObjectsRequest submitObjectsRequest = xdsbMetadataGeneratorImpl
-				.generateMetadata(c32Document.toString(), "1.1.1.1.1");
-
-		LOGGER.debug("Generated SubmitObjectsRequest");
-
-		try {
-			LOGGER.debug(marshall(submitObjectsRequest));
-		} catch (Throwable e) {
-			LOGGER.debug(e.toString(), e);
-		}
+	@Test
+	public void testGenerateMetadata_RemC32() throws Throwable {
+		initClinical();
+		String metadataFileName = "unitTestMetaRemC32.xml";
+		testGenerateMetadata(metadataFileName);
 	}
 
-	private static String marshall(Object obj) throws Throwable {
-		final JAXBContext context = JAXBContext.newInstance(obj.getClass());
+	@Test
+	public void testGenerateMetadata_CdaR2() throws Throwable {
+		initClinical();
+		String metadataFileName = "unitTestMetaCdaR2Consent.xml";
+		testGenerateMetadata(metadataFileName);
+	}
+	
+	@Test
+	public void testGenerateMetadata_Xacml() throws Throwable {
+		initPrivacy();
+		String metadataFileName = "unitTestMetaXacml.xml";
+		testGenerateMetadata(metadataFileName);
+	}
+	
+	private void testGenerateMetadataXml(String fileName,
+			String expectedMetadataFileName, LinkedList<String> ignorableXPathsRegex) throws IOException {
+		// Arrange
+		String file = fileReader.readFile(fileName);
+		String expectedMetadata = fileReader.readFile(expectedMetadataFileName);
 
-		// Create the marshaller, this is the nifty little thing that will
-		// actually transform the object into XML
-		final Marshaller marshaller = context.createMarshaller();
+		// Act
+		String meta = sut.generateMetadataXml(file, "1.1.1.1.1");
 
-		// Create a stringWriter to hold the XML
-		final StringWriter stringWriter = new StringWriter();
+		// Assert
+		DetailedDiff diff = XmlComparator.compareXMLs(expectedMetadata, meta,
+				ignorableXPathsRegex);
+		assertTrue(diff.similar());
+	}
+	
+	private void testGenerateMetadata(String metadataFileName)
+			throws IOException, Throwable, SAXException {
+		// Arrange
+		String metadata = fileReader.readFile(metadataFileName);
+		String documentMock = "documentMock";
+		String homeCommunityIdMock = "homeCommunityIdMock";
+		sut = spy(sut);
+		doReturn(metadata).when(sut).generateMetadataXml(documentMock,
+				homeCommunityIdMock);
+		XMLUnit.setIgnoreWhitespace(true);
 
-		// Marshal the javaObject and write the XML to the stringWriter
-		marshaller.marshal(obj, stringWriter);
+		// Act
+		SubmitObjectsRequest submitObjectsRequest = sut.generateMetadata(
+				documentMock, homeCommunityIdMock);
+		String xml = marshaller.marshall(submitObjectsRequest);
 
-		return stringWriter.toString();
+		// Assert
+		assertNotNull(submitObjectsRequest);
+		assertXMLEqual("", metadata, xml);
+	}
+
+	private LinkedList<String> createIgnorableXPathRegexList() {
+		LinkedList<String> ignorableXPathsRegex = new LinkedList<String>();
+		ignorableXPathsRegex
+				.add("\\/SubmitObjectsRequest\\[1\\]/RegistryObjectList\\[1\\]/ExtrinsicObject\\[1\\]/Slot\\[1\\]/ValueList\\[1\\]/Value\\[1\\]");
+		ignorableXPathsRegex
+				.add("\\/SubmitObjectsRequest\\[1\\]/RegistryObjectList\\[1\\]/ExtrinsicObject\\[1\\]/ExternalIdentifier\\[2\\]/@value");
+		ignorableXPathsRegex
+				.add("\\/SubmitObjectsRequest\\[1\\]/RegistryObjectList\\[1\\]/RegistryPackage\\[1\\]/Slot\\[1\\]/ValueList\\[1\\]/Value\\[1\\]");
+		ignorableXPathsRegex
+				.add("\\/SubmitObjectsRequest\\[1\\]/RegistryObjectList\\[1\\]/RegistryPackage\\[1\\]/ExternalIdentifier\\[1\\]/@value");
+		return ignorableXPathsRegex;
+	}
+	
+	private void initClinical(){
+		sut = new XdsbMetadataGeneratorImpl(new UniqueOidProviderImpl(),
+				XdsbDocumentType.CLINICAL_DOCUMENT, marshaller);
+	}
+	
+	private void initPrivacy(){
+		sut = new XdsbMetadataGeneratorImpl(new UniqueOidProviderImpl(),
+				XdsbDocumentType.PRIVACY_CONSENT, marshaller);
 	}
 }

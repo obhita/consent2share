@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
+import gov.samhsa.consent2share.infrastructure.PixQueryService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.LookupDto;
@@ -73,6 +74,9 @@ public class PatientControllerTest {
 	
 	@Mock
 	UserContext userContext;
+	
+	@Mock
+	PixQueryService pixQueryService;
 
 	@Mock
 	private FieldValidator fieldValidator;
@@ -84,6 +88,8 @@ public class PatientControllerTest {
 	final String validBirthDate = "1/1/1950";
 	final String validEmail = "test@test.com";
 	final String validGenderCode = "administrativeGenderCode";
+	final String validMrn = "PUI100000000001";
+	final String validEid = "1c5c59f0-5788-11e3-84b3-00155d3a2124";
 
 	@Before
 	public void setUp() {
@@ -754,6 +760,8 @@ public class PatientControllerTest {
 
 		List<LookupDto> stateCodes = (List<LookupDto>) mock(List.class);
 		when(stateCodeService.findAllStateCodes()).thenReturn(stateCodes);
+		
+		when(pixQueryService.getEid(validMrn)).thenReturn(validEid);
 
 		mockMvc.perform(
 				post("/patients/profile.html")
@@ -764,7 +772,8 @@ public class PatientControllerTest {
 						.param(validGenderCode ,
 								validGenderCode )
 						.param("username", username)
-						.param("password","password"))
+						.param("password","password")
+						.param("medicalRecordNumber",validMrn))
 				.andExpect(
 						model().attribute("currentUser", equalTo(currentUser)))
 				.andExpect(
@@ -818,6 +827,14 @@ public class PatientControllerTest {
 				}
 				
 				if (patientProfileDto.getAdministrativeGenderCode() == null || !patientProfileDto.getAdministrativeGenderCode().equals(validGenderCode)){
+					return false;
+				}
+				
+				if (patientProfileDto.getMedicalRecordNumber() == null || !patientProfileDto.getMedicalRecordNumber().equals(validMrn)){
+					return false;
+				}
+				
+				if (patientProfileDto.getEnterpriseIdentifier() == null || !patientProfileDto.getEnterpriseIdentifier().equals(validEid)){
 					return false;
 				}
 				

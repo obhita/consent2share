@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<handler-chains xmlns="http://java.sun.com/xml/ns/javaee">
-	<handler-chain>
-		<handler>			
-			<handler-name>gov.samhsa.acs.pep.ws.SAMLRequestHandler</handler-name>
-			<handler-class>gov.samhsa.acs.pep.ws.SAMLRequestHandler</handler-class>
-		</handler>
-	</handler-chain>
-</handler-chains>

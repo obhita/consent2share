@@ -31,7 +31,7 @@
                <family>Smith</family>
             </name>
             <administrativeGenderCode code="M" codeSystem="2.16.840.1.113883.5.1"/>
-            <birthTime value="02/19/1983"/>
+            <birthTime value="19830218"/>
          </patient>
       </patientRole>
    </recordTarget>
@@ -99,8 +99,8 @@
                codeSystemName="LOINC"
                displayName="Privacy Policy Acknowledgement Document"/>
          <effectiveTime>
-            <low value="09/04/2013"/>
-            <high value="09/04/2014"/>
+            <low value="20130904"/>
+            <high value="20140904"/>
          </effectiveTime>
       </serviceEvent>
    </documentationOf>

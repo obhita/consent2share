@@ -286,6 +286,12 @@
 		<dependency>
 			<groupId>com.echosign</groupId>
 			<artifactId>adobe-ecosign</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>XmlSchema</artifactId>
+					<groupId>org.apache.ws.commons</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Our own projects -->
@@ -298,11 +304,6 @@
 		<dependency>
 			<groupId>edu.vt.middleware</groupId>
 			<artifactId>vt-password</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
 		</dependency>
 
 	</dependencies>

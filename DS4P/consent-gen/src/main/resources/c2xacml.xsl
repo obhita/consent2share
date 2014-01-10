@@ -5,7 +5,8 @@
 
 	<xsl:output indent="yes" />
 
-
+	<xsl:param name="enterpriseIdentifier" as="xs:string" select="'PleaseEnterValidMRNForEID'"/>
+	
 	<xsl:template match="/">
 		<xsl:variable name="countDoNotShareClinicalDocumentSectionTypeCodes"
 			select="count(//doNotShareClinicalDocumentSectionTypeCodesList/doNotShareClinicalDocumentSectionTypeCodes)+count(//doNotShareSensitivityPolicyCodesList/doNotShareSensitivityPolicyCodes)+count(//doNotShareClinicalConceptCodesList/doNotShareClinicalConceptCodes)+count(//doNotShareClinicalDocumentTypeCodesList/doNotShareClinicalDocumentTypeCodes)" />
@@ -15,12 +16,22 @@
 			/> -->
 		<xsl:variable name="consentId" select="ConsentExport/id" />
 		<xsl:variable name="patientId" select="ConsentExport/Patient/email" />
+		<xsl:variable name="resourceId">
+			<xsl:choose>
+				<xsl:when test="not(codepoint-equal($enterpriseIdentifier,'PleaseEnterValidMRNForEID'))">
+					<xsl:value-of select="$enterpriseIdentifier"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$patientId"/>
+				</xsl:otherwise>
+			</xsl:choose>		
+		</xsl:variable>
 		<xsl:variable name="policyId"
 			select="concat('urn:samhsa:names:tc:consent2share:1.0:policyid:', $patientId, ':', $consentId)" />
 
 		<Policy xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
 			PolicyId="{$consentId}"
-			RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+			RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides">
 			<Description>
 				This is a reference policy for
 				<xsl:value-of select="$patientId" />
@@ -33,7 +44,8 @@
 							<ResourceMatch
 								MatchId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match">
 								<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">
-									<xsl:value-of select="ConsentExport/Patient/email" />
+									<!-- xsl:value-of select="ConsentExport/Patient/email" /-->
+									<xsl:value-of select="$resourceId" />
 								</AttributeValue>
 								<ResourceAttributeDesignator
 									AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
@@ -65,7 +77,7 @@
 										FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
 										<SubjectAttributeDesignator
 											MustBePresent="false"
-											AttributeId="urn:samhsa:names:tc:consent2share:1.0:subject:accessor-provider-npi"
+											AttributeId="urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"
 											DataType="http://www.w3.org/2001/XMLSchema#string"></SubjectAttributeDesignator>
 									</Apply>
 									<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">
@@ -84,7 +96,7 @@
 										FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
 										<SubjectAttributeDesignator
 											MustBePresent="false"
-											AttributeId="urn:samhsa:names:tc:consent2share:1.0:subject:accessor-provider-npi"
+											AttributeId="urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"
 											DataType="http://www.w3.org/2001/XMLSchema#string"></SubjectAttributeDesignator>
 									</Apply>
 									<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">
@@ -103,7 +115,7 @@
 										FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
 										<SubjectAttributeDesignator
 											MustBePresent="false"
-											AttributeId="urn:samhsa:names:tc:consent2share:1.0:subject:receiver-provider-npi"
+											AttributeId="urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"
 											DataType="http://www.w3.org/2001/XMLSchema#string"></SubjectAttributeDesignator>
 									</Apply>
 									<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">
@@ -119,7 +131,7 @@
 										FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
 										<SubjectAttributeDesignator
 											MustBePresent="false"
-											AttributeId="urn:samhsa:names:tc:consent2share:1.0:subject:receiver-provider-npi"
+											AttributeId="urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"
 											DataType="http://www.w3.org/2001/XMLSchema#string"></SubjectAttributeDesignator>
 									</Apply>
 									<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">

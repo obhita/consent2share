@@ -37,7 +37,7 @@ import org.springframework.security.access.annotation.Secured;
 /**
  * The Interface PatientLegalRepresentativeAssociationService.
  */
-@Secured("ROLE_USER")
+@Secured({"ROLE_USER","ROLE_ADMIN"})
 public interface PatientLegalRepresentativeAssociationService {
 
 	/**

@@ -59,13 +59,15 @@ public class RequestGenerator {
 		InputStream is =new ByteArrayInputStream(request.getBytes());
 		try {
 			// Need call SimplePDPFactory.getSimplePDP() to use RequestMarshaller from herasaf
-			requestType=RequestMarshaller.unmarshal(is);
+			requestType=unmarshalRequest(is);
 		} catch (SyntaxException e) {
-			LOGGER.debug(e.toString(),e);
-		} catch (Exception e){
 			LOGGER.debug(e.toString(),e);
 		}
 		return requestType;
+	}
+	
+	RequestType unmarshalRequest(InputStream inputStream) throws SyntaxException{
+		return RequestMarshaller.unmarshal(inputStream);
 	}
 	
 	public String generateRequestString(String recepientSubjectNPI, String intermediarySubjectNPI, String purposeOfUse, String patientId){

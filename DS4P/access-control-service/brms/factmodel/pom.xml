@@ -12,6 +12,23 @@
 
 	<build>
 		<finalName>brms-factmodel</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+					<instrumentation>
+						<excludes>
+							<exclude>gov/samhsa/acs/brms/domain/*.class</exclude>
+						</excludes>
+					</instrumentation>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+				</configuration>
+			</plugin>
+		</plugins>		
 	</build>
 
 </project>

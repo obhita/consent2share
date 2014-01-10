@@ -25,7 +25,11 @@ public class XdsbRegistryServiceImpl implements XDSRegistry {
 	private static final Logger LOG = Logger.getLogger(XdsbRegistryServiceImpl.class
 			.getName());
 	
-	protected  static AdhocQueryResponse returnedValueOfRegistryStoredQuery;
+	protected static AdhocQueryResponse returnedValueOfRegistryStoredQuery;
+	protected static MCCIIN000002UV01 returnedValueOfPatientRegistryRecordRevised;
+	protected static MCCIIN000002UV01 returnedValueOfPatientRegistryRecordAdded;
+	protected static MCCIIN000002UV01 returnedValueOfPatientRegistryDuplicatesResolved;
+	
 
 	/*
 	 * (non-Javadoc)
@@ -40,7 +44,7 @@ public class XdsbRegistryServiceImpl implements XDSRegistry {
 		LOG.info("Executing operation patientRegistryRecordRevised");
 		System.out.println(input);
 		try {
-			MCCIIN000002UV01 _return = null;
+			MCCIIN000002UV01 _return = returnedValueOfPatientRegistryRecordRevised;
 			return _return;
 		} catch (java.lang.Exception ex) {
 			ex.printStackTrace();
@@ -123,7 +127,7 @@ public class XdsbRegistryServiceImpl implements XDSRegistry {
 		LOG.info("Executing operation patientRegistryRecordAdded");
 		System.out.println(input);
 		try {
-			MCCIIN000002UV01 _return = null;
+			MCCIIN000002UV01 _return = returnedValueOfPatientRegistryRecordAdded;
 			return _return;
 		} catch (java.lang.Exception ex) {
 			ex.printStackTrace();
@@ -144,7 +148,7 @@ public class XdsbRegistryServiceImpl implements XDSRegistry {
 		LOG.info("Executing operation patientRegistryDuplicatesResolved");
 		System.out.println(input);
 		try {
-			MCCIIN000002UV01 _return = null;
+			MCCIIN000002UV01 _return = returnedValueOfPatientRegistryDuplicatesResolved;
 			return _return;
 		} catch (java.lang.Exception ex) {
 			ex.printStackTrace();

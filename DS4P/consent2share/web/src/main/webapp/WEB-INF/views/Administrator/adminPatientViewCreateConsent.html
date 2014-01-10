@@ -50,7 +50,7 @@
 
 	<div class="container outmost-holder">
 		<!-- !START: Page Header -->
-		<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='Create Patient Consent',backPageURI='/Administrator/adminPatientView.html'+${patientIdLink}">
+		<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='Create Patient Consent',backPageURI='/Administrator/adminPatientView.html?id='+${patientID}">
 			<div class="container">
 				<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/admin_fragments :: admin-navbarHeaderFragmentBackButton">
 			

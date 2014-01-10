@@ -149,7 +149,7 @@ public interface PatientService {
 	 * @param lastName the last name
 	 * @return the patient profile dto
 	 */
-	public List<PatientAdminDto> findAllPatientByFirstNameAndLastName(String firstName,String lastName);
+	public List<PatientAdminDto> findAllPatientByFirstNameAndLastName(String[] tokens);
 	
 	/**
 	 * Find recent patient dtos by id.

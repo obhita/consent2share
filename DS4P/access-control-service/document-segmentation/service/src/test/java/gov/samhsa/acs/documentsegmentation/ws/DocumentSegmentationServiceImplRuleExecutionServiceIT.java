@@ -49,7 +49,7 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 	private static String xdsDocumentEntryUniqueId;
 	private static String endpointAddressForAuditService;
 	private static String endpointAddressGuvnorService;
-	
+
 	private static RuleExecutionServiceImpl ruleExecutionService;
 	private static DocumentEditorImpl documentEditor;
 	private static SimpleMarshallerImpl marshaller;
@@ -82,15 +82,12 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 	public void setUpBeforeClass() throws Exception {
 		fileReader = new FileReaderImpl();
 		metadataGenerator = new MetadataGeneratorImpl();
-		documentEditor = new DocumentEditorImpl();
-		documentEditor.setFileReader(fileReader);
-		documentEditor.setMetadataGenerator(metadataGenerator);
+		documentEditor = new DocumentEditorImpl(metadataGenerator, fileReader,
+				new DocumentXmlConverterImpl());
 		marshaller = new SimpleMarshallerImpl();
 		documentEncrypter = new DocumentEncrypterImpl();
-		documentRedactor = new DocumentRedactorImpl();
-		documentRedactor.setDocumentEditor(documentEditor);
-		documentRedactor
-				.setDocumentXmlConverter(new DocumentXmlConverterImpl());
+		documentRedactor = new DocumentRedactorImpl(documentEditor,
+				new DocumentXmlConverterImpl());
 		documentMasker = new DocumentMaskerImpl();
 		documentTagger = new DocumentTaggerImpl();
 		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
@@ -99,17 +96,18 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 		address = "http://localhost:9000/services/processDocumentservice";
 		wsdlURL = new URL(address + "?wsdl");
 		c32Document = fileReader.readFile("c32.xml");
-		
+
 		endpointAddressGuvnorService = "http://localhost:7070/guvnor-5.5.0.Final-tomcat-6.0/rest/packages/AnnotationRules/source";
 
-		ruleExecutionService = new RuleExecutionServiceImpl(new GuvnorServiceImpl(
-				endpointAddressGuvnorService,"admin", "admin"), new SimpleMarshallerImpl());
+		ruleExecutionService = new RuleExecutionServiceImpl(
+				new GuvnorServiceImpl(endpointAddressGuvnorService, "admin",
+						"admin"), new SimpleMarshallerImpl());
 		ep = Endpoint
 				.publish(
 						address,
 						new DocumentSegmentationServiceImpl(
 								new DocumentSegmentationImpl(
-										ruleExecutionService, 
+										ruleExecutionService,
 										new AuditServiceImpl(
 												endpointAddressForAuditService),
 										documentEditor, marshaller,

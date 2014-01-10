@@ -34,8 +34,10 @@ import org.slf4j.LoggerFactory;
  * The Class UniqueOidProviderImpl.
  */
 public class UniqueOidProviderImpl implements UniqueOidProvider {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(UniqueOidProviderImpl.class);
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(UniqueOidProviderImpl.class);
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -59,18 +61,5 @@ public class UniqueOidProviderImpl implements UniqueOidProvider {
 		id = id.replaceFirst("^0+(?!$)", "");
 
 		return id;
-	}
-
-	/**
-	 * The main method.
-	 * 
-	 * @param aArgs
-	 *            the arguments
-	 */
-	public static final void main(String... aArgs) {
-		UniqueOidProviderImpl provider = new UniqueOidProviderImpl();
-		String oid = provider.getOid();
-
-		LOGGER.debug(oid);
 	}
 }

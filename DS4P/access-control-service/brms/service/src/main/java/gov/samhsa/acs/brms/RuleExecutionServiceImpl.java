@@ -25,11 +25,11 @@
  ******************************************************************************/
 package gov.samhsa.acs.brms;
 
+import gov.samhsa.acs.brms.domain.ClinicalFact;
+import gov.samhsa.acs.brms.domain.FactModel;
+import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.brms.guvnor.GuvnorService;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
-import gov.samhsa.consent2share.accesscontrolservices.brms.domain.ClinicalFact;
-import gov.samhsa.consent2share.accesscontrolservices.brms.domain.FactModel;
-import gov.samhsa.consent2share.accesscontrolservices.brms.domain.RuleExecutionContainer;
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
 
 import org.drools.KnowledgeBase;
@@ -150,7 +150,7 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 	 * 
 	 * @return the stateful knowledge session
 	 */
-	private StatefulKnowledgeSession createStatefulKnowledgeSession() {
+	StatefulKnowledgeSession createStatefulKnowledgeSession() {
 		StatefulKnowledgeSession session = null;
 		try {
 			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory

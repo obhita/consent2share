@@ -104,6 +104,48 @@ public class PatientProfileDtoToPatientMapperTest {
 	}
 	
 	@Test
+	public void testMap_Given_MedicalRecordNumber(){
+		// Arrange
+		final String username = "username";
+		PatientProfileDto patientDto = mock(PatientProfileDto.class);
+		when(patientDto.getUsername()).thenReturn(username);
+		
+		Patient patient = new Patient();
+		when(patientRepository.findByUsername(username)).thenReturn(patient);
+		
+		final String mrn = "mrn";
+		when(patientDto.getMedicalRecordNumber()).thenReturn(mrn);
+		
+		// Act
+		Patient result = sut.map(patientDto);
+		
+		// Assert
+		assertEquals(patient, result);
+		assertEquals(mrn,result.getMedicalRecordNumber());
+	}
+	
+	@Test
+	public void testMap_Given_EnterpriseIdentifier(){
+		// Arrange
+		final String username = "username";
+		PatientProfileDto patientDto = mock(PatientProfileDto.class);
+		when(patientDto.getUsername()).thenReturn(username);
+		
+		Patient patient = new Patient();
+		when(patientRepository.findByUsername(username)).thenReturn(patient);
+		
+		final String eid = "eid";
+		when(patientDto.getEnterpriseIdentifier()).thenReturn(eid);
+		
+		// Act
+		Patient result = sut.map(patientDto);
+		
+		// Assert
+		assertEquals(patient, result);
+		assertEquals(eid,result.getEnterpriseIdentifier());
+	}
+	
+	@Test
 	public void test_General_Case() {
 		final String username = "username";
 		PatientProfileDto patientDto = mock(PatientProfileDto.class);

@@ -2,12 +2,15 @@ package gov.samhsa.acs.contexthandler;
 
 import static org.junit.Assert.assertEquals;
 
+import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.contexthandler.PolicyDecisionPointImpl;
 import gov.samhsa.acs.contexthandler.PolicyDecisionPointImplData;
 import gov.samhsa.acs.contexthandler.RequestGenerator;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,10 +24,15 @@ import org.herasaf.xacml.core.simplePDP.SimplePDPFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.mockito.Mockito.*;
+
+@RunWith(MockitoJUnitRunner.class)
 public class PolicyDecisionPointImplTest {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PolicyDecisionPointImplTest.class);
@@ -153,4 +161,66 @@ public class PolicyDecisionPointImplTest {
 				pdp.evaluateRequest(simplePDP, request,
 						new LinkedList<Evaluatable>()).getPdpDecision());
 	}
+	
+	@Test
+	public void testEvaluateRequestWithPatientUniqueId() {
+		pdp.deployPolicies(simplePDP, policies);
+		assertEquals(
+				"PERMIT",
+				pdp.evaluateRequest(simplePDP, request,
+						new LinkedList<Evaluatable>()).getPdpDecision());
+		pdp.undeployPolicy(simplePDP, policy);
+		pdp.deployPolicies(simplePDP, policies_invalid);
+		assertEquals(
+				"DENY",
+				pdp.evaluateRequest(simplePDP, request,"1").getPdpDecision());
+	}
+	
+	@Test
+	public void testEvaluateRequestWithRequestAndPatientUniqueId() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		pdp.deployPolicies(simplePDP, policies);
+		assertEquals(
+				"PERMIT",
+				pdp.evaluateRequest(simplePDP, request,
+						new LinkedList<Evaluatable>()).getPdpDecision());
+		pdp.undeployPolicy(simplePDP, policy);
+		pdp.deployPolicies(simplePDP, policies_invalid);
+		Field simplePDPField=pdp.getClass().getDeclaredField("simplePDP");
+		simplePDPField.setAccessible(true);
+		simplePDPField.set(pdp, simplePDP);
+		assertEquals(
+				"DENY",
+				pdp.evaluateRequest(request,"1").getPdpDecision());
+	}
+	
+	@Test
+	public void testEvaluateRequestWithXacmlRequest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		XacmlRequest xacmlRequest=new XacmlRequest();
+		xacmlRequest.setIntermediarySubjectNPI("1285969170");
+		xacmlRequest.setRecepientSubjectNPI("1568797520");
+		xacmlRequest.setPurposeOfUse("TREAT");
+		xacmlRequest.setPatientId("consent2share@outlook.com");
+		when(requestGeneratorMock.generateRequest("1568797520", "1285969170", "TREAT", "consent2share@outlook.com")).thenReturn(request);
+		pdp.deployPolicies(simplePDP, policies);
+		assertEquals(
+				"PERMIT",
+				pdp.evaluateRequest(simplePDP, request,
+						new LinkedList<Evaluatable>()).getPdpDecision());
+		pdp.undeployPolicy(simplePDP, policy);
+		pdp.deployPolicies(simplePDP, policies_invalid);
+		Field simplePDPField=pdp.getClass().getDeclaredField("simplePDP");
+		simplePDPField.setAccessible(true);
+		simplePDPField.set(pdp, simplePDP);
+		assertEquals(
+				"DENY",
+				pdp.evaluateRequest(xacmlRequest).getPdpDecision());
+	}
+	
+	@Test
+	public void testGetPolicies(){
+		List<Evaluatable> policies=new ArrayList<Evaluatable>();
+		when(data.getPolicies("1")).thenReturn(policies);
+		assertEquals(pdp.getPolicies("1"),policies);
+	}
+	
 }

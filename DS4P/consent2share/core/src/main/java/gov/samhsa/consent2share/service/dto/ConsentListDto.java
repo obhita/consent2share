@@ -28,7 +28,6 @@ package gov.samhsa.consent2share.service.dto;
 import java.util.Date;
 import java.util.Set;
 
-import org.springframework.format.annotation.DateTimeFormat;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -313,22 +313,9 @@
 													<span id="email_client_error_text" class="required-text" style="display: none;">
 														Please provide a valid email address.</span>
 												</div>
-												
-												<div th:if="${medicalRecordNumber}">
-		                                   			<label for="mrn">Medical Record Number(MRN)</label>	                                    			
-		                                   		</div>
-		                                   		<div class="inline-block">
-		                                    		<span  th:field="*{medicalRecordNumber}"> </span>
-		                                    	</div>		                                    	
-												<div th:if="${enterpriseIdentifier}">
-		                                   			<label for="enterpriseIdentifier">Enterprise Identifier</label>	                                    			
-		                                   		</div>
-		                                   		<div class="inline-block">
-		                                    		<span  th:field="*{enterpriseIdentifier}"> </span>
-		                                    	</div>	
 		                                    		                                    												
 											</div>
-										</div>
+										</div>									
 
 										<div style="clear: both"></div>
 									</fieldset>
@@ -401,6 +388,35 @@
 													<span id="ssn_client_error_text" class="required-text" style="display: none;">
 														Please provide a valid social security number. For example 123-45-6789.</span>
 												</div>
+											</div>
+											
+											<div class="form-group">
+												<div>
+													<label for="medical_record_number">Medical Record Number (MRN)</label>
+												</div>
+												<div class="inline-block">
+													<input id="medical_record_number" name="medicalRecordNumber" type="text"
+														th:field="*{medicalRecordNumber}" class="form-control" />
+													<span class="required-text" th:errors="*{medicalRecordNumber}">
+														Please provide a valid medical record number.</span>
+													<span id="mrn_client_error_text" class="required-text" style="display: none;">
+														Please provide a valid medical record number.</span>
+												</div>
+											</div>
+											
+											<div class="form-group">
+												<div>
+													<label for="enterprise_identifier">Enterprise Identifier (EID)</label>
+												</div>
+												<div class="inline-block">
+													<span id="enterprise_identifier" th:text="*{enterpriseIdentifier}?: 'You must enter a valid MRN to view the Enterprise Identifier.'" >
+													You must enter a valid MRN to view the Enterprise Identifier.
+													</span>
+												</div>												
+												<!-- div class="inline-block">
+													<input id="enterprise_identifier" name="enterpriseIdentifier" type="text"
+														th:field="*{enterpriseIdentifier}" class="form-control" th:disabled="true"/>
+												</div-->
 											</div>
 											
 											<div class="form-group">

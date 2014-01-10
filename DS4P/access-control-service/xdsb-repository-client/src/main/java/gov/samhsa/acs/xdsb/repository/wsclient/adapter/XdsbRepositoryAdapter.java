@@ -53,7 +53,14 @@ public class XdsbRepositoryAdapter {
 	/** The marshaller. */
 	private SimpleMarshaller marshaller;
 
+	/** The response filter. */
 	private RetrieveDocumentSetResponseFilter responseFilter;
+
+	/**
+	 * Instantiates a new xdsb repository adapter.
+	 */
+	public XdsbRepositoryAdapter() {
+	}
 
 	/**
 	 * Instantiates a new xdsb repository adapter.
@@ -62,6 +69,8 @@ public class XdsbRepositoryAdapter {
 	 *            the xdsb repository
 	 * @param marshaller
 	 *            the marshaller
+	 * @param responseFilter
+	 *            the response filter
 	 */
 	public XdsbRepositoryAdapter(XDSRepositorybWebServiceClient xdsbRepository,
 			SimpleMarshaller marshaller,
@@ -131,6 +140,19 @@ public class XdsbRepositoryAdapter {
 		return xdsbRepository.retrieveDocumentSet(request);
 	}
 
+	/**
+	 * Retrieve document set.
+	 * 
+	 * @param request
+	 *            the request
+	 * @param patientId
+	 *            the patient id
+	 * @param authorNPI
+	 *            the author npi
+	 * @return the retrieve document set response
+	 * @throws Throwable
+	 *             the throwable
+	 */
 	public RetrieveDocumentSetResponse retrieveDocumentSet(
 			RetrieveDocumentSetRequest request, String patientId,
 			String authorNPI) throws Throwable {
@@ -160,6 +182,13 @@ public class XdsbRepositoryAdapter {
 		return retrieveDocumentSetResponse;
 	}
 
+	/**
+	 * Retrieve document set.
+	 * 
+	 * @param docRequest
+	 *            the doc request
+	 * @return the retrieve document set response
+	 */
 	public RetrieveDocumentSetResponse retrieveDocumentSet(
 			DocumentRequest docRequest) {
 		RetrieveDocumentSetRequest request = createRetrieveDocumentSetRequest(docRequest);
@@ -168,6 +197,13 @@ public class XdsbRepositoryAdapter {
 		return retrieveDocumentSetResponse;
 	}
 
+	/**
+	 * Retrieve document set.
+	 * 
+	 * @param docRequest
+	 *            the doc request
+	 * @return the retrieve document set response
+	 */
 	public RetrieveDocumentSetResponse retrieveDocumentSet(
 			List<DocumentRequest> docRequest) {
 		RetrieveDocumentSetRequest request = createRetrieveDocumentSetRequest(docRequest);
@@ -189,7 +225,7 @@ public class XdsbRepositoryAdapter {
 	 */
 	String generateMetadata(String documentXmlString, String homeCommunityId,
 			XdsbDocumentType documentTypeForXdsbMetadata) {
-		XdsbMetadataGenerator xdsbMetadataGenerator = createXdsbMetadataGenerator(documentTypeForXdsbMetadata); 
+		XdsbMetadataGenerator xdsbMetadataGenerator = createXdsbMetadataGenerator(documentTypeForXdsbMetadata);
 		String metadata = xdsbMetadataGenerator.generateMetadataXml(
 				documentXmlString, homeCommunityId);
 		return metadata;
@@ -205,7 +241,7 @@ public class XdsbRepositoryAdapter {
 	XdsbMetadataGeneratorImpl createXdsbMetadataGenerator(
 			XdsbDocumentType documentTypeForXdsbMetadata) {
 		return new XdsbMetadataGeneratorImpl(new UniqueOidProviderImpl(),
-				documentTypeForXdsbMetadata);
+				documentTypeForXdsbMetadata, this.marshaller);
 	}
 
 	/**
@@ -259,6 +295,13 @@ public class XdsbRepositoryAdapter {
 		return request;
 	}
 
+	/**
+	 * Creates the retrieve document set request.
+	 * 
+	 * @param docRequest
+	 *            the doc request
+	 * @return the retrieve document set request
+	 */
 	RetrieveDocumentSetRequest createRetrieveDocumentSetRequest(
 			DocumentRequest docRequest) {
 		RetrieveDocumentSetRequest request = new RetrieveDocumentSetRequest();
@@ -266,6 +309,13 @@ public class XdsbRepositoryAdapter {
 		return request;
 	}
 
+	/**
+	 * Creates the retrieve document set request.
+	 * 
+	 * @param docRequest
+	 *            the doc request
+	 * @return the retrieve document set request
+	 */
 	RetrieveDocumentSetRequest createRetrieveDocumentSetRequest(
 			List<DocumentRequest> docRequest) {
 		RetrieveDocumentSetRequest request = new RetrieveDocumentSetRequest();

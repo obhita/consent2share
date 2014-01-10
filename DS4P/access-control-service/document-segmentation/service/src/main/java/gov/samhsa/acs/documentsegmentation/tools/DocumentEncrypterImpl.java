@@ -54,11 +54,27 @@ public class DocumentEncrypterImpl implements DocumentEncrypter {
 	/** The document xml converter. */
 	private DocumentXmlConverter documentXmlConverter;
 
+	/**
+	 * Instantiates a new document encrypter impl.
+	 */
+	public DocumentEncrypterImpl() {
+	}
+
+	/**
+	 * Instantiates a new document encrypter impl.
+	 * 
+	 * @param documentXmlConverter
+	 *            the document xml converter
+	 */
+	public DocumentEncrypterImpl(DocumentXmlConverter documentXmlConverter) {
+		super();
+		this.documentXmlConverter = documentXmlConverter;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.documentsegmentation.util
+	 * @see gov.samhsa.acs.documentsegmentation.util
 	 * .DocumentEncrypter#encryptDocument(java.security.Key, java.lang.String,
 	 * gov.samhsa.acs.common.bean.RuleExecutionContainer)
 	 */
@@ -104,33 +120,14 @@ public class DocumentEncrypterImpl implements DocumentEncrypter {
 				// Output encrypted doc to file
 				// FileHelper.writeDocToFile(xmlDocument, "Encrypted_C32.xml");
 
-				xmlString = documentXmlConverter.convertXmlDocToString(xmlDocument);
+				xmlString = documentXmlConverter
+						.convertXmlDocToString(xmlDocument);
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				throw new DS4PException(e.toString(), e);
 			}
 		}
 		return xmlString;
-	}
-
-	/**
-	 * Gets the document xml converter.
-	 * 
-	 * @return the document xml converter
-	 */
-	public DocumentXmlConverter getDocumentXmlConverter() {
-		return documentXmlConverter;
-	}
-
-	/**
-	 * Sets the document xml converter.
-	 * 
-	 * @param documentXmlConverter
-	 *            the new document xml converter
-	 */
-	public void setDocumentXmlConverter(
-			DocumentXmlConverter documentXmlConverter) {
-		this.documentXmlConverter = documentXmlConverter;
 	}
 
 	/**

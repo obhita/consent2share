@@ -143,23 +143,21 @@
 							</span>
 
 							<section class="top-margin10">
-								<form id="adminProfileForm" onsubmit="return validateUpdateAdminProfile('adminProfileForm')" action="#" th:action="@{/Administrator/editAdminProfile.html}" method="post">
-									
-									<!-- TODO: Fix input elements to properly use bootstrap classes and div wrappings
-												to control width instead of setting a width in pixels using CSS -->
+								<form id="adminProfileForm" onsubmit="return validateUpdateAdminProfile('adminProfileForm')" action="#" th:action="@{/Administrator/editAdminProfile.html}" th:object="${adminProfileDto}" method="post">
 									
 									<fieldset id="edit-login-required" class="row">
 
 										<legend>Edit Required Account Information</legend>
 
 										<div class="required-info-group">
+										<div style="max-width: 350px;">
 											<div class="form-group top-margin10">
 												<div>
 													<label for="first_name">First Name</label>
 												</div>
 												<div>
-													<input id="first_name" name="firstname" type="text" aria-required="true" class="form-control inline-block" />
-													<span class="required-text" style="display: none;">First name is required.</span>
+													<input id="first_name" name="firstname" type="text" aria-required="true" th:field="*{firstName}" class="form-control inline-block"/>
+													<span id="fname_server_error_text"  class="required-text" th:errors="*{firstName}" >First name is required.</span>
 													<span id="fname_client_error_text" class="required-text" style="display: none;">First name is required.</span>
 												</div>
 											</div>
@@ -169,10 +167,20 @@
 													<label for="last_name">Last Name</label>
 												</div>
 												<div>
-													<input id="last_name" name="lastname" type="text"
-														aria-required="true" class="form-control inline-block" /> 
-													<span class="required-text" style="display: none;">Last name must be between 2 and 30 characters.</span>
+													<input id="last_name" name="lastname" type="text" th:field="*{lastName}" aria-required="true" class="form-control inline-block" /> 
+													<span id="lname_server_error_text"  class="required-text" th:errors="*{lastName}" >Last name must be between 2 and 30 characters.</span>
 													<span id="lname_client_error_text" class="required-text" style="display: none">Last name is required.</span>
+												</div>
+											</div>
+
+											<div class="form-group">
+												<div>
+													<label for="employee_id">Employee ID</label>
+												</div>
+												<div>
+													<input id="employee-id" name="employeeid" type="text"  th:field="*{employeeId}" aria-required="true" class="form-control inline-block" />
+													<span id="empid_server_error_text" class="required-text" th:errors="*{employeeId}">Employee	ID validation error message</span>
+													<span id="empid_client_error_text" class="required-text" style="display: none">Employee	ID validation error message</span>
 												</div>
 											</div>
 
@@ -181,94 +189,23 @@
 													<label for="gender">Gender</label>
 												</div>
 												<div class="controls">
-													<select id="gender" class="form-control inline-block">
+													<select id="gender" th:field="*{administrativeGenderCode}" class="form-control inline-block">
 														<option selected="selected" value="">--- Please Select ---</option>
-														
-														<option value="M">Male</option>
-														<option value="F">Female</option>
-														
-														<!-- <option th:each="gender : ${administrativeGenderCodes}"
-															th:value="${gender.code}" th:text="${gender.displayName}">F</option> -->
+														<option th:each="gender : ${administrativeGenderCodes}" th:value="${gender.code}" th:text="${gender.displayName}">F</option>
 													</select>
-													<span class="required-text" style="display: none;">Gender Selection is required.</span>
+													<span id="gender_server_error_text" class="required-text" th:errors="*{administrativeGenderCode}">Gender Selection is required.</span>
 													<span id="gender_client_error_text" class="required-text" style="display: none;">Gender Selection is required.</span>
 												</div>
 											</div>
-
-											<!-- <div class="form-group">
-												<div>
-													<label class="control-label">Date of Birth</label>
-												</div>
-												<div id="dob" class="controls inline-block">
-													<input type="text" id="date" class="form-control" data-format="MM/DD/YYYY" data-template="MMM D YYYY"
-														name="date" style="display: none;" />
-													<select id="month" class="form-control">
-														<option selected="selected" value="  ">Month</option>
-														<option value="01">January</option>
-														<option value="02">February</option>
-														<option value="03">March</option>
-														<option value="04">April</option>
-														<option value="05">May</option>
-														<option value="06">June</option>
-														<option value="07">July</option>
-														<option value="08">August</option>
-														<option value="09">September</option>
-														<option value="10">October</option>
-														<option value="11">November</option>
-														<option value="12">December</option>
-													</select>
-													<select id="day" class="form-control">
-														<option selected="selected" value="  ">Day</option>
-														<option value="01">01</option>
-														<option value="02">02</option>
-														<option value="03">03</option>
-														<option value="04">04</option>
-														<option value="05">05</option>
-														<option value="06">06</option>
-														<option value="07">07</option>
-														<option value="08">08</option>
-														<option value="09">09</option>
-														<option value="10">10</option>
-														<option value="11">11</option>
-														<option value="12">12</option>
-														<option value="13">13</option>
-														<option value="14">14</option>
-														<option value="15">15</option>
-														<option value="16">16</option>
-														<option value="17">17</option>
-														<option value="18">18</option>
-														<option value="19">19</option>
-														<option value="20">20</option>
-														<option value="21">21</option>
-														<option value="22">22</option>
-														<option value="23">23</option>
-														<option value="24">24</option>
-														<option value="25">25</option>
-														<option value="26">26</option>
-														<option value="27">27</option>
-														<option value="28">28</option>
-														<option value="29">29</option>
-														<option value="30">30</option>
-														<option value="31">31</option>
-													</select>
-													<select id="year" class="form-control">
-														<option selected="selected" value="    ">Year</option>
-													</select>
-													<span id="dob_error_text" class="required-text">Date of Birth is required.</span>
-													<span id="dob_client_error_text" class="required-text"
-														style="display: none;">Date of Birth is required.</span>
-												</div>
-											</div> -->
-
+											
 											<div class="form-group">
 												<div>
 													<label for="email">Email</label>
 												</div>
 												<div>
-													<input id="email" name="email" type="text" aria-required="true" class="form-control inline-block" />
-													<span class="required-text" style="display: none;">Please provide a valid email address.</span>
-													<span id="email_client_error_text" class="required-text" style="display: none;">
-														Please provide a valid email address.</span>
+													<input id="email" name="email" type="text" aria-required="true" th:field="*{email}" class="form-control inline-block" />
+													<span id="email_server_error_text" class="required-text" th:errors="*{email}" >Please provide a valid email address.</span>
+													<span id="email_client_error_text" class="required-text" style="display: none;">Please provide a valid email address.</span>
 												</div>
 											</div>
 										</div>
@@ -299,25 +236,26 @@
 															<div class="modal-body">
 																<div id="username-password-container">
 																	<div class="form-group">
-																		<label for="user_name">Username</label>
-																		<!-- <input id="user_name" name="username" type="text" class="form-control"
-																			aria-required="true" th:field="*{username}" /> -->
-																		<input id="user_name" name="username" type="text" class="form-control"
-																			aria-required="true"/>
-																		<!-- <span class="required-text" th:errors="*{username}">Username is required.</span> -->
-																		<span class="required-text" style="display: none;">Username is required.</span>
-																		<span id="username_client_error_text" class="required-text" style="display: none;">Username is required.</span>
+																		<div>
+																			<label for="user_name">Username</label>
+																		</div>
+																		<div>
+																			<input id="user_name" name="username" type="text" class="form-control" aria-required="true" th:field="*{username}"/>
+																			<span id="username_server_error_text" class="required-text" th:errors="*{username}">Username is required.</span>
+																			<span id="username_client_error_text" class="required-text" style="display: none;">Username is required.</span>
+																		</div>
 																	</div>
 																	
 																	<div class="form-group">
-																		<label for="password">Password</label>
-																		<!-- <input id="password" name="password" type="password" class="form-control"
-																			aria-required="true" th:field="*{password}"/> -->
-																		<input id="password" name="password" type="password" class="form-control"
-																			aria-required="true" style="-webkit-text-security:none !important;"/>
-																		<!-- <span class="required-text" th:errors="*{password}">Password is required.</span> -->
-																		<span class="required-text" style="display: none;">Password is required.</span>
-																		<span id="pwd_client_error_text" class="required-text" style="display: none;">Password is required.</span>
+																		<div>
+																			<label for="password">Password</label>
+																		</div>
+																		<div>
+																			<input id="password" name="password" type="password" class="form-control" aria-required="true" th:field="*{password}"
+																				style="-webkit-text-security:none !important;"/>
+																			<span  id="pwd_server_error_text"  class="required-text" th:errors="*{password}">Password is required.</span>
+																			<span id="pwd_client_error_text" class="required-text" style="display: none;">Password is required.</span>
+																		</div>
 																	</div>
 																</div>
 															</div>
@@ -334,6 +272,7 @@
 												<!-- /.modal -->
 												
 											</div>
+										</div>
 										</div>
 										
 									</fieldset>

@@ -26,9 +26,7 @@
 package gov.samhsa.consent2share.web;
 
 import gov.samhsa.consent2share.domain.account.Users;
-import gov.samhsa.consent2share.hl7.Hl7v3TransformerException;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
-import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.TokenExpiredException;
 import gov.samhsa.consent2share.infrastructure.security.TokenNotExistException;
@@ -49,9 +47,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -137,13 +133,12 @@ public class SignupController extends AbstractController {
 	 * @throws ParseException the parse exception
 	 * @throws UsernameNotExistException the username not exist exception
 	 * @throws EmailAddressNotExistException the email address not exist exception
-	 * @throws Hl7v3TransformerException 
 	 */
 	@RequestMapping(value = "registration.html", method = RequestMethod.POST)
 	public String signup(@Valid SignupDto signupDto, BindingResult result,
 			HttpServletRequest request, RedirectAttributes redirectAttributes,
 			Model model) throws MessagingException, ParseException,
-			UsernameNotExistException, EmailAddressNotExistException, Hl7v3TransformerException {
+			UsernameNotExistException, EmailAddressNotExistException {
 
 		fieldValidator.validate(signupDto, result);
 

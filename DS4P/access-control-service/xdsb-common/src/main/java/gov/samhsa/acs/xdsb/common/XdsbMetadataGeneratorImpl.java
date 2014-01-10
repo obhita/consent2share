@@ -26,17 +26,14 @@
 package gov.samhsa.acs.xdsb.common;
 
 import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.acs.common.tool.SimpleMarshaller;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -44,10 +41,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import oasis.names.tc.ebxml_regrep.xsd.lcm._3.SubmitObjectsRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import oasis.names.tc.ebxml_regrep.xsd.lcm._3.SubmitObjectsRequest;
 
 /**
  * The Class XdsbMetadataGeneratorImpl.
@@ -78,6 +75,9 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 	/** The document type for xdsb metadata. */
 	private XdsbDocumentType documentTypeForXdsbMetadata;
 
+	/** The marshaller. */
+	private SimpleMarshaller marshaller;
+
 	/**
 	 * Instantiates a new xdsb metadata generator impl.
 	 * 
@@ -85,11 +85,15 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 	 *            the unique oid provider
 	 * @param documentTypeForXdsbMetadata
 	 *            the document type for xdsb metadata
+	 * @param marshaller
+	 *            the marshaller
 	 */
 	public XdsbMetadataGeneratorImpl(UniqueOidProvider uniqueOidProvider,
-			XdsbDocumentType documentTypeForXdsbMetadata) {
+			XdsbDocumentType documentTypeForXdsbMetadata,
+			SimpleMarshaller marshaller) {
 		this.uniqueOidProvider = uniqueOidProvider;
 		this.documentTypeForXdsbMetadata = documentTypeForXdsbMetadata;
+		this.marshaller = marshaller;
 	}
 
 	/*
@@ -162,62 +166,13 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 		String metadataXml = generateMetadataXml(document, homeCommunityId);
 		SubmitObjectsRequest submitObjectsRequest = null;
 		try {
-			submitObjectsRequest = unmarshallFromXml(
+			submitObjectsRequest = marshaller.unmarshallFromXml(
 					SubmitObjectsRequest.class, metadataXml);
 		} catch (JAXBException e) {
 			throw new DS4PException(e.toString(), e);
 		}
 
 		return submitObjectsRequest;
-	}
-
-	/**
-	 * Unmarshall from xml.
-	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param clazz
-	 *            the clazz
-	 * @param xml
-	 *            the xml
-	 * @return the t
-	 * @throws JAXBException
-	 *             the jAXB exception
-	 */
-	@SuppressWarnings("unchecked")
-	private static <T> T unmarshallFromXml(Class<T> clazz, String xml)
-			throws JAXBException {
-		JAXBContext context = JAXBContext.newInstance(clazz);
-		Unmarshaller um = context.createUnmarshaller();
-		ByteArrayInputStream input = new ByteArrayInputStream(xml.getBytes());
-
-		return (T) um.unmarshal(input);
-	}
-
-	/**
-	 * Marshall.
-	 * 
-	 * @param obj
-	 *            the obj
-	 * @return the string
-	 * @throws Throwable
-	 *             the throwable
-	 */
-	@SuppressWarnings("unused")
-	private static String marshall(Object obj) throws Throwable {
-		final JAXBContext context = JAXBContext.newInstance(obj.getClass());
-
-		// Create the marshaller, this is the nifty little thing that will
-		// actually transform the object into XML
-		final Marshaller marshaller = context.createMarshaller();
-
-		// Create a stringWriter to hold the XML
-		final StringWriter stringWriter = new StringWriter();
-
-		// Marshal the javaObject and write the XML to the stringWriter
-		marshaller.marshal(obj, stringWriter);
-
-		return stringWriter.toString();
 	}
 
 	/**

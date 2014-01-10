@@ -30,7 +30,7 @@ public class DocumentMaskerImplTest {
 
 	private static RuleExecutionContainer ruleExecutionContainer;
 	private static String c32;
-	
+
 	private static DocumentMaskerImpl documentMasker;
 
 	@BeforeClass
@@ -38,8 +38,7 @@ public class DocumentMaskerImplTest {
 		fileReader = new FileReaderImpl();
 		documentXmlConverter = new DocumentXmlConverterImpl();
 
-		documentMasker = new DocumentMaskerImpl();
-		documentMasker.setDocumentXmlConverter(documentXmlConverter);
+		documentMasker = new DocumentMaskerImpl(documentXmlConverter);
 
 		c32 = fileReader.readFile("c32.xml");
 		ruleExecutionContainer = setRuleExecutionContainer();

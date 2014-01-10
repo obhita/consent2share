@@ -124,8 +124,18 @@ function validateProfileUpdateForm(){
 	}else{
 		$('#ssn_client_error_text').text("");
 		$('#ssn_client_error_text').attr('style', "display: none;");
-	}
+	}	
 	
+	var isValidMrn = chkMrn($('#medical_record_number').val());
+
+	if(isValidMrn !== true){
+		isFormValid = false;
+		$('#mrn_client_error_text').html(isValidMrn);
+		$('#mrn_client_error_text').attr('style', "");
+	}else{
+		$('#mrn_client_error_text').text("");
+		$('#mrn_client_error_text').attr('style', "display: none;");
+	}		
 	
 	if(isFormValid !== true){
 		if(flagUserPassInvalid === false){
@@ -135,6 +145,40 @@ function validateProfileUpdateForm(){
 	}else{
 		return true;
 	}
+}
+
+
+function validateAdminEditPatientProfileForm(){
+	preprocessInput();
+
+	var isFormValid = true;
+	
+	isFormValid = validateCommonFields(isFormValid);
+	
+	var isValidPhone = chkPhone($('#phone').val());
+
+	if(isValidPhone !== true){
+		isFormValid = false;
+		$('#phone_client_error_text').html(isValidPhone);
+		$('#phone_client_error_text').attr('style', "");
+	}else{
+		$('#phone_client_error_text').text("");
+		$('#phone_client_error_text').attr('style', "display: none;");
+	}
+	
+	var isValidZip = chkZip($('#zip').val());
+
+	if(isValidZip !== true){
+		isFormValid = false;
+		$('#zip_client_error_text').html(isValidZip);
+		$('#zip_client_error_text').attr('style', "");
+	}else{
+		$('#zip_client_error_text').text("");
+		$('#zip_client_error_text').attr('style', "display: none;");
+	}
+			
+	
+	return isFormValid;
 }
 
 
@@ -195,17 +239,6 @@ function validateCommonFields(inFormValid){
 		$('#email_client_error_text').text("");
 		$('#email_client_error_text').attr('style', "display: none;");
 	}
-
-	/**	var isValidMrn = chkMrn($('#medicalRecordNumber').val());
-
-	if(isValidMrn !== true){
-		isFormValidSub = false;
-		$('#mrn_client_error_text').html(isValidMrn);
-		$('#mrn_client_error_text').attr('style', "");
-	}else{
-		$('#mrn_client_error_text').text("");
-		$('#mrn_client_error_text').attr('style', "display: none;");
-	}	*/
 	
 	return isFormValidSub;
 }
@@ -213,9 +246,8 @@ function validateCommonFields(inFormValid){
 
 
 
-/* Function to validate Create Patient Account form
- * on Administrator/adminHome.html page */
-function validateCreatePatientAccount(){
+/* Function to validate Create Patient Account form on Administrator/adminHome.html page */
+function validateAdminCreatePatientAccount(){
 	preprocessInput();
 
 	var isFormValid = true;
@@ -385,12 +417,9 @@ function chkLname(inLname){
 }
 
 function chkMrn(inMrn){
-	if(2 > inMrn.length || inMrn.length > 30){
-		if(0 >= inMrn.length){
-			return "MRN is required";
-		}else{
-			return "MRN must be between 2 and 30 characters long";
-		}
+	var errorString = "MRN must be between 0 and 30 characters long";
+	if(0 > inMrn.length || inMrn.length > 30){
+		return errorString;
 	}else{
 		return true;
 	}

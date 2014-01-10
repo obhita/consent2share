@@ -23,8 +23,8 @@ insert into patient(username, first_name, last_name, birth_day, administrative_g
 values('albert.smith', 'Albert', 'Smith', '1983-02-19', 2, 'consent2share@outlook.com', 1,'5555555555','7175 Columbia Gateway Dr','columbia',22,'21246',1);
 insert into patient(username, first_name, last_name, birth_day, administrative_gender_code, email, version,telephone, street_address_line,city, state_code,postal_code,country_code)
 values('appscan', 'Adam', 'Smith', '1960-02-09', 2, 'consent2share@outlook.com', 1,'5555555555','7175 Columbia Gateway Dr','columbia',22,'21246',1);
-insert into patient(username, first_name, last_name, birth_day, administrative_gender_code, email, version)
-values('consent2share.admin', 'Mary', 'Doe', '1975-10-10', 1, 'marydoe@test.com', 1);
+insert into provider_admin(username, first_name, last_name,administrative_gender_code, email, version,employeeid)
+values('consent2share.admin', 'Mary', 'Doe', 1, 'consent2share@outlook.com', 1, 'c2s77777');
 
 
 INSERT INTO individual_provider ( entity_type, enumeration_date, first_line_mailing_address, first_line_practice_location_address, last_update_date, mailing_address_city_name, mailing_address_country_code, mailing_address_fax_number, mailing_address_postal_code, mailing_address_state_name, mailing_address_telephone_number, npi, practice_location_address_city_name, practice_location_address_country_code, practice_location_address_fax_number, practice_location_address_postal_code, practice_location_address_state_name, practice_location_address_telephone_number, provider_taxonomy_code, provider_taxonomy_description, second_line_mailing_address, second_line_practice_location_address, version, credential, first_name, last_name, middle_name, name_prefix, name_suffix, patient) 

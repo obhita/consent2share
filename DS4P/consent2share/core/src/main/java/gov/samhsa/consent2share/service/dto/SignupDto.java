@@ -61,9 +61,6 @@ public class SignupDto {
 	/** The password. */
 	private String password;
 
-	/** The MRN. */
-	private String medicalRecordNumber;	
-
 	/**
 	 * Gets the first name.
 	 *
@@ -189,14 +186,4 @@ public class SignupDto {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
-	public String getMedicalRecordNumber() {
-		return medicalRecordNumber;
-	}
-
-	public void setMedicalRecordNumber(String medicalRecordNumber) {
-		this.medicalRecordNumber = medicalRecordNumber;
-	}
-	
-	
 }

@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class XMLDateAdapter extends XmlAdapter<String, Date> {
 
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 	
 	@Override
 	public Date unmarshal(String v) throws Exception {

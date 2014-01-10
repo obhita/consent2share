@@ -73,18 +73,13 @@ public class DocumentSegmentationImplIT {
 		fileReader = new FileReaderImpl();
 		documentXmlConverter = new DocumentXmlConverterImpl();
 		metadataGenerator = new MetadataGeneratorImpl();
-		documentEditor = new DocumentEditorImpl();
-		documentEditor.setFileReader(fileReader);
-		documentEditor.setMetadataGenerator(metadataGenerator);
-		documentEditor.setDocumentXmlConverter(documentXmlConverter);
+		documentEditor = new DocumentEditorImpl(metadataGenerator, fileReader,
+				documentXmlConverter);
 		marshaller = new SimpleMarshallerImpl();
 		documentTagger = new DocumentTaggerImpl();
-		documentEncrypter = new DocumentEncrypterImpl();
-		documentEncrypter.setDocumentXmlConverter(documentXmlConverter);
-		documentRedactor = new DocumentRedactorImpl();
-		documentRedactor.setDocumentEditor(documentEditor);
-		documentRedactor
-				.setDocumentXmlConverter(documentXmlConverter);
+		documentEncrypter = new DocumentEncrypterImpl(documentXmlConverter);
+		documentRedactor = new DocumentRedactorImpl(documentEditor,
+				documentXmlConverter);
 		documentMasker = new DocumentMaskerImpl();
 		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
 		additionalMetadataGeneratorForSegmentedClinicalDocumentImpl = new AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl();
@@ -98,9 +93,10 @@ public class DocumentSegmentationImplIT {
 		endpointAddressForRuleExectionWebServiceClient = "http://localhost:90/RuleExecutionService/services/RuleExecutionService";
 		xdsDocumentEntryUniqueId = "123";
 		endpointAddressGuvnorService = "http://localhost:7070/guvnor-5.5.0.Final-tomcat-6.0/rest/packages/AnnotationRules/source";
-		
-		ruleExecutionService = new RuleExecutionServiceImpl(new GuvnorServiceImpl(
-				endpointAddressGuvnorService,"admin", "admin"), new SimpleMarshallerImpl());
+
+		ruleExecutionService = new RuleExecutionServiceImpl(
+				new GuvnorServiceImpl(endpointAddressGuvnorService, "admin",
+						"admin"), new SimpleMarshallerImpl());
 		try {
 			xacmlResultObject = marshaller.unmarshallFromXml(XacmlResult.class,
 					xacmlResult);

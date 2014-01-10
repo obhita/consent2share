@@ -85,24 +85,4 @@ public class DocumentSegmentationServiceImpl implements
 				parameters.getXdsDocumentEntryUniqueId());
 		return response;
 	}
-
-	/**
-	 * Gets the document processor.
-	 * 
-	 * @return the document processor
-	 */
-	public DocumentSegmentation getDocumentSegmentationService() {
-		return documentSegmentationService;
-	}
-
-	/**
-	 * Sets the push pep.
-	 * 
-	 * @param documentSegmentationService
-	 *            the new document segmentation service
-	 */
-	public void setDocumentSegmentationService(
-			DocumentSegmentation documentSegmentationService) {
-		this.documentSegmentationService = documentSegmentationService;
-	}
 }

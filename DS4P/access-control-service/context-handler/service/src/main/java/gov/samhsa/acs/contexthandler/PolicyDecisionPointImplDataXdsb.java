@@ -34,11 +34,13 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 
+import org.herasaf.xacml.core.SyntaxException;
 import org.herasaf.xacml.core.policy.Evaluatable;
 import org.herasaf.xacml.core.policy.PolicyMarshaller;
 import org.slf4j.Logger;
@@ -54,7 +56,7 @@ public class PolicyDecisionPointImplDataXdsb implements
 	public static final String URN_POLICY_COMBINING_ALGORITHM_PERMIT_OVERRIDES = "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:permit-overrides";
 
 	/** The urn policy combining algorithm. */
-	private String urnPolicyCombiningAlgorithm;
+	String urnPolicyCombiningAlgorithm;
 
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -140,8 +142,7 @@ public class PolicyDecisionPointImplDataXdsb implements
 			String policySet = makePolicySet(policiesString);
 
 			// Unmarshall policy set as an Evaluatable and add to policy list
-			Evaluatable policy = PolicyMarshaller
-					.unmarshal(new ByteArrayInputStream(policySet.getBytes()));
+			Evaluatable policy = unmarshal(new ByteArrayInputStream(policySet.getBytes()));
 			policies.add(policy);
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
@@ -149,6 +150,10 @@ public class PolicyDecisionPointImplDataXdsb implements
 					"Consent files cannot be queried/retrieved from XDS.b");
 		}
 		return policies;
+	}
+	
+	Evaluatable unmarshal(InputStream inputStream) throws SyntaxException{
+		return PolicyMarshaller.unmarshal(inputStream);
 	}
 
 	/**

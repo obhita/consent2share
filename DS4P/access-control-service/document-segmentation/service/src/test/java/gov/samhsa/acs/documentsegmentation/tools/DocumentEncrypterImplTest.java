@@ -39,14 +39,13 @@ public class DocumentEncrypterImplTest {
 	private static final String ENCRYPTION_PREFIX = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ClinicalDocument xmlns=\"urn:hl7-org:v3\"                  xmlns:sdtc=\"urn:hl7-org:sdtc\"                  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">   <xenc:EncryptedData xmlns:xenc=\"http://www.w3.org/2001/04/xmlenc#\"                       Type=\"http://www.w3.org/2001/04/xmlenc#Content\">      <xenc:EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes128-cbc\"/>      <ds:KeyInfo xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">         <xenc:EncryptedKey>            <xenc:EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#kw-tripledes\"/>            <xenc:CipherData>               <xenc:CipherValue>";
 
 	private static DocumentEncrypterImpl documentEncrypter;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		fileReader = new FileReaderImpl();
 		documentXmlConverter = new DocumentXmlConverterImpl();
 
-		documentEncrypter = new DocumentEncrypterImpl();
-		documentEncrypter.setDocumentXmlConverter(documentXmlConverter);
+		documentEncrypter = new DocumentEncrypterImpl(documentXmlConverter);
 
 		c32 = fileReader.readFile("c32.xml");
 		c32Document = documentXmlConverter.loadDocument(c32);
@@ -70,12 +69,14 @@ public class DocumentEncrypterImplTest {
 			encryptedKey = keyCipher.encryptKey(c32Document, aesSymmetricKey);
 			rootElement = c32Document.getDocumentElement();
 
-			String notEncrypted = documentXmlConverter.convertXmlDocToString(c32Document);
+			String notEncrypted = documentXmlConverter
+					.convertXmlDocToString(c32Document);
 
 			// Act
 			documentEncrypter.encryptElement(c32Document, aesSymmetricKey,
 					encryptedKey, rootElement);
-			String encrypted = documentXmlConverter.convertXmlDocToString(c32Document);
+			String encrypted = documentXmlConverter
+					.convertXmlDocToString(c32Document);
 			logger.debug("NOT ENCRYPTED--> " + notEncrypted);
 			logger.debug("ENCRYPTED--> " + encrypted);
 

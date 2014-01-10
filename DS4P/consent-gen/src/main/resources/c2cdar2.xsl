@@ -20,6 +20,28 @@
         <xsl:value-of select="substring($currentDateTimeUtc, 21, 2)"/>
         <xsl:text>+0000</xsl:text>
     </xsl:variable>
+    
+    <xsl:variable name="consentStart" select="//ConsentExport/consentStart"/>
+    <xsl:variable name="consentEnd" select="//ConsentExport/consentEnd"/>
+    
+    <xsl:variable name="consentStartTime">
+    	<xsl:value-of select="substring($consentStart, 1, 4)"/>
+        <xsl:value-of select="substring($consentStart, 6, 2)"/>
+        <xsl:value-of select="substring($consentStart, 9, 2)"/>
+        <!--xsl:value-of select="substring($consentStart, 12, 2)"/>
+        <xsl:value-of select="substring($consentStart, 15, 2)"/>
+        <xsl:value-of select="substring($consentStart, 18, 2)"/>
+        <xsl:value-of select="substring($consentStart, 20, 5)"/-->
+    </xsl:variable>
+    <xsl:variable name="consentEndTime">
+    	<xsl:value-of select="substring($consentEnd, 1, 4)"/>
+        <xsl:value-of select="substring($consentEnd, 6, 2)"/>
+        <xsl:value-of select="substring($consentEnd, 9, 2)"/>
+        <!--xsl:value-of select="substring($consentEnd, 12, 2)"/>
+        <xsl:value-of select="substring($consentEnd, 15, 2)"/>
+        <xsl:value-of select="substring($consentEnd, 18, 2)"/>
+        <xsl:value-of select="substring($consentEnd, 20, 5)"/-->
+    </xsl:variable>
 
     <xsl:template match="/">
 
@@ -244,8 +266,8 @@
                     <code code="57016-8" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
                         displayName="Privacy Policy Acknowledgement Document"/>
                     <effectiveTime>
-                        <low value="{/ConsentExport/consentStart}"/>
-                        <high value="{/ConsentExport/consentEnd}"/>
+                        <low value="{$consentStartTime}"/>
+                        <high value="{$consentEndTime}"/>
                     </effectiveTime>
                 </serviceEvent>
             </documentationOf>

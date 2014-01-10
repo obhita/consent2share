@@ -25,8 +25,6 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.dto;
 
-import gov.samhsa.consent2share.domain.provider.IndividualProvider;
-import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
 
 import java.util.Set;
 

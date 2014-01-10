@@ -25,48 +25,71 @@
  ******************************************************************************/
 package gov.samhsa.consent;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * The Class ConsentBuilderImpl.
+ */
 public class ConsentBuilderImpl implements ConsentBuilder {
 
+	/** The consent dto factory. */
 	@Autowired
 	ConsentDtoFactory consentDtoFactory;
-	
-	@Autowired
-	ConsentTransformer consentTransformer;	
 
+	/** The consent transformer. */
+	@Autowired
+	ConsentTransformer consentTransformer;
+
+	/** The Constant CDAR2XSLNAME. */
 	private final static String CDAR2XSLNAME = "c2cdar2.xsl";
-	
+
+	/** The Constant XACMLXSLNAME. */
 	private final static String XACMLXSLNAME = "c2xacml.xsl";
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see gov.samhsa.consent.ConsentBuilder#buildConsent2Cdar2(long)
+	 */
 	@Override
-	public String buildConsent2Cdar2(long consentId) throws ConsentGenException{
+	public String buildConsent2Cdar2(long consentId) throws ConsentGenException {
 		ConsentDto consentDto = consentDtoFactory.createConsentDto(consentId);
-		String cdar2 = consentTransformer.transform(consentDto,CDAR2XSLNAME);
+		String cdar2 = consentTransformer.transform(consentDto, CDAR2XSLNAME,
+				null);
 		return cdar2;
 	}
 
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent.ConsentBuilder#buildConsent2Xacml(java.lang.Object)
+	 */
 	@Override
 	public String buildConsent2Xacml(Object obj) throws ConsentGenException {
 		ConsentDto consentDto = consentDtoFactory.createConsentDto(obj);
-		String xacml = consentTransformer.transform(consentDto,XACMLXSLNAME);
+		String xacml = consentTransformer.transform(consentDto, XACMLXSLNAME,
+				consentDto.getPatientDto().getEnterpriseIdentifier());
 		return xacml;
 	}
-	
+
+	/**
+	 * Sets the consent dto factory.
+	 * 
+	 * @param consentDtoFactory
+	 *            the new consent dto factory
+	 */
 	public void setConsentDtoFactory(ConsentDtoFactory consentDtoFactory) {
 		this.consentDtoFactory = consentDtoFactory;
 	}
 
-
+	/**
+	 * Sets the consent transformer.
+	 * 
+	 * @param consentTransformer
+	 *            the new consent transformer
+	 */
 	public void setConsentTransformer(ConsentTransformer consentTransformer) {
 		this.consentTransformer = consentTransformer;
 	}
-
-
-
-
-	
-
 }

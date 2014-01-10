@@ -143,7 +143,7 @@ tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; }
 			<div class="modal fade" id="createPatient" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 			  <div class="modal-dialog">
 			    <div class="modal-content">
-					<form id="admin_create_patient_acct_form" th:object="${basicPatientAccountDto}" th:action="@{adminCreatePatientAccount.html}" onsubmit="return validateCreatePatientAccount('admin_create_patient_acct_form')" method="post">
+					<form id="admin_create_patient_acct_form" th:object="${basicPatientAccountDto}" th:action="@{adminCreatePatientAccount.html}" onsubmit="return validateAdminCreatePatientAccount('admin_create_patient_acct_form')" method="post">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
 							<p class="h3-style" id="myModalLabel">Create Patient Account</p>
@@ -151,19 +151,23 @@ tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; }
 					
 						<div class="modal-body">
 							<section class="row">
-								<div class="form-group col-md-6 col-sm-6">
+								<div class="form-group col-sm-6">
 									<label>First Name</label>
 									<input id="first_name" type="text" th:field="*{firstName}" class="form-control" placeholder="First Name" />
+									<span id="fname_error_text" class="required-text" style="display:none;">First name is required.</span>
+									<span id="fname_client_error_text" class="required-text" style="display: none;">First name is required.</span>
 								</div>
 				
-								<div class="form-group col-md-6 col-sm-6">
+								<div class="form-group col-sm-6">
 									<label>Last Name</label>
 									<input id="last_name" type="text" th:field="*{lastName}" class="form-control" placeholder="Last Name" />
+									<span id="lname_error_text" class="required-text" style="display:none;">Last name is required.</span>
+									<span id="lname_client_error_text" class="required-text" style="display: none;">Last name is required.</span>
 								</div>
 							</section>
 					
-							<section class="row" id="create-patient-dob">
-								<div class="form-group col-md-4 col-sm-4">
+							<section class="row">
+								<div class="form-group col-sm-5">
 									<div>
 										<label for="gender">Gender</label>
 									</div>
@@ -179,7 +183,7 @@ tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; }
 									</div>
 								</div>
 						
-								<div class="form-group col-md-6 col-sm-6">
+								<div class="form-group col-sm-7">
 									<div>
 										<label class="control-label">Date of Birth</label>
 									</div>
@@ -239,8 +243,7 @@ tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; }
 											<option selected="selected" value="    ">Year</option>
 										</select>
 										<span id="dob_error_text" class="required-text" style="display:none;">Date of Birth is required.</span>
-										<span id="dob_client_error_text" class="required-text"
-											style="display: none;">Date of Birth is required.</span>
+										<span id="dob_client_error_text" class="required-text" style="display: none;">Date of Birth is required.</span>
 									</div>
 								</div>
 							</section>
@@ -260,41 +263,49 @@ tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; }
 <!-- END MODAL -->			
 						
 			<div class="row">
-				<section class="col-md-12 col-sm-12">
+				<section class="col-sm-12">
 					<div class="box">
 						<div class="box-header">
 								<h2>
-									<span class="fa fa-user"></span><span class="break"></span>Recent Patients
+									<span class="fa fa-user"></span><span class="break"></span>Recent Patient Activity
 								</h2>
 								<div class="box-icon"></div>
 						</div>
 						<div class="box-content">
                         	<table class="table table-striped" >
-                            	<tbody>
-                                 	<tr>
-				                   		<td><b>First Name</b></td>
-				                   		<td><b>Last Name</b></td>
-				                   		<td><b>Gender</b></td>
-				                   		<td><b>DOB</b></td>
-				                   		<td><b>Date Created</b></td>
-									</tr> 
-			                   		
-			                 		<tr class="tr-highlight" onclick="document.location = 'adminPatientView.html?id=1';" style="">
-			                   		 	<td>Albert</td>
-			                   		 	<td>Smith</td>
-			                   		 	<td>M</td>
-			              		     	<td>02/19/1983 </td>
-			              		     	<td>01/02/2013 </td>
-                                  	</tr> 
-                                  	
-                            <!--      	<tr th:each="recentPatient:${recentVisits}" class="tr-highlight" th:href="@{'adminPatientView.html?id='+${recentPatient.id}}" onclick="document.location = adminPatientView.html?id=2;" th:onclick="'document.location=\'adminPatientView.html?id=' + ${recentPatient.id} + '\';'" method="get">
-			                   		 	<td th:text="${recentPatient.firstName}"></td>
-			                   		 	<td th:text="${recentPatient.lastName}"></td>
-			                   		 	<td th:text="${recentPatient.administrativeGenderCode}"></td>
-			              		     	<td th:text="${recentPatient.birthDate==null}? '' : *{#dates.format((recentPatient.birthDate), 'MM/dd/yyyy')}"></td>
-			              		     	<td>01/02/2013 </td>  
-                                  	</tr> --> 
-                                  	   
+	                        	<thead>
+									<tr>
+										<th>First Name</th>
+										<th>Last Name</th>
+										<th>DOB</th>
+										<th>Gender</th>
+										<th>Activity Type</th>
+										<th>Date Created</th>                                          
+									</tr>
+								</thead>
+                            <!-- 	<tbody>
+	                              	<tr th:each="recentPatient:${recentVisits}" class="tr-highlight" th:href="@{'adminPatientView.html?id='+${recentPatient.id}}"
+	                              			onclick="document.location = adminPatientView.html?id=2;"
+	                              			th:onclick="'document.location=\'adminPatientView.html?id=' + ${recentPatient.id} + '\';'" method="get">
+				                   		 		<td th:text="${recentPatient.firstName}">First Name</td>
+				                   		 		<td th:text="${recentPatient.lastName}">Last Name</td>
+				                   		 		<td th:text="${recentPatient.birthDate==null}? '' : *{#dates.format((recentPatient.birthDate), 'MM/dd/yyyy')}">DOB</td>
+				                   		 		<td th:text="${recentPatient.administrativeGenderCode}">Gender</td>
+				                   		 		<td>Consent Signed</td>
+				              		     		<td>01/02/2013</td>  
+	                                </tr>
+                              	</tbody> -->
+                              	<tbody>
+	                              	<tr th:each="recentActivityDto:${recentActivityDtos}" class="tr-highlight" th:href="@{'adminPatientView.html?id='+${recentActivityDto.patientid}}"
+	                              			onclick="document.location = adminPatientView.html?id=2;"
+	                              			th:onclick="'document.location=\'adminPatientView.html?id=' + ${recentActivityDto.patientid} + '\';'" method="get">
+				                   		 		<td th:text="${recentActivityDto.firstname}">First Name</td>
+				                   		 		<td th:text="${recentActivityDto.lastname}">Last Name</td>
+				                   		 		<td th:text="${recentActivityDto.birthDate==null}? '' : *{#dates.format((recentActivityDto.birthDate), 'MM/dd/yyyy')}">DOB</td>
+				                   		 		<td th:text="${recentActivityDto.administrativeGenderCode}">Gender</td>
+				                   		 		<td th:text="${recentActivityDto.activity+' '+recentActivityDto.type}">Consent Signed</td>
+				              		     		<td th:text="${recentActivityDto.timestamp}">01/02/2013</td>  
+	                                </tr>
                               	</tbody>
                        		</table> 
                 		</div>

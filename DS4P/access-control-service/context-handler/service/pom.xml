@@ -95,6 +95,23 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+					<instrumentation>
+						<excludes>
+							<exclude>gov/va/ehtac/ds4p/ws/*.class</exclude>
+						</excludes>
+						<ignoreMethodAnnotation>gov.samhsa.acs.common.cobertura.CoverageIgnore</ignoreMethodAnnotation>
+					</instrumentation>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+				</configuration>
+			</plugin>
 		</plugins>
 
 	</build>

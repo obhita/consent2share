@@ -59,10 +59,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.InjectMocks;
-import org.xml.sax.SAXException;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.xml.sax.SAXException;
 
 /**
  * @author sadhana.chandra
@@ -71,12 +71,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConsentTransformerImplTest {
 
+	private static final String SAMPLE_DATE_START = "2013-09-04T08:00:00-0500";
+	private static final String SAMPLE_DATE_END = "2014-09-04T08:00:00-0500";
+	private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+
 	@InjectMocks
 	ConsentTransformerImpl cstl = new ConsentTransformerImpl();
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -89,9 +93,10 @@ public class ConsentTransformerImplTest {
 	 * Test method for
 	 * {@link gov.samhsa.consent.ConsentTransformerImpl#transform(gov.samhsa.consent.ConsentDto, java.lang.String)}
 	 * .
-	 * @throws TransformerException 
-	 * @throws JAXBException 
-	 * @throws ConsentGenException 
+	 * 
+	 * @throws TransformerException
+	 * @throws JAXBException
+	 * @throws ConsentGenException
 	 */
 	@Test
 	public void testTransform() throws ConsentGenException {
@@ -102,15 +107,21 @@ public class ConsentTransformerImplTest {
 			e.printStackTrace();
 		}
 
-		String actualTransform = cstl.transform(consentDto, "c2cdar2.xsl");
+		String actualTransform = cstl
+				.transform(consentDto, "c2cdar2.xsl", null);
 
 		String expectedResult = convertXMLFileToString("consentSaxTransformSample.xml");
-		
-		/** list of regular expressions that custom difference listener used during xml comparison. */
-		final List<String> ignorableXPathsRegex = new ArrayList<String>();
-		ignorableXPathsRegex.add("\\/ClinicalDocument\\[1\\]/effectiveTime\\[1\\]\\/@value");
 
-		DetailedDiff diff = compareXMLs(expectedResult, actualTransform, ignorableXPathsRegex);
+		/**
+		 * list of regular expressions that custom difference listener used
+		 * during xml comparison.
+		 */
+		final List<String> ignorableXPathsRegex = new ArrayList<String>();
+		ignorableXPathsRegex
+				.add("\\/ClinicalDocument\\[1\\]/effectiveTime\\[1\\]\\/@value");
+
+		DetailedDiff diff = compareXMLs(expectedResult, actualTransform,
+				ignorableXPathsRegex);
 		// Diff provides two methods for comparison identical and similar.
 		// Identical expects content and order of elements to be same.
 		// Similar is less stricter and allows change in order
@@ -121,7 +132,8 @@ public class ConsentTransformerImplTest {
 	 * Test method for
 	 * {@link gov.samhsa.consent.ConsentTransformerImpl#jaxbMarshall(gov.samhsa.consent.ConsentDto)}
 	 * .
-	 * @throws JAXBException 
+	 * 
+	 * @throws JAXBException
 	 */
 	@Test
 	public void testJaxbMarshall() throws JAXBException {
@@ -136,7 +148,17 @@ public class ConsentTransformerImplTest {
 
 		String xmlContent = convertXMLFileToString("consentJaxBTransformSample.xml");
 
-		DetailedDiff diff = compareXMLs(xmlContent, marshalresult.toString(), null);
+		// consentStart and consentEnd are java.util.Date type, so they are
+		// affected by daylight saving and hard to test jaxbMarshall operation
+		// by comparing the output with a static file (based on the current
+		// daylight saving status, it changes the time zone).
+		// Therefore, they are ignored as below.
+		final List<String> ignorableXPathsRegex = new ArrayList<String>();
+		ignorableXPathsRegex
+				.add("\\/ConsentExport\\[1\\]/consentStart\\[1\\]/");
+		ignorableXPathsRegex.add("\\/ConsentExport\\[1\\]/consentEnd\\[1\\]/");
+		DetailedDiff diff = compareXMLs(xmlContent, marshalresult.toString(),
+				ignorableXPathsRegex);
 
 		// Diff provides two methods for comparison identical and similar.
 		// Identical expects content and order of elements to be same.
@@ -175,10 +197,10 @@ public class ConsentTransformerImplTest {
 	public void testJaxbMarshall_by_StartDate() throws JAXBException {
 
 		String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-		SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		ConsentDto consentDto = new ConsentDto();
 		try {
-			consentDto.setConsentStart(dateFormat.parse("9/4/2013"));
+			consentDto.setConsentStart(dateFormat.parse(SAMPLE_DATE_START));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -197,10 +219,10 @@ public class ConsentTransformerImplTest {
 	public void testJaxbMarshall_by_EndDate() throws JAXBException {
 
 		String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-		SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		ConsentDto consentDto = new ConsentDto();
 		try {
-			consentDto.setConsentEnd(dateFormat.parse("9/4/2013"));
+			consentDto.setConsentEnd(dateFormat.parse(SAMPLE_DATE_START));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -219,10 +241,10 @@ public class ConsentTransformerImplTest {
 	public void testJaxbMarshall_by_SignedDate() throws JAXBException {
 
 		String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-		SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		ConsentDto consentDto = new ConsentDto();
 		try {
-			consentDto.setSignedDate(dateFormat.parse("9/4/2013"));
+			consentDto.setSignedDate(dateFormat.parse(SAMPLE_DATE_START));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -241,10 +263,10 @@ public class ConsentTransformerImplTest {
 	public void testJaxbMarshall_by_RevocationDate() throws JAXBException {
 
 		String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-		SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		ConsentDto consentDto = new ConsentDto();
 		try {
-			consentDto.setRevocationDate(dateFormat.parse("9/4/2013"));
+			consentDto.setRevocationDate(dateFormat.parse(SAMPLE_DATE_START));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -258,24 +280,25 @@ public class ConsentTransformerImplTest {
 
 		Assert.assertEquals(expected, result);
 	}
-	
 
-/*	@Test
-	public void testJaxbMarshall_Marshal_invalid_Object_Exception() throws JAXBException {
-
-		thrown.expect(JAXBException.class);
-		
-    	cstl.jaxbMarshall();
-
-	}
-	*/
+	/*
+	 * @Test public void testJaxbMarshall_Marshal_invalid_Object_Exception()
+	 * throws JAXBException {
+	 * 
+	 * thrown.expect(JAXBException.class);
+	 * 
+	 * cstl.jaxbMarshall();
+	 * 
+	 * }
+	 */
 
 	/**
 	 * Test method for
 	 * {@link gov.samhsa.consent.ConsentTransformerImpl#saxonTransform(java.lang.String, javax.xml.transform.stream.StreamSource)}
 	 * .
-	 * @throws TransformerException 
-	 * @throws JAXBException 
+	 * 
+	 * @throws TransformerException
+	 * @throws JAXBException
 	 */
 	@Test
 	public void testSaxonTransform() throws TransformerException, JAXBException {
@@ -297,34 +320,37 @@ public class ConsentTransformerImplTest {
 		URL cd2 = getClass().getClassLoader().getResource("c2cdar2.xsl");
 		xslID = cd2.toString();
 
-		StreamResult srcdar = cstl.saxonTransform(xslID, streamSource);
+		StreamResult srcdar = cstl.saxonTransform(xslID, streamSource, null);
 
 		String expectedResult = convertXMLFileToString("consentSaxTransformSample.xml");
 
-		/** list of regular expressions that custom difference listener used during xml comparison. */
+		/**
+		 * list of regular expressions that custom difference listener used
+		 * during xml comparison.
+		 */
 		final List<String> ignorableXPathsRegex = new ArrayList<String>();
-		ignorableXPathsRegex.add("\\/ClinicalDocument\\[1\\]/effectiveTime\\[1\\]\\/@value");
-		
-		DetailedDiff diff = compareXMLs(expectedResult, srcdar.getOutputStream().toString(), ignorableXPathsRegex);
+		ignorableXPathsRegex
+				.add("\\/ClinicalDocument\\[1\\]/effectiveTime\\[1\\]\\/@value");
+
+		DetailedDiff diff = compareXMLs(expectedResult, srcdar
+				.getOutputStream().toString(), ignorableXPathsRegex);
 		// Diff provides two methods for comparison identical and similar.
 		// Identical expects content and order of elements to be same.
 		// Similar is less stricter and allows change in order
 		Assert.assertEquals(true, diff.similar());
-	
-	}
-	
 
-	
+	}
+
 	@Test
-	public void testSaxonTransform_Exception() throws TransformerException, JAXBException {
+	public void testSaxonTransform_Exception() throws TransformerException,
+			JAXBException {
 
 		thrown.expect(TransformerConfigurationException.class);
-	//	thrown.expectMessage("Error in SAXON Transfroming");
+		// thrown.expectMessage("Error in SAXON Transfroming");
 
-		
-		String xslID = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <xsl:stylesheet "+
-		  " xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" " +
-		  "   xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" exclude-result-prefixes=\"xs\" version=\"2.0\">";
+		String xslID = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <xsl:stylesheet "
+				+ " xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" "
+				+ "   xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" exclude-result-prefixes=\"xs\" version=\"2.0\">";
 
 		StreamSource streamSource;
 
@@ -339,25 +365,24 @@ public class ConsentTransformerImplTest {
 
 		streamSource = new StreamSource(new ByteArrayInputStream(
 				marshalresult.toByteArray()));
-	//	URL cd2 = getClass().getClassLoader().getResource("c2cdar2.xsl");
-	//	xslID = cd2.toString();
+		// URL cd2 = getClass().getClassLoader().getResource("c2cdar2.xsl");
+		// xslID = cd2.toString();
 
-		cstl.saxonTransform(xslID, streamSource);	
+		cstl.saxonTransform(xslID, streamSource, null);
 		System.out.println("inside");
 	}
-		
-	
-	private void setXMLUnitConfig(){
-		
+
+	private void setXMLUnitConfig() {
+
 		XMLUnit.setIgnoreWhitespace(Boolean.TRUE);
 		XMLUnit.setIgnoreComments(Boolean.TRUE);
 		XMLUnit.setIgnoreDiffBetweenTextAndCDATA(Boolean.TRUE);
 		XMLUnit.setIgnoreAttributeOrder(Boolean.TRUE);
 	}
-	
 
-	private DetailedDiff  compareXMLs(String expectedResult, String actualResult, List<String> ignorableXPathsRegex){
-		
+	private DetailedDiff compareXMLs(String expectedResult,
+			String actualResult, List<String> ignorableXPathsRegex) {
+
 		DetailedDiff diff = null;
 		try {
 			setXMLUnitConfig();
@@ -368,31 +393,31 @@ public class ConsentTransformerImplTest {
 			diff.overrideElementQualifier(new ElementNameQualifier());
 			diff.overrideElementQualifier(new ElementNameAndAttributeQualifier());
 			diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
-			
-			if(ignorableXPathsRegex != null) {
-				RegexBasedDifferenceListener ignorableElementsListener = new RegexBasedDifferenceListener(ignorableXPathsRegex);
+
+			if (ignorableXPathsRegex != null) {
+				RegexBasedDifferenceListener ignorableElementsListener = new RegexBasedDifferenceListener(
+						ignorableXPathsRegex);
 				/** setting our custom difference listener */
 				diff.overrideDifferenceListener(ignorableElementsListener);
 			}
 
-			
-            @SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked")
 			List<Difference> differences = diff.getAllDifferences();
-            for (Object object : differences) {
-                Difference difference = (Difference)object;
-                System.out.println("***********************");
-                System.out.println(difference);
-                System.out.println("***********************");
-            }
+			for (Object object : differences) {
+				Difference difference = (Difference) object;
+				System.out.println("***********************");
+				System.out.println(difference);
+				System.out.println("***********************");
+			}
 
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return diff;
-		
+
 	}
 
 	private ConsentDto getConsentDto() throws ParseException {
@@ -401,16 +426,19 @@ public class ConsentTransformerImplTest {
 		consentDto
 				.setConsentReferenceid("0f498c11-9211-4cf2-89e0-1f968d5dce7e");
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-		consentDto.setConsentStart(dateFormat.parse("9/4/2013"));
-		consentDto.setConsentEnd(dateFormat.parse("9/4/2014"));
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+		SimpleDateFormat dateIntegerFormat = new SimpleDateFormat("yyyyMMdd");
+		// consentDto.setConsentStart(dateIntegerFormat.parse("20130904"));
+		// consentDto.setConsentEnd(dateIntegerFormat.parse("20140904"));
+		consentDto.setConsentStart(dateFormat.parse(SAMPLE_DATE_START));
+		consentDto.setConsentEnd(dateFormat.parse(SAMPLE_DATE_END));
 		// null
 		// consentDto.setSignedDate();
 		consentDto.setVersion(new Integer("53"));
 		// null
 		// consentDto.setRevocationDate();
 
-		setPatientDto(consentDto, dateFormat);
+		setPatientDto(consentDto, dateIntegerFormat);
 		setProvidersPermittedToDisclose(consentDto);
 		setProvidersDisclosureIsMadeTo(consentDto);
 		setOrganizationalProvidersPermittedToDisclose(consentDto);
@@ -427,7 +455,6 @@ public class ConsentTransformerImplTest {
 
 	private void setPatientDto(ConsentDto consentDto,
 			SimpleDateFormat dateFormat) throws ParseException {
-
 		// Create patientdto
 		PatientDto patientDto = new PatientDto();
 		patientDto.setAddressCity("columbia");
@@ -436,7 +463,7 @@ public class ConsentTransformerImplTest {
 		patientDto.setAddressStateCode("MD");
 		patientDto.setAddressStreetAddressLine("7175 Columbia Gateway Dr");
 		patientDto.setAdministrativeGenderCode("M");
-		patientDto.setBirthDate(dateFormat.parse("2/19/1983"));
+		patientDto.setBirthDate(dateFormat.parse("19830218"));
 		patientDto.setEmail("consent2share@outlook.com");
 		patientDto.setFirstName("Albert");
 		patientDto.setLastName("Smith");
@@ -453,7 +480,7 @@ public class ConsentTransformerImplTest {
 
 		IndividualProviderDto individualProviderDto = new IndividualProviderDto();
 
-		individualProviderDto.setEnumerationDate("10/08/2009");
+		individualProviderDto.setEnumerationDate("2009-10-08T00:00:00-0500");
 		individualProviderDto
 				.setFirstLinePracticeLocationAddress("26520 CACTUS AVE");
 		individualProviderDto.setFirstName("DAN");
@@ -475,7 +502,7 @@ public class ConsentTransformerImplTest {
 
 		// second one
 		individualProviderDto = new IndividualProviderDto();
-		individualProviderDto.setEnumerationDate("10/09/2009");
+		individualProviderDto.setEnumerationDate("2009-10-08T00:00:00-0500");
 		individualProviderDto
 				.setFirstLinePracticeLocationAddress("5570 STERRETT PL");
 		individualProviderDto.setFirstName("GEORGE");
@@ -504,7 +531,7 @@ public class ConsentTransformerImplTest {
 
 		IndividualProviderDto individualProviderDto = new IndividualProviderDto();
 
-		individualProviderDto.setEnumerationDate("10/08/2009");
+		individualProviderDto.setEnumerationDate("2009-10-08T00:00:00-0500");
 		individualProviderDto
 				.setFirstLinePracticeLocationAddress("600 N WOLFE ST");
 		individualProviderDto.setFirstName("MONICA");
@@ -527,7 +554,7 @@ public class ConsentTransformerImplTest {
 		// second one
 
 		individualProviderDto = new IndividualProviderDto();
-		individualProviderDto.setEnumerationDate("10/08/2009");
+		individualProviderDto.setEnumerationDate("2009-10-08T00:00:00-0500");
 		individualProviderDto
 				.setFirstLinePracticeLocationAddress("107 S 5TH ST");
 		individualProviderDto.setFirstName("TERESA");

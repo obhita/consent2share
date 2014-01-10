@@ -9,6 +9,7 @@ import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
+import gov.samhsa.acs.xdsb.common.XdsbErrorFactory;
 import gov.samhsa.acs.xdsb.repository.wsclient.XDSRepositorybWebServiceClient;
 import gov.samhsa.acs.xdsb.repository.wsclient.adapter.RetrieveDocumentSetResponseFilter;
 import gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter;
@@ -77,7 +78,7 @@ public class XdsbRepositoryAdapterIT {
 
 		xdsbRepositoryAdapter = new XdsbRepositoryAdapter(
 				new XDSRepositorybWebServiceClient(endpointAddress),
-				new SimpleMarshallerImpl(), new RetrieveDocumentSetResponseFilter(new DocumentXmlConverterImpl()));
+				new SimpleMarshallerImpl(), new RetrieveDocumentSetResponseFilter(new DocumentXmlConverterImpl(), new XdsbErrorFactory()));
 	}
 
 	@Ignore

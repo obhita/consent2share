@@ -30,6 +30,7 @@ import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.namespace.PepNamespaceContext;
+import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.contexthandler.ContextHandler;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentation;
 import gov.samhsa.acs.pep.c32getter.C32Getter;
@@ -130,6 +131,9 @@ public class PepImpl implements Pep {
 	/** The xdsbRegistry. */
 	private final XdsbRegistry xdsbRegistry;
 
+	/** The marshaller. */
+	private final SimpleMarshaller marshaller;
+
 	/** The subject purpose of use. */
 	private String subjectPurposeOfUse; // = "TREAT";
 
@@ -172,11 +176,14 @@ public class PepImpl implements Pep {
 	 *            the xdsb repository
 	 * @param xdsbRegistry
 	 *            the xdsb registry
+	 * @param marshaller
+	 *            the marshaller
 	 */
 	public PepImpl(ContextHandler contextHandler, C32Getter c32Getter,
 			DocumentSegmentation documentSegmentation,
 			DataHandlerToBytesConverter dataHandlerToBytesConverter,
-			XdsbRepository xdsbRepository, XdsbRegistry xdsbRegistry) {
+			XdsbRepository xdsbRepository, XdsbRegistry xdsbRegistry,
+			SimpleMarshaller marshaller) {
 		super();
 		this.contextHandler = contextHandler;
 		this.c32Getter = c32Getter;
@@ -184,6 +191,7 @@ public class PepImpl implements Pep {
 		this.dataHandlerToBytesConverter = dataHandlerToBytesConverter;
 		this.xdsbRepository = xdsbRepository;
 		this.xdsbRegistry = xdsbRegistry;
+		this.marshaller = marshaller;
 	}
 
 	/*
@@ -477,7 +485,8 @@ public class PepImpl implements Pep {
 		}
 
 		String metadataString = new XdsbMetadataGeneratorImpl(
-				new UniqueOidProviderImpl(), XdsbDocumentType.CLINICAL_DOCUMENT)
+				new UniqueOidProviderImpl(),
+				XdsbDocumentType.CLINICAL_DOCUMENT, marshaller)
 				.generateMetadataXml(documentSet, subjectLocality);
 
 		SubmitObjectsRequest submitObjectRequest = null;

@@ -9,14 +9,14 @@
         <addressStateCode>MD</addressStateCode>
         <addressPostalCode>21246</addressPostalCode>
         <addressCountryCode>US</addressCountryCode>
-        <birthDate>02/19/1983</birthDate>
+        <birthDate>19830218</birthDate>
         <administrativeGenderCode>M</administrativeGenderCode>
         <email>consent2share@outlook.com</email>
         <patientIdNumber>1</patientIdNumber>
     </Patient>
     <IndividualProvidersPermittedToDiscloseList>
         <IndividualProvidersPermittedToDisclose>
-            <enumerationDate>10/08/2009</enumerationDate>
+            <enumerationDate>2009-10-08T00:00:00-0500</enumerationDate>
             <firstLinePracticeLocationAddress>26520 CACTUS AVE</firstLinePracticeLocationAddress>
             <firstName>DAN</firstName>
             <lastName>HOANG</lastName>
@@ -32,7 +32,7 @@
             <secondLinePracticeLocationAddress></secondLinePracticeLocationAddress>
         </IndividualProvidersPermittedToDisclose>
         <IndividualProvidersPermittedToDisclose>
-            <enumerationDate>10/09/2009</enumerationDate>
+            <enumerationDate>2009-10-08T00:00:00-0500</enumerationDate>
             <firstLinePracticeLocationAddress>5570 STERRETT PL</firstLinePracticeLocationAddress>
             <firstName>GEORGE</firstName>
             <lastName>CARLSON</lastName>
@@ -50,7 +50,7 @@
     </IndividualProvidersPermittedToDiscloseList>
     <IndividualProvidersDisclosureIsMadeToList>
         <IndividualProvidersDisclosureIsMadeTo>
-            <enumerationDate>10/08/2009</enumerationDate>
+            <enumerationDate>2009-10-08T00:00:00-0500</enumerationDate>
             <firstLinePracticeLocationAddress>107 S 5TH ST</firstLinePracticeLocationAddress>
             <firstName>TERESA</firstName>
             <lastName>LUQUIN</lastName>
@@ -66,7 +66,7 @@
             <secondLinePracticeLocationAddress>STE. 210</secondLinePracticeLocationAddress>
         </IndividualProvidersDisclosureIsMadeTo>
         <IndividualProvidersDisclosureIsMadeTo>
-            <enumerationDate>10/08/2009</enumerationDate>
+            <enumerationDate>2009-10-08T00:00:00-0500</enumerationDate>
             <firstLinePracticeLocationAddress>600 N WOLFE ST</firstLinePracticeLocationAddress>
             <firstName>MONICA</firstName>
             <lastName>VAN DONGEN</lastName>
@@ -84,8 +84,8 @@
     </IndividualProvidersDisclosureIsMadeToList>
     <OrganizationalProvidersPermittedToDiscloseList/>
     <OrganizationalProvidersDisclosureIsMadeToList/>
-    <consentStart>09/04/2013</consentStart>
-    <consentEnd>09/04/2014</consentEnd>
+    <consentStart>2013-09-04T00:00:00-0500</consentStart>
+    <consentEnd>2014-09-04T00:00:00-0500</consentEnd>
     <version>53</version>
     <doNotShareClinicalDocumentTypeCodesList/>
     <doNotShareClinicalDocumentSectionTypeCodesList/>

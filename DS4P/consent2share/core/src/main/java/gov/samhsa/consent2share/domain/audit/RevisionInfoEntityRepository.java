@@ -25,6 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.domain.audit;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -44,5 +46,13 @@ public interface RevisionInfoEntityRepository extends
 	 * @return the revision info entity
 	 */
 	RevisionInfoEntity findOneById(Number n);
+	
+	/**
+	 * Find all by username.
+	 *
+	 * @param username the username
+	 * @return the list
+	 */
+	List<RevisionInfoEntity> findAllByUsername(String username);
 
 }

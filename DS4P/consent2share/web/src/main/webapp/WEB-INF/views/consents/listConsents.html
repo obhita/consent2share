@@ -125,7 +125,7 @@
 					<div class="alert alert-info rounded">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
   		    			Click the  <a href="../consents/addConsent.html"><strong><button class="btn btn-success btn-xs">
-												<span class="glyphicon  glyphicon-plus glyphicon-white"></span>
+												<span class="glyphicon glyphicon-plus glyphicon-white"></span>
 											</button></strong></a> button to add a new consent.
 					</div>
 				</span>
@@ -279,9 +279,8 @@
 
 									<div class="summary-record-details-container">
 										<ul class="summary-border provider-ul">
-											<li th:each="discloseName:${consentEntry.toDiscloseName}"><label
-												th:text="${discloseName}"><span class="glyphicon  glyphicon-user"></span>
-													Washington, George</label></li>
+											<li th:each="discloseName:${consentEntry.toDiscloseName}"><span class="fa fa-user"></span>
+												<label th:text="${discloseName}">Washington, George</label></li>
 
 										</ul>
 
@@ -290,9 +289,8 @@
 										</div>
 
 										<ul class="summary-border right provider-ul">
-											<li th:each="isMadeToName:${consentEntry.isMadeToName}"><label
-												th:text="${isMadeToName}"><span class="glyphicon  glyphicon-user"></span>
-													Reagan, Ronald</label></li>
+											<li th:each="isMadeToName:${consentEntry.isMadeToName}"><span class="fa fa-user"></span>
+												<label th:text="${isMadeToName}">Reagan, Ronald</label></li>
 										</ul>
 										<div class="clearfix"></div>
 
@@ -425,14 +423,14 @@
 											<li th:switch="${consentEntry.revokeStage}" class="help-inline" role="listitem">
 											
 												<span th:case="${0}">
-													<a  th:id="@{'revoke'+${consentEntry.id}}" class="btn btn-default btn-sm  btn-inverse revokation-button" href="#revoke-modal"
+													<a  th:id="@{'revoke'+${consentEntry.id}}" class="btn btn-default btn-sm revokation-button" href="#revoke-modal"
 														role="button" data-edit-button="#content1"
 														data-toggle="modal" th:text="#{list_consent_withdrawal}">Withdrawal</a> 
 												</span>	
 												
 												<span th:case="${1}">	
-													<a class="btn btn-default btn-sm  btn-inactive" role="button">
-														<div style="margin-right: 4px; margin-left: -4px" class="glyphicon glyphicon-refresh glyphicon-spin"></div>
+													<a class="btn btn-default btn-sm btn-inactive" role="button">
+														<div style="margin-right: 4px; margin-left: -4px" class="fa fa-refresh fa-spin"></div>
 														<span th:text="#{list_consent_withdrawal_in_progress}">Withdrawal In Progress</span>
 													</a>
 												</span>
