@@ -1,0 +1,24 @@
+<h2>Push C32</h2>
+
+<h3>Scenario #1:</h3>
+
+<h3>Patients</h3>
+<table class="table table-striped">
+	<tr ng-repeat="patient in ehrNumOne.patients">
+		<td>Id: {{patient.id}}</td>
+		<td>Full Name: {{patient.fullName}}</td>
+		<td>
+			<div class="pull-right">
+				<button ng-click="pushC32(patient)">Push C32</button>
+			</div>
+		</td>
+	</tr>
+</table>
+
+
+  <div ng-controller="acsshowcase">
+ Provider:
+      <select ng-model="color" ng-options="provider.name for provider in providers"></select><br>
+   Patient:
+      <select ng-model="color" ng-options="patient.name for patient in patients"></select><br>    
+  </div>
