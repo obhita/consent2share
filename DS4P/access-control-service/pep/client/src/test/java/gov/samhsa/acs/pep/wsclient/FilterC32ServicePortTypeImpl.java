@@ -3,6 +3,8 @@ package gov.samhsa.acs.pep.wsclient;
 import gov.samhsa.ds4ppilot.contract.pep.FilterC32ServicePortType;
 import gov.samhsa.ds4ppilot.schema.pep.FilterC32Request;
 import gov.samhsa.ds4ppilot.schema.pep.FilterC32Response;
+import gov.samhsa.ds4ppilot.schema.pep.PushC32Request;
+import gov.samhsa.ds4ppilot.schema.pep.PushC32Response;
 import gov.samhsa.ds4ppilot.schema.pep.RegisteryStoredQueryRequest;
 import gov.samhsa.ds4ppilot.schema.pep.RegisteryStoredQueryResponse;
 import gov.samhsa.ds4ppilot.schema.pep.RetrieveDocumentSetRequest;
@@ -87,5 +89,11 @@ public class FilterC32ServicePortTypeImpl implements FilterC32ServicePortType {
 			ex.printStackTrace();
 			throw new RuntimeException(ex);
 		}
+	}
+
+	@Override
+	public PushC32Response pushC32(PushC32Request parameters) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

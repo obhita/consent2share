@@ -27,6 +27,7 @@ package gov.samhsa.consent2share.service.provider;
 
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
+import gov.samhsa.consent2share.domain.provider.StaffOrganizationalProvider;
 import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
 
 import java.util.List;
@@ -36,7 +37,7 @@ import org.springframework.security.access.annotation.Secured;
 /**
  * The Interface OrganizationalProviderService.
  */
-@Secured("ROLE_USER")
+@Secured({"ROLE_USER", "ROLE_ADMIN"})
 public interface OrganizationalProviderService {
 
 	/**
@@ -135,5 +136,12 @@ public interface OrganizationalProviderService {
 	 * @return the organizational provider
 	 */
 	public abstract OrganizationalProvider updateOrganizationalProvider(OrganizationalProvider organizationalProvider);
+	
+	/**
+	 * Find all staff organizational providers.
+	 *
+	 * @return the list
+	 */
+	public abstract List<StaffOrganizationalProvider> findAllStaffOrganizationalProviders();
 
 }

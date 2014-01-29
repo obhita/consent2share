@@ -376,7 +376,7 @@
 
 											<li th:switch="${consentEntry.consentStage}"
 												class="help-inline" role="listitem">
-												<span th:case="${0}">
+												<span th:case="CONSENT_SAVED">
 												<a href="#"
 												th:href="@{'javascript:document.' + 'consent_edit_' + ${consentEntry.id} + '.submit()'}"
 												class="btn btn-sm btn-info" th:text="#{list_consent_edit_consent}">Edit</a>
@@ -384,13 +384,13 @@
 												th:href="@{'javascript:document.' + 'consent_download_' + ${consentEntry.id} + '.submit()'}"
 												class="btn btn-sm btn-info" th:text="#{list_consent_preview_consent}">Preview this Consent</a>
 												</span> 
-												<span  th:case="${1}">
+												<span  th:case="CONSENT_SUBMITTED">
 												<a href="#"
 												th:href="@{'javascript:document.' + 'consent_download_' + ${consentEntry.id} + '.submit()'}"
 												class="btn btn-sm btn-primary" th:text="#{list_consent_view_consent}">View this Consent</a>												 
 												</span>
 												
-												<span  th:case="${2}">
+												<span  th:case="CONSENT_SIGNED">
 												<a href="#"
 												th:href="@{'javascript:document.' + 'consent_download_' + ${consentEntry.id} + '.submit()'}"
 												class="btn btn-sm btn-primary" th:text="#{list_consent_view_signed_consent}">View Signed Consent</a>
@@ -402,46 +402,46 @@
 												<li th:switch="${consentEntry.consentStage}"
 												class="help-inline" role="listitem">
 												
-												<span th:case="${1}">
+												<span th:case="CONSENT_SUBMITTED">
 												<a href="#" class="btn btn-sm btn-warning"
 												onclick="window.open('toEmail.html')" th:text="#{list_consent_go_mailbox}">Go to Your Mailbox</a>
 												</span>
 												
-												<span th:case="${0}">
+												<span th:case="CONSENT_SAVED">
 												<a href="#"
 												th:href="@{'javascript:document.' + 'consent_sign_' + ${consentEntry.id} + '.submit()'}"
-												class="btn btn-sm btn-success" th:text="#{list_consent_submit}">Submit</a> 
+												class="btn btn-sm btn-success submit_buttons" th:text="#{list_consent_submit}">Submit</a> 
 												</span> 
 												</li>
 
 																                	<li th:switch="${consentEntry.consentStage}" class="help-inline" role="listitem">
-																                	<a th:case="${2}" href="#" th:href="@{'exportXACMLConsents/'+ ${consentEntry.id}}" class="btn btn-sm btn-success">  Export to XACML</a>
+																                	<a th:case="CONSENT_SIGNED" href="#" th:href="@{'exportXACMLConsents/'+ ${consentEntry.id}}" class="btn btn-sm btn-success">  Export to XACML</a>
 																                	</li>
 											<li class="help-inline" role="listitem"></li>
 
 											<!-- Button to trigger modal -->
 											<li th:switch="${consentEntry.revokeStage}" class="help-inline" role="listitem">
 											
-												<span th:case="${0}">
+												<span th:case="REVOCATION_NOT_SUBMITTED">
 													<a  th:id="@{'revoke'+${consentEntry.id}}" class="btn btn-default btn-sm revokation-button" href="#revoke-modal"
 														role="button" data-edit-button="#content1"
 														data-toggle="modal" th:text="#{list_consent_withdrawal}">Withdrawal</a> 
 												</span>	
 												
-												<span th:case="${1}">	
+												<span th:case="REVOCATION_SUBMITTED">	
 													<a class="btn btn-default btn-sm btn-inactive" role="button">
 														<div style="margin-right: 4px; margin-left: -4px" class="fa fa-refresh fa-spin"></div>
 														<span th:text="#{list_consent_withdrawal_in_progress}">Withdrawal In Progress</span>
 													</a>
 												</span>
 												
-												<span th:case="${2}">			
+												<span th:case="REVOCATION_REVOKED">			
 													<a  href="#" class="btn btn-sm btn-primary"
 														th:href="@{'javascript:document.' + 'revokation_download_' + ${consentEntry.id} + '.submit()'}"
 														th:text="#{list_consent_view_signed_revocation}">View Signed Revocation</a>
 												</span>
 														
-												<span th:case="${4}">
+												<span th:case="NA">
 													<form th:name="@{'form_delete_' + ${consentEntry.id}}" th:action="@{deleteConsents}" method="post">
 														<input type="hidden" name="consentId" th:value="${consentEntry.id}"/>
 														<a th:href="@{'javascript:document.' + 'form_delete_' + ${consentEntry.id} + '.submit()'}"

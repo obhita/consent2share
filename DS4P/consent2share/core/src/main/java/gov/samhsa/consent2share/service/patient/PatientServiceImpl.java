@@ -146,12 +146,27 @@ public class PatientServiceImpl implements PatientService {
 		List<PatientAdminDto> PatientAdminDtoList=mapPatientListToPatientAdminDtoList(patients);
 		return PatientAdminDtoList;
 	}
+	
+	@Override
+	public PatientProfileDto findByUsername(String username){
+		Patient patient=patientRepository.findByUsername(username);
+		PatientProfileDto patientDto = modelMapper.map(patient,
+				PatientProfileDto.class);
+		return patientDto;
+	}
 
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.patient.PatientService#findIdByUsername(java.lang.String)
 	 */
 	public Long findIdByUsername(String username) {
 		return patientRepository.findByUsername(username).getId();
+	}
+	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.patient.PatientService#findUsernameById(java.lang.Long)
+	 */
+	public String findUsernameById(long id) {
+		return patientRepository.findOne(id).getUsername();
 	}
 
 	/* (non-Javadoc)

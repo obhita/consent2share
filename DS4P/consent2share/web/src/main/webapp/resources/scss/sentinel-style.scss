@@ -275,6 +275,11 @@ used more than once per page.
 		@extend .no-pad;
 	}
 	
+	/* Override Bootstrap 3 default background color for table-hover highlighted row */
+	.table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
+		background-color: #faf2c9;
+	}
+	
 	/* Override joyride default behavior for the following selector */
 	.joyride-modal-bg {
 		z-index: 1500;
@@ -393,11 +398,13 @@ used more than once per page.
 
 /* ----------------------------------------------------[ Administrator ] */
 
-/* --------------- TEMPORARY - Watermark hidden ------------------- */
+	/* ---- TEMPORARY - Watermark hidden ---- */
 	#watermark {
 		display: none;
 	}
 
+	
+	
 	#adminHomeSearchBar {
 		.hidden-xs {
 			padding-left: 4px;
@@ -405,7 +412,7 @@ used more than once per page.
 		}
 	}
 	
-	.admin-pages {	
+	.admin-pages {
 		#adminCreateConsent-2buttons {
 			float: right !important;
 		}
@@ -435,6 +442,18 @@ used more than once per page.
 	}
 
 	#adminPatientView-page {
+		div.hover-state {
+			padding: 5px 15px;
+			border-radius: 4px;			
+			&:hover {
+				
+				color: #428abd;
+				font-size: 15px;
+				background-color: #DCE4E8;
+				& span:first-child {font-size: 20px;}
+			}
+		}
+		
 		div#editPatient.modal { 
 			form > div {
 				padding-left: 15px !important;
@@ -467,8 +486,8 @@ used more than once per page.
 	}
 	
 	.btn-padding  {
-			padding:24px;
-		}
+		padding:24px;
+	}
 	
 
 
@@ -624,13 +643,10 @@ used more than once per page.
 			}
 	*/
 	
-	
 	#bread-crumb-btn {
-			float: left;
-			margin-top: 6px;
-		}
-
-
+		float: left;
+		margin-top: 6px;
+	}
 	
 	
 	
@@ -833,98 +849,94 @@ used more than once per page.
 	}
 	
 	
-/* ----------------------------------------------------[ Connections Main ] */
+/* ----------------------------------------------------[ Pagination ] */
 	
-	#connectionMain-page, #connectionProviderAdd-page {
-		.result_row {
+	.pagination {
+		margin-left: 20px;
+		font-size: 80%;
+		
+		a {
+	    	text-decoration: none;
+			border: solid 1px #ACE;
+			color: #168;
+		}
+		
+		a, span {
+	    	display: block;
+	    	float: left;
+	    	padding: 0.3em 0.5em;
+	    	margin-right: 6px;
+			margin-bottom: 5px;
+		}
+		
+		.currentpage {
+	    	background: #26B;
+	    	color: #fff;
+			border: solid 1px #ACE;
+			
+			&.prev, &.next {
+				color:#999;
+				border-color:#999;
+				background:#fff;
+			}
+		}
+	}
+	
+	
+/* ----------------------------------------------------[ Providers ] */
+		
+	.provider_record_space {
+    	margin: 10px 0;
+    	
+	    .result_row {
 			padding-right: 2px;
 			margin: 3px 0px 3px 20px;
 			font-size:  .95em;
 			font-family: helvetica;
 			color: black;
 			span.result_field {
-    			margin-right: 4px;
-    		}
-    		span.provider_name_field {
-    			font-weight: bold;
-    		}
-    		span.provider_specialty_field {
-    			font-style: italic;
-    		}
+	    		margin-right: 4px;
+	    	}
+	    	span.provider_name_field {
+	    		font-weight: bold;
+	    	}
+	    	span.provider_specialty_field {
+	    		font-style: italic;
+	    	}
 		}
-    	
-    	.provider_record_space {
-    		margin: 10px 0;
-    	}
-    	.provider_record_box {
+		
+		.provider_record_box {
     		border: solid lightblue 1px;
     		padding: 5px;
     		margin: 0 0 10px;
+    		
+	    	.provider_record_header {
+	    		&.unassigned {
+	    			background-color: #edf5fa !important;
+	    			.add_button_space {
+	    				color:#A57575 !important;
+	    			}
+	    		}
+	    		&.assigned {
+	    			background-color: #CBe7CA !important;
+	    			.add_button_space {
+	    				color: #338A3A !important;
+	    			}
+	    		}
+	    		
+	    		.add_button_space {
+	    			margin-left: 20px;
+	    			color: green;
+	    			
+	    		}
+				
+				background-color: #edf5fa;
+	    		padding: 5px;
+	    	}
+	    	
     	}
-    	.provider_record_header {
-    		&.unassigned {
-    			background-color: #edf5fa !important;
-    			.add_button_space {
-    				color:#A57575 !important;
-    			}
-    		}
-    		&.assigned {
-    			background-color: #CBe7CA !important;
-    			.add_button_space {
-    				color: #338A3A !important;
-    			}
-    		}
-    		background-color: #edf5fa;
-    		padding: 5px;
-    		 .add_button_space {
-    			margin-left: 20px;
-    			color: green;
-    			
-    		}
-    	}
     	
-    	
-    	
-    	
-    	
-		.pagination {
-			margin-left: 20px;
-			font-size: 80%;
-		}
-		        
-		.pagination a {
-		    text-decoration: none;
-			border: solid 1px #ACE;
-			color: #168;
-		}
-		
-		.pagination a, .pagination span {
-		    display: block;
-		    float: left;
-		    padding: 0.3em 0.5em;
-		    margin-right: 6px;
-			margin-bottom: 5px;
-		}
-		
-		.pagination .currentpage {
-		    background: #26B;
-		    color: #fff;
-			border: solid 1px #ACE;
-		}
-		
-		.pagination .currentpage.prev, .pagination .currentpage.next{
-			color:#999;
-			border-color:#999;
-			background:#fff;
-		}
-	}
-	
-	#tour-trigger-area {
-		& > section:nth-child(3) {
-			overflow-x: auto;
-			border: 1px solid #ccc;
-			}
-	}
+    }
 	
 	#add-provider-btn {
 		margin: 10px 0px 0px;
@@ -948,6 +960,14 @@ used more than once per page.
 		}
 	}
 	
+	/*
+	#tour-trigger-area {
+		& > section:nth-child(3) {
+			overflow-x: auto;
+			border: 1px solid #ccc;
+			}
+	}
+	*/
 
 /* ----------------------------------------------------[ Medical Info ] */
 	#medical-documents {
@@ -960,17 +980,17 @@ used more than once per page.
 	}
 
 /* ----------------------------------------------------[ Login ] */
-	#login-navbar {		
+	#login-navbar {
 		.container {
 /*			height: 46px;   */
 			z-index: 50;		
-			}
+		}
 		&.navbar {
 			margin-left: 0;
 			margin-right: 0;
-			}
-				
-		a.btn.btn-navbar, #create-account-navbar a.btn.btn-navbar {
+		}
+		
+		a.btn.btn-navbar {
 			display: none;	
 		} 
 		

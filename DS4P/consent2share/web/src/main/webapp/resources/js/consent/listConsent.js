@@ -5,7 +5,7 @@ $(document).ready(function() {
 
 			$('body').removeClass('fouc_loading');
 
-			$("#signnow").click(function() {
+			$(".submit_buttons").click(function() {
 				$(this).attr("disabled", "disabled");
 			});
 			

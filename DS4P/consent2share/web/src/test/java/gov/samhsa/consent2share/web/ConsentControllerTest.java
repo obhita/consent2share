@@ -29,10 +29,12 @@ import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
 import gov.samhsa.consent2share.service.patient.PatientService;
+import gov.samhsa.consent2share.service.reference.AdministrativeGenderCodeService;
 import gov.samhsa.consent2share.service.reference.ClinicalDocumentSectionTypeCodeService;
 import gov.samhsa.consent2share.service.reference.ClinicalDocumentTypeCodeService;
 import gov.samhsa.consent2share.service.reference.PurposeOfUseCodeService;
 import gov.samhsa.consent2share.service.reference.SensitivityPolicyCodeService;
+import gov.samhsa.consent2share.service.reference.StateCodeService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -87,6 +89,14 @@ public class ConsentControllerTest {
 	@Mock
     SensitivityPolicyCodeService sensitivityPolicyCodeService;
 	
+	/** The administrative gender code service. */
+	@Mock
+	AdministrativeGenderCodeService administrativeGenderCodeService;
+	
+	/** The state code service. */
+	@Mock
+	StateCodeService stateCodeService;
+	
 	@Mock
 	NotificationService notificationService;
 	
@@ -110,12 +120,19 @@ public class ConsentControllerTest {
 	public void setUp() throws Exception {
 		mockMvc = MockMvcBuilders.standaloneSetup(this.consentController).build();
 		
+		//This mocked user is not a providerAdmin (it's a regular patient account)
 		AuthenticatedUser user=mock(AuthenticatedUser.class); 
 		when(userContext.getCurrentUser()).thenReturn(user);
 		when(user.getUsername()).thenReturn("mockedUser");
+		when(user.getLastName()).thenReturn("Mocklastname");
+		when(user.getFirstName()).thenReturn("Mockfirstname");
+		when(user.getIsProviderAdmin()).thenReturn(false);
 		
 		PatientProfileDto patient=mock(PatientProfileDto.class);
 		when(patientService.findPatientProfileByUsername(anyString())).thenReturn(patient);
+		when(patient.getUsername()).thenReturn("mockedUser");
+		when(patient.getLastName()).thenReturn("Mocklastname");
+		when(patient.getFirstName()).thenReturn("Mockfirstname");
 		when(patient.getId()).thenReturn((long)1);
 		
 		List<ConsentListDto> consentListDtos=new ArrayList<ConsentListDto>();
@@ -295,7 +312,8 @@ public class ConsentControllerTest {
 			.thenReturn(consentDto);
 		
 		mockMvc.perform(get("/consents/addConsent.html"))
-			.andExpect(model().attribute("currentUser", userContext.getCurrentUser()))
+			.andExpect(model().attribute("patient_lname", patientService.findPatientProfileByUsername("mockedUser").getLastName()))
+			.andExpect(model().attribute("patient_fname", patientService.findPatientProfileByUsername("mockedUser").getFirstName()))
 			.andExpect(model().attribute("consentDto", consentDto))
 			.andExpect(model().attribute("individualProvidersDto", individualProvidersDto))
 			.andExpect(model().attribute("clinicalDocumentSectionType", clinicalDocumentSectionTypeDto))
@@ -303,6 +321,8 @@ public class ConsentControllerTest {
 			.andExpect(model().attribute("sensitivityPolicy", sensitivityPolicyDto))
 			.andExpect(model().attribute("purposeOfUse", purposeOfUseDto))
 			.andExpect(model().attribute("organizationalProvidersDto", organizationalProvidersDto))
+			.andExpect(model().attribute("administrativeGenderCodes", administrativeGenderCodeService.findAllAdministrativeGenderCodes()))
+			.andExpect(model().attribute("stateCodes", stateCodeService.findAllStateCodes()))
 			.andExpect(view().name("views/consents/addConsent"));
 		
 	}
@@ -407,7 +427,7 @@ public class ConsentControllerTest {
 		consentListDtos.add(consentListDto);
 		
 		when(consentListDto.getId()).thenReturn((long)2);
-		when(consentListDto.getConsentStage()).thenReturn(2);
+		when(consentListDto.getConsentStage()).thenReturn("CONSENT_SIGNED");
 		
 		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreSignList=2"))
 		.andExpect(status().isOk());	
@@ -422,7 +442,7 @@ public class ConsentControllerTest {
 		consentListDtos.add(consentListDto);
 		
 		when(consentListDto.getId()).thenReturn((long)2);
-		when(consentListDto.getConsentStage()).thenReturn(1);
+		when(consentListDto.getConsentStage()).thenReturn("CONSENT_SUBMITTED");
 		
 		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreSignList=2"))
 		.andExpect(status().isOk());	
@@ -437,7 +457,7 @@ public class ConsentControllerTest {
 		consentListDtos.add(consentListDto);
 		
 		when(consentListDto.getId()).thenReturn((long)2);
-		when(consentListDto.getRevokeStage()).thenReturn(2);
+		when(consentListDto.getRevokeStage()).thenReturn("REVOCATION_REVOKED");
 		
 		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreRevokeList=2"))
 		.andExpect(status().isOk());	
@@ -452,7 +472,7 @@ public class ConsentControllerTest {
 		consentListDtos.add(consentListDto);
 		
 		when(consentListDto.getId()).thenReturn((long)2);
-		when(consentListDto.getConsentStage()).thenReturn(1);
+		when(consentListDto.getConsentStage()).thenReturn("CONSENT_SUBMITTED");
 		
 		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreRevokeList=2"))
 		.andExpect(status().isOk());	

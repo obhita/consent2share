@@ -86,7 +86,7 @@ public class AdhocQueryResponseFilter {
 			String authorNPI) throws Exception, Throwable {
 		// select the ExtrinsicObjects that doesn't have an author id starting
 		// with authorNPI^
-		String xPathExpr = "//rim:Classification[@classificationScheme='$']/descendant::rim:Value[not(starts-with(concat(.,'^'),'%'))]/ancestor::rim:ExtrinsicObject";
+		String xPathExpr = "//rim:Classification[@classificationScheme='$']/descendant::rim:Value[not(starts-with(.,concat('%', '^')))]/ancestor::rim:ExtrinsicObject";
 		xPathExpr = xPathExpr.replace("%", authorNPI);
 		xPathExpr = xPathExpr.replace("$",
 				UUID_CLASSIFICATIONSCHEME_XDSDOCUMENTENTRY_AUTHOR);

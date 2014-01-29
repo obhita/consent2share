@@ -112,7 +112,7 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 					elementToBeRedacted.getParentNode().removeChild(
 							elementToBeRedacted);
 
-					// mask element contents
+					// redact entry
 					String xPathExprObservationId = "//hl7:id[@root='%']/ancestor::hl7:entry";
 					xPathExprObservationId = xPathExprObservationId.replace(
 							"%", observationId);

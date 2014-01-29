@@ -233,6 +233,11 @@ header.navbar > .container {
   /* Calls the force-pad mixin defined in this file with 0px as the parameter */
 }
 
+/* Override Bootstrap 3 default background color for table-hover highlighted row */
+.table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
+  background-color: #faf2c9;
+}
+
 /* Override joyride default behavior for the following selector */
 .joyride-modal-bg {
   z-index: 1500;
@@ -327,7 +332,7 @@ header.navbar > .container {
 }
 
 /* ----------------------------------------------------[ Administrator ] */
-/* --------------- TEMPORARY - Watermark hidden ------------------- */
+/* ---- TEMPORARY - Watermark hidden ---- */
 #watermark {
   display: none;
 }
@@ -362,6 +367,18 @@ header.navbar > .container {
   display: block;
 }
 
+#adminPatientView-page div.hover-state {
+  padding: 5px 15px;
+  border-radius: 4px;
+}
+#adminPatientView-page div.hover-state:hover {
+  color: #428abd;
+  font-size: 15px;
+  background-color: #DCE4E8;
+}
+#adminPatientView-page div.hover-state:hover span:first-child {
+  font-size: 20px;
+}
 #adminPatientView-page div#editPatient.modal form > div {
   padding-left: 15px !important;
 }
@@ -714,81 +731,78 @@ div#createPatient .modal-header .h3-style, div#editPatient .modal-header .h3-sty
   margin-top: -2px;
 }
 
-/* ----------------------------------------------------[ Connections Main ] */
-#connectionMain-page .result_row, #connectionProviderAdd-page .result_row {
-  padding-right: 2px;
-  margin: 3px 0px 3px 20px;
-  font-size: .95em;
-  font-family: helvetica;
-  color: black;
-}
-#connectionMain-page .result_row span.result_field, #connectionProviderAdd-page .result_row span.result_field {
-  margin-right: 4px;
-}
-#connectionMain-page .result_row span.provider_name_field, #connectionProviderAdd-page .result_row span.provider_name_field {
-  font-weight: bold;
-}
-#connectionMain-page .result_row span.provider_specialty_field, #connectionProviderAdd-page .result_row span.provider_specialty_field {
-  font-style: italic;
-}
-#connectionMain-page .provider_record_space, #connectionProviderAdd-page .provider_record_space {
-  margin: 10px 0;
-}
-#connectionMain-page .provider_record_box, #connectionProviderAdd-page .provider_record_box {
-  border: solid lightblue 1px;
-  padding: 5px;
-  margin: 0 0 10px;
-}
-#connectionMain-page .provider_record_header, #connectionProviderAdd-page .provider_record_header {
-  background-color: #edf5fa;
-  padding: 5px;
-}
-#connectionMain-page .provider_record_header.unassigned, #connectionProviderAdd-page .provider_record_header.unassigned {
-  background-color: #edf5fa !important;
-}
-#connectionMain-page .provider_record_header.unassigned .add_button_space, #connectionProviderAdd-page .provider_record_header.unassigned .add_button_space {
-  color: #A57575 !important;
-}
-#connectionMain-page .provider_record_header.assigned, #connectionProviderAdd-page .provider_record_header.assigned {
-  background-color: #CBe7CA !important;
-}
-#connectionMain-page .provider_record_header.assigned .add_button_space, #connectionProviderAdd-page .provider_record_header.assigned .add_button_space {
-  color: #338A3A !important;
-}
-#connectionMain-page .provider_record_header .add_button_space, #connectionProviderAdd-page .provider_record_header .add_button_space {
-  margin-left: 20px;
-  color: green;
-}
-#connectionMain-page .pagination, #connectionProviderAdd-page .pagination {
+/* ----------------------------------------------------[ Pagination ] */
+.pagination {
   margin-left: 20px;
   font-size: 80%;
 }
-#connectionMain-page .pagination a, #connectionProviderAdd-page .pagination a {
+.pagination a {
   text-decoration: none;
   border: solid 1px #ACE;
   color: #168;
 }
-#connectionMain-page .pagination a, #connectionMain-page .pagination span, #connectionProviderAdd-page .pagination a, #connectionProviderAdd-page .pagination span {
+.pagination a, .pagination span {
   display: block;
   float: left;
   padding: 0.3em 0.5em;
   margin-right: 6px;
   margin-bottom: 5px;
 }
-#connectionMain-page .pagination .currentpage, #connectionProviderAdd-page .pagination .currentpage {
+.pagination .currentpage {
   background: #26B;
   color: #fff;
   border: solid 1px #ACE;
 }
-#connectionMain-page .pagination .currentpage.prev, #connectionMain-page .pagination .currentpage.next, #connectionProviderAdd-page .pagination .currentpage.prev, #connectionProviderAdd-page .pagination .currentpage.next {
+.pagination .currentpage.prev, .pagination .currentpage.next {
   color: #999;
   border-color: #999;
   background: #fff;
 }
 
-#tour-trigger-area > section:nth-child(3) {
-  overflow-x: auto;
-  border: 1px solid #ccc;
+/* ----------------------------------------------------[ Providers ] */
+.provider_record_space {
+  margin: 10px 0;
+}
+.provider_record_space .result_row {
+  padding-right: 2px;
+  margin: 3px 0px 3px 20px;
+  font-size: .95em;
+  font-family: helvetica;
+  color: black;
+}
+.provider_record_space .result_row span.result_field {
+  margin-right: 4px;
+}
+.provider_record_space .result_row span.provider_name_field {
+  font-weight: bold;
+}
+.provider_record_space .result_row span.provider_specialty_field {
+  font-style: italic;
+}
+.provider_record_space .provider_record_box {
+  border: solid lightblue 1px;
+  padding: 5px;
+  margin: 0 0 10px;
+}
+.provider_record_space .provider_record_box .provider_record_header {
+  background-color: #edf5fa;
+  padding: 5px;
+}
+.provider_record_space .provider_record_box .provider_record_header.unassigned {
+  background-color: #edf5fa !important;
+}
+.provider_record_space .provider_record_box .provider_record_header.unassigned .add_button_space {
+  color: #A57575 !important;
+}
+.provider_record_space .provider_record_box .provider_record_header.assigned {
+  background-color: #CBe7CA !important;
+}
+.provider_record_space .provider_record_box .provider_record_header.assigned .add_button_space {
+  color: #338A3A !important;
+}
+.provider_record_space .provider_record_box .provider_record_header .add_button_space {
+  margin-left: 20px;
+  color: green;
 }
 
 #add-provider-btn {
@@ -809,6 +823,14 @@ div#createPatient .modal-header .h3-style, div#editPatient .modal-header .h3-sty
   width: auto;
 }
 
+/*
+#tour-trigger-area {
+	& > section:nth-child(3) {
+		overflow-x: auto;
+		border: 1px solid #ccc;
+		}
+}
+*/
 /* ----------------------------------------------------[ Medical Info ] */
 #medical-documents .btn {
   display: block !important;
@@ -826,7 +848,7 @@ div#createPatient .modal-header .h3-style, div#editPatient .modal-header .h3-sty
   margin-left: 0;
   margin-right: 0;
 }
-#login-navbar a.btn.btn-navbar, #login-navbar #create-account-navbar a.btn.btn-navbar {
+#login-navbar a.btn.btn-navbar {
   display: none;
 }
 #login-navbar #login-username, #login-navbar #login-password {

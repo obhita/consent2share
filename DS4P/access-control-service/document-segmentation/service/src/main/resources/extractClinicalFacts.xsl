@@ -15,9 +15,11 @@
     <xsl:template match="/">
         <FactModel xsl:exclude-result-prefixes="#all" >
             <xsl:sequence select="$xacmlResult"/>
+            
             <ClinicalFacts>
                 <xsl:for-each select="//observation/value">
                     <xsl:if test="ancestor::entryRelationship[1][@typeCode='SUBJ']">
+                    	<!-- Problems and Allergies are handled here -->
                         <ClinicalFact>
                             <xsl:call-template name="clinicalFacts" exclude-result-prefixes="#all"/>
                         </ClinicalFact>
@@ -26,7 +28,7 @@
 
                 <xsl:for-each
                     select="//substanceAdministration/consumable/manufacturedProduct/manufacturedMaterial/code">
-
+                    <!-- Medications are handled here -->
                     <ClinicalFact>
                         <code>
                             <xsl:value-of select="@code"/>
@@ -54,11 +56,12 @@
                 </xsl:for-each>
 
                 <xsl:for-each select="//organizer//observation/code">
+                	<!-- Results are handled here -->
                     <ClinicalFact>
                         <xsl:call-template name="clinicalFacts"/>
                     </ClinicalFact>
                 </xsl:for-each>
-                <xsl:for-each select="//organizer//procedure/code">
+                <xsl:for-each select="//organizer//procedure/code"> <!-- This procedure is inside lab results -->
                     <ClinicalFact>
                         <xsl:call-template name="clinicalFacts"/>
                     </ClinicalFact>

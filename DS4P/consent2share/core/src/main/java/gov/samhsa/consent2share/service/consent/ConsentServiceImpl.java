@@ -169,13 +169,32 @@ public class ConsentServiceImpl implements ConsentService {
 	 *
 	 * @param consentId the consent id
 	 */
-	public void deleteConsent(Long consentId) {
-		Consent consent=findConsent(consentId);
-		if (consent.getSignedPdfConsent()!=null){
-			if (consent.getSignedPdfConsent().getSignedPdfConsentContent()!=null)
-				return;
+	public boolean deleteConsent(Long consentId) {
+		Consent consent = null;
+		
+		try{
+			consent = findConsent(consentId);
+		}catch(IllegalArgumentException e){
+			logger.warn("Attempted to call findConsent(consentId) with null or invalid consentId from deleteConsent(Long consentId) method in ConsentService.");
+			logger.warn("The exception stack trace is: " + e);
+			return false;
 		}
-        consentRepository.delete(consent);
+		
+		if (consent.getSignedPdfConsent()!=null){
+			if (consent.getSignedPdfConsent().getSignedPdfConsentContent()!=null){
+				return false;
+			}
+		}
+		
+		try{
+			consentRepository.delete(consent);
+		}catch(IllegalArgumentException e){
+			logger.warn("Attempted to call consentRepository.delete(consent) with null or invalid consent from deleteConsent(Long consentId) method in ConsentService.");
+			logger.warn("The exception stack trace is: " + e);
+			return false;
+		}
+        
+        return true;
     }
 
 
@@ -208,12 +227,13 @@ public class ConsentServiceImpl implements ConsentService {
 	 * @param consentPdfDto the consent pdf dto
 	 */
 	@Override
-	public void signConsent(ConsentPdfDto consentPdfDto){
+	public boolean signConsent(ConsentPdfDto consentPdfDto){
 		Consent consent=consentRepository.findOne(consentPdfDto.getId());
+		if(consent==null)
+			return false;
 		// SignConsent
 		SignedPDFConsent signedPdfConsent = makeSignedPdfConsent();
-		AuthenticatedUser currentUser = userContext.getCurrentUser();
-		Patient patient=patientRepository.findByUsername(currentUser.getUsername());
+		Patient patient=consent.getPatient();
 		String patientEmail=patient.getEmail();
 		
 		//Email hard-coded and to be changed
@@ -226,7 +246,8 @@ public class ConsentServiceImpl implements ConsentService {
 		signedPdfConsent.setDocumentSignedStatus("Unsigned");
 		consent.setSignedPdfConsent(signedPdfConsent);
 		consentRepository.save(consent);
-		}
+		return true;
+	}
 	
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.consent.ConsentService#signConsentRevokation(gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto)
@@ -235,8 +256,7 @@ public class ConsentServiceImpl implements ConsentService {
 		Consent consent=consentRepository.findOne(consentRevokationPdfDto.getId());
 		// SignConsentRevokation
 		SignedPDFConsentRevocation signedPDFConsentRevocation=makeSignedPDFConsentRevocation();
-		AuthenticatedUser currentUser = userContext.getCurrentUser();
-		Patient patient=patientRepository.findByUsername(currentUser.getUsername());
+		Patient patient=consent.getPatient();
 		String patientEmail=patient.getEmail();
 		
 		//TODO:Email and Email message hard-coded and to be changed
@@ -366,6 +386,16 @@ public class ConsentServiceImpl implements ConsentService {
 		return consentListDtos;
 	}
 	
+	@Override
+	public List<ConsentListDto> findAllConsentsDtoByUserName(String userName){
+		Patient patient=patientRepository.findByUsername(userName);
+		List<Consent> consents = consentRepository.findByPatient(patient);
+		List<ConsentListDto> consentListDtos=makeConsentListDtos();
+		if (consents!=null)
+		consentListDtos=consentListToConsentListDtosConverter(consents);
+		return consentListDtos;
+	}
+	
 	/**
 	 * Consent list to consent list dtos converter.
 	 *
@@ -427,27 +457,27 @@ public class ConsentServiceImpl implements ConsentService {
 
 			if (consent.getSignedPdfConsent()!=null){
 				if (consent.getSignedPdfConsent().getSignedPdfConsentContent()!=null){
-					consentListDto.setConsentStage(2);
+					consentListDto.setConsentStage("CONSENT_SIGNED");
 				}
 				else{
-					consentListDto.setConsentStage(1);
+					consentListDto.setConsentStage("CONSENT_SUBMITTED");
 				}
 			}
 			else{
-				consentListDto.setConsentStage(0);
+				consentListDto.setConsentStage("CONSENT_SAVED");
 			}
 
-			if (consentListDto.getConsentStage()!=2){
-				consentListDto.setRevokeStage(4);
+			if (!consentListDto.getConsentStage().equals("CONSENT_SIGNED")){
+				consentListDto.setRevokeStage("NA");
 			}
 			else{
 				if (consent.getSignedPdfConsentRevoke()!=null)
 					if(consent.getSignedPdfConsentRevoke().getSignedPdfConsentRevocationContent()!=null)
-						consentListDto.setRevokeStage(2);
+						consentListDto.setRevokeStage("REVOCATION_REVOKED");
 					else
-						consentListDto.setRevokeStage(1);
+						consentListDto.setRevokeStage("REVOCATION_SUBMITTED");
 				else
-					consentListDto.setRevokeStage(0);
+					consentListDto.setRevokeStage("REVOCATION_NOT_SUBMITTED");
 			}
 
 
@@ -807,6 +837,7 @@ public class ConsentServiceImpl implements ConsentService {
 //			toDiscloseName.addAll(toDiscloseOrgName);
 			consentDto.setDoNotShareClinicalConceptCodes(consentDoNotShareClinicalConceptCodes);
 			consentDto.setId(consent.getId());
+			consentDto.setUsername(consent.getPatient().getUsername());
 
 			//
 		    // Converting timestamp to Date to resolve

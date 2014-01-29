@@ -29,6 +29,9 @@ import java.util.List;
 
 import org.herasaf.xacml.core.policy.Evaluatable;
 
+/**
+ * The Interface PolicyDecisionPointImplData.
+ */
 public interface PolicyDecisionPointImplData {
 
 	/**
@@ -36,7 +39,12 @@ public interface PolicyDecisionPointImplData {
 	 * 
 	 * @param patientUniqueId
 	 *            the patient unique id
+	 * @param recipientSubjectNPI
+	 *            the recipient subject npi
+	 * @param intermediarySubjectNPI
+	 *            the intermediary subject npi
 	 * @return the policies
 	 */
-	public abstract List<Evaluatable> getPolicies(String patientUniqueId);
+	public abstract List<Evaluatable> getPolicies(String patientUniqueId,
+			String recipientSubjectNPI, String intermediarySubjectNPI);
 }

@@ -146,8 +146,27 @@ public class ConsentServiceImplTest {
 		Consent consent=mock(Consent.class);
 		when(cstspy.findConsent((long)1)).thenReturn(consent);
 		when(consent.getSignedPdfConsent()).thenReturn(null);
-		cstspy.deleteConsent((long)1);
+		boolean isDeleteSuccess = cstspy.deleteConsent((long)1);
+		assertTrue(isDeleteSuccess);
 		verify(consentRepository).delete(any(Consent.class));
+	}
+	
+	/**
+	 * Test deleteConsent. Check if delete fails when getSignedPdfConsent is not null.
+	 */
+	@Test
+	public void testDeleteConsent_Check_if_Delete_Fails_on_SignedPdf_Not_Null(){
+		ConsentService cstspy=spy(cst);
+		Consent consent=mock(Consent.class);
+		SignedPDFConsent signedPDFConsent = mock(SignedPDFConsent.class);
+		when(cstspy.findConsent((long)1)).thenReturn(consent);
+		Byte tempByte = new Byte("5");
+		byte tempByteAry[] = {tempByte.byteValue()};
+		when(signedPDFConsent.getSignedPdfConsentContent()).thenReturn(tempByteAry);
+		when(consent.getSignedPdfConsent()).thenReturn(signedPDFConsent);
+		boolean isDeleteSuccess = cstspy.deleteConsent((long)1);
+		assertFalse("Expected isDeleteSuccess to be false", isDeleteSuccess);
+		verify(consentRepository,never()).delete(any(Consent.class));
 	}
 	
 	/**
@@ -189,16 +208,15 @@ public class ConsentServiceImplTest {
 	@Test
 	public void testSignConsent_Check_if_Necessary_Domain_Bindings_are_Set_and_Repository_is_Called(){
 		Consent consent=mock(Consent.class);
-		AuthenticatedUser user=mock(AuthenticatedUser.class); 
-		when(userContext.getCurrentUser()).thenReturn(user);
-		
-		when(user.getUsername()).thenReturn("mockedUser");
+		Patient patient=mock(Patient.class);
 		when(consentRepository.findOne(anyLong())).thenReturn(consent);
 		
 		ConsentService spy=spy(cst);
 		ConsentPdfDto consentPdfDto=mock(ConsentPdfDto.class);
 		SignedPDFConsent signedPdfConsent=mock(SignedPDFConsent.class);
 		when(spy.makeSignedPdfConsent()).thenReturn(signedPdfConsent);
+		when(consent.getPatient()).thenReturn(patient);
+		when(patient.getEmail()).thenReturn("patient@consent2share.com");
 		spy.signConsent(consentPdfDto);
 		
 		//all the anystring() should be replaced after we've decided what to put there

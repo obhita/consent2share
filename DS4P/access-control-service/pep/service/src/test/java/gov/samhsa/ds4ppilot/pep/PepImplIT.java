@@ -55,8 +55,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class PepImplIT {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(PepImplIT.class);
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(PepImplIT.class);
 
 	private static boolean packageXdm;
 	private static String senderEmailAddress;
@@ -65,9 +66,9 @@ public class PepImplIT {
 	private final static String PERMIT_DECISION = "PERMIT";
 	private final static String DENY_DECISION = "DENY";
 	private final static String NOT_APPLICABLE = "NOT_APPLICABLE";
-	
+
 	private static DocumentSegmentationImpl documentSegmentation;
-	
+
 	private static RuleExecutionServiceImpl ruleExecutionService;
 	private static SimpleMarshallerImpl marshaller;
 	private static String xacmlResult;
@@ -88,7 +89,7 @@ public class PepImplIT {
 	private static DocumentFactModelExtractorImpl documentFactModelExtractor;
 	private static FileReaderImpl fileReader;
 	private static AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl additionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
-	
+
 	private PolicyDecisionPointImpl policyDecisionPoint;
 
 	@Before
@@ -97,20 +98,25 @@ public class PepImplIT {
 		packageXdm = true;
 		senderEmailAddress = "leo.smith@direct.obhita-stage.org";
 		reciepientEmailAddress = "Duane_Decouteau@direct.healthvault-stage.com";
-		ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-		policyDecisionPoint=(PolicyDecisionPointImpl) context.getBean("policyDecisionPoint");
+		ApplicationContext context = new ClassPathXmlApplicationContext(
+				"applicationContext.xml");
+		policyDecisionPoint = (PolicyDecisionPointImpl) context
+				.getBean("policyDecisionPoint");
 
 		fileReader = new FileReaderImpl();
 		metadataGenerator = new MetadataGeneratorImpl();
-		documentEditor = new DocumentEditorImpl(metadataGenerator, fileReader, new DocumentXmlConverterImpl());
+		documentEditor = new DocumentEditorImpl(metadataGenerator, fileReader,
+				new DocumentXmlConverterImpl());
 		marshaller = new SimpleMarshallerImpl();
 		documentTagger = new DocumentTaggerImpl();
 		documentEncrypter = new DocumentEncrypterImpl();
-		documentRedactor = new DocumentRedactorImpl(documentEditor, new DocumentXmlConverterImpl());
+		documentRedactor = new DocumentRedactorImpl(documentEditor,
+				new DocumentXmlConverterImpl());
 		documentMasker = new DocumentMaskerImpl();
 		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
-		additionalMetadataGeneratorForSegmentedClinicalDocumentImpl = new AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl();;
-		
+		additionalMetadataGeneratorForSegmentedClinicalDocumentImpl = new AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl();
+		;
+
 		c32Document = fileReader.readFile("c32.xml");
 		xacmlResult = "<xacmlResult><pdpDecision>Permit</pdpDecision><purposeOfUse>TREAT</purposeOfUse><messageId>4617a579-1881-4e40-9f98-f85bd81d6502</messageId><homeCommunityId>2.16.840.1.113883.3.467</homeCommunityId><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:org:us-privacy-law:42CFRPart2</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:org:refrain-policy:NORDSLCD</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:redact:ETH</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:redact:PSY</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:mask:HIV</pdpObligation></xacmlResult>";
 		ruleExecutionResponseContainer = "<ruleExecutionContainer><executionResponseList><executionResponse><c32SectionLoincCode>11450-4</c32SectionLoincCode><c32SectionTitle>Problems</c32SectionTitle><code>66214007</code><codeSystemName>SNOMED CT</codeSystemName><displayName>Substance Abuse Disorder</displayName><documentObligationPolicy>ENCRYPT</documentObligationPolicy><documentRefrainPolicy>NORDSLCD</documentRefrainPolicy><impliedConfSection>R</impliedConfSection><itemAction>REDACT</itemAction><observationId>e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7</observationId><sensitivity>ETH</sensitivity><USPrivacyLaw>42CFRPart2</USPrivacyLaw></executionResponse><executionResponse><c32SectionLoincCode>11450-4</c32SectionLoincCode><c32SectionTitle>Problems</c32SectionTitle><code>111880001</code><codeSystemName>SNOMED CT</codeSystemName><displayName>Acute HIV</displayName><documentObligationPolicy>ENCRYPT</documentObligationPolicy><documentRefrainPolicy>NORDSLCD</documentRefrainPolicy><impliedConfSection>R</impliedConfSection><itemAction>MASK</itemAction><observationId>d11275e7-67ae-11db-bd13-0800200c9a66</observationId><sensitivity>HIV</sensitivity><USPrivacyLaw>42CFRPart2</USPrivacyLaw></executionResponse></executionResponseList></ruleExecutionContainer>";
@@ -120,10 +126,11 @@ public class PepImplIT {
 		endpointAddressForRuleExectionWebServiceClient = "http://localhost:90/RuleExecutionService/services/RuleExecutionService";
 		xdsDocumentEntryUniqueId = "123";
 		endpointAddressGuvnorService = "http://localhost:8080/guvnor-5.5.0.Final-tomcat-6.0/rest/packages/AnnotationRules/source";
-		
-		ruleExecutionService = new RuleExecutionServiceImpl(new GuvnorServiceImpl(
-				endpointAddressGuvnorService,"admin", "admin"), new SimpleMarshallerImpl());
-		
+
+		ruleExecutionService = new RuleExecutionServiceImpl(
+				new GuvnorServiceImpl(endpointAddressGuvnorService, "admin",
+						"admin"), new SimpleMarshallerImpl());
+
 		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
 		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
 				ruleExecutionService, new AuditServiceImpl(
@@ -131,13 +138,13 @@ public class PepImplIT {
 				marshaller, documentEncrypter, documentRedactor,
 				documentMasker, documentTagger, documentFactModelExtractor,
 				additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
-		
+
 	}
 
 	// Integration test
-//	@Test
+	// @Test
 	public void testHandleC32Request_Permit() throws Exception {
-		
+
 		// Arrange
 
 		String samplePolicyPath = "src/test/resources/samplePolicy.xml";
@@ -145,41 +152,45 @@ public class PepImplIT {
 		String recepientSubjectNPI = "1568797520";
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "consent2share@outlook.com";
-		//String purposeOfUse = "PWATRNY";
+		// String purposeOfUse = "PWATRNY";
 		String purposeOfUse = "TREAT";
 		String xdsDocumentEntryUniqueId = "123";
-		
+
 		// pdp
 		PolicyDecisionPointImpl pdpSpy = spy(policyDecisionPoint);
-		Evaluatable policy=null;
+		Evaluatable policy = null;
 		try {
 			InputStream is = new FileInputStream(samplePolicyPath);
-			policy=PolicyMarshaller.unmarshal(is);
+			policy = PolicyMarshaller.unmarshal(is);
 		} catch (Exception e) {
-			LOGGER.debug(e.toString(),e);
+			LOGGER.debug(e.toString(), e);
 		}
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
-		when(pdpSpy.getPolicies(resourceId)).thenReturn(policies);
-		
+		when(
+				pdpSpy.getPolicies(resourceId, recepientSubjectNPI,
+						intermediarySubjectNPI)).thenReturn(policies);
+
 		// pdp request
 		RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
-		InputStream requestis=null;
-		RequestType request=null;
+		InputStream requestis = null;
+		RequestType request = null;
 		try {
-			requestis=new FileInputStream(samplePolicyRequestPath);
-			request=RequestMarshaller.unmarshal(requestis);
+			requestis = new FileInputStream(samplePolicyRequestPath);
+			request = RequestMarshaller.unmarshal(requestis);
 		} catch (Exception e) {
-			LOGGER.debug(e.toString(),e);
+			LOGGER.debug(e.toString(), e);
 		}
-		when(requestGeneratorMock.generateRequest(recepientSubjectNPI, intermediarySubjectNPI, purposeOfUse, resourceId)).thenReturn(request);
-		
+		when(
+				requestGeneratorMock.generateRequest(recepientSubjectNPI,
+						intermediarySubjectNPI, purposeOfUse, resourceId))
+				.thenReturn(request);
+
 		testPermit(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
 				requestGeneratorMock);
 	}
 
-	
 	private void testPermit(String recepientSubjectNPI,
 			String intermediarySubjectNPI, String resourceId,
 			String purposeOfUse, String xdsDocumentEntryUniqueId,
@@ -189,40 +200,42 @@ public class PepImplIT {
 		ContextHandlerImpl contextHandler = new ContextHandlerImpl(pdpSpy);
 
 		// c32 getter
-//		final String endpointAddress = "http:localhost/Rem.Web/C32Service.svc";
-//		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
+		// final String endpointAddress =
+		// "http:localhost/Rem.Web/C32Service.svc";
+		// C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
 		C32GetterImpl c32Getter = mock(C32GetterImpl.class);
 		String c32String = loadXMLAsString("c32.xml");
 		when(c32Getter.getC32(resourceId)).thenReturn(c32String);
-		
+
 		// document segmentation
-//		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
-//		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
-//				ruleExecutionService, new AuditServiceImpl(
-//						endpointAddressForAuditServcie), documentEditor,
-//				marshaller, documentEncrypter, documentRedactor,
-//				documentMasker, documentTagger, documentFactModelExtractor,
-//				additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
+		// final String documentSegmentationEndpointAddress =
+		// "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+		// DocumentSegmentationImpl documentSegmentation = new
+		// DocumentSegmentationImpl(
+		// ruleExecutionService, new AuditServiceImpl(
+		// endpointAddressForAuditServcie), documentEditor,
+		// marshaller, documentEncrypter, documentRedactor,
+		// documentMasker, documentTagger, documentFactModelExtractor,
+		// additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
 
 		// dataHandlerToBytesConverter
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
-		
+
 		// xdsbRepository
 		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
 				xdsbRepositoryEndpointAddress);
-		
+
 		// xdsbRegistry
 		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
 				xdsbRegistryEndpointAddress);
 
-		
 		// pep
-		PepImpl pep = new PepImpl(contextHandler,
-				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
-				xdsbRepository, xdsbRegistry, marshaller);		
-//		pep.setSubjectPurposeOfUse("TREAT");
+		PepImpl pep = new PepImpl(contextHandler, c32Getter,
+				documentSegmentation, dataHandlerToBytesConverter,
+				xdsbRepository, xdsbRegistry, marshaller);
+		// pep.setSubjectPurposeOfUse("TREAT");
 		pep.setSubjectPurposeOfUse(purposeOfUse);
 		pep.setSubjectLocality("2.16.840.1.113883.3.467");
 		pep.setOrganization("SAMHSA");
@@ -233,19 +246,21 @@ public class PepImplIT {
 		pep.setHomeCommunityId("2.16.840.1.113883.3.467");
 
 		// Act
-//		FilterC32Response c32Response = pep.handleC32Request(
-//				patientIdPermit, packageXdm, senderEmailAddress,
-//				reciepientEmailAddress);
-		FilterC32Response c32Response = pep.handleC32Request(recepientSubjectNPI, intermediarySubjectNPI, resourceId, packageXdm, senderEmailAddress, reciepientEmailAddress, xdsDocumentEntryUniqueId);
+		// FilterC32Response c32Response = pep.handleC32Request(
+		// patientIdPermit, packageXdm, senderEmailAddress,
+		// reciepientEmailAddress);
+		FilterC32Response c32Response = pep.handleC32Request(
+				recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+				packageXdm, senderEmailAddress, reciepientEmailAddress,
+				xdsDocumentEntryUniqueId);
 		writePackageToFile(c32Response);
 		LOGGER.debug(c32Response.getPdpDecision());
 		LOGGER.debug(c32Response.getMaskedDocument());
-		
+
 		// Assert
 		assertEquals(PERMIT_DECISION, c32Response.getPdpDecision());
 	}
 
-	
 	/**
 	 * @param c32Response
 	 * @throws IOException
@@ -266,8 +281,9 @@ public class PepImplIT {
 
 	// Integration test
 	@Test
-	public void testHandleC32Request_DenyByIntermediarySubjectNPIMismatch() throws Exception {
-		
+	public void testHandleC32Request_DenyByIntermediarySubjectNPIMismatch()
+			throws Exception {
+
 		// Arrange
 
 		String samplePolicyPath = "src/test/resources/samplePolicyDenyByIntermediarySubjectNPIMismatch.xml";
@@ -275,35 +291,40 @@ public class PepImplIT {
 		String recepientSubjectNPI = "1568797520";
 		String intermediarySubjectNPI = "1111111111";
 		String resourceId = "consent2share@outlook.com";
-//		String purposeOfUse = "PWATRNY";
+		// String purposeOfUse = "PWATRNY";
 		String purposeOfUse = "TREAT";
 		String xdsDocumentEntryUniqueId = "123";
-		
+
 		// pdp
 		PolicyDecisionPointImpl pdpSpy = spy(policyDecisionPoint);
-		Evaluatable policy=null;
+		Evaluatable policy = null;
 		try {
 			InputStream is = new FileInputStream(samplePolicyPath);
-			policy=PolicyMarshaller.unmarshal(is);
+			policy = PolicyMarshaller.unmarshal(is);
 		} catch (Exception e) {
-			LOGGER.debug(e.toString(),e);
+			LOGGER.debug(e.toString(), e);
 		}
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
-		when(pdpSpy.getPolicies(resourceId)).thenReturn(policies);
-		
+		when(
+				pdpSpy.getPolicies(resourceId, recepientSubjectNPI,
+						intermediarySubjectNPI)).thenReturn(policies);
+
 		// pdp request
 		RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
-		InputStream requestis=null;
-		RequestType request=null;
+		InputStream requestis = null;
+		RequestType request = null;
 		try {
-			requestis=new FileInputStream(samplePolicyRequestPath);
-			request=RequestMarshaller.unmarshal(requestis);
+			requestis = new FileInputStream(samplePolicyRequestPath);
+			request = RequestMarshaller.unmarshal(requestis);
 		} catch (Exception e) {
-			LOGGER.debug(e.toString(),e);
+			LOGGER.debug(e.toString(), e);
 		}
-		when(requestGeneratorMock.generateRequest(recepientSubjectNPI, intermediarySubjectNPI, purposeOfUse, resourceId)).thenReturn(request);
-		
+		when(
+				requestGeneratorMock.generateRequest(recepientSubjectNPI,
+						intermediarySubjectNPI, purposeOfUse, resourceId))
+				.thenReturn(request);
+
 		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
 				requestGeneratorMock);
@@ -317,19 +338,21 @@ public class PepImplIT {
 		ContextHandlerImpl contextHandler = new ContextHandlerImpl(pdpSpy);
 
 		// c32 getter
-//		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
-//		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
+		// final String endpointAddress =
+		// "http://localhost/Rem.Web/C32Service.svc";
+		// C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
 		C32GetterImpl c32Getter = mock(C32GetterImpl.class);
 		String c32String = loadXMLAsString("c32.xml");
 		when(c32Getter.getC32(resourceId)).thenReturn(c32String);
 
 		// document segmentation
 		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
-		//DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl();
+		// DocumentSegmentationImpl documentSegmentation = new
+		// DocumentSegmentationImpl();
 
 		// dataHandlerToBytesConverter
 		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
-		
+
 		// xdsbRepository
 		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
 		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
@@ -341,13 +364,13 @@ public class PepImplIT {
 				xdsbRegistryEndpointAddress);
 
 		// pep
-		PepImpl pep = new PepImpl(contextHandler,
-				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
+		PepImpl pep = new PepImpl(contextHandler, c32Getter,
+				documentSegmentation, dataHandlerToBytesConverter,
 				xdsbRepository, xdsbRegistry, marshaller);
-//		pep.setSubjectPurposeOfUse("TREAT");
+		// pep.setSubjectPurposeOfUse("TREAT");
 		pep.setSubjectPurposeOfUse(purposeOfUse);
 		pep.setSubjectLocality("2.16.840.1.113883.3.467");
-//		pep.setOrganization("SAMHSA");
+		// pep.setOrganization("SAMHSA");
 		pep.setOrganizationId("FEiSystems");
 		pep.setResourceName("NwHINDirectSend");
 		pep.setResourceType("C32");
@@ -355,49 +378,56 @@ public class PepImplIT {
 		pep.setHomeCommunityId("2.16.840.1.113883.3.467");
 
 		// Act
-//		FilterC32Response c32Response = pep.handleC32Request(
-//				patientIdPermit, packageXdm, senderEmailAddress,
-//				reciepientEmailAddress);
-		FilterC32Response c32Response = pep.handleC32Request(recepientSubjectNPI, intermediarySubjectNPI, resourceId, packageXdm, senderEmailAddress, reciepientEmailAddress, xdsDocumentEntryUniqueId);
+		// FilterC32Response c32Response = pep.handleC32Request(
+		// patientIdPermit, packageXdm, senderEmailAddress,
+		// reciepientEmailAddress);
+		FilterC32Response c32Response = pep.handleC32Request(
+				recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+				packageXdm, senderEmailAddress, reciepientEmailAddress,
+				xdsDocumentEntryUniqueId);
 		LOGGER.debug(c32Response.getPdpDecision());
 		LOGGER.debug(c32Response.getMaskedDocument());
-		
+
 		// Assert
 		assertEquals(DENY_DECISION, c32Response.getPdpDecision());
-		assertNull("c32Response shouldn't have any documents, because it should have been denied.", c32Response.getMaskedDocument());
+		assertNull(
+				"c32Response shouldn't have any documents, because it should have been denied.",
+				c32Response.getMaskedDocument());
 	}
 
 	// Integration test
 	@Test
 	public void testHandleC32Request_DenyByTime() throws Exception {
-		
+
 		// Arrange
 
 		String samplePolicyPath = "src/test/resources/samplePolicy.xml";
-//		String samplePolicyRequestPath = "";
+		// String samplePolicyRequestPath = "";
 		String recepientSubjectNPI = "1568797520";
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "consent2share@outlook.com";
-//		String purposeOfUse = "PWATRNY";
+		// String purposeOfUse = "PWATRNY";
 		String purposeOfUse = "TREAT";
 		String xdsDocumentEntryUniqueId = "123";
-		
+
 		// pdp
 		PolicyDecisionPointImpl pdpSpy = spy(policyDecisionPoint);
-		Evaluatable policy=null;
+		Evaluatable policy = null;
 		try {
 			InputStream is = new FileInputStream(samplePolicyPath);
-			policy=PolicyMarshaller.unmarshal(is);
+			policy = PolicyMarshaller.unmarshal(is);
 		} catch (Exception e) {
-			LOGGER.debug(e.toString(),e);
+			LOGGER.debug(e.toString(), e);
 		}
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
-		when(pdpSpy.getPolicies(resourceId)).thenReturn(policies);
-		
+		when(
+				pdpSpy.getPolicies(resourceId, recepientSubjectNPI,
+						intermediarySubjectNPI)).thenReturn(policies);
+
 		// pdp request
 		RequestGenerator requestGenerator = new RequestGenerator();
-		
+
 		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
 				requestGenerator);
@@ -405,8 +435,9 @@ public class PepImplIT {
 
 	// Integration test
 	@Test
-	public void testHandleC32Request_DenyByRecepientSubjectNPIMismatch() throws Exception {
-		
+	public void testHandleC32Request_DenyByRecepientSubjectNPIMismatch()
+			throws Exception {
+
 		// Arrange
 
 		String samplePolicyPath = "src/test/resources/samplePolicyDenyByRecepientSubjectNPIMismatch.xml";
@@ -414,35 +445,40 @@ public class PepImplIT {
 		String recepientSubjectNPI = "1111111111";
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "consent2share@outlook.com";
-//		String purposeOfUse = "PWATRNY";
+		// String purposeOfUse = "PWATRNY";
 		String purposeOfUse = "TREAT";
 		String xdsDocumentEntryUniqueId = "123";
-		
+
 		// pdp
 		PolicyDecisionPointImpl pdpSpy = spy(policyDecisionPoint);
-		Evaluatable policy=null;
+		Evaluatable policy = null;
 		try {
 			InputStream is = new FileInputStream(samplePolicyPath);
-			policy=PolicyMarshaller.unmarshal(is);
+			policy = PolicyMarshaller.unmarshal(is);
 		} catch (Exception e) {
-			LOGGER.debug(e.toString(),e);
+			LOGGER.debug(e.toString(), e);
 		}
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
-		when(pdpSpy.getPolicies(resourceId)).thenReturn(policies);
-		
+		when(
+				pdpSpy.getPolicies(resourceId, recepientSubjectNPI,
+						intermediarySubjectNPI)).thenReturn(policies);
+
 		// pdp request
 		RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
-		InputStream requestis=null;
-		RequestType request=null;
+		InputStream requestis = null;
+		RequestType request = null;
 		try {
-			requestis=new FileInputStream(samplePolicyRequestPath);
-			request=RequestMarshaller.unmarshal(requestis);
+			requestis = new FileInputStream(samplePolicyRequestPath);
+			request = RequestMarshaller.unmarshal(requestis);
 		} catch (Exception e) {
-			LOGGER.debug(e.toString(),e);
+			LOGGER.debug(e.toString(), e);
 		}
-		when(requestGeneratorMock.generateRequest(recepientSubjectNPI, intermediarySubjectNPI, purposeOfUse, resourceId)).thenReturn(request);
-		
+		when(
+				requestGeneratorMock.generateRequest(recepientSubjectNPI,
+						intermediarySubjectNPI, purposeOfUse, resourceId))
+				.thenReturn(request);
+
 		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
 				requestGeneratorMock);
@@ -450,44 +486,50 @@ public class PepImplIT {
 
 	// Integration test
 	@Test
-	public void testHandleC32Request_DenyByResourceIdMismatch() throws Exception {
-		
+	public void testHandleC32Request_DenyByResourceIdMismatch()
+			throws Exception {
+
 		// Arrange
-	
+
 		String samplePolicyPath = "src/test/resources/samplePolicyDenyByResourceIdMismatch.xml";
 		String samplePolicyRequestPath = "src/test/resources/samplePolicyRequest.xml";
 		String recepientSubjectNPI = "1568797520";
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "wrongresourceid@outlook.com";
-//		String purposeOfUse = "PWATRNY";
+		// String purposeOfUse = "PWATRNY";
 		String purposeOfUse = "TREAT";
 		String xdsDocumentEntryUniqueId = "123";
-		
+
 		// pdp
 		PolicyDecisionPointImpl pdpSpy = spy(policyDecisionPoint);
-		Evaluatable policy=null;
+		Evaluatable policy = null;
 		try {
 			InputStream is = new FileInputStream(samplePolicyPath);
-			policy=PolicyMarshaller.unmarshal(is);
+			policy = PolicyMarshaller.unmarshal(is);
 		} catch (Exception e) {
-			LOGGER.debug(e.toString(),e);
+			LOGGER.debug(e.toString(), e);
 		}
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
-		when(pdpSpy.getPolicies(resourceId)).thenReturn(policies);
-		
+		when(
+				pdpSpy.getPolicies(resourceId, recepientSubjectNPI,
+						intermediarySubjectNPI)).thenReturn(policies);
+
 		// pdp request
 		RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
-    	InputStream requestis=null;
-		RequestType request=null;
+		InputStream requestis = null;
+		RequestType request = null;
 		try {
-			requestis=new FileInputStream(samplePolicyRequestPath);
-			request=RequestMarshaller.unmarshal(requestis);
+			requestis = new FileInputStream(samplePolicyRequestPath);
+			request = RequestMarshaller.unmarshal(requestis);
 		} catch (Exception e) {
-			LOGGER.debug(e.toString(),e);
+			LOGGER.debug(e.toString(), e);
 		}
-		when(requestGeneratorMock.generateRequest(recepientSubjectNPI, intermediarySubjectNPI, purposeOfUse, resourceId)).thenReturn(request);
-		
+		when(
+				requestGeneratorMock.generateRequest(recepientSubjectNPI,
+						intermediarySubjectNPI, purposeOfUse, resourceId))
+				.thenReturn(request);
+
 		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
 				requestGeneratorMock);
@@ -495,236 +537,267 @@ public class PepImplIT {
 
 	// Integration test
 	@Test
-	public void testHandleC32Request_Permit_withActualPolicies() throws Exception {
-		
+	public void testHandleC32Request_Permit_withActualPolicies()
+			throws Exception {
+
 		// Arrange
 
-//		String samplePolicyPath = "src/test/resources/samplePolicy.xml";
-//		String samplePolicyRequestPath = "src/test/resources/samplePolicyRequest.xml";
+		// String samplePolicyPath = "src/test/resources/samplePolicy.xml";
+		// String samplePolicyRequestPath =
+		// "src/test/resources/samplePolicyRequest.xml";
 		String recepientSubjectNPI = "1083949036";
 		String intermediarySubjectNPI = "1174858088";
 		String resourceId = "consent2share@outlook.com";
-//		String purposeOfUse = "PWATRNY";
+		// String purposeOfUse = "PWATRNY";
 		String purposeOfUse = "TREAT";
 		String xdsDocumentEntryUniqueId = "123";
-//		
-//		// pdp request
-//		RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
-//		InputStream requestis=null;
-//		RequestType request=null;
-//		try {
-//			requestis=new FileInputStream(samplePolicyRequestPath);
-//			request=RequestMarshaller.unmarshal(requestis);
-//		} catch (Exception e) {
-//			LOGGER.debug(e.toString(),e);
-//		}
-//		when(requestGeneratorMock.generateRequest(recepientSubjectNPI, intermediarySubjectNPI, purposeOfUse, resourceId)).thenReturn(request);
+		//
+		// // pdp request
+		// RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
+		// InputStream requestis=null;
+		// RequestType request=null;
+		// try {
+		// requestis=new FileInputStream(samplePolicyRequestPath);
+		// request=RequestMarshaller.unmarshal(requestis);
+		// } catch (Exception e) {
+		// LOGGER.debug(e.toString(),e);
+		// }
+		// when(requestGeneratorMock.generateRequest(recepientSubjectNPI,
+		// intermediarySubjectNPI, purposeOfUse,
+		// resourceId)).thenReturn(request);
 		RequestGenerator requestGeneratorMock = new RequestGenerator();
 		testPermit(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, policyDecisionPoint,
 				requestGeneratorMock);
 	}
 
-// Integration test
+	// Integration test
 	@Test
-	public void testHandleC32Request_DenyByTime_withActualPolicies() throws Exception {
-		
+	public void testHandleC32Request_DenyByTime_withActualPolicies()
+			throws Exception {
+
 		// Arrange
 
-//		String samplePolicyPath = "src/test/resources/samplePolicy.xml";
-//		String samplePolicyRequestPath = "src/test/resources/samplePolicyRequest.xml";
+		// String samplePolicyPath = "src/test/resources/samplePolicy.xml";
+		// String samplePolicyRequestPath =
+		// "src/test/resources/samplePolicyRequest.xml";
 		String recepientSubjectNPI = "1083949036";
 		String intermediarySubjectNPI = "1174858088";
 		String resourceId = "consent2share@outlook.com";
-//		String purposeOfUse = "PWATRNY";
+		// String purposeOfUse = "PWATRNY";
 		String purposeOfUse = "TREAT";
 		String xdsDocumentEntryUniqueId = "123";
-		
-//		// pdp request
+
+		// // pdp request
 		RequestGenerator requestGenerator = new RequestGenerator();
 		RequestGenerator spyRequestGenerator = spy(requestGenerator);
-		when(spyRequestGenerator.getDate()).thenReturn("2030-07-18T00:00:00-04:00");
-		
+		when(spyRequestGenerator.getDate()).thenReturn(
+				"2030-07-18T00:00:00-04:00");
+
 		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, policyDecisionPoint,
 				spyRequestGenerator);
 	}
-//
-//	// Integration test
-//	@Test
-//	public void testHandleC32Request_DenyByRecepientSubjectNPIMistmatch_withActualPolicies() throws Exception {
-//		
-//		// Arrange
-//
-//		String recepientSubjectNPI = "1111111111";
-//		String intermediarySubjectNPI = "1174858088";
-//		String resourceId = "consent2share@outlook.com";
-//		String purposeOfUse = "TREAT";
-//		String xdsDocumentEntryUniqueId = "123";
-//		
-//		RequestGenerator requestGeneratorMock = new RequestGenerator();
-//		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
-//				purposeOfUse, xdsDocumentEntryUniqueId, policyDecisionPoint,
-//				requestGeneratorMock);
-//	}
-//
-//	// Integration test
-//	@Test
-//	public void testHandleC32Request_DenyByIntermediarySubjectNPIMistmatch_withActualPolicies() throws Exception {
-//		
-//		// Arrange
-//	
-//		String recepientSubjectNPI = "1083949036";
-//		String intermediarySubjectNPI = "1111111111";
-//		String resourceId = "consent2share@outlook.com";
-//		String purposeOfUse = "TREAT";
-//		String xdsDocumentEntryUniqueId = "123";
-//		
-//		RequestGenerator requestGeneratorMock = new RequestGenerator();
-//		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
-//				purposeOfUse, xdsDocumentEntryUniqueId, policyDecisionPoint,
-//				requestGeneratorMock);
-//	}
-//
-//	// Integration test
-//	@Test
-//	public void testHandleC32Request_DenyByResourceIdMistmatch_withActualPolicies() throws Exception {
-//		
-//		// Arrange
-//	
-//		String recepientSubjectNPI = "1083949036";
-//		String intermediarySubjectNPI = "1174858088";
-//		String resourceId = "consent2share@wrongEmailAddress.com";
-//		String purposeOfUse = "TREAT";
-//		String xdsDocumentEntryUniqueId = "123";
-//		
-//		RequestGenerator requestGeneratorMock = new RequestGenerator();
-//		testNotApplicable(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
-//				purposeOfUse, xdsDocumentEntryUniqueId, policyDecisionPoint,
-//				requestGeneratorMock);
-//	}
-//
-//	// Integration test
-//	@Test
-//	public void testHandleC32Request_DenyByPurposeOfUseMistmatch_withActualPolicies() throws Exception {
-//		
-//		// Arrange
-//	
-//		String recepientSubjectNPI = "1083949036";
-//		String intermediarySubjectNPI = "1174858088";
-//		String resourceId = "consent2share@outlook.com";
-//		String purposeOfUse = "HMARKT";
-//		String xdsDocumentEntryUniqueId = "123";
-//		
-//		RequestGenerator requestGeneratorMock = new RequestGenerator();
-//		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
-//				purposeOfUse, xdsDocumentEntryUniqueId, policyDecisionPoint,
-//				requestGeneratorMock);
-//	}
-//
-//	private void testNotApplicable(String recepientSubjectNPI,
-//			String intermediarySubjectNPI, String resourceId,
-//			String purposeOfUse, String xdsDocumentEntryUniqueId,
-//			PolicyDecisionPoint pdpSpy, RequestGenerator requestGeneratorMock) {
-//		// context handler
-//		ContextHandlerImpl contextHandler = new ContextHandlerImpl(pdpSpy, requestGeneratorMock);
-//
-//		// c32 getter
-////		final String endpointAddress = "http://localhost/Rem.Web/C32Service.svc";
-////		C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
-//		C32GetterImpl c32Getter = mock(C32GetterImpl.class);
-//		String c32String = loadXMLAsString("c32.xml");
-//		when(c32Getter.getC32(resourceId)).thenReturn(c32String);
-//
-//		// document segmentation
-//		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
-//		DocumentSegmentationHandlerImpl documentSegmentation = new DocumentSegmentationHandlerImpl();
-//
-//		// dataHandlerToBytesConverter
-//		DataHandlerToBytesConverter dataHandlerToBytesConverter = new DataHandlerToBytesConverterImpl();
-//		
-//		// xdsbRepository
-//		final String xdsbRepositoryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsrepositoryb";
-//		XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
-//				xdsbRepositoryEndpointAddress);
-//
-//		// xdsbRegistry
-//		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
-//		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
-//				xdsbRegistryEndpointAddress);
-//
-//		// pep
-//		PepImpl pep = new PepImpl(contextHandler,
-//				c32Getter, documentSegmentation, dataHandlerToBytesConverter,
-//				xdsbRepository, xdsbRegistry);
-////		pep.setSubjectPurposeOfUse("TREAT");
-//		pep.setSubjectPurposeOfUse(purposeOfUse);
-//		pep.setSubjectLocality("2.16.840.1.113883.3.467");
-//		pep.setOrganization("SAMHSA");
-//		pep.setOrganizationId("FEiSystems");
-//		pep.setResourceName("NwHINDirectSend");
-//		pep.setResourceType("C32");
-//		pep.setResourceAction("Execute");
-//		pep.setHomeCommunityId("2.16.840.1.113883.3.467");
-//
-//		// Act
-////		FilterC32Response c32Response = pep.handleC32Request(
-////				patientIdPermit, packageXdm, senderEmailAddress,
-////				reciepientEmailAddress);
-//		FilterC32Response c32Response = pep.handleC32Request(recepientSubjectNPI, intermediarySubjectNPI, resourceId, packageXdm, senderEmailAddress, reciepientEmailAddress, xdsDocumentEntryUniqueId);
-//		LOGGER.debug(c32Response.getPdpDecision());
-//		LOGGER.debug(c32Response.getMaskedDocument());
-//		
-//		// Assert
-//		assertEquals(NOT_APPLICABLE, c32Response.getPdpDecision());
-//		assertNull("c32Response shouldn't have any documents, because it should have been denied.", c32Response.getMaskedDocument());
-//	}
-//
-//	// Integration test
-//	@Test
-//	public void testHandleC32Request_DenyByPurposeOfUseMismatch() throws Exception {
-//		
-//		// Arrange
-//	
-//		String samplePolicyPath = "src/test/resources/samplePolicyDenyByPurposeOfUseMismatch.xml";
-//		String samplePolicyRequestPath = "src/test/resources/samplePolicyRequest.xml";
-//		String recepientSubjectNPI = "1568797520";
-//		String intermediarySubjectNPI = "1285969170";
-//		String resourceId = "consent2share@outlook.com";
-////		String purposeOfUse = "PWATRNY";
-//		String purposeOfUse = "HMARKT";
-//		String xdsDocumentEntryUniqueId = "123";
-//		
-//		// pdp
-//		PolicyDecisionPoint pdpSpy = spy(policyDecisionPoint);
-//		Evaluatable policy=null;
-//		try {
-//			InputStream is = new FileInputStream(samplePolicyPath);
-//			policy=PolicyMarshaller.unmarshal(is);
-//		} catch (Exception e) {
-//			LOGGER.debug(e.toString(),e);
-//		}
-//		List<Evaluatable> policies = new ArrayList<Evaluatable>();
-//		policies.add(policy);
-//		when(pdpSpy.getPolicies(resourceId)).thenReturn(policies);
-//		
-//		// pdp request
-//		RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
-//		InputStream requestis=null;
-//		RequestType request=null;
-//		try {
-//			requestis=new FileInputStream(samplePolicyRequestPath);
-//			request=RequestMarshaller.unmarshal(requestis);
-//		} catch (Exception e) {
-//			LOGGER.debug(e.toString(),e);
-//		}
-//		when(requestGeneratorMock.generateRequest(recepientSubjectNPI, intermediarySubjectNPI, purposeOfUse, resourceId)).thenReturn(request);
-//		
-//		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
-//				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
-//				requestGeneratorMock);
-//	}
-//
+
+	//
+	// // Integration test
+	// @Test
+	// public void
+	// testHandleC32Request_DenyByRecepientSubjectNPIMistmatch_withActualPolicies()
+	// throws Exception {
+	//
+	// // Arrange
+	//
+	// String recepientSubjectNPI = "1111111111";
+	// String intermediarySubjectNPI = "1174858088";
+	// String resourceId = "consent2share@outlook.com";
+	// String purposeOfUse = "TREAT";
+	// String xdsDocumentEntryUniqueId = "123";
+	//
+	// RequestGenerator requestGeneratorMock = new RequestGenerator();
+	// testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+	// purposeOfUse, xdsDocumentEntryUniqueId, policyDecisionPoint,
+	// requestGeneratorMock);
+	// }
+	//
+	// // Integration test
+	// @Test
+	// public void
+	// testHandleC32Request_DenyByIntermediarySubjectNPIMistmatch_withActualPolicies()
+	// throws Exception {
+	//
+	// // Arrange
+	//
+	// String recepientSubjectNPI = "1083949036";
+	// String intermediarySubjectNPI = "1111111111";
+	// String resourceId = "consent2share@outlook.com";
+	// String purposeOfUse = "TREAT";
+	// String xdsDocumentEntryUniqueId = "123";
+	//
+	// RequestGenerator requestGeneratorMock = new RequestGenerator();
+	// testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+	// purposeOfUse, xdsDocumentEntryUniqueId, policyDecisionPoint,
+	// requestGeneratorMock);
+	// }
+	//
+	// // Integration test
+	// @Test
+	// public void
+	// testHandleC32Request_DenyByResourceIdMistmatch_withActualPolicies()
+	// throws Exception {
+	//
+	// // Arrange
+	//
+	// String recepientSubjectNPI = "1083949036";
+	// String intermediarySubjectNPI = "1174858088";
+	// String resourceId = "consent2share@wrongEmailAddress.com";
+	// String purposeOfUse = "TREAT";
+	// String xdsDocumentEntryUniqueId = "123";
+	//
+	// RequestGenerator requestGeneratorMock = new RequestGenerator();
+	// testNotApplicable(recepientSubjectNPI, intermediarySubjectNPI,
+	// resourceId,
+	// purposeOfUse, xdsDocumentEntryUniqueId, policyDecisionPoint,
+	// requestGeneratorMock);
+	// }
+	//
+	// // Integration test
+	// @Test
+	// public void
+	// testHandleC32Request_DenyByPurposeOfUseMistmatch_withActualPolicies()
+	// throws Exception {
+	//
+	// // Arrange
+	//
+	// String recepientSubjectNPI = "1083949036";
+	// String intermediarySubjectNPI = "1174858088";
+	// String resourceId = "consent2share@outlook.com";
+	// String purposeOfUse = "HMARKT";
+	// String xdsDocumentEntryUniqueId = "123";
+	//
+	// RequestGenerator requestGeneratorMock = new RequestGenerator();
+	// testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+	// purposeOfUse, xdsDocumentEntryUniqueId, policyDecisionPoint,
+	// requestGeneratorMock);
+	// }
+	//
+	// private void testNotApplicable(String recepientSubjectNPI,
+	// String intermediarySubjectNPI, String resourceId,
+	// String purposeOfUse, String xdsDocumentEntryUniqueId,
+	// PolicyDecisionPoint pdpSpy, RequestGenerator requestGeneratorMock) {
+	// // context handler
+	// ContextHandlerImpl contextHandler = new ContextHandlerImpl(pdpSpy,
+	// requestGeneratorMock);
+	//
+	// // c32 getter
+	// // final String endpointAddress =
+	// "http://localhost/Rem.Web/C32Service.svc";
+	// // C32GetterImpl c32Getter = new C32GetterImpl(endpointAddress);
+	// C32GetterImpl c32Getter = mock(C32GetterImpl.class);
+	// String c32String = loadXMLAsString("c32.xml");
+	// when(c32Getter.getC32(resourceId)).thenReturn(c32String);
+	//
+	// // document segmentation
+	// final String documentSegmentationEndpointAddress =
+	// "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
+	// DocumentSegmentationHandlerImpl documentSegmentation = new
+	// DocumentSegmentationHandlerImpl();
+	//
+	// // dataHandlerToBytesConverter
+	// DataHandlerToBytesConverter dataHandlerToBytesConverter = new
+	// DataHandlerToBytesConverterImpl();
+	//
+	// // xdsbRepository
+	// final String xdsbRepositoryEndpointAddress =
+	// "http://feijboss01:8080/axis2/services/xdsrepositoryb";
+	// XdsbRepositoryImpl xdsbRepository = new XdsbRepositoryImpl(
+	// xdsbRepositoryEndpointAddress);
+	//
+	// // xdsbRegistry
+	// final String xdsbRegistryEndpointAddress =
+	// "http://feijboss01:8080/axis2/services/xdsregistryb";
+	// XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
+	// xdsbRegistryEndpointAddress);
+	//
+	// // pep
+	// PepImpl pep = new PepImpl(contextHandler,
+	// c32Getter, documentSegmentation, dataHandlerToBytesConverter,
+	// xdsbRepository, xdsbRegistry);
+	// // pep.setSubjectPurposeOfUse("TREAT");
+	// pep.setSubjectPurposeOfUse(purposeOfUse);
+	// pep.setSubjectLocality("2.16.840.1.113883.3.467");
+	// pep.setOrganization("SAMHSA");
+	// pep.setOrganizationId("FEiSystems");
+	// pep.setResourceName("NwHINDirectSend");
+	// pep.setResourceType("C32");
+	// pep.setResourceAction("Execute");
+	// pep.setHomeCommunityId("2.16.840.1.113883.3.467");
+	//
+	// // Act
+	// // FilterC32Response c32Response = pep.handleC32Request(
+	// // patientIdPermit, packageXdm, senderEmailAddress,
+	// // reciepientEmailAddress);
+	// FilterC32Response c32Response = pep.handleC32Request(recepientSubjectNPI,
+	// intermediarySubjectNPI, resourceId, packageXdm, senderEmailAddress,
+	// reciepientEmailAddress, xdsDocumentEntryUniqueId);
+	// LOGGER.debug(c32Response.getPdpDecision());
+	// LOGGER.debug(c32Response.getMaskedDocument());
+	//
+	// // Assert
+	// assertEquals(NOT_APPLICABLE, c32Response.getPdpDecision());
+	// assertNull("c32Response shouldn't have any documents, because it should have been denied.",
+	// c32Response.getMaskedDocument());
+	// }
+	//
+	// // Integration test
+	// @Test
+	// public void testHandleC32Request_DenyByPurposeOfUseMismatch() throws
+	// Exception {
+	//
+	// // Arrange
+	//
+	// String samplePolicyPath =
+	// "src/test/resources/samplePolicyDenyByPurposeOfUseMismatch.xml";
+	// String samplePolicyRequestPath =
+	// "src/test/resources/samplePolicyRequest.xml";
+	// String recepientSubjectNPI = "1568797520";
+	// String intermediarySubjectNPI = "1285969170";
+	// String resourceId = "consent2share@outlook.com";
+	// // String purposeOfUse = "PWATRNY";
+	// String purposeOfUse = "HMARKT";
+	// String xdsDocumentEntryUniqueId = "123";
+	//
+	// // pdp
+	// PolicyDecisionPoint pdpSpy = spy(policyDecisionPoint);
+	// Evaluatable policy=null;
+	// try {
+	// InputStream is = new FileInputStream(samplePolicyPath);
+	// policy=PolicyMarshaller.unmarshal(is);
+	// } catch (Exception e) {
+	// LOGGER.debug(e.toString(),e);
+	// }
+	// List<Evaluatable> policies = new ArrayList<Evaluatable>();
+	// policies.add(policy);
+	// when(pdpSpy.getPolicies(resourceId)).thenReturn(policies);
+	//
+	// // pdp request
+	// RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
+	// InputStream requestis=null;
+	// RequestType request=null;
+	// try {
+	// requestis=new FileInputStream(samplePolicyRequestPath);
+	// request=RequestMarshaller.unmarshal(requestis);
+	// } catch (Exception e) {
+	// LOGGER.debug(e.toString(),e);
+	// }
+	// when(requestGeneratorMock.generateRequest(recepientSubjectNPI,
+	// intermediarySubjectNPI, purposeOfUse, resourceId)).thenReturn(request);
+	//
+	// testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+	// purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
+	// requestGeneratorMock);
+	// }
+	//
 	private static String loadXMLAsString(String xmlFileName) {
 		InputStream in = null;
 		StringBuilder c32Document = new StringBuilder();
@@ -744,7 +817,7 @@ public class PepImplIT {
 			in.close();
 
 		} catch (Exception e) {
-			LOGGER.debug(e.toString(),e);
+			LOGGER.debug(e.toString(), e);
 		}
 
 		return c32Document.toString();

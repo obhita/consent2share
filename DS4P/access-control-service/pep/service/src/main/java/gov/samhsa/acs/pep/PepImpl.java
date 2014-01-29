@@ -32,8 +32,10 @@ import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.namespace.PepNamespaceContext;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.contexthandler.ContextHandler;
+import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentation;
 import gov.samhsa.acs.pep.c32getter.C32Getter;
+import gov.samhsa.acs.pep.saml.SamlTokenParser;
 import gov.samhsa.acs.pep.xdsbregistry.XdsbRegistry;
 import gov.samhsa.acs.pep.xdsbrepository.XdsbRepository;
 import gov.samhsa.acs.xdsb.common.UniqueOidProviderImpl;
@@ -41,6 +43,8 @@ import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.common.XdsbMetadataGeneratorImpl;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.ds4ppilot.schema.pep.FilterC32Response;
+import gov.samhsa.ds4ppilot.schema.pep.PushC32Request;
+import gov.samhsa.ds4ppilot.schema.pep.PushC32Response;
 import gov.samhsa.ds4ppilot.schema.pep.RegisteryStoredQueryResponse;
 import gov.samhsa.ds4ppilot.schema.pep.RetrieveDocumentSetResponse;
 import gov.va.ehtac.ds4p.ws.EnforcePolicy;
@@ -86,6 +90,8 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.ValueListType;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
 
+import org.apache.ws.security.SAMLTokenPrincipal;
+import org.apache.ws.security.saml.ext.bean.AttributeBean;
 import org.hl7.v3.Device;
 import org.hl7.v3.Id;
 import org.hl7.v3.PRPAIN201301UV02;
@@ -260,6 +266,53 @@ public class PepImpl implements Pep {
 		return c32Response;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see Pep#handleC32Request(java. lang.String, boolean, java.lang.String,
+	 * java.lang.String)
+	 */
+	@Override
+	public FilterC32Response handleC32Request(String originalC32,
+			String senderNpi, String recipientNpi) {
+		
+//		
+//		if (samlTokenParser == null) {
+//			samlTokenParser = new SamlTokenParser();
+//		}
+//	    samlTokenPrincipal = (SAMLTokenPrincipal)(context.getUserPrincipal());
+//		
+//		String resourceId = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:resource:resource-id");
+//		String intermediarySubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject");
+//		String purposeOfUse = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
+//		String recipientSubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject");
+//		XacmlRequest xacmlRequest = setXacmlRequest(resourceId, purposeOfUse, intermediarySubject, recipientSubject);
+//		
+//		
+//		if (!validateRetrieveDocumentSetRequest(input)) {
+//			return xdsbErrorFactory
+//					.errorRetrieveDocumentSetResponseMultipleRepositoryId();
+//		}
+//		
+//		XacmlResponse xacmlResponse = null;
+//		try{
+//			xacmlResponse = contextHandler
+//				.enforcePolicy(xacmlRequest);
+//		}
+//		catch(NoPolicyFoundException e){
+//			logger.error(e.getMessage(), e);
+//			return xdsbErrorFactory.errorRetrieveDocumentSetResponseNoConsentsFound(resourceId);
+//		}
+//		if (PERMIT.equals(xacmlResponse.getPdpDecision())) {
+		
+		
+		
+
+			
+			
+			return null;
+			
+	}
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -59,11 +59,10 @@ public class ConsentListDto {
 	/** The do not share clinical concept codes. */
 	private Set<String> doNotShareClinicalConceptCodes;
 
-	/** The consent stage. */
-	private int consentStage;
+	private String consentStage;
 
 	/** The revoke stage. */
-	private int revokeStage;
+	private String revokeStage;
 	
 	// Consent Sharing date
 	/** The consent start. */
@@ -252,7 +251,7 @@ public class ConsentListDto {
 	 * 
 	 * @return the consent stage
 	 */
-	public int getConsentStage() {
+	public String getConsentStage() {
 		return consentStage;
 	}
 
@@ -262,7 +261,7 @@ public class ConsentListDto {
 	 * @param consentStage
 	 *            the new consent stage
 	 */
-	public void setConsentStage(int consentStage) {
+	public void setConsentStage(String consentStage) {
 		this.consentStage = consentStage;
 	}
 
@@ -291,7 +290,7 @@ public class ConsentListDto {
 	 * 
 	 * @return the revoke stage
 	 */
-	public int getRevokeStage() {
+	public String getRevokeStage() {
 		return revokeStage;
 	}
 
@@ -301,7 +300,7 @@ public class ConsentListDto {
 	 * @param revokeStage
 	 *            the new revoke stage
 	 */
-	public void setRevokeStage(int revokeStage) {
+	public void setRevokeStage(String revokeStage) {
 		this.revokeStage = revokeStage;
 	}
 

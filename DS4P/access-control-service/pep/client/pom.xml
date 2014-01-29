@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>pep</artifactId>
-		<version>1.1.0-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>pep-client</artifactId>
@@ -20,9 +20,13 @@
 	<dependencies>
 
 		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-library</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-frontend-jaxws</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 		
 		<dependency>
@@ -32,9 +36,24 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-ws-security</artifactId>
+		</dependency>		
+		
+        <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+        </dependency>		
+		
+		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
+			<artifactId>spring-context</artifactId>
 		</dependency>
+		
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-simple</artifactId>	
+         </dependency>		
 
 		<!-- Testing -->
 
@@ -70,10 +89,19 @@
 				resources, even for default resource -->
 			<resource>
 				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
 				<includes>
-					<include>**/*.*</include>
+					<include>**/*.properties</include>
 				</includes>
 			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</resource>
+	
 		</resources>
 
 		<plugins>
@@ -135,8 +163,7 @@
 							<exclude>gov/va/ehtac/ds4p/ws/*.class</exclude>
 							<exclude>gov/samhsa/schema/ds4p/xdsbregistry/message/*.class</exclude>
 							<exclude>gov/samhsa/ds4ppilot/schema/pep/*.class</exclude>
-							<exclude>gov/samhsa/ds4ppilot/contract/pep/*.class</exclude>
-							
+							<exclude>gov/samhsa/ds4ppilot/contract/pep/*.class</exclude>							
 						</excludes>
 					</instrumentation>
 					<formats>

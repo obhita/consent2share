@@ -39,12 +39,11 @@
 	<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
 	<!-- END: Favicon -->
 </head>
+
 <head>
-<style>
-tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; } 
-</style>
-<link href="../../../resources/css/jquery-ui.css" rel="stylesheet" th:href="@{/resources/css/jquery-ui.css}"/>
+	<link href="../../../resources/css/jquery-ui.css" rel="stylesheet" th:href="@{/resources/css/jquery-ui.css}"/>
 </head>
+
 <body id="adminHome-page" class="admin-pages">
 
 <div class="container outmost-holder">
@@ -272,7 +271,7 @@ tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; }
 								<div class="box-icon"></div>
 						</div>
 						<div class="box-content">
-                        	<table class="table table-striped" >
+                        	<table class="table table-striped table-hover" >
 	                        	<thead>
 									<tr>
 										<th>First Name</th>
@@ -284,7 +283,7 @@ tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; }
 									</tr>
 								</thead>
                             <!-- 	<tbody>
-	                              	<tr th:each="recentPatient:${recentVisits}" class="tr-highlight" th:href="@{'adminPatientView.html?id='+${recentPatient.id}}"
+	                              	<tr th:each="recentPatient:${recentVisits}" th:href="@{'adminPatientView.html?id='+${recentPatient.id}}"
 	                              			onclick="document.location = adminPatientView.html?id=2;"
 	                              			th:onclick="'document.location=\'adminPatientView.html?id=' + ${recentPatient.id} + '\';'" method="get">
 				                   		 		<td th:text="${recentPatient.firstName}">First Name</td>
@@ -296,7 +295,7 @@ tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; }
 	                                </tr>
                               	</tbody> -->
                               	<tbody>
-	                              	<tr th:each="recentActivityDto:${recentActivityDtos}" class="tr-highlight" th:href="@{'adminPatientView.html?id='+${recentActivityDto.patientid}}"
+	                              	<tr th:each="recentActivityDto:${recentActivityDtos}" th:href="@{'adminPatientView.html?id='+${recentActivityDto.patientid}}"
 	                              			onclick="document.location = adminPatientView.html?id=2;"
 	                              			th:onclick="'document.location=\'adminPatientView.html?id=' + ${recentActivityDto.patientid} + '\';'" method="get">
 				                   		 		<td th:text="${recentActivityDto.firstname}">First Name</td>
@@ -385,7 +384,7 @@ tr.tr-highlight:hover, tr.highlight { background-color: #faf2c9; }
 				<section class="col-md-12 col-sm-12 box">
 					<div class="box-header">
 						<h2>
-							<span class="fa fa-inbox"></span><span class="break"></span>Message Center
+							<span class="fa fa-inbox"></span><span class="break"></span>Notifications
 						</h2>
 					</div>
 					<div class="box-content">

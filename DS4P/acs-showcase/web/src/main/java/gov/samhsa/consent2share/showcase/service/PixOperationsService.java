@@ -51,4 +51,6 @@ public interface PixOperationsService extends PixManagerClientService {
 	 * @return the MCCIIN000002UV01 (Acknowledgement)
 	 */
 	public MCCIIN000002UV01 revisePatientRegistryRecord(String c32xml);
+
+	public String updatePatientAndAuthorId(String c32xml);
 }

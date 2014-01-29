@@ -39,14 +39,17 @@ import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
+import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
-import gov.samhsa.consent2share.service.dto.SpecificMedicalInfosSetDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
+import gov.samhsa.consent2share.service.patient.PatientNotFoundException;
 import gov.samhsa.consent2share.service.patient.PatientService;
+import gov.samhsa.consent2share.service.reference.AdministrativeGenderCodeService;
 import gov.samhsa.consent2share.service.reference.ClinicalDocumentSectionTypeCodeService;
 import gov.samhsa.consent2share.service.reference.ClinicalDocumentTypeCodeService;
 import gov.samhsa.consent2share.service.reference.PurposeOfUseCodeService;
 import gov.samhsa.consent2share.service.reference.SensitivityPolicyCodeService;
+import gov.samhsa.consent2share.service.reference.StateCodeService;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -111,6 +114,14 @@ public class ConsentController {
 	/** The sensitivity policy code service. */
 	@Autowired
 	private SensitivityPolicyCodeService sensitivityPolicyCodeService;
+	
+	/** The administrative gender code service. */
+	@Autowired
+	private AdministrativeGenderCodeService administrativeGenderCodeService;
+	
+	/** The state code service. */
+	@Autowired
+	private StateCodeService stateCodeService;
 
 	/** The user context. */
 	@Autowired
@@ -144,10 +155,9 @@ public class ConsentController {
 		ConsentPdfDto consentPdfDto = consentService
 				.findConsentPdfDto(consentId);
 		if (consentService.isConsentBelongToThisUser(consentId, patientId)) {
-			consentService.signConsent(consentPdfDto);
-			return "redirect:listConsents.html?emailsent=true";
+			if(consentService.signConsent(consentPdfDto)==true);
+				return "redirect:listConsents.html?emailsent=true";
 		}
-
 		return "redirect:listConsents.html?emailsent=false";
 	}
 
@@ -239,7 +249,7 @@ public class ConsentController {
 				long consentId = Long.parseLong(consentIdString);
 				for (ConsentListDto consentListDto : consentListDtos) {
 					if (consentListDto.getId() == consentId
-							&& consentListDto.getConsentStage() == 2)
+							&& consentListDto.getConsentStage().equals("CONSENT_SIGNED"))
 						isSigned = true;
 				}
 			}
@@ -250,7 +260,7 @@ public class ConsentController {
 				long consentId = Long.parseLong(consentIdString);
 				for (ConsentListDto consentListDto : consentListDtos) {
 					if (consentListDto.getId() == consentId
-							&& consentListDto.getRevokeStage() == 2)
+							&& consentListDto.getRevokeStage().equals("CONSENT_SIGNED"))
 						isSigned = true;
 				}
 			}
@@ -270,18 +280,35 @@ public class ConsentController {
 	@RequestMapping(value = "addConsent.html")
 	public String consentAdd(Model model) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
+		PatientProfileDto currentPatient = null;
+		
+		if (currentUser.getIsProviderAdmin() == false) {
+			currentPatient = patientService.findPatientProfileByUsername(currentUser.getUsername());
+			
+			if (currentPatient == null){
+				throw new PatientNotFoundException("Patient not found by username");
+			}
+			
+		}else{
+			throw new IllegalStateException("ProviderAdmin users cannot access the ConsentController");
+		}
+		
 		List<AddConsentIndividualProviderDto> individualProvidersDto = patientService
-				.findAddConsentIndividualProviderDtoByUsername(currentUser
+				.findAddConsentIndividualProviderDtoByUsername(currentPatient
 						.getUsername());
 		List<AddConsentOrganizationalProviderDto> organizationalProvidersDto = patientService
-				.findAddConsentOrganizationalProviderDtoByUsername(currentUser
+				.findAddConsentOrganizationalProviderDtoByUsername(currentPatient
 						.getUsername());
 		ConsentDto consentDto = consentService.makeConsentDto();
+		
+		consentDto.setUsername(currentPatient.getUsername());
 
 		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 		Calendar today = Calendar.getInstance();
 		Calendar oneYearFromNow = Calendar.getInstance();
 		oneYearFromNow.add(Calendar.YEAR, 1);
+		
+		populateLookupCodes(model);
 
 		List<AddConsentFieldsDto> sensitivityPolicyDto = sensitivityPolicyCodeService
 				.findAllSensitivityPolicyCodesAddConsentFieldsDto();
@@ -295,7 +322,8 @@ public class ConsentController {
 				dateFormat.format(today.getTime()));
 		model.addAttribute("defaultEndDate",
 				dateFormat.format(oneYearFromNow.getTime()));
-		model.addAttribute("currentUser", currentUser);
+		model.addAttribute("patient_lname", currentPatient.getLastName());
+		model.addAttribute("patient_fname", currentPatient.getFirstName());
 		model.addAttribute("consentDto", consentDto);
 		model.addAttribute("individualProvidersDto", individualProvidersDto);
 		model.addAttribute("clinicalDocumentSectionType",
@@ -306,60 +334,88 @@ public class ConsentController {
 		model.addAttribute("organizationalProvidersDto",
 				organizationalProvidersDto);
 		model.addAttribute("addConsent", true);
+		model.addAttribute("isProviderAdminUser", false);
 		return "views/consents/addConsent";
 	}
 
 	@RequestMapping(value = "editConsent.html")
-	public String consetEdit(Model model,
+	public String consetEdit(@RequestParam(value = "patientId", defaultValue = "-1") long in_patientId, Model model,
 			@RequestParam("consentId") long consentId) {
-		ConsentDto consentDto = consentService.findConsentById(consentId);
 
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
-		List<AddConsentIndividualProviderDto> individualProvidersDto = patientService
-				.findAddConsentIndividualProviderDtoByUsername(currentUser
-						.getUsername());
-		List<AddConsentOrganizationalProviderDto> organizationalProvidersDto = patientService
-				.findAddConsentOrganizationalProviderDtoByUsername(currentUser
-						.getUsername());
-
-		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-		Calendar today = Calendar.getInstance();
-		Calendar oneYearFromNow = Calendar.getInstance();
-		oneYearFromNow.add(Calendar.YEAR, 1);
-
-		List<AddConsentFieldsDto> sensitivityPolicyDto = sensitivityPolicyCodeService
-				.findAllSensitivityPolicyCodesAddConsentFieldsDto();
-		List<AddConsentFieldsDto> purposeOfUseDto = purposeOfUseCodeService
-				.findAllPurposeOfUseCodesAddConsentFieldsDto();
-		List<AddConsentFieldsDto> clinicalDocumentSectionTypeDto = clinicalDocumentSectionTypeCodeService
-				.findAllClinicalDocumentSectionTypeCodesAddConsentFieldsDto();
-		List<AddConsentFieldsDto> clinicalDocumentTypeDto = clinicalDocumentTypeCodeService
-				.findAllClinicalDocumentTypeCodesAddConsentFieldsDto();
+		PatientProfileDto currentPatient = null;
 		
-		Set<SpecificMedicalInfoDto> clinicalConceptCodes = consentDto.getDoNotShareClinicalConceptCodes();
+		if (currentUser.getIsProviderAdmin() == true) {
+			try{
+				currentPatient = patientService.findPatient(in_patientId);
+			}catch(IllegalArgumentException e){
+				logger.warn("in_patientId was null when consentAdd called by a providerAdmin user.");
+				logger.warn("Exception Stack Trace: " + e);
+			}
+			
+			if (currentPatient == null){
+				throw new PatientNotFoundException("Patient not found by id");
+			}
+		}else{
+			currentPatient = patientService.findPatientProfileByUsername(currentUser.getUsername());
+			
+			if (currentPatient == null){
+				throw new PatientNotFoundException("Patient not found by username");
+			}
+		}
 		
-		SpecificMedicalInfosSetDto clinicalConceptCodesSet = new SpecificMedicalInfosSetDto(clinicalConceptCodes);
+		ConsentDto consentDto = consentService.findConsentById(consentId);
 		
-		model.addAttribute("DoNotShareClinicalConceptCodes", clinicalConceptCodes);
-
-		model.addAttribute("defaultStartDate",
-				dateFormat.format(today.getTime()));
-		model.addAttribute("defaultEndDate",
-				dateFormat.format(oneYearFromNow.getTime()));
-		model.addAttribute("currentUser", currentUser);
-		model.addAttribute("consentDto", consentDto);
-		model.addAttribute("individualProvidersDto", individualProvidersDto);
-		model.addAttribute("clinicalDocumentSectionType",
-				clinicalDocumentSectionTypeDto);
-		model.addAttribute("clinicalDocumentType", clinicalDocumentTypeDto);
-		model.addAttribute("sensitivityPolicy", sensitivityPolicyDto);
-		model.addAttribute("purposeOfUse", purposeOfUseDto);
-		model.addAttribute("organizationalProvidersDto",
-				organizationalProvidersDto);
-
-		model.addAttribute("addConsent", false);
-
-		return "views/consents/addConsent";
+		//Make sure current patient and patient listed in consentDto match
+		if(!consentDto.getUsername().equals(currentPatient.getUsername())){
+			throw new IllegalStateException("Current patient username and username from consentDto do not match.");
+		}else{
+		
+			List<AddConsentIndividualProviderDto> individualProvidersDto = patientService
+					.findAddConsentIndividualProviderDtoByUsername(currentUser
+							.getUsername());
+			List<AddConsentOrganizationalProviderDto> organizationalProvidersDto = patientService
+					.findAddConsentOrganizationalProviderDtoByUsername(currentUser
+							.getUsername());
+	
+			DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+			Calendar today = Calendar.getInstance();
+			Calendar oneYearFromNow = Calendar.getInstance();
+			oneYearFromNow.add(Calendar.YEAR, 1);
+	
+			List<AddConsentFieldsDto> sensitivityPolicyDto = sensitivityPolicyCodeService
+					.findAllSensitivityPolicyCodesAddConsentFieldsDto();
+			List<AddConsentFieldsDto> purposeOfUseDto = purposeOfUseCodeService
+					.findAllPurposeOfUseCodesAddConsentFieldsDto();
+			List<AddConsentFieldsDto> clinicalDocumentSectionTypeDto = clinicalDocumentSectionTypeCodeService
+					.findAllClinicalDocumentSectionTypeCodesAddConsentFieldsDto();
+			List<AddConsentFieldsDto> clinicalDocumentTypeDto = clinicalDocumentTypeCodeService
+					.findAllClinicalDocumentTypeCodesAddConsentFieldsDto();
+			
+			Set<SpecificMedicalInfoDto> clinicalConceptCodes = consentDto.getDoNotShareClinicalConceptCodes();
+			
+			model.addAttribute("DoNotShareClinicalConceptCodes", clinicalConceptCodes);
+	
+			model.addAttribute("defaultStartDate",
+					dateFormat.format(today.getTime()));
+			model.addAttribute("defaultEndDate",
+					dateFormat.format(oneYearFromNow.getTime()));
+			model.addAttribute("patient_lname", currentPatient.getLastName());
+			model.addAttribute("patient_fname", currentPatient.getFirstName());
+			model.addAttribute("consentDto", consentDto);
+			model.addAttribute("individualProvidersDto", individualProvidersDto);
+			model.addAttribute("clinicalDocumentSectionType",
+					clinicalDocumentSectionTypeDto);
+			model.addAttribute("clinicalDocumentType", clinicalDocumentTypeDto);
+			model.addAttribute("sensitivityPolicy", sensitivityPolicyDto);
+			model.addAttribute("purposeOfUse", purposeOfUseDto);
+			model.addAttribute("organizationalProvidersDto",
+					organizationalProvidersDto);
+	
+			model.addAttribute("addConsent", false);
+	
+			return "views/consents/addConsent";
+		}
 	}
 
 	/**
@@ -380,10 +436,7 @@ public class ConsentController {
 	public String consentAddPost(@Valid ConsentDto consentDto,
 			BindingResult bindingResult, Model model,
 			@RequestParam(value = "ICD9", required = false) HashSet<String> icd9) throws ConsentGenException {
-
-		AuthenticatedUser currentUser = userContext.getCurrentUser();
-		model.addAttribute("currentUser", currentUser);
-
+		
 		Set<String> isMadeTo = new HashSet<String>();
 		Set<String> isMadeFrom = new HashSet<String>();
 		if (consentDto.getOrganizationalProvidersDisclosureIsMadeTo() != null)
@@ -400,26 +453,31 @@ public class ConsentController {
 				&& (!isMadeFrom.isEmpty())
 				&& consentService.areThereDuplicatesInTwoSets(isMadeTo,
 						isMadeFrom) == false) {
-			consentDto.setUsername(currentUser.getUsername());
-			Set<SpecificMedicalInfoDto> doNotShareClinicalConceptCodes = new HashSet<SpecificMedicalInfoDto>();
-			if (icd9 != null)
-				for (String item : icd9) {					
-					String icd9Item = item.replace("^^^", ",");
-					SpecificMedicalInfoDto specificMedicalInfoDto = new SpecificMedicalInfoDto();
-					specificMedicalInfoDto.setCodeSystem("ICD9");
-					
-					specificMedicalInfoDto.setCode(icd9Item.substring(0,
-							icd9Item.indexOf(";")));
-					specificMedicalInfoDto.setDisplayName(icd9Item
-							.substring(icd9Item.indexOf(";") + 1));
-					doNotShareClinicalConceptCodes.add(specificMedicalInfoDto);
-				}
-			consentDto
-					.setDoNotShareClinicalConceptCodes(doNotShareClinicalConceptCodes);
 			
-			consentService.saveConsent(consentDto);
-
-			return "redirect:listConsents.html?notify=add";
+			//Make sure username from consentDto matches a valid patient username
+			if(patientService.findPatientProfileByUsername(consentDto.getUsername()) == null){
+				throw new IllegalArgumentException("Username from consentDto does not match any valid patient usernames");
+			}else{
+				Set<SpecificMedicalInfoDto> doNotShareClinicalConceptCodes = new HashSet<SpecificMedicalInfoDto>();
+				if (icd9 != null)
+					for (String item : icd9) {					
+						String icd9Item = item.replace("^^^", ",");
+						SpecificMedicalInfoDto specificMedicalInfoDto = new SpecificMedicalInfoDto();
+						specificMedicalInfoDto.setCodeSystem("ICD9");
+						
+						specificMedicalInfoDto.setCode(icd9Item.substring(0,
+								icd9Item.indexOf(";")));
+						specificMedicalInfoDto.setDisplayName(icd9Item
+								.substring(icd9Item.indexOf(";") + 1));
+						doNotShareClinicalConceptCodes.add(specificMedicalInfoDto);
+					}
+				consentDto
+						.setDoNotShareClinicalConceptCodes(doNotShareClinicalConceptCodes);
+				
+				consentService.saveConsent(consentDto);
+	
+				return "redirect:listConsents.html?notify=add";
+			}
 		}
 
 		return "views/resourceNotFound";
@@ -520,9 +578,12 @@ public class ConsentController {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());
-
+		
+		//TODO: Add code to display notice to user on delete failure
+		boolean isDeleteSuccess = false;
+		
 		if (consentService.isConsentBelongToThisUser(consentId, patientId)) {
-			consentService.deleteConsent(consentId);
+			isDeleteSuccess = consentService.deleteConsent(consentId);
 			return "redirect:/consents/listConsents.html";
 		}
 		return "redirect:/consents/listConsents.html";
@@ -607,5 +668,17 @@ public class ConsentController {
 		}
 		return "views/resourceNotFound";
 	}
+	
+	/**
+	 * Populate lookup codes.
+	 * 
+	 * @param model
+	 *            the model
+	 */
+	private void populateLookupCodes(Model model) {
+		model.addAttribute("administrativeGenderCodes", administrativeGenderCodeService.findAllAdministrativeGenderCodes());
+		model.addAttribute("stateCodes", stateCodeService.findAllStateCodes());
+	}
+
 
 }

@@ -46,6 +46,26 @@ public class AuthenticatedUser {
 
 	/** The gender display name. */
 	private String genderDisplayName;
+	
+	//TODO: Replace this boolean flag with a more comprehensive and flexible way to store the user's role
+	/** The providerAdmin role flag. */
+	private boolean isProviderAdmin;
+	
+	
+	
+	/**
+	 * Default constructor
+	 */
+	public AuthenticatedUser(){
+		this.username = null;
+		this.firstName = null;
+		this.lastName = null;
+		this.birthDate = null;
+		this.genderDisplayName = null;
+		this.isProviderAdmin = false;
+	}
+	
+	
 
 	/**
 	 * Gets the username.
@@ -135,6 +155,27 @@ public class AuthenticatedUser {
 	 */
 	public void setGenderDisplayName(String genderDisplayName) {
 		this.genderDisplayName = genderDisplayName;
+	}
+
+	
+	
+	
+	/**
+	 * Gets the isProviderAdmin flag.
+	 * 
+	 * @return the isProviderAdmin
+	 */
+	public boolean getIsProviderAdmin() {
+		return isProviderAdmin;
+	}
+
+	/**
+	 * Sets the isProviderAdmin flag.
+	 * 
+	 * @param isProviderAdmin the isProviderAdmin to set (TRUE or FALSE)
+	 */
+	public void setIsProviderAdmin(boolean isProviderAdmin) {
+		this.isProviderAdmin = isProviderAdmin;
 	}
 
 }

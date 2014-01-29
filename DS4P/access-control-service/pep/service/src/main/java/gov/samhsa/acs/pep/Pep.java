@@ -62,6 +62,21 @@ public interface Pep {
 	public FilterC32Response handleC32Request(String recepientSubjectNPI, String intermediarySubjectNPI, String resourceId, boolean packageAsXdm, String senderEmailAddress, String recipientEmailAddress, String xdsDocumentEntryUniqueId);
 
 	/**
+	 * Handle c32 request.
+	 *
+	 * @param recepientSubjectNPI the recepient subject npi
+	 * @param intermediarySubjectNPI the intermediary subject npi
+	 * @param resourceId the resource id
+	 * @param packageAsXdm the package as xdm
+	 * @param senderEmailAddress the sender email address
+	 * @param recipientEmailAddress the recipient email address
+	 * @param xdsDocumentEntryUniqueId the xds document entry unique id
+	 * @return the filter c32 response
+	 */
+	public FilterC32Response handleC32Request(String originalC32, String senderNpi, String recipientNpi);
+	
+	
+	/**
 	 * Retrieve document set request.
 	 *
 	 * @param homeCommunityId the home community id

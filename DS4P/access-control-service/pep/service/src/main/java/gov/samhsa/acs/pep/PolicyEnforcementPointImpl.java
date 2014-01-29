@@ -3,9 +3,12 @@ package gov.samhsa.acs.pep;
 import gov.samhsa.acs.common.bean.XacmlResult;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
+import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.contexthandler.ContextHandler;
+import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentation;
+import gov.samhsa.acs.pep.saml.SamlTokenParser;
 import gov.samhsa.acs.xdsb.common.XdsbErrorFactory;
 import gov.samhsa.acs.xdsb.registry.wsclient.adapter.XdsbRegistryAdapter;
 import gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter;
@@ -17,11 +20,22 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest.DocumentRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
 
+import java.io.IOException;
+import java.util.StringTokenizer;
 import java.util.UUID;
+
+import javax.annotation.Resource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+import javax.xml.ws.WebServiceContext;
 
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 
+import org.apache.ws.security.SAMLTokenPrincipal;
+import org.herasaf.xacml.core.api.PDP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,26 +52,6 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	// Parameters
-	// --Request
-	/** The patient unique id. */
-	private String patientUniqueId;
-	// --SAML Header
-	/** The patient id. */
-	private String patientId;
-
-	/** The home community id. */
-	private String homeCommunityId;
-
-	/** The subject purpose of use. */
-	private String subjectPurposeOfUse;
-
-	/** The recepient subject npi. */
-	private String recepientSubjectNPI;
-
-	/** The intermediary subject npi. */
-	private String intermediarySubjectNPI;
 
 	// Services
 	/** The xdsb registry. */
@@ -77,7 +71,20 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
 	/** The marshaller. */
 	private SimpleMarshaller marshaller;
+	
+	@Resource
+	private WebServiceContext context;
 
+	private SamlTokenParser samlTokenParser;
+	
+	private SAMLTokenPrincipal samlTokenPrincipal;
+
+	/** The data handler to bytes converter. */
+	private  DataHandlerToBytesConverter dataHandlerToBytesConverter;
+	
+	
+	public PolicyEnforcementPointImpl(){}
+	
 	/**
 	 * Instantiates a new policy enforcement point impl.
 	 * 
@@ -98,7 +105,8 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 			XdsbRepositoryAdapter xdsbRepository,
 			XdsbErrorFactory xdsbErrorFactory, ContextHandler contextHandler,
 			DocumentSegmentation documentSegmentation,
-			SimpleMarshaller marshaller) {
+			SimpleMarshaller marshaller, WebServiceContext context,
+			SamlTokenParser parser, DataHandlerToBytesConverter dataHandlerToBytesConverter) {
 		super();
 		this.xdsbRegistry = xdsbRegistry;
 		this.xdsbRepository = xdsbRepository;
@@ -106,6 +114,9 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 		this.contextHandler = contextHandler;
 		this.documentSegmentation = documentSegmentation;
 		this.marshaller = marshaller;
+		this.context = context;
+		this.samlTokenParser = parser;
+		this.dataHandlerToBytesConverter = dataHandlerToBytesConverter;
 	}
 
 	/*
@@ -116,6 +127,17 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	 */
 	@Override
 	public AdhocQueryResponse registryStoredQuery(AdhocQueryRequest req) {
+		if (samlTokenParser == null) {
+			samlTokenParser = new SamlTokenParser();
+		}
+		samlTokenPrincipal = (SAMLTokenPrincipal)(context.getUserPrincipal());
+		
+		String resourceId = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:resource:resource-id");
+		String intermediarySubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject");
+		String purposeOfUse = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
+		String recipientSubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject");
+		XacmlRequest xacmlRequest = setXacmlRequest(resourceId, purposeOfUse, intermediarySubject, recipientSubject);
+		
 		// Validate input parameters
 		if (!validateAdhocQueryRequest(req)) {
 			return xdsbErrorFactory.errorAdhocQueryResponseMissingParameters();
@@ -138,24 +160,29 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 		}
 
 		// The patient id in $XDSDocumentEntryPatientId
-		this.patientUniqueId = xdsbRegistry.extractPatientId(req);
-		if (!patientUniqueId.equals(xdsbRegistry.getPatientUniqueId(patientId,
-				homeCommunityId))) {
+		String patientUniqueId = xdsbRegistry.extractPatientId(req);
+		if (!patientUniqueId.equals(xacmlRequest.getPatientUniqueId())) {
 			return xdsbErrorFactory
 					.errorAdhocQueryResponseInconsistentPatientUniqueId(
 							patientUniqueId, xdsbRegistry.getPatientUniqueId(
-									patientId, homeCommunityId));
+									xacmlRequest.getPatientId(), xacmlRequest.getHomeCommunityId()));
 		}
-		XacmlRequest xacmlRequest = setXacmlRequest();
-		XacmlResponse xacmlResponse = contextHandler
+		XacmlResponse xacmlResponse = null;
+		try{
+			xacmlResponse = contextHandler
 				.enforcePolicy(xacmlRequest);
+		}
+		catch(NoPolicyFoundException e){
+			logger.error(e.getMessage(), e);
+			return xdsbErrorFactory.errorAdhocQueryResponseNoConsentsFound(patientUniqueId);
+		}
 		// If PDP returns PERMIT
 		if (PERMIT.equals(xacmlResponse.getPdpDecision())) {
 			// Search for clinical documents of the patient
 			AdhocQueryResponse response;
 			try {
 				response = xdsbRegistry.registryStoredQuery(req,
-						intermediarySubjectNPI);
+						intermediarySubject);
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 				return xdsbErrorFactory
@@ -173,7 +200,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 				// Return no documents found error message
 				return xdsbErrorFactory
 						.errorAdhocQueryResponseNoDocumentsFound(
-								patientUniqueId, intermediarySubjectNPI);
+								patientUniqueId, intermediarySubject);
 			}
 			// Return successfully retrieved and filtered response
 			return response;
@@ -184,6 +211,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 		}
 	}
 
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -193,20 +221,38 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	@Override
 	public RetrieveDocumentSetResponse retrieveDocumentSet(
 			RetrieveDocumentSetRequest input) {
+		
+		if (samlTokenParser == null) {
+			samlTokenParser = new SamlTokenParser();
+		}
+	    samlTokenPrincipal = (SAMLTokenPrincipal)(context.getUserPrincipal());
+		
+		String resourceId = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:resource:resource-id");
+		String intermediarySubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject");
+		String purposeOfUse = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
+		String recipientSubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject");
+		XacmlRequest xacmlRequest = setXacmlRequest(resourceId, purposeOfUse, intermediarySubject, recipientSubject);
+		
+		
 		if (!validateRetrieveDocumentSetRequest(input)) {
 			return xdsbErrorFactory
 					.errorRetrieveDocumentSetResponseMultipleRepositoryId();
 		}
-		this.patientUniqueId = xdsbRegistry.getPatientUniqueId(patientId,
-				homeCommunityId);
-		XacmlRequest xacmlRequest = setXacmlRequest();
-		XacmlResponse xacmlResponse = contextHandler
+		
+		XacmlResponse xacmlResponse = null;
+		try{
+			xacmlResponse = contextHandler
 				.enforcePolicy(xacmlRequest);
+		}
+		catch(NoPolicyFoundException e){
+			logger.error(e.getMessage(), e);
+			return xdsbErrorFactory.errorRetrieveDocumentSetResponseNoConsentsFound(resourceId);
+		}
 		if (PERMIT.equals(xacmlResponse.getPdpDecision())) {
 			RetrieveDocumentSetResponse response;
 			try {
-				response = xdsbRepository.retrieveDocumentSet(input, patientId,
-						intermediarySubjectNPI);
+				response = xdsbRepository.retrieveDocumentSet(input, xacmlRequest.getPatientId(),
+						xacmlRequest.getIntermediarySubjectNPI());
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 				return xdsbErrorFactory
@@ -218,9 +264,9 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 				return xdsbErrorFactory
 						.errorRetrieveDocumentSetResponseNotExistsOrAccessible(input);
 			}
+
 			// Start segmentation
-			// return response;
-			XacmlResult xacmlResult = getXacmlResult(xacmlRequest,
+			XacmlResult xacmlResult = createXacmlResult(xacmlRequest,
 					xacmlResponse);
 			for (DocumentResponse documentResponse : response
 					.getDocumentResponse()) {
@@ -262,121 +308,113 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	 */
 	@Override
 	public DirectEmailSendResponse directEmailSend(
-			DirectEmailSendRequest parameters) {
-		// TODO: implement directEmailSend operation
-		return new DirectEmailSendResponse();
-	}
+			DirectEmailSendRequest input) {
+		DirectEmailSendResponse response = new DirectEmailSendResponse();
+			
+		if (samlTokenParser == null) {
+			samlTokenParser = new SamlTokenParser();
+		}
+	    samlTokenPrincipal = (SAMLTokenPrincipal)(context.getUserPrincipal());
+		
+		String resourceId = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:resource:resource-id");
+		String intermediarySubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject");
+		String purposeOfUse = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
+		String recipientSubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject");
+		XacmlRequest xacmlRequest = setXacmlRequest(resourceId, purposeOfUse, intermediarySubject, recipientSubject);
+		
+		
+//		if (!validateRetrieveDocumentSetRequest(input)) {
+//			return xdsbErrorFactory
+//					.errorRetrieveDocumentSetResponseMultipleRepositoryId();
+//		}
+		
+		XacmlResponse xacmlResponse = null;
+		try{
+			xacmlResponse = contextHandler
+				.enforcePolicy(xacmlRequest);
+		}
+		catch(NoPolicyFoundException e){
+			logger.error(e.getMessage(), e);
+//			return xdsbErrorFactory.errorRetrieveDocumentSetResponseNoConsentsFound(resourceId);
+			response.setPdpDecision("NO_POLICY");
+			return response;
+		}
+		
+		if (PERMIT.equals(xacmlResponse.getPdpDecision())) {
+			response.setPdpDecision(PERMIT);
+			String originalC32 = input.getC32();
 
-	/**
-	 * Gets the patient id.
-	 * 
-	 * @return the patient id
-	 */
-	public String getPatientId() {
-		return patientId;
-	}
+			byte[] processedPayload;
+			
+			try {
+				XacmlResult xacmlResult = createXacmlResult(xacmlRequest, xacmlResponse);
+//				JAXBContext jaxbContext = JAXBContext
+//						.newInstance(XacmlResult.class);
+//				Marshaller marshaller = jaxbContext.createMarshaller();
+//				marshaller.setProperty("com.sun.xml.bind.xmlDeclaration",
+//						Boolean.FALSE);
+//				marshaller.marshal(xacmlResult, xacmlResponseXml);
+				String xacmlResultString = marshaller.marshall(xacmlResult);
 
-	/**
-	 * Sets the patient id.
-	 * 
-	 * @param patientId
-	 *            the new patient id
-	 */
-	public void setPatientId(String patientId) {
-		this.patientId = patientId;
-	}
+				String xdsDocumentEntryUniqueId = "";
+				// packageAsXdm = input.getPackageAsXdm()
+				boolean packageAsXdm = true;
+				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
+						.segmentDocument(originalC32,
+								xacmlResultString, packageAsXdm,
+								true, input.getSenderEmail(),
+								input.getRecipientEmail(), xdsDocumentEntryUniqueId);
 
-	/**
-	 * Gets the home community id.
-	 * 
-	 * @return the home community id
-	 */
-	public String getHomeCommunityId() {
-		return homeCommunityId;
-	}
+				processedPayload = dataHandlerToBytesConverter
+						.toByteArray(segmentDocumentResponse
+								.getProcessedDocument());
 
-	/**
-	 * Sets the home community id.
-	 * 
-	 * @param homeCommunityId
-	 *            the new home community id
-	 */
-	public void setHomeCommunityId(String homeCommunityId) {
-		this.homeCommunityId = homeCommunityId;
+				response.setMaskedDocument(segmentDocumentResponse
+						.getMaskedDocument());
+				response.setFilteredStreamBody(processedPayload);
+			} catch (PropertyException e) {
+				throw new DS4PException(e.toString(), e);
+			} catch (JAXBException e) {
+				throw new DS4PException(e.toString(), e);
+			} catch (IOException e) {
+				throw new DS4PException(e.toString(), e);
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}			
+		}
+		else {
+			response.setPdpDecision("DENY");
+		}
+		return response;
 	}
+	
 
-	/**
-	 * Gets the subject purpose of use.
-	 * 
-	 * @return the subject purpose of use
-	 */
-	public String getSubjectPurposeOfUse() {
-		return subjectPurposeOfUse;
-	}
-
-	/**
-	 * Sets the subject purpose of use.
-	 * 
-	 * @param subjectPurposeOfUse
-	 *            the new subject purpose of use
-	 */
-	public void setSubjectPurposeOfUse(String subjectPurposeOfUse) {
-		this.subjectPurposeOfUse = subjectPurposeOfUse;
-	}
-
-	/**
-	 * Gets the recepient subject npi.
-	 * 
-	 * @return the recepient subject npi
-	 */
-	public String getRecepientSubjectNPI() {
-		return recepientSubjectNPI;
-	}
-
-	/**
-	 * Sets the recepient subject npi.
-	 * 
-	 * @param recepientSubjectNPI
-	 *            the new recepient subject npi
-	 */
-	public void setRecepientSubjectNPI(String recepientSubjectNPI) {
-		this.recepientSubjectNPI = recepientSubjectNPI;
-	}
-
-	/**
-	 * Gets the intermediary subject npi.
-	 * 
-	 * @return the intermediary subject npi
-	 */
-	public String getIntermediarySubjectNPI() {
-		return intermediarySubjectNPI;
-	}
-
-	/**
-	 * Sets the intermediary subject npi.
-	 * 
-	 * @param intermediarySubjectNPI
-	 *            the new intermediary subject npi
-	 */
-	public void setIntermediarySubjectNPI(String intermediarySubjectNPI) {
-		this.intermediarySubjectNPI = intermediarySubjectNPI;
-	}
 
 	/**
 	 * Sets the xacml request.
 	 * 
 	 * @return the xacml request
 	 */
-	XacmlRequest setXacmlRequest() {
+	public XacmlRequest setXacmlRequest(String resourceId, String purposeOfUse, String intermediarySubject, String recipientSubject) {
+
 		XacmlRequest xacmlRequest = new XacmlRequest();
+		
+		String homeCommunityId = "";
+		String patientId = "";
+		
+		// Sample resourceId: "d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO"
+		StringTokenizer tokenizer = new StringTokenizer(resourceId, "&");
+		patientId = tokenizer.nextToken().replace("^^^", "");
+		homeCommunityId = tokenizer.nextToken();
+		
 		xacmlRequest.setHomeCommunityId(homeCommunityId);
-		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
+		xacmlRequest.setIntermediarySubjectNPI(intermediarySubject);
 		xacmlRequest.setMessageId(UUID.randomUUID().toString());
-		xacmlRequest.setPurposeOfUse(subjectPurposeOfUse);
-		xacmlRequest.setRecepientSubjectNPI(recepientSubjectNPI);
-		xacmlRequest.setPatientId((patientUniqueId.substring(0,
-				patientUniqueId.indexOf('^'))).replace("'", ""));
-		xacmlRequest.setPatientUniqueId(patientUniqueId);
+		xacmlRequest.setPurposeOfUse(purposeOfUse);
+		xacmlRequest.setRecepientSubjectNPI(recipientSubject);
+		xacmlRequest.setPatientId(patientId);
+		
+		xacmlRequest.setPatientUniqueId("'"+resourceId+"'");
 		return xacmlRequest;
 	}
 
@@ -429,7 +467,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	}
 
 	/**
-	 * Gets the xacml result.
+	 * Sets the xacml result.
 	 * 
 	 * @param xacmlRequest
 	 *            the xacml request
@@ -437,7 +475,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	 *            the xacml response
 	 * @return the xacml result
 	 */
-	private XacmlResult getXacmlResult(XacmlRequest xacmlRequest,
+	private XacmlResult createXacmlResult(XacmlRequest xacmlRequest,
 			XacmlResponse xacmlResponse) {
 		XacmlResult xacmlResult = new XacmlResult();
 		xacmlResult.setHomeCommunityId(xacmlRequest.getHomeCommunityId());
@@ -447,4 +485,5 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 		xacmlResult.setSubjectPurposeOfUse(xacmlRequest.getPurposeOfUse());
 		return xacmlResult;
 	}
+	
 }

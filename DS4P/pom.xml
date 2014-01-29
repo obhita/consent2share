@@ -8,13 +8,13 @@
 
 	<groupId>gov.samhsa.ds4p</groupId>
 	<artifactId>DS4P</artifactId>
-	<version>0.1.0.BUILD-SNAPSHOT</version>
+	<version>0.2.0-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 	<name>DS4P</name>
 
 	<prerequisites>
-		<maven>3.0</maven>
+		<maven>3.0.3</maven>
 	</prerequisites>
 
 	<ciManagement>
@@ -22,9 +22,12 @@
 		<url>http://obhitabuild01/</url>
 	</ciManagement>
 
+	<!-- Since buildnumber-maven-plugin uses git command, git command must in 
+		path. i.e. need set git in the path Environment variable -->
 	<scm>
 		<url>https://github.com/PilotDS4P/ds4p-prod</url>
-		<connection>scm:git:http://github.com/PilotDS4P/ds4p-prod/git-build-number.git</connection>
+		<connection>scm:git:https://github.com/PilotDS4P/ds4p-prod.git</connection>
+		<developerConnection>scm:git:https://github.com/PilotDS4P/ds4p-prod.git</developerConnection>
 	</scm>
 
 	<developers>
@@ -100,6 +103,18 @@
 			<url>http://dist.wso2.org/maven2</url>
 		</pluginRepository>
 	</pluginRepositories>
+	
+	<modules>
+		<module>access-control-service</module>	
+		
+		<module>acs-showcase</module>	
+		
+		<module>consent-gen</module>
+		
+		<module>consent2share</module>
+		
+		<module>si-c2s-xds</module>
+	</modules>
 
 	<properties>
 		<java.version>1.6</java.version>
@@ -131,6 +146,13 @@
 		<maven.enforcer.plugin>1.0</maven.enforcer.plugin>
 		<jaxws-maven-plugin.version>2.2</jaxws-maven-plugin.version>
 		<commons-jxpath.version>1.3</commons-jxpath.version>
+		<versions-maven-plugin.version>2.1</versions-maven-plugin.version>
+		<maven-clean-plugin.version>2.5</maven-clean-plugin.version>
+		<maven-install-plugin.version>2.5.1</maven-install-plugin.version>
+		<maven-site-plugin.version>3.3</maven-site-plugin.version>
+		<buildnumber-maven-plugin.version>1.2</buildnumber-maven-plugin.version>
+		<maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+		<dependency-check-maven.version>1.0.7</dependency-check-maven.version>
 
 		<!-- Dependency version properties -->
 
@@ -143,7 +165,6 @@
 		<cxf-xjc-plugin.version>2.6.0</cxf-xjc-plugin.version>
 		<cxf.wss4j.version>1.6.11</cxf.wss4j.version>
 
-		<!-- consent2Share Project Properties Start -->
 		<schema-export.version>0.0.1-SNAPSHOT</schema-export.version>
 
 		<adobe-ecosign.version>15</adobe-ecosign.version>
@@ -192,17 +213,14 @@
 		<jackson-core-asl.version>1.9.12</jackson-core-asl.version>
 		<solr-solrj.version>3.6.1</solr-solrj.version>
 		<el-api.version>2.2</el-api.version>
-		<selenium-server.version>2.33.0</selenium-server.version>
+		<selenium-server.version>2.39.0</selenium-server.version>
 		<jaxb-impl.version>2.2.7</jaxb-impl.version>
 		<jaxb.version>2.1.9</jaxb.version>
 		<Saxon-HE.version>9.5.1-2</Saxon-HE.version>
 		<commons-io.version>2.1</commons-io.version>
 		<xmlunit.version>1.5</xmlunit.version>
-		<consent-gen.version>0.1.0.BUILD-SNAPSHOT</consent-gen.version>
 		<slf4j.version>1.7.5</slf4j.version>
-		<!-- consent2Share Project Properties Start -->
 
-		<!-- Access Control Service -->
 		<axiom-api.version>1.2.5</axiom-api.version>
 		<xmlsec.version>1.5.6</xmlsec.version>
 		<xml-security-impl.version>1.0</xml-security-impl.version>
@@ -215,7 +233,6 @@
 		<xalan.version>2.7.1</xalan.version>
 		<xml-apis.version>2.0.2</xml-apis.version>
 		<jsr311-api.version>1.1.1</jsr311-api.version>
-		<acs-components.version>1.1.0-SNAPSHOT</acs-components.version>
 		<herasaf.version>1.0.0.M3</herasaf.version>
 
 		<json-path.version>0.8.1</json-path.version>
@@ -224,6 +241,7 @@
 
 		<xws-security.version>3.0</xws-security.version>
 		<xmlschema-core.version>2.0.3</xmlschema-core.version>
+		<jaxws-api.version>2.2.8</jaxws-api.version>
 
 	</properties>
 
@@ -794,27 +812,27 @@
 			<dependency>
 				<groupId>gov.samhsa.consent</groupId>
 				<artifactId>consent-gen</artifactId>
-				<version>${consent-gen.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>common-library</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>brms-client</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>brms-factmodel</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>brms-service</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.googlecode.sardine</groupId>
@@ -830,53 +848,48 @@
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>document-segmentation-service</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>gov.samhsa.consent2share.accesscontrolservice.contexthandler</groupId>
+				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>context-handler-service</artifactId>
-				<version>${acs-components.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>xdsb-repository-client-jar-with-dependencies</groupId>
-				<artifactId>xdsb-repository-client-jar-with-dependencies</artifactId>
-				<version>${acs-components.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>xdsb-registry-client-jar-with-dependencies</groupId>
-				<artifactId>xdsb-registry-client-jar-with-dependencies</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>xdsb-common</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>xdsb-registry-client</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>xdsb-repository-client</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>pep-service</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>context-handler-client</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>gov.samhsa.consent2share</groupId>
 				<artifactId>c32-service-client</artifactId>
-				<version>${acs-components.version}</version>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>gov.samhsa.consent2share</groupId>
+				<artifactId>pep-client</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.herasaf.xacml.core</groupId>
@@ -925,6 +938,12 @@
 				<artifactId>xml-security-impl</artifactId>
 				<version>${xml-security-impl.version}</version>
 			</dependency>
+			
+	        <dependency>
+	            <groupId>javax.xml.ws</groupId>
+	            <artifactId>jaxws-api</artifactId>
+	            <version>${jaxws-api.version}</version>
+	        </dependency>
 
 			<!-- Drools dependencies -->
 			<dependency>
@@ -982,6 +1001,17 @@
 				<artifactId>cxf-rt-ws-mex</artifactId>
 				<version>${cxf.version}</version>
 			</dependency>
+			<dependency>
+	            <groupId>org.apache.cxf.services.sts</groupId>
+	            <artifactId>cxf-services-sts-core</artifactId>
+				<version>${cxf.version}</version>
+	        </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>runtime</scope>
+            </dependency>
 
 			<!-- Web stack-specific dependencies that are internally needed by the 
 				Endpoint object as it exposes a web service -->
@@ -1129,10 +1159,18 @@
 
 		<plugins>
 
-			<!-- Must present in plugins section for enforcer to run -->
+			<!-- Must present in plugins section for enforcer to run in the default 
+				build lifecyle -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
+			</plugin>
+
+			<!-- Must present in plugins section for buildnumber-maven-plugin to run in the default 
+				build lifecyle -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
 			</plugin>
 
 		</plugins>
@@ -1215,6 +1253,32 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
 					<version>${maven-war-plugin.version}</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+							<manifestEntries>
+								<Implementation-Version>${project.version}</Implementation-Version>
+								<Implementation-Commit>${buildNumber}</Implementation-Commit>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${maven-jar-plugin.version}</version>
+					<configuration>
+						<archive>
+							<!-- will put the entries into META-INF/MANIFEST.MF file -->
+							<manifestEntries>
+								<Implementation-Version>${project.version}</Implementation-Version>
+								<Implementation-Commit>${buildNumber}</Implementation-Commit>
+							</manifestEntries>
+						</archive>
+					</configuration>
 				</plugin>
 
 				<plugin>
@@ -1285,12 +1349,13 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>selenium-maven-plugin</artifactId>
 					<version>${selenium-maven-plugin}</version>
-					<configuration>
-						<browser>*firefox</browser>
-						<suite>src/main/webapp/selenium/test-suite.xhtml</suite>
-						<results>${project.build.directory}/selenium.html</results>
-						<startURL>http://localhost:4444/</startURL>
-					</configuration>
+<!-- 					<configuration> -->
+<!-- 						<browser>*firefox</browser> -->
+<!-- 						<trustAllSSLCertificates>true</trustAllSSLCertificates> -->
+<!-- 						<suite>src/main/webapp/selenium/test-suite.xhtml</suite> -->
+<!-- 						<results>${project.build.directory}/selenium.html</results> -->
+<!-- 						<startURL>http://localhost:4444/</startURL> -->
+<!-- 					</configuration> -->
 					<dependencies>
 						<dependency>
 							<groupId>org.seleniumhq.selenium</groupId>
@@ -1489,7 +1554,45 @@
 				<plugin>
 					<groupId>org.owasp</groupId>
 					<artifactId>dependency-check-maven</artifactId>
-					<version>1.0.7</version>
+					<version>${dependency-check-maven.version}</version>
+				</plugin>
+					
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>${versions-maven-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>${maven-clean-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>${maven-install-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>${maven-site-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>buildnumber-maven-plugin</artifactId>
+					<version>${buildnumber-maven-plugin.version}</version>
+					<executions>
+						<execution>
+							<phase>validate</phase>
+							<goals>
+								<goal>create</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 
 			</plugins>

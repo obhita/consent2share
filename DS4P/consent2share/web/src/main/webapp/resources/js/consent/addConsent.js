@@ -730,6 +730,10 @@ function initAddConsent(addConsent, specMedSet) {
 					
 				});
 				
+				$('#btn_add_provider_search').click(function(e){
+					$('#disclose-modal').modal('hide');
+					$('#addProviderSearch-modal').modal();
+				});
 				
 				
 				/******************************************************************************************

@@ -51,7 +51,7 @@ public class XdmZipUtils {
 	public static final String PATH_README = "README.txt";
 	
 	/** The Constant PATH_METADATA. */
-	public static final String PATH_METADATA = XDM_SUB_FOLDER + "METADADATA.xml";
+	public static final String PATH_METADATA = XDM_SUB_FOLDER + "METADATA.xml";
 	
 	/** The Constant PATH_C32. */
 	public static final String PATH_C32 = XDM_SUB_FOLDER + "DOCUMENT.xml";

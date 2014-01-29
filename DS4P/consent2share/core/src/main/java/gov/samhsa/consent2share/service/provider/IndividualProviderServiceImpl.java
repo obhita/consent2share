@@ -29,9 +29,14 @@ import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
 import gov.samhsa.consent2share.domain.provider.IndividualProvider;
 import gov.samhsa.consent2share.domain.provider.IndividualProviderRepository;
+import gov.samhsa.consent2share.domain.provider.StaffIndividualProvider;
+import gov.samhsa.consent2share.domain.provider.StaffIndividualProviderRepository;
+import gov.samhsa.consent2share.domain.reference.EntityType;
+import gov.samhsa.consent2share.service.dto.AbstractProviderDto;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -58,6 +63,9 @@ public class IndividualProviderServiceImpl implements IndividualProviderService 
 	/** The patient repository. */
 	@Autowired
 	PatientRepository patientRepository;
+	
+	@Autowired
+	StaffIndividualProviderRepository staffIndividualProviderRepository;
 
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.provider.IndividualProviderService#countAllIndividualProviders()
@@ -207,5 +215,11 @@ public class IndividualProviderServiceImpl implements IndividualProviderService 
 		return providerDto;
     }
 
-
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.provider.IndividualProviderService#findAllStaffIndividualProviders()
+	 */
+	@Override
+	public List<StaffIndividualProvider> findAllStaffIndividualProviders() {
+		return staffIndividualProviderRepository.findAll();
+	}
 }

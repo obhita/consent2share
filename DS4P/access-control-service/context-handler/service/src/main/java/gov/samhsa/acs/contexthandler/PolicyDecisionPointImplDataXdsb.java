@@ -26,6 +26,7 @@
 package gov.samhsa.acs.contexthandler;
 
 import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.registry.wsclient.adapter.XdsbRegistryAdapter;
 import gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter;
@@ -67,6 +68,9 @@ public class PolicyDecisionPointImplDataXdsb implements
 	/** The xdsb repository. */
 	private XdsbRepositoryAdapter xdsbRepository;
 
+	/** The policy list filter. */
+	private XacmlPolicyListFilter policyListFilter;
+
 	/**
 	 * Instantiates a new policy decision point impl data xdsb.
 	 * 
@@ -74,11 +78,15 @@ public class PolicyDecisionPointImplDataXdsb implements
 	 *            the xdsb registry
 	 * @param xdsbRepository
 	 *            the xdsb repository
+	 * @param policyListFilter
+	 *            the policy list filter
 	 */
 	public PolicyDecisionPointImplDataXdsb(XdsbRegistryAdapter xdsbRegistry,
-			XdsbRepositoryAdapter xdsbRepository) {
+			XdsbRepositoryAdapter xdsbRepository,
+			XacmlPolicyListFilter policyListFilter) {
 		this.xdsbRegistry = xdsbRegistry;
 		this.xdsbRepository = xdsbRepository;
+		this.policyListFilter = policyListFilter;
 		this.urnPolicyCombiningAlgorithm = URN_POLICY_COMBINING_ALGORITHM_PERMIT_OVERRIDES;
 	}
 
@@ -89,14 +97,18 @@ public class PolicyDecisionPointImplDataXdsb implements
 	 *            the xdsb registry
 	 * @param xdsbRepository
 	 *            the xdsb repository
+	 * @param policyListFilter
+	 *            the policy list filter
 	 * @param urnPolicyCombiningAlgorithm
 	 *            the urn policy combining algorithm
 	 */
 	public PolicyDecisionPointImplDataXdsb(XdsbRegistryAdapter xdsbRegistry,
 			XdsbRepositoryAdapter xdsbRepository,
+			XacmlPolicyListFilter policyListFilter,
 			String urnPolicyCombiningAlgorithm) {
 		this.xdsbRegistry = xdsbRegistry;
 		this.xdsbRepository = xdsbRepository;
+		this.policyListFilter = policyListFilter;
 		if (urnPolicyCombiningAlgorithm == null
 				|| "".equals(urnPolicyCombiningAlgorithm)) {
 			this.urnPolicyCombiningAlgorithm = URN_POLICY_COMBINING_ALGORITHM_PERMIT_OVERRIDES;
@@ -108,11 +120,13 @@ public class PolicyDecisionPointImplDataXdsb implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see gov.samhsa.acs.contexthandler.PolicyDecisionPointImplData#
-	 * getPolicies(java.lang.String)
+	 * @see
+	 * gov.samhsa.acs.contexthandler.PolicyDecisionPointImplData#getPolicies
+	 * (java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public List<Evaluatable> getPolicies(String patientUniqueId) {
+	public List<Evaluatable> getPolicies(String patientUniqueId,
+			String recipientSubjectNPI, String intermediarySubjectNPI) {
 		List<Evaluatable> policies = new LinkedList<Evaluatable>();
 		List<String> policiesString = new LinkedList<String>();
 		try {
@@ -124,6 +138,14 @@ public class PolicyDecisionPointImplDataXdsb implements
 			// Extract doc.request from query response
 			RetrieveDocumentSetRequest retrieveDocumentSetRequest = xdsbRegistry
 					.extractXdsbDocumentReferenceListAsRetrieveDocumentSetRequest(response);
+
+			// If no policies at all, throw NoPolicyFoundException to be caught
+			// at PolicyEnforcementPointImpl
+			if (retrieveDocumentSetRequest.getDocumentRequest().size() <= 0) {
+				throw new NoPolicyFoundException(
+						"No consents found for patient:" + patientUniqueId
+								+ " in XDS.b repository.");
+			}
 
 			// Retrieve all policies
 			RetrieveDocumentSetResponse retrieveDocumentSetResponse = xdsbRepository
@@ -138,12 +160,33 @@ public class PolicyDecisionPointImplDataXdsb implements
 				policiesString.add(docString);
 			}
 
+			// Filter the policiesString List by recipientSubjectNPI and
+			// intermediarySubjectNPI to remove the unrelated policies (the
+			// policies about other providers)
+			policyListFilter.filterByNPI(policiesString, recipientSubjectNPI,
+					intermediarySubjectNPI);
+
+			// If no policies left in the list (no related policies), throw
+			// NoPolicyFoundException to be caught at
+			// PolicyEnforcementPointImpl
+			if (policiesString.size() <= 0) {
+				throw new NoPolicyFoundException(
+						"No consents found for patient:" + patientUniqueId
+								+ " in XDS.b repository.");
+			}
+
 			// Wrap policies in a policy set
 			String policySet = makePolicySet(policiesString);
 
 			// Unmarshall policy set as an Evaluatable and add to policy list
-			Evaluatable policy = unmarshal(new ByteArrayInputStream(policySet.getBytes()));
+			Evaluatable policy = unmarshal(new ByteArrayInputStream(
+					policySet.getBytes()));
 			policies.add(policy);
+		} catch (NoPolicyFoundException e) {
+			// Log the exception, but throw it again to be caught at
+			// PolicyEnforcementPointImpl
+			logger.error(e.getMessage(), e);
+			throw e;
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 			throw new DS4PException(
@@ -151,8 +194,17 @@ public class PolicyDecisionPointImplDataXdsb implements
 		}
 		return policies;
 	}
-	
-	Evaluatable unmarshal(InputStream inputStream) throws SyntaxException{
+
+	/**
+	 * Unmarshal.
+	 * 
+	 * @param inputStream
+	 *            the input stream
+	 * @return the evaluatable
+	 * @throws SyntaxException
+	 *             the syntax exception
+	 */
+	Evaluatable unmarshal(InputStream inputStream) throws SyntaxException {
 		return PolicyMarshaller.unmarshal(inputStream);
 	}
 

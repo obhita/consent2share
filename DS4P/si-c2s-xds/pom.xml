@@ -4,52 +4,22 @@
 	<parent>
 		<groupId>gov.samhsa.ds4p</groupId>
 		<artifactId>DS4P</artifactId>
-		<version>0.1.0.BUILD-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
+	
 	<groupId>gov.samhsa.consent2share</groupId>
-	<artifactId>consent2share-si</artifactId>
+	
+	<artifactId>si-c2s-xds</artifactId>
+	
 	<packaging>war</packaging>
-	<name>consent2share spring integration</name>
+	
+	<name>consent2share-xds.b spring integration</name>
 
 	<dependencies>
 		<!-- Test -->
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-core</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-		</dependency>
-
-		<!-- Logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
 		</dependency>
 
 		<dependency>
@@ -100,6 +70,7 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
+		
 		<!-- Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -220,7 +191,7 @@
 			<artifactId>spring-integration-http</artifactId>
 		</dependency>
 
-		<!-- Consent2Share Projects -->
+		<!-- Our Own Projects -->
 		<dependency>
 			<groupId>gov.samhsa.consent</groupId>
 			<artifactId>consent-gen</artifactId>
@@ -232,13 +203,7 @@
 
 	</dependencies>
 	<build>
-		<finalName>consent2share-si</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-		</plugins>
+		<finalName>si-c2s-xds</finalName>
 		
 		<resources>
 			<resource>

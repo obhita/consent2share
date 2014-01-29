@@ -39,18 +39,24 @@
                         <xsd:element name="patiendId" type="xsd:string" />
                         <xsd:element name="recipientNPI" type="xsd:string" />
                         <xsd:element name="senderNPI" type="xsd:string" />
-                        <xsd:element name="RecipientEmail" type="xsd:string" />
-                        <xsd:element name="SenderEmail" type="xsd:string" />
-                        <xsd:element name="PurposeOfUse" type="xsd:string" maxOccurs="unbounded"/>
+                        <xsd:element name="recipientEmail" type="xsd:string" />
+                        <xsd:element name="senderEmail" type="xsd:string" />
+                        <xsd:element name="purposeOfUse" type="xsd:string" />
                         <xsd:element name="requestedDoc" type="xsd:string" />
                         <xsd:element name="date" type="xsd:date" />
+                        <xsd:element name="resourceId" type="xsd:string" />
+                        <xsd:element name="c32" type="xsd:string" />
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
             <xsd:element name="DirectEmailSendResponse">
                 <xsd:complexType>
                     <xsd:sequence>
-                        <xsd:element name="return" type="xsd:string" />
+						<xsd:element name="patientId" type="xsd:string" />
+						<xsd:element name="pdpDecision" type="xsd:string" />
+						<xsd:element name="filteredStreamBody" type="xsd:base64Binary" />
+						<xsd:element name="maskedDocument" type="xsd:string" />
+					 	<xsd:element name="return" type="xsd:string" />
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>

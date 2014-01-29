@@ -55,7 +55,8 @@ public class PolicyDecisionPointImplTest {
 		try {
 			InputStream is = new FileInputStream(
 					"src/test/resources/samplePolicy.xml");
-			//Before calling this SimplePDPFactory.getSimplePDP() must be called
+			// Before calling this SimplePDPFactory.getSimplePDP() must be
+			// called
 			policy = PolicyMarshaller.unmarshal(is);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
@@ -109,9 +110,6 @@ public class PolicyDecisionPointImplTest {
 
 	@Test
 	public void testDeployPoliciesListOfEvaluatable_PERMIT() {
-		// Arrange
-		pdp.deployPolicies(simplePDP, policies);
-
 		// Act
 		String decision = pdp.evaluateRequest(simplePDP, request, policies)
 				.getPdpDecision();
@@ -161,7 +159,7 @@ public class PolicyDecisionPointImplTest {
 				pdp.evaluateRequest(simplePDP, request,
 						new LinkedList<Evaluatable>()).getPdpDecision());
 	}
-	
+
 	@Test
 	public void testEvaluateRequestWithPatientUniqueId() {
 		pdp.deployPolicies(simplePDP, policies);
@@ -171,13 +169,15 @@ public class PolicyDecisionPointImplTest {
 						new LinkedList<Evaluatable>()).getPdpDecision());
 		pdp.undeployPolicy(simplePDP, policy);
 		pdp.deployPolicies(simplePDP, policies_invalid);
-		assertEquals(
-				"DENY",
-				pdp.evaluateRequest(simplePDP, request,"1").getPdpDecision());
+		assertEquals("DENY",
+				pdp.evaluateRequest(simplePDP, request, "1", "", "")
+						.getPdpDecision());
 	}
-	
+
 	@Test
-	public void testEvaluateRequestWithRequestAndPatientUniqueId() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+	public void testEvaluateRequestWithRequestAndPatientUniqueId()
+			throws SecurityException, NoSuchFieldException,
+			IllegalArgumentException, IllegalAccessException {
 		pdp.deployPolicies(simplePDP, policies);
 		assertEquals(
 				"PERMIT",
@@ -185,22 +185,26 @@ public class PolicyDecisionPointImplTest {
 						new LinkedList<Evaluatable>()).getPdpDecision());
 		pdp.undeployPolicy(simplePDP, policy);
 		pdp.deployPolicies(simplePDP, policies_invalid);
-		Field simplePDPField=pdp.getClass().getDeclaredField("simplePDP");
+		Field simplePDPField = pdp.getClass().getDeclaredField("simplePDP");
 		simplePDPField.setAccessible(true);
 		simplePDPField.set(pdp, simplePDP);
-		assertEquals(
-				"DENY",
-				pdp.evaluateRequest(request,"1").getPdpDecision());
+		assertEquals("DENY", pdp.evaluateRequest(request, "1", "", "")
+				.getPdpDecision());
 	}
-	
+
 	@Test
-	public void testEvaluateRequestWithXacmlRequest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		XacmlRequest xacmlRequest=new XacmlRequest();
+	public void testEvaluateRequestWithXacmlRequest() throws SecurityException,
+			NoSuchFieldException, IllegalArgumentException,
+			IllegalAccessException {
+		XacmlRequest xacmlRequest = new XacmlRequest();
 		xacmlRequest.setIntermediarySubjectNPI("1285969170");
 		xacmlRequest.setRecepientSubjectNPI("1568797520");
 		xacmlRequest.setPurposeOfUse("TREAT");
 		xacmlRequest.setPatientId("consent2share@outlook.com");
-		when(requestGeneratorMock.generateRequest("1568797520", "1285969170", "TREAT", "consent2share@outlook.com")).thenReturn(request);
+		when(
+				requestGeneratorMock.generateRequest("1568797520",
+						"1285969170", "TREAT", "consent2share@outlook.com"))
+				.thenReturn(request);
 		pdp.deployPolicies(simplePDP, policies);
 		assertEquals(
 				"PERMIT",
@@ -208,19 +212,17 @@ public class PolicyDecisionPointImplTest {
 						new LinkedList<Evaluatable>()).getPdpDecision());
 		pdp.undeployPolicy(simplePDP, policy);
 		pdp.deployPolicies(simplePDP, policies_invalid);
-		Field simplePDPField=pdp.getClass().getDeclaredField("simplePDP");
+		Field simplePDPField = pdp.getClass().getDeclaredField("simplePDP");
 		simplePDPField.setAccessible(true);
 		simplePDPField.set(pdp, simplePDP);
-		assertEquals(
-				"DENY",
-				pdp.evaluateRequest(xacmlRequest).getPdpDecision());
+		assertEquals("DENY", pdp.evaluateRequest(xacmlRequest).getPdpDecision());
 	}
-	
+
 	@Test
-	public void testGetPolicies(){
-		List<Evaluatable> policies=new ArrayList<Evaluatable>();
-		when(data.getPolicies("1")).thenReturn(policies);
-		assertEquals(pdp.getPolicies("1"),policies);
+	public void testGetPolicies() {
+		List<Evaluatable> policies = new ArrayList<Evaluatable>();
+		when(data.getPolicies("1", "", "")).thenReturn(policies);
+		assertEquals(pdp.getPolicies("1", "", ""), policies);
 	}
-	
+
 }

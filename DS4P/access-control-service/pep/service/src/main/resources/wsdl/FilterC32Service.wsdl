@@ -110,6 +110,28 @@
 				</xsd:complexType>
 			</xsd:element>
 
+			<xsd:element name="PushC32Request">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="senderNpi" type="xsd:string" />
+						<xsd:element name="recipientNpi" type="xsd:string" />
+						<xsd:element name="originalC32" type="xsd:string" />
+						<xsd:element name="patientId" type="xsd:string" />	
+						<xsd:element name="resourceId" type="xsd:string" />					
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="PushC32Response">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="patientId" type="xsd:string" />
+						<xsd:element name="pdpDecision" type="xsd:string" />
+						<xsd:element name="filteredStreamBody" type="xsd:base64Binary" />
+						<xsd:element name="maskedDocument" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
 		</xsd:schema>
 	</wsdl:types>
 	<!-- <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
@@ -136,6 +158,13 @@
 	<wsdl:message name="RegisteryStoredQueryResponse">
 		<wsdl:part element="di:RegisteryStoredQueryResponse" name="parameters" />
 	</wsdl:message>
+	
+	<wsdl:message name="PushC32Request">
+		<wsdl:part element="di:PushC32Request" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="PushC32Response">
+		<wsdl:part element="di:PushC32Response" name="parameters" />
+	</wsdl:message>	
 
 	<wsdl:portType name="FilterC32ServicePortType">
 		<wsdl:operation name="FilterC32">
@@ -162,6 +191,14 @@
 			<wsdl:input message="tsu:RegisteryStoredQueryRequest" />
 			<wsdl:output message="tsu:RegisteryStoredQueryResponse" />
 		</wsdl:operation>
+		
+		<wsdl:operation name="PushC32">
+			<wsdl:documentation>Query XDS.b repository for patient
+			</wsdl:documentation>
+			<wsdl:input message="tsu:PushC32Request" />
+			<wsdl:output message="tsu:PushC32Response" />
+		</wsdl:operation>
+		
 	</wsdl:portType>
 
 	<wsdl:binding name="FilterC32ServiceBinding" type="tsu:FilterC32ServicePortType">
@@ -197,12 +234,22 @@
 				<soap:body use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
+		
+		<wsdl:operation name="PushC32">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>		
 
 	</wsdl:binding>
 	<wsdl:service name="FilterC32Service">
 		<wsdl:port binding="tsu:FilterC32ServiceBinding" name="FilterC32Port">
 			<soap:address
-				location="http://obhitaqaapp01/Pep/services/filterc32service" />
+				location="http://localhost:80/Pep/services/filterc32service" />
 		</wsdl:port>
 	</wsdl:service>
 </wsdl:definitions>

@@ -31,7 +31,7 @@ import javax.validation.constraints.Size;
 /**
  * The Class OrganizationalProviderDto.
  */
-public class OrganizationalProviderDto extends ProviderDto {
+public class OrganizationalProviderDto extends AbstractProviderDto {
 
 	/** The org name. */
 	@NotNull

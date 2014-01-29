@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>pep</artifactId>
-		<version>1.1.0-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>pep-service</artifactId>
@@ -25,7 +25,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>gov.samhsa.consent2share.accesscontrolservice.contexthandler</groupId>
+			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>context-handler-service</artifactId>
 		</dependency>
 
@@ -159,7 +159,7 @@
 							<exclude>gov/samhsa/ds4ppilot/schema/pep/*.class</exclude>
 							<exclude>gov/samhsa/ds4ppilot/contract/**/*.class</exclude>
 							
-<!-- 							The following class are excluded because they're not used and may be removed in the future. -->
+							<!-- The following class are excluded because they're not used and may be removed in the future. -->
 							<exclude>gov/samhsa/acs/pep/PepImpl.class</exclude>
 							<exclude>gov/samhsa/acs/pep/c32getter/C32GetterImpl.class</exclude>
 							<exclude>gov/samhsa/acs/pep/c32getter/DataHandlerToBytesConverterImpl.class</exclude>
@@ -167,9 +167,7 @@
 							<exclude>gov/samhsa/acs/pep/ws/XDSDocumentServiceImpl.class</exclude>
 							<exclude>gov/samhsa/acs/pep/xdsbregistry/*.class</exclude>
 							<exclude>gov/samhsa/acs/pep/xdsbrepository/*.class</exclude>
-							<exclude>gov/samhsa/acs/pep/audit/*.class</exclude>
-							
-							
+							<exclude>gov/samhsa/acs/pep/audit/*.class</exclude>							
 						</excludes>
 					</instrumentation>
 					<formats>

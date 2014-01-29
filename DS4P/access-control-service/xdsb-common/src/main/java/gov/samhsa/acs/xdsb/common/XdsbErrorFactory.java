@@ -124,7 +124,7 @@ public class XdsbErrorFactory {
 		}
 		String codeContext = "The document(s) "
 				+ list.toString()
-				+ " does/do not exist or access denied by Policy Decision Point.";
+				+ " does/do not exist or access denied by Policy Enforcement Point.";
 		String errorCode = "XDSRepositoryError";
 		boolean isPartial = false;
 
@@ -167,6 +167,16 @@ public class XdsbErrorFactory {
 	 */
 	public RetrieveDocumentSetResponse errorRetrieveDocumentSetResponseAccessDeniedByPDP() {
 		String codeContext = "The access to patient documents is denied by Policy Decision Point.";
+		String errorCode = "XDSRepositoryError";
+		boolean isPartial = false;
+
+		return createRetrieveDocumentSetResponseError(codeContext, errorCode,
+				isPartial);
+	}
+	
+	public RetrieveDocumentSetResponse errorRetrieveDocumentSetResponseNoConsentsFound(String patientUniqueId) {
+		String codeContext = "No consents found for patient "
+				+ patientUniqueId + ".";
 		String errorCode = "XDSRepositoryError";
 		boolean isPartial = false;
 
@@ -232,6 +242,15 @@ public class XdsbErrorFactory {
 		String codeContext = "No documents found for patient "
 				+ patientUniqueId + " authored by " + intermediarySubjectNPI
 				+ ".";
+		String errorCode = "XDSRegistryError";
+
+		return createAdhocQueryResponseError(codeContext, errorCode);
+	}
+	
+	public AdhocQueryResponse errorAdhocQueryResponseNoConsentsFound(
+			String patientUniqueId) {
+		String codeContext = "No consents found for patient "
+				+ patientUniqueId + ".";
 		String errorCode = "XDSRegistryError";
 
 		return createAdhocQueryResponseError(codeContext, errorCode);

@@ -85,11 +85,17 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 * 
 	 * @param patientUniqueId
 	 *            the patient unique id
+	 * @param recipientSubjectNPI
+	 *            the recipient subject npi
+	 * @param intermediarySubjectNPI
+	 *            the intermediary subject npi
 	 * @return the policies
 	 */
-	public List<Evaluatable> getPolicies(String patientUniqueId) {
+	public List<Evaluatable> getPolicies(String patientUniqueId,
+			String recipientSubjectNPI, String intermediarySubjectNPI) {
 
-		return data.getPolicies(patientUniqueId);
+		return data.getPolicies(patientUniqueId, recipientSubjectNPI,
+				intermediarySubjectNPI);
 	}
 
 	/**
@@ -99,10 +105,16 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 *            the pdp
 	 * @param patientUniqueId
 	 *            the patient unique id
+	 * @param recipientSubjectNPI
+	 *            the recipient subject npi
+	 * @param intermediarySubjectNPI
+	 *            the intermediary subject npi
 	 * @return the list
 	 */
-	public List<Evaluatable> deployPolicies(PDP pdp, String patientUniqueId) {
-		List<Evaluatable> deployedPolicies = getPolicies(patientUniqueId);
+	public List<Evaluatable> deployPolicies(PDP pdp, String patientUniqueId,
+			String recipientSubjectNPI, String intermediarySubjectNPI) {
+		List<Evaluatable> deployedPolicies = getPolicies(patientUniqueId,
+				recipientSubjectNPI, intermediarySubjectNPI);
 		deployPolicies(pdp, deployedPolicies);
 		return deployedPolicies;
 	}
@@ -151,6 +163,21 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	}
 
 	/**
+	 * Undeploy all policies.
+	 * 
+	 * @param pdp
+	 *            the pdp
+	 */
+	public void undeployAllPolicies(PDP pdp) {
+		PolicyRepository repo = (PolicyRepository) pdp.getPolicyRepository();
+		List<Evaluatable> policies = new LinkedList<Evaluatable>(
+				repo.getDeployment());
+		for (Evaluatable policy : policies) {
+			repo.undeploy(policy.getId());
+		}
+	}
+
+	/**
 	 * Undeploy multiple policies on the policy repository.
 	 * 
 	 * @param pdp
@@ -176,8 +203,8 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest
-	 * (org.herasaf.xacml.core.api.PDP,
+	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest(org
+	 * .herasaf.xacml.core.api.PDP,
 	 * org.herasaf.xacml.core.context.impl.RequestType, java.util.List)
 	 */
 	@Override
@@ -191,16 +218,18 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest
-	 * (org.herasaf.xacml.core.api.PDP,
-	 * org.herasaf.xacml.core.context.impl.RequestType, java.lang.String)
+	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest(org
+	 * .herasaf.xacml.core.api.PDP,
+	 * org.herasaf.xacml.core.context.impl.RequestType, java.lang.String,
+	 * java.lang.String, java.lang.String)
 	 */
 	@Override
 	public XacmlResponse evaluateRequest(PDP pdp, RequestType request,
-			String patientUniqueId) {
+			String patientUniqueId, String recipientSubjectNPI,
+			String intermediarySubjectNPI) {
 		LOGGER.info("evaluateRequest invoked");
 		List<Evaluatable> deployedPolicies = deployPolicies(pdp,
-				patientUniqueId);
+				patientUniqueId, recipientSubjectNPI, intermediarySubjectNPI);
 		return managePoliciesAndEvaluateRequest(pdp, request, deployedPolicies);
 	}
 
@@ -208,23 +237,25 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest
-	 * (org.herasaf.xacml.core.context.impl.RequestType)
+	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest(org
+	 * .herasaf.xacml.core.context.impl.RequestType, java.lang.String,
+	 * java.lang.String, java.lang.String)
 	 */
 	@Override
 	public XacmlResponse evaluateRequest(RequestType request,
-			String patientUniqueId) {
+			String patientUniqueId, String recipientSubjectNPI,
+			String intermediarySubjectNPI) {
 		LOGGER.info("evaluateRequest invoked");
 		return managePoliciesAndEvaluateRequest(this.simplePDP, request,
-				patientUniqueId);
+				patientUniqueId, recipientSubjectNPI, intermediarySubjectNPI);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest
-	 * (gov.samhsa.acs.common.dto.XacmlRequest)
+	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest(gov
+	 * .samhsa.acs.common.dto.XacmlRequest)
 	 */
 	public XacmlResponse evaluateRequest(XacmlRequest xacmlRequest) {
 		LOGGER.info("evaluateRequest invoked");
@@ -233,15 +264,17 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 				xacmlRequest.getIntermediarySubjectNPI(),
 				xacmlRequest.getPurposeOfUse(), xacmlRequest.getPatientId());
 		return managePoliciesAndEvaluateRequest(this.simplePDP, request,
-				xacmlRequest.getPatientUniqueId());
+				xacmlRequest.getPatientUniqueId(),
+				xacmlRequest.getRecepientSubjectNPI(),
+				xacmlRequest.getIntermediarySubjectNPI());
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest
-	 * (org.herasaf.xacml.core.context.impl.RequestType, java.util.List)
+	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest(org
+	 * .herasaf.xacml.core.context.impl.RequestType, java.util.List)
 	 */
 	@Override
 	public XacmlResponse evaluateRequest(RequestType request,
@@ -261,13 +294,18 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 *            the request
 	 * @param patientUniqueId
 	 *            the patient unique id
+	 * @param recipientSubjectNPI
+	 *            the recipient subject npi
+	 * @param intermediarySubjectNPI
+	 *            the intermediary subject npi
 	 * @return the xacml response
 	 */
 	private XacmlResponse managePoliciesAndEvaluateRequest(PDP pdp,
-			RequestType request, String patientUniqueId) {
-		List<Evaluatable> deployedPolicies = deployPolicies(pdp,
-				patientUniqueId);
-		return managePoliciesAndEvaluateRequest(pdp, request, deployedPolicies);
+			RequestType request, String patientUniqueId,
+			String recipientSubjectNPI, String intermediarySubjectNPI) {
+		deployPolicies(pdp, patientUniqueId, recipientSubjectNPI,
+				intermediarySubjectNPI);
+		return managePoliciesAndEvaluateRequest(pdp, request);
 	}
 
 	/**
@@ -285,8 +323,25 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 */
 	private XacmlResponse managePoliciesAndEvaluateRequest(PDP pdp,
 			RequestType request, List<Evaluatable> deployedPolicies) {
+		deployPolicies(pdp, deployedPolicies);
 		XacmlResponse xacmlResponse = evaluateRequest(pdp, request);
 		undeployPolicies(pdp, deployedPolicies);
+		return xacmlResponse;
+	}
+
+	/**
+	 * Manage policies and evaluate request.
+	 * 
+	 * @param pdp
+	 *            the pdp
+	 * @param request
+	 *            the request
+	 * @return the xacml response
+	 */
+	private XacmlResponse managePoliciesAndEvaluateRequest(PDP pdp,
+			RequestType request) {
+		XacmlResponse xacmlResponse = evaluateRequest(pdp, request);
+		undeployAllPolicies(pdp);
 		return xacmlResponse;
 	}
 
@@ -322,14 +377,8 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 			}
 		}
 
-		LOGGER.debug("xacmlResponse is ready: ");
 		LOGGER.debug("xacmlResponse.pdpDecision: "
 				+ xacmlResponse.getPdpDecision());
-		if (xacmlResponse.getPdpObligation() != null) {
-			for (String o : xacmlResponse.getPdpObligation()) {
-				LOGGER.debug("xacmlResponse.pdpObligation: " + o);
-			}
-		}
 		LOGGER.debug("xacmlResponse is ready!");
 		return xacmlResponse;
 	}

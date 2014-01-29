@@ -29,6 +29,8 @@ import gov.samhsa.ds4ppilot.contract.pep.FilterC32Service;
 import gov.samhsa.ds4ppilot.contract.pep.FilterC32ServicePortType;
 import gov.samhsa.ds4ppilot.schema.pep.FilterC32Request;
 import gov.samhsa.ds4ppilot.schema.pep.FilterC32Response;
+import gov.samhsa.ds4ppilot.schema.pep.PushC32Request;
+import gov.samhsa.ds4ppilot.schema.pep.PushC32Response;
 import gov.samhsa.ds4ppilot.schema.pep.RegisteryStoredQueryRequest;
 import gov.samhsa.ds4ppilot.schema.pep.RegisteryStoredQueryResponse;
 import gov.samhsa.ds4ppilot.schema.pep.RetrieveDocumentSetRequest;
@@ -68,10 +70,22 @@ public class FilterC32WebServiceClient {
 		filterC32Request.setSenderEmailAddress("DoNotCare@donotcare.com");
 		
 		filterC32Request.setPackageAsXdm(false);
-		FilterC32Response filterC32Response = filterC32WebServiceClient.filterC32(filterC32Request);
+//		FilterC32Response filterC32Response = filterC32WebServiceClient.filterC32(filterC32Request);
 		
-		System.out.println(filterC32Response.getPdpDecision());
-		System.out.println(filterC32Response.getMaskedDocument());
+//		System.out.println(filterC32Response.getPdpDecision());
+//		System.out.println(filterC32Response.getMaskedDocument());
+		
+		// pushc32
+		PushC32Request pushC32Request = new PushC32Request();
+		pushC32Request.setPatientId("PUI100010060001");
+		pushC32Request.setRecipientNpi("1760717789");
+		pushC32Request.setSenderNpi("1114252178");
+		pushC32Request.setResourceId("d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
+		
+		PushC32Response pushC32Response = filterC32WebServiceClient.pushC32(pushC32Request);
+		
+		System.out.println("PushC32 PDP Decision: " + pushC32Response.getPdpDecision());
+		System.out.println("PushC32 Masked Document: " + pushC32Response.getMaskedDocument());
 	}
 
 	public FilterC32WebServiceClient(String endpointAddress) {
@@ -106,6 +120,16 @@ public class FilterC32WebServiceClient {
 		return result;
 	}
 
+	public PushC32Response pushC32(PushC32Request pushC32Request) {
+		logger.debug("Creating Filter C32 Service instance ...");
+		
+		FilterC32ServicePortType port = createPort();
+
+		PushC32Response result = port.pushC32(pushC32Request);
+
+		return result;
+	}
+	
 	private FilterC32ServicePortType createPort() {
 		final URL WSDL_LOCATION = this.getClass().getClassLoader()
 				.getResource(wsdlFileName);

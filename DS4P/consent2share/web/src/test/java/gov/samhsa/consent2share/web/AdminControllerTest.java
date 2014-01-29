@@ -2,29 +2,40 @@ package gov.samhsa.consent2share.web;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
+import gov.samhsa.consent2share.infrastructure.HashMapResultToProviderDtoConverter;
 import gov.samhsa.consent2share.infrastructure.PixQueryService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.admin.AdminService;
 import gov.samhsa.consent2share.service.audit.AdminAuditService;
+import gov.samhsa.consent2share.service.consent.ConsentNotFoundException;
 import gov.samhsa.consent2share.service.consent.ConsentService;
 import gov.samhsa.consent2share.service.dto.AbstractPdfDto;
 import gov.samhsa.consent2share.service.dto.AdminProfileDto;
+import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
+import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
+import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 import gov.samhsa.consent2share.service.dto.PatientAdminDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.RecentAcctivityDto;
 import gov.samhsa.consent2share.service.patient.PatientService;
+import gov.samhsa.consent2share.service.provider.IndividualProviderService;
+import gov.samhsa.consent2share.service.provider.OrganizationalProviderService;
+import gov.samhsa.consent2share.service.provider.ProviderSearchLookupService;
 import gov.samhsa.consent2share.service.reference.AdministrativeGenderCodeService;
 import gov.samhsa.consent2share.service.reference.LanguageCodeService;
 import gov.samhsa.consent2share.service.reference.MaritalStatusCodeService;
@@ -33,17 +44,26 @@ import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeServic
 import gov.samhsa.consent2share.service.reference.StateCodeService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import org.hamcrest.Description;
+import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.util.NestedServletException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AdminControllerTest {
@@ -88,6 +108,16 @@ public class AdminControllerTest {
 	@Mock
 	PixQueryService pixQueryService;
 	
+	@Mock
+	HashMap<String,String> Result;
+	
+	@Mock
+	IndividualProviderService individualProviderService;
+	
+	@Mock
+	OrganizationalProviderService organizationalProviderService;
+
+	
 
 	/** The religious affiliation code service. */
 	@Mock
@@ -97,10 +127,19 @@ public class AdminControllerTest {
 	@Mock
 	StateCodeService stateCodeService;
 	
+	@Mock
+	HashMapResultToProviderDtoConverter hashMapResultToProviderDtoConverter;
+	
+	@Mock
+	ProviderSearchLookupService providerSearchLookupService;
+	
 	@InjectMocks
 	AdminController adminController;
 	
 	MockMvc mockMvc;
+	
+	@Rule
+	public ExpectedException thrownException = ExpectedException.none();
 	
 	final String validFirstName = "Tom";
 	final String validLastName = "Lee";
@@ -156,7 +195,7 @@ public class AdminControllerTest {
 	@Test
 	public void testAdminPatientView_when_id_is_not_present() throws Exception{
 		mockMvc.perform(get("/Administrator/adminPatientView.html"))
-		.andExpect(status().isBadRequest());
+		.andExpect(view().name("redirect:adminHome.html"));
 	}
 	
 	@Test
@@ -259,10 +298,93 @@ public class AdminControllerTest {
 						.param(validGenderCode ,
 								validGenderCode ))
 			.andExpect(model().hasNoErrors())	
-			.andExpect(view().name("redirect:/Administrator/adminPatientView.html?id=1"))	;	
+			.andExpect(view().name("redirect:/Administrator/adminPatientView.html?notify=editpatientprofile&status=success&id=1"))	;	
 	
 	}
 	
+	@Test
+	public void testSubmitConsentWhenConsentIsFound() throws Exception{
+		ConsentPdfDto consentPdfDto = mock(ConsentPdfDto.class);
+		
+		when(consentService.findConsentPdfDto(any(long.class))).thenReturn(consentPdfDto);
+		when(consentService.signConsent(any(ConsentPdfDto.class))).thenReturn(true);
+		when(consentService.isConsentBelongToThisUser(any(long.class), any(long.class))).thenReturn(true);
+		mockMvc.perform(post("/Administrator/adminPatientViewSubmitConsent.html")
+				.param("consentId", "1")
+				.param("patientId", "1"))
+				.andExpect(view().name("redirect:adminPatientView.html?notify=submit&status=success&id=1"));
+	}
 	
+	@Test
+	public void testSubmitConsentWhenConsentIsFoundButSubmissionFails() throws Exception{
+		ConsentDto consentDto = mock(ConsentDto.class);
+		when(consentDto.getUsername()).thenReturn("patientusername");
+		
+		ConsentPdfDto consentPdfDto = mock(ConsentPdfDto.class);
+		
+		when(consentService.findConsentById(any(long.class))).thenReturn(consentDto);
+		when(patientService.findUsernameById(any(long.class))).thenReturn("patientusername");
+		when(consentService.findConsentPdfDto(any(long.class))).thenReturn(consentPdfDto);
+		when(consentService.signConsent(any(ConsentPdfDto.class))).thenReturn(false);
+		
+		mockMvc.perform(post("/Administrator/adminPatientViewSubmitConsent.html")
+				.param("consentId", "1")
+				.param("patientId", "1"))
+				.andExpect(view().name("redirect:adminPatientView.html?notify=submit&status=fail&id=1"));
+	}
+	
+	@Test
+	public void testSubmitConsentWhenConsentIsNotFound() throws Exception{
+		when(consentService.findConsentById(any(long.class))).thenReturn(null);
+		
+		mockMvc.perform(post("/Administrator/adminPatientViewSubmitConsent.html")
+				.param("consentId", "1")
+				.param("patientId", "1"))
+				.andExpect(view().name("redirect:adminPatientView.html?notify=submit&status=fail&id=1"));
+	}
+	
+	@Test
+	public void testAddProvider() throws Exception {
+		when(Result.get("entityType")).thenReturn("entityTypeValue");
+		when(Result.get("providerOrganizationName")).thenReturn("providerOrganizationNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialTitleorPosition")).thenReturn("authorizedOfficialTitleorPositionValue");
+		when(Result.get("authorizedOfficialNamePrefixText")).thenReturn("authorizedOfficialNamePrefixTextValue");
+		when(Result.get("authorizedOfficialTelephoneNumber")).thenReturn("authorizedOfficialTelephoneNumberValue");
+		mockMvc.perform(post("/Administrator/connectionProviderAdd.html").param("querySent", "{\"npi\":\"1114252178\",\"entityType\":\"Individual\",\"replacementNpi\":\"\",\"employerIdentificationNumber\":\"\",\"isSoleProprietor\":false,\"isOrganizationSubpart\":false,\"parentOrganizationLbn\":\"\",\"parentOrganizationTin\":\"\",\"providerOrganizationName\":\"\",\"providerLastName\":\"MORGAN\",\"providerFirstName\":\"TERRENCE\",\"providerMiddleName\":\"\",\"providerNamePrefixText\":\"MR.\",\"providerNameSuffixText\":\"\",\"providerCredentialText\":\"LGSW, CSC-AD\",\"providerFirstLineBusinessMailingAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessMailingAddress\":\"\",\"providerBusinessMailingAddressCityName\":\"BALTIMORE\",\"providerBusinessMailingAddressStateName\":\"MD\",\"providerBusinessMailingAddressPostalCode\":\"212373903\",\"providerBusinessMailingAddressCountryCode\":\"US\",\"providerBusinessMailingAddressTelephoneNumber\":\"4108876465\",\"providerBusinessMailingAddressFaxNumber\":\"4106876005\",\"providerFirstLineBusinessPracticeLocationAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessPracticeLocationAddress\":\"\",\"providerBusinessPracticeLocationAddressCityName\":\"BALTIMORE\",\"providerBusinessPracticeLocationAddressStateName\":\"MD\",\"providerBusinessPracticeLocationAddressPostalCode\":\"212373903\",\"providerBusinessPracticeLocationAddressCountryCode\":\"US\",\"providerBusinessPracticeLocationAddressTelephoneNumber\":\"4108876465\",\"providerBusinessPracticeLocationAddressFaxNumber\":\"4106876005\",\"providerEnumerationDate\":\"10/08/2009\",\"lastUpdateDate\":\"10/08/2009\",\"npideactivationReasonCode\":\"\",\"npideactivationReason\":\"\",\"npideactivationDate\":\"\",\"npireactivationDate\":\"\",\"providerGenderCode\":\"M\",\"providerGender\":\"Male\",\"authorizedOfficialLastName\":\"\",\"authorizedOfficialFirstName\":\"\",\"authorizedOfficialMiddleName\":\"\",\"authorizedOfficialTitleorPosition\":\"\",\"authorizedOfficialNamePrefixText\":\"\",\"authorizedOfficialNameSuffixText\":\"\",\"authorizedOfficialCredentialText\":\"\",\"authorizedOfficialTelephoneNumber\":\"\",\"healthcareProviderTaxonomyCode_1\":\"101YM0800X\",\"providerLicenseNumber_1\":\"14742\",\"providerLicenseNumberStateCode_1\":\"MD\",\"healthcareProviderTaxonomy_1\":\"Mental Health\"}")
+				.param("patientusername", "albert.smith").param("patientId", "1"))
+				.andExpect(view().name("redirect:/Administrator/adminPatientView.html?id=1"));
+		
+	}
+	
+	@Test
+	public void testSignConsentRevokation_when_authentication_succeeds() throws Exception{
+		ConsentRevokationPdfDto consentRevokationPdfDto=mock(ConsentRevokationPdfDto.class);
+		when(consentService.findConsentRevokationPdfDto(anyLong())).thenReturn(consentRevokationPdfDto);
+		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(true);
+		mockMvc.perform(post("/Administrator/adminPatientViewRevokeConsent.html").param("patientId", "1").param("consentId", "1").param("revokationType", "NO NEVER"))
+			.andExpect(view().name("redirect:adminPatientView.html?notify=revokepatientconsent&status=success&id=1"));
+		verify(consentRevokationPdfDto).setRevokationType("NO NEVER");
+	}
+	
+	@Test
+	public void testSignConsentRevokation_when_authentication_fails() throws Exception{
+		ConsentRevokationPdfDto consentRevokationPdfDto=mock(ConsentRevokationPdfDto.class);
+		when(consentService.findConsentRevokationPdfDto(anyLong())).thenReturn(consentRevokationPdfDto);
+		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(false);
+		mockMvc.perform(post("/Administrator/adminPatientViewRevokeConsent.html").param("patientId", "1").param("consentId", "1").param("revokationType", "NO NEVER"))
+			.andExpect(view().name("redirect:adminPatientView.html?notify=revokepatientconsent&status=fail&id=1"));
+		verify(consentService,never()).signConsentRevokation(consentRevokationPdfDto);
+	}
+	
+	@Test
+	public void testAjaxProviderSearch_Checked_Status_Is_OK() throws Exception {
+		 when(providerSearchLookupService.isValidatedSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(true);
+		 when(providerSearchLookupService.providerSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn("artifitial JSON");
+		 mockMvc.perform(get("/Administrator/providerSearch.html"))
+         	.andExpect(status().isOk())
+         	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+	}
 
 }

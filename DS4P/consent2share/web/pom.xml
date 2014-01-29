@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>consent2share</artifactId>
-		<version>0.1.0.BUILD-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>consent2share-web</artifactId>
@@ -306,6 +306,29 @@
 			<artifactId>vt-password</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>2.39.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-firefox-driver</artifactId>
+			<version>2.33.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-server</artifactId>
+			<version>${selenium-server.version}</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -391,6 +414,191 @@
 				</dependency>
 			</dependencies>
 
+		</profile>
+
+		<!-- To include selenium test: mvn clean install -Pselenium-test -->
+		<profile>
+			<id>selenium-test</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>sql-maven-plugin</artifactId>
+						<!-- These dependencies do not care dependencies in non-profile dependencyManagement -->
+						<dependencies>
+							<!-- specify the dependent jdbc driver here -->
+							<dependency>
+								<groupId>mysql</groupId>
+								<artifactId>mysql-connector-java</artifactId>
+								<version>${mysql-connector.version}</version>
+							</dependency>
+						</dependencies>
+
+						<configuration>
+							<driver>com.mysql.jdbc.Driver</driver>
+							<url>${maven.database.url}</url>
+							<username>${maven.database.username}</username>
+							<password>${maven.database.password}</password>
+							<!-- You can comment out username/password configurations and have 
+								maven to look them up in your settings.xml using ${settingsKey} -->
+							<settingsKey>sensibleKey</settingsKey>
+							<!-- sql-maven-plugin which skip the execution for projects of packaging 
+								type 'pom' as default behaviour. It is same a few plugins like the source 
+								and javadoc plugin (amongst others) -->
+							<forceMojoExecution>true</forceMojoExecution>
+						</configuration>
+
+						<executions>
+							<execution>
+								<id>drop-db-if-any</id>
+								<phase>package</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<!-- need another database to drop the targeted one -->
+									<url>${maven.database-deployment-helper.url}</url>
+									<username>${maven.database-deployment-helper.username}</username>
+									<password>${maven.database-deployment-helper.password}</password>
+									<autocommit>true</autocommit>
+									<sqlCommand>drop database consent2share</sqlCommand>
+									<!-- ignore error when database is not avaiable -->
+									<onError>continue</onError>
+								</configuration>
+							</execution>
+
+							<execution>
+								<id>create-db</id>
+								<phase>package</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<!-- need another database to create the targeted one -->
+									<url>${maven.database-deployment-helper.url}</url>
+									<username>${maven.database-deployment-helper.username}</username>
+									<password>${maven.database-deployment-helper.password}</password>
+									<!-- no transaction -->
+									<autocommit>true</autocommit>
+									<sqlCommand>create database consent2share</sqlCommand>
+								</configuration>
+							</execution>
+
+							<execution>
+								<id>create-schema</id>
+								<phase>package</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<autocommit>true</autocommit>
+									<srcFiles>
+										<srcFile>../sqlDatabase/src/main/resources/mysql-scripts/consent2share-schema.sql</srcFile>
+									</srcFiles>
+								</configuration>
+							</execution>
+
+							<execution>
+								<id>create-data-lookup</id>
+								<phase>package</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<orderFile>ascending</orderFile>
+									<fileset>
+										<basedir>${basedir}/../sqlDatabase</basedir>
+										<includes>
+											<include>src/main/resources/mysql-scripts/data/*.sql</include>
+										</includes>
+									</fileset>
+								</configuration>
+							</execution>
+
+							<execution>
+								<id>create-data-persona</id>
+								<phase>package</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<orderFile>ascending</orderFile>
+									<fileset>
+										<basedir>${basedir}/../sqlDatabase</basedir>
+										<includes>
+											<include>src/main/resources/mysql-scripts/data/persona/*.sql</include>
+										</includes>
+									</fileset>
+								</configuration>
+							</execution>
+
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.tomcat.maven</groupId>
+						<artifactId>tomcat7-maven-plugin</artifactId>
+						<!-- <version>2.0</version> -->
+						<configuration>
+							<path>/consent2share</path>
+							<contextFile>${basedir}/src/main/resources/META-INF/spring/seleniumContext.xml</contextFile>
+							<keystoreFile>C:/consent2share.keystore</keystoreFile>
+							<keystorePass>changeit</keystorePass>
+							<useTestClasspath>true</useTestClasspath>
+						</configuration>
+						<executions>
+							<!-- At pre-integration-test phase, run the war in an embedded Tomcat 
+								server. -->
+							<execution>
+								<id>start-tomcat</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>run-war-only</goal>
+								</goals>
+								<configuration>
+									<httpsPort>8444</httpsPort>
+									<port>8081</port>
+									<fork>true</fork>
+								</configuration>
+							</execution>
+							<!-- At post-integration-test phase, stop the embedded Tomcat server. -->
+							<execution>
+								<id>stop-tomcat</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>shutdown</goal>
+								</goals>
+							</execution>
+						</executions>
+						<dependencies>
+							<!-- Used to allow embedded Tomcat to connect to a MySQL database -->
+							<dependency>
+								<groupId>mysql</groupId>
+								<artifactId>mysql-connector-java</artifactId>
+								<version>${mysql-connector.version}</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>verify</id>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<includes>
+								<include>**/selenium/*.java</include>
+							</includes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 
 	</profiles>

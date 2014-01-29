@@ -66,8 +66,10 @@ public interface ConsentService {
 	 * Delete consent.
 	 *
 	 * @param consentId the consent id
+	 * @return the boolean
+	 * 			true on success, false on failure
 	 */
-	void deleteConsent(Long consentId);
+	boolean deleteConsent(Long consentId);
 
 	/**
 	 * Find consent.
@@ -143,6 +145,7 @@ public interface ConsentService {
 	 * Save consent.
 	 *
 	 * @param consentDto the consent dto
+	 * @throws ConsentGenException the consent gen exception
 	 */
 	void saveConsent(ConsentDto consentDto) throws ConsentGenException;
 	
@@ -175,8 +178,9 @@ public interface ConsentService {
 	 * Sign consent.
 	 *
 	 * @param consentPdfDto the consent pdf dto
+	 * @return true, if successful
 	 */
-	void signConsent(ConsentPdfDto consentPdfDto);
+	boolean signConsent(ConsentPdfDto consentPdfDto);
 
 	/**
 	 * Make SignedPdfConsent.
@@ -245,5 +249,13 @@ public interface ConsentService {
 	 * @param revokationType the revokation type
 	 */
 	void addUnsignedConsentRevokationPdf(Long consentId, String revokationType);
+
+	/**
+	 * Find all consents dto by user name.
+	 *
+	 * @param userName the user name
+	 * @return the list
+	 */
+	List<ConsentListDto> findAllConsentsDtoByUserName(String userName);
 
 }

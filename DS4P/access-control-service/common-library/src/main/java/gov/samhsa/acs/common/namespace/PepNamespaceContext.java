@@ -64,6 +64,12 @@ public class PepNamespaceContext implements NamespaceContext {
 	/** The Constant IHE_ITI_XDSB_2007_URI. */
 	public static final String IHE_ITI_XDSB_2007_URI = "urn:ihe:iti:xds-b:2007";
 
+	/** The Constant XACML_2_PREFIX. */
+	public static final String XACML_2_PREFIX = "xacml2";
+
+	/** The Constant XACML_2_URI. */
+	public static final String XACML_2_URI = "urn:oasis:names:tc:xacml:2.0:policy:schema:os";
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -83,6 +89,8 @@ public class PepNamespaceContext implements NamespaceContext {
 			uri = QUERY_URI;
 		else if (prefix.equals(IHE_ITI_XDSB_2007_PREFIX))
 			uri = IHE_ITI_XDSB_2007_URI;
+		else if (prefix.equals(XACML_2_PREFIX))
+			uri = XACML_2_URI;
 		else
 			uri = null;
 		return uri;

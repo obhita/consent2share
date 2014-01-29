@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
+import gov.samhsa.consent2share.infrastructure.HashMapResultToProviderDtoConverter;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
@@ -100,6 +101,9 @@ public class ProviderControllerTest {
 	
 	@Mock
 	HashMap<String,String> Result;
+	
+	@Mock
+	HashMapResultToProviderDtoConverter hashMapResultToProviderDtoConverter;
 	
 	MockMvc mockMvc;
 	

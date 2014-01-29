@@ -6,11 +6,10 @@
 	<parent>
 		<groupId>gov.samhsa.ds4p</groupId>
 		<artifactId>DS4P</artifactId>
-		<version>0.1.0.BUILD-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>gov.samhsa.consent2share</groupId>
-	<version>1.1.0-SNAPSHOT</version>
 
 	<artifactId>access-control-service</artifactId>
 	<packaging>pom</packaging>

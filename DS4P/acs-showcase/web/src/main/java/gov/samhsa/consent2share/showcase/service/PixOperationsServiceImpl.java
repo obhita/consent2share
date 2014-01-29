@@ -420,6 +420,13 @@ public class PixOperationsServiceImpl implements PixOperationsService {
 	 */
 	@Override
 	public RegistryResponse provideAndRegisterClinicalDocument(String c32xml) {
+		c32xml = updatePatientAndAuthorId(c32xml);
+		return xdsbRepository.provideAndRegisterDocumentSet(c32xml,
+				PixManagerConstants.GLOBAL_DOMAIN_ID,
+				XdsbDocumentType.CLINICAL_DOCUMENT);
+	}
+
+	public String updatePatientAndAuthorId(String c32xml) {
 		String hl7v3Xml = null;
 		try {
 			hl7v3Xml = pixManagerTransformService.getPixQueryXml(c32xml);
@@ -472,9 +479,7 @@ public class PixOperationsServiceImpl implements PixOperationsService {
 			throw new AcsShowCaseException(
 					"PixOperationsService failed! Cannot retrieve EID.");
 		}
-		return xdsbRepository.provideAndRegisterDocumentSet(c32xml,
-				PixManagerConstants.GLOBAL_DOMAIN_ID,
-				XdsbDocumentType.CLINICAL_DOCUMENT);
+		return c32xml;
 	}
 
 	/**

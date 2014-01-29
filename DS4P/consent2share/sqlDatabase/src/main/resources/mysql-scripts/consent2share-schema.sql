@@ -840,33 +840,6 @@ create unique index ix_auth_username on authorities
     ) ENGINE=InnoDB
 ;
 
-    create table provider_admin (
-        id bigint not null auto_increment,
-        email varchar(255),
-        employeeid varchar(255),
-        first_name varchar(30) not null,
-        last_name varchar(30) not null,
-        username varchar(30),
-        version integer,
-        administrative_gender_code bigint,
-        primary key (id)
-    ) ENGINE=InnoDB
-;
-
-    create table provider_admin_aud (
-        id bigint not null,
-        rev bigint not null,
-        revtype tinyint,
-        email varchar(255),
-        employeeid varchar(255),
-        first_name varchar(30),
-        last_name varchar(30),
-        username varchar(30),
-        administrative_gender_code bigint,
-        primary key (id, rev)
-    ) ENGINE=InnoDB
-;
-
     create table provider_taxononomy_code (
         id bigint not null auto_increment,
         code varchar(250) not null,
@@ -1084,6 +1057,181 @@ create unique index ix_auth_username on authorities
         original_text varchar(250),
         version integer,
         primary key (id)
+    ) ENGINE=InnoDB
+;
+
+    create table staff (
+        id bigint not null auto_increment,
+        email varchar(255),
+        employeeid varchar(255),
+        first_name varchar(30) not null,
+        last_name varchar(30) not null,
+        username varchar(30),
+        version integer,
+        administrative_gender_code bigint,
+        primary key (id)
+    ) ENGINE=InnoDB
+;
+
+    create table staff_aud (
+        id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        email varchar(255),
+        employeeid varchar(255),
+        first_name varchar(30),
+        last_name varchar(30),
+        username varchar(30),
+        administrative_gender_code bigint,
+        primary key (id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table staff_individual_provider (
+        id bigint not null auto_increment,
+        entity_type integer,
+        enumeration_date varchar(30) not null,
+        first_line_mailing_address varchar(255) not null,
+        first_line_practice_location_address varchar(255) not null,
+        last_update_date varchar(30) not null,
+        mailing_address_city_name varchar(30) not null,
+        mailing_address_country_code varchar(30) not null,
+        mailing_address_fax_number varchar(30) not null,
+        mailing_address_postal_code varchar(30) not null,
+        mailing_address_state_name varchar(30) not null,
+        mailing_address_telephone_number varchar(30) not null,
+        npi varchar(30),
+        practice_location_address_city_name varchar(30) not null,
+        practice_location_address_country_code varchar(30) not null,
+        practice_location_address_fax_number varchar(30) not null,
+        practice_location_address_postal_code varchar(30) not null,
+        practice_location_address_state_name varchar(30) not null,
+        practice_location_address_telephone_number varchar(30) not null,
+        provider_taxonomy_code varchar(30) not null,
+        provider_taxonomy_description varchar(255) not null,
+        second_line_mailing_address varchar(255) not null,
+        second_line_practice_location_address varchar(255) not null,
+        version integer,
+        credential varchar(30) not null,
+        first_name varchar(30) not null,
+        last_name varchar(30) not null,
+        middle_name varchar(30) not null,
+        name_prefix varchar(30) not null,
+        name_suffix varchar(30) not null,
+        staff bigint,
+        primary key (id)
+    ) ENGINE=InnoDB
+;
+
+    create table staff_individual_provider_audit (
+        id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        entity_type integer,
+        enumeration_date varchar(30),
+        first_line_mailing_address varchar(255),
+        first_line_practice_location_address varchar(255),
+        last_update_date varchar(30),
+        mailing_address_city_name varchar(30),
+        mailing_address_country_code varchar(30),
+        mailing_address_fax_number varchar(30),
+        mailing_address_postal_code varchar(30),
+        mailing_address_state_name varchar(30),
+        mailing_address_telephone_number varchar(30),
+        npi varchar(30),
+        practice_location_address_city_name varchar(30),
+        practice_location_address_country_code varchar(30),
+        practice_location_address_fax_number varchar(30),
+        practice_location_address_postal_code varchar(30),
+        practice_location_address_state_name varchar(30),
+        practice_location_address_telephone_number varchar(30),
+        provider_taxonomy_code varchar(30),
+        provider_taxonomy_description varchar(255),
+        second_line_mailing_address varchar(255),
+        second_line_practice_location_address varchar(255),
+        credential varchar(30),
+        first_name varchar(30),
+        last_name varchar(30),
+        middle_name varchar(30),
+        name_prefix varchar(30),
+        name_suffix varchar(30),
+        staff bigint,
+        primary key (id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table staff_organizational_provider (
+        id bigint not null auto_increment,
+        entity_type integer,
+        enumeration_date varchar(30) not null,
+        first_line_mailing_address varchar(255) not null,
+        first_line_practice_location_address varchar(255) not null,
+        last_update_date varchar(30) not null,
+        mailing_address_city_name varchar(30) not null,
+        mailing_address_country_code varchar(30) not null,
+        mailing_address_fax_number varchar(30) not null,
+        mailing_address_postal_code varchar(30) not null,
+        mailing_address_state_name varchar(30) not null,
+        mailing_address_telephone_number varchar(30) not null,
+        npi varchar(30),
+        practice_location_address_city_name varchar(30) not null,
+        practice_location_address_country_code varchar(30) not null,
+        practice_location_address_fax_number varchar(30) not null,
+        practice_location_address_postal_code varchar(30) not null,
+        practice_location_address_state_name varchar(30) not null,
+        practice_location_address_telephone_number varchar(30) not null,
+        provider_taxonomy_code varchar(30) not null,
+        provider_taxonomy_description varchar(255) not null,
+        second_line_mailing_address varchar(255) not null,
+        second_line_practice_location_address varchar(255) not null,
+        version integer,
+        authorized_official_first_name varchar(30) not null,
+        authorized_official_last_name varchar(30) not null,
+        authorized_official_name_prefix varchar(30) not null,
+        authorized_official_telephone_number varchar(30) not null,
+        authorized_official_title varchar(30) not null,
+        org_name varchar(255) not null,
+        other_org_name varchar(30),
+        staff bigint,
+        primary key (id)
+    ) ENGINE=InnoDB
+;
+
+    create table staff_organizational_provider_audit (
+        id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        entity_type integer,
+        enumeration_date varchar(30),
+        first_line_mailing_address varchar(255),
+        first_line_practice_location_address varchar(255),
+        last_update_date varchar(30),
+        mailing_address_city_name varchar(30),
+        mailing_address_country_code varchar(30),
+        mailing_address_fax_number varchar(30),
+        mailing_address_postal_code varchar(30),
+        mailing_address_state_name varchar(30),
+        mailing_address_telephone_number varchar(30),
+        npi varchar(30),
+        practice_location_address_city_name varchar(30),
+        practice_location_address_country_code varchar(30),
+        practice_location_address_fax_number varchar(30),
+        practice_location_address_postal_code varchar(30),
+        practice_location_address_state_name varchar(30),
+        practice_location_address_telephone_number varchar(30),
+        provider_taxonomy_code varchar(30),
+        provider_taxonomy_description varchar(255),
+        second_line_mailing_address varchar(255),
+        second_line_practice_location_address varchar(255),
+        authorized_official_first_name varchar(30),
+        authorized_official_last_name varchar(30),
+        authorized_official_name_prefix varchar(30),
+        authorized_official_telephone_number varchar(30),
+        authorized_official_title varchar(30),
+        org_name varchar(255),
+        other_org_name varchar(30),
+        staff bigint,
+        primary key (id, rev)
     ) ENGINE=InnoDB
 ;
 
@@ -1604,20 +1752,6 @@ create unique index ix_auth_username on authorities
         references procedure_observation (id)
 ;
 
-    alter table provider_admin 
-        add index FK4DAC7381185F3145 (administrative_gender_code), 
-        add constraint FK4DAC7381185F3145 
-        foreign key (administrative_gender_code) 
-        references administrative_gender_code (id)
-;
-
-    alter table provider_admin_aud 
-        add index FKF38174F2CDA971CE (rev), 
-        add constraint FKF38174F2CDA971CE 
-        foreign key (rev) 
-        references revinfo (rev)
-;
-
     alter table result_observation 
         add index FKF0BB0AB2036D5 (patient), 
         add constraint FKF0BB0AB2036D5 
@@ -1667,3 +1801,44 @@ create unique index ix_auth_username on authorities
         references social_history_status_code (id)
 ;
 
+    alter table staff 
+        add index FK68AC2E0185F3145 (administrative_gender_code), 
+        add constraint FK68AC2E0185F3145 
+        foreign key (administrative_gender_code) 
+        references administrative_gender_code (id)
+;
+
+    alter table staff_aud 
+        add index FK6BDAFCD1CDA971CE (rev), 
+        add constraint FK6BDAFCD1CDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table staff_individual_provider 
+        add index FK1DE190F8BCBBC9E6 (staff), 
+        add constraint FK1DE190F8BCBBC9E6 
+        foreign key (staff) 
+        references staff (id)
+;
+
+    alter table staff_individual_provider_audit 
+        add index FKD928F5D4CDA971CE (rev), 
+        add constraint FKD928F5D4CDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table staff_organizational_provider 
+        add index FK7BA1B813BCBBC9E6 (staff), 
+        add constraint FK7BA1B813BCBBC9E6 
+        foreign key (staff) 
+        references staff (id)
+;
+
+    alter table staff_organizational_provider_audit 
+        add index FK8E381CAFCDA971CE (rev), 
+        add constraint FK8E381CAFCDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;

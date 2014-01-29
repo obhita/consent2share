@@ -27,6 +27,7 @@ package gov.samhsa.consent2share.web;
 
 import flexjson.JSONDeserializer;
 import gov.samhsa.consent2share.domain.reference.EntityType;
+import gov.samhsa.consent2share.infrastructure.HashMapResultToProviderDtoConverter;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
@@ -34,7 +35,6 @@ import gov.samhsa.consent2share.service.dto.LegalRepresentativeDto;
 import gov.samhsa.consent2share.service.dto.LookupDto;
 import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
-import gov.samhsa.consent2share.service.dto.ProviderDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
 import gov.samhsa.consent2share.service.patient.PatientLegalRepresentativeAssociationService;
 import gov.samhsa.consent2share.service.patient.PatientService;
@@ -131,6 +131,9 @@ public class ProviderController {
 	
 	@Autowired
 	ProviderSearchLookupService providerSearchLookupService;
+	
+	@Autowired
+	HashMapResultToProviderDtoConverter hashMapResultToProviderDtoConverter;
 	
 	/** The logger. */
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -284,11 +287,10 @@ public class ProviderController {
 			String lastname=request.getParameter("lastname");
 			
 			if(providerSearchLookupService.isValidatedSearch(usstate,city,zipcode,gender,specialty,phone,firstname,lastname)==true)
-			{IOUtils.copy(
-					new ByteArrayInputStream(
-							providerSearchLookupService.providerSearch(usstate,city,zipcode,gender,specialty,phone,firstname,lastname).getBytes()), out);
-			out.flush();
-			out.close();
+			{
+				IOUtils.copy(new ByteArrayInputStream(providerSearchLookupService.providerSearch(usstate,city,zipcode,gender,specialty,phone,firstname,lastname).getBytes()), out);
+				out.flush();
+				out.close();
 			}
 
 		} catch (IOException e) {
@@ -314,7 +316,7 @@ public class ProviderController {
 	
 		if ((EntityType.valueOf(Result.get("entityType"))==EntityType.Organization)){
 			OrganizationalProviderDto providerDto=new OrganizationalProviderDto();
-			setProviderDto(providerDto,Result);
+			hashMapResultToProviderDtoConverter.setProviderDto(providerDto,Result);
 			providerDto.setOrgName(Result.get("providerOrganizationName"));
 			providerDto.setAuthorizedOfficialLastName(Result.get("authorizedOfficialLastName"));
 			providerDto.setAuthorizedOfficialFirstName(Result.get("authorizedOfficialFirstName"));
@@ -326,7 +328,7 @@ public class ProviderController {
 		}
 		else{
 			IndividualProviderDto providerDto=new IndividualProviderDto();
-			setProviderDto(providerDto,Result);
+			hashMapResultToProviderDtoConverter.setProviderDto(providerDto,Result);
 			providerDto.setFirstName(Result.get("providerFirstName"));
 			providerDto.setMiddleName(Result.get("providerMiddleName"));
 			providerDto.setLastName(Result.get("providerLastName"));
@@ -371,36 +373,4 @@ public class ProviderController {
 		model.addAttribute("stateCodes", stateCodeService.findAllStateCodes());
 	}
 	
-	/**
-	 * Sets the provider dto.
-	 *
-	 * @param providerDto the provider dto
-	 * @param Result the result
-	 * @return the provider dto
-	 */
-	private ProviderDto setProviderDto(ProviderDto providerDto, HashMap<String,String> Result){
-		providerDto.setNpi(Result.get("npi"));
-		providerDto.setEntityType(EntityType.valueOf(Result.get("entityType")));
-		providerDto.setFirstLineMailingAddress(Result.get("providerFirstLineBusinessMailingAddress"));
-		providerDto.setSecondLineMailingAddress(Result.get("providerSecondLineBusinessMailingAddress"));
-		providerDto.setMailingAddressCityName(Result.get("providerBusinessMailingAddressCityName"));
-		providerDto.setMailingAddressStateName(Result.get("providerBusinessMailingAddressStateName"));
-		providerDto.setMailingAddressPostalCode(Result.get("providerBusinessMailingAddressPostalCode"));
-		providerDto.setMailingAddressCountryCode(Result.get("providerBusinessMailingAddressCountryCode"));
-		providerDto.setMailingAddressTelephoneNumber(Result.get("providerBusinessMailingAddressTelephoneNumber"));
-		providerDto.setMailingAddressFaxNumber(Result.get("providerBusinessMailingAddressFaxNumber"));
-		providerDto.setFirstLinePracticeLocationAddress(Result.get("providerFirstLineBusinessPracticeLocationAddress"));
-		providerDto.setSecondLinePracticeLocationAddress(Result.get("providerSecondLineBusinessPracticeLocationAddress")); 
-		providerDto.setPracticeLocationAddressCityName(Result.get("providerBusinessPracticeLocationAddressCityName"));
-		providerDto.setPracticeLocationAddressStateName(Result.get("providerBusinessPracticeLocationAddressStateName"));
-		providerDto.setPracticeLocationAddressPostalCode(Result.get("providerBusinessPracticeLocationAddressPostalCode")); 
-		providerDto.setPracticeLocationAddressCountryCode(Result.get("providerBusinessPracticeLocationAddressCountryCode")); 
-		providerDto.setPracticeLocationAddressTelephoneNumber(Result.get("providerBusinessPracticeLocationAddressTelephoneNumber"));
-		providerDto.setPracticeLocationAddressFaxNumber(Result.get("providerBusinessPracticeLocationAddressFaxNumber"));
-		providerDto.setEnumerationDate(Result.get("providerEnumerationDate"));
-		providerDto.setLastUpdateDate(Result.get("lastUpdateDate"));
-		providerDto.setProviderTaxonomyCode(Result.get("healthcareProviderTaxonomyCode_1"));
-		providerDto.setProviderTaxonomyDescription(Result.get("healthcareProviderTaxonomy_1"));
-		return providerDto;
-	}
 }

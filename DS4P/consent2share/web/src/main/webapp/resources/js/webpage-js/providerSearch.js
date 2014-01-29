@@ -95,7 +95,7 @@ jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage )
 			var startPageLink = currentPage > halfLinkCnt ? Math.max( Math.min( currentPage-halfLinkCnt, pageCnt-lnkCnt4most), 0) : 0 ;
 			var endPageLink = currentPage > halfLinkCnt ? Math.min(currentPage+halfLinkCnt, pageCnt) : Math.min( lnkCnt4most, pageCnt );
 			
-			var pgClickHandler = function( pageNo ) {	return function( evt ) { return pageLinkClicked( pageNo, evt ); }	}
+			var pgClickHandler = function( pageNo ) {	return function( evt ) { return pageLinkClicked( pageNo, evt ); };	};
 			var addPageLink = function( pageNo, appendopts )
 			{
 				pageNo = pageNo<0 ? 0 : (pageNo<pageCnt?pageNo:pageCnt-1) ; 
@@ -109,7 +109,7 @@ jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage )
 					lnk.addClass( appendopts.classes );
 					
 				pageLinksBar.append( lnk );
-			}
+			};
 			
 			if( txt_prev && (currentPage > 0 ) )				// add "Previous" link
 				addPageLink( currentPage-1, {text:txt_prev, classes:"prev"} );
@@ -145,7 +145,7 @@ jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage )
 		buildPagingLinks();
         func2showPage( arrHtmlStr, currentPage, items_per_page );
 	});
-}
+};
 
 function lookup (){
 	    var providerSearchForm="";

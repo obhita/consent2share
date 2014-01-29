@@ -25,6 +25,15 @@
 		wsdlLocation="classpath:wsdl/Pep.wsdl" address="/PepService">
 		<jaxws:properties>
 			<entry key="mtom-enabled" value="true" />
+			
+          <!-- Use only if not using WS-SecureConversation -->
+          <entry key="ws-security.callback-handler" value="gov.samhsa.acs.pep.saml.ServiceKeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+          <!-- Use only if using WS-SecureConversation -->
+          <!--entry key="ws-security.callback-handler.sct" value="service.ServiceKeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties.sct" value="serviceKeystore.properties"/-->
+          <!-- Uncomment below element if Metro clients present -->
+          <!--entry key="ws-security.is-bsp-compliant" value="false"/-->			
 		</jaxws:properties>
 	</jaxws:endpoint>
 
@@ -151,6 +160,10 @@
 	
 	<!-- PDP -->
 	<!-- PDP: data - PolicyDecisionPointImplDataXdsb -->
+	<bean id="xacmlPolicyListFilter"
+		class="gov.samhsa.acs.contexthandler.XacmlPolicyListFilter"
+		scope="prototype" autowire="constructor">
+	</bean>
 	<bean id="policyDecisionPointImplDataXdsb"
 		class="gov.samhsa.acs.contexthandler.PolicyDecisionPointImplDataXdsb"
 		scope="prototype" autowire="constructor">
@@ -254,12 +267,23 @@
 	<bean id="policyEnforcementPointImpl"
 		class="gov.samhsa.acs.pep.PolicyEnforcementPointImpl"
 		scope="prototype" autowire="constructor">
-		<property name="patientId" value="#{parameterConfigProperties.patientId}" />
-		<property name="recepientSubjectNPI" value="#{parameterConfigProperties.recepientSubjectNPI}" />
-		<property name="intermediarySubjectNPI" value="#{parameterConfigProperties.intermediarySubjectNPI}" />
-		<property name="subjectPurposeOfUse" value="#{parameterConfigProperties.subjectPurposeOfUse}" />
-		<property name="homeCommunityId" value="#{parameterConfigProperties.domainId}" />
 	</bean>
+	
+	<bean id="webServiceContext"
+		class="org.apache.cxf.jaxws.context.WebServiceContextImpl"
+		scope="prototype">
+	</bean>
+	
+	<bean id="samlTokenParser"
+		class="gov.samhsa.acs.pep.saml.SamlTokenParser"
+		scope="prototype">
+	</bean>
+	
+	<bean id="samlTokenPrincipal"
+		class="org.apache.ws.security.SAMLTokenPrincipal"
+		scope="prototype">
+	</bean>
+	
 	<!-- PEP: pep-ws -->
 	<bean id="pepPortTypeImpl"
 		class="gov.samhsa.acs.pep.ws.PepPortTypeImpl"

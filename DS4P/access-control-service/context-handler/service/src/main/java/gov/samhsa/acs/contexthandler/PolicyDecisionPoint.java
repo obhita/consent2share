@@ -64,10 +64,15 @@ public interface PolicyDecisionPoint {
 	 *            the request
 	 * @param patientUniqueId
 	 *            the patient unique id
+	 * @param recipientSubjectNPI
+	 *            the recipient subject npi
+	 * @param intermediarySubjectNPI
+	 *            the intermediary subject npi
 	 * @return the xacml response
 	 */
 	public abstract XacmlResponse evaluateRequest(PDP pdp, RequestType request,
-			String patientUniqueId);
+			String patientUniqueId, String recipientSubjectNPI,
+			String intermediarySubjectNPI);
 
 	/**
 	 * Evaluate the request using the simplePDP and retrieve the response from
@@ -77,10 +82,15 @@ public interface PolicyDecisionPoint {
 	 *            the request
 	 * @param patientUniqueId
 	 *            the patient unique id
+	 * @param recipientSubjectNPI
+	 *            the recipient subject npi
+	 * @param intermediarySubjectNPI
+	 *            the intermediary subject npi
 	 * @return the xacml response
 	 */
 	public abstract XacmlResponse evaluateRequest(RequestType request,
-			String patientUniqueId);
+			String patientUniqueId, String recipientSubjectNPI,
+			String intermediarySubjectNPI);
 
 	/**
 	 * Evaluate the request using the simplePDP and retrieve the response from

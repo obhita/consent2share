@@ -29,6 +29,8 @@ import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProviderRepository;
+import gov.samhsa.consent2share.domain.provider.StaffOrganizationalProvider;
+import gov.samhsa.consent2share.domain.provider.StaffOrganizationalProviderRepository;
 import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
 
 import java.util.List;
@@ -57,6 +59,9 @@ public class OrganizationalProviderServiceImpl implements OrganizationalProvider
 	/** The organizational provider repository. */
 	@Autowired
     OrganizationalProviderRepository organizationalProviderRepository;
+	
+	@Autowired
+	StaffOrganizationalProviderRepository staffOrganizationalProviderRepository;
 
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.provider.OrganizationalProviderService#countAllOrganizationalProviders()
@@ -192,5 +197,10 @@ public class OrganizationalProviderServiceImpl implements OrganizationalProvider
 		
 		organizationalProviderRepository.save(organizationalProvider);
 		
+	}
+
+	@Override
+	public List<StaffOrganizationalProvider> findAllStaffOrganizationalProviders() {
+		return staffOrganizationalProviderRepository.findAll();
 	}
 }

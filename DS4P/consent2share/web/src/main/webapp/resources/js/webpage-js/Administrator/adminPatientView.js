@@ -125,15 +125,89 @@ $(document).ready(function(){
 	initAllDOBFields();
 	initOrigDataVals();
 	
-	//Bind event handlers:
+	$('.cmd-view-consent').click(function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var consentId = $(this).attr("value");
+		var link = "downloadPdf.html?consentId=" + consentId;
+		
+		window.open(link,'_newtab');
+		$('#consent_options_modal_' + consentId).modal('hide');
+	});
+	
+	$('.cmd-edit-consent').click(function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var consentId = $(this).attr("value");
+		var link = "adminPatientViewEditConsent.html?consentId=" + consentId;
+		
+		window.open(link,'_self');
+		$('#consent_options_modal_' + consentId).modal('hide');
+	});
+	
+	$('.cmd-submit-consent').click(function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var consentId = $(this).attr("value");
+		
+		$('#form_submit_consent_' + consentId).submit();
+		$('#consent_options_modal_' + consentId).modal('hide');
+	});
+	
+	$('.cmd-delete-consent').click(function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var consentId = $(this).attr("value");
+		
+		$('#form_delete_consent_' + consentId).submit();
+		$('#consent_options_modal_' + consentId).modal('hide');
+	});
+	
+/*	$('.cmd-revoke-consent').click(function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var consentId = $(this).attr("value");
+		
+		$('#form_revoke_consent_' + consentId).submit();
+		$('#consent_options_modal_' + consentId).modal('hide');
+	});*/
+	
+	$(".cmd-submit-revokation").click(function(){
+		var consentId = $(this).attr("value");
+		if(!($('#optionsRadio1_'+consentId).is(':checked')) && !($('#optionsRadio2_'+consentId).is(':checked'))){
+			alert ("Please select one option.");
+		}
+		else{
+			/*$("#consentRevokationForm").append('<input name="consentId" style="display: none;" hidden="true" value="'+consentRevokationId+'"/>');*/
+			/*$("#consentRevokationForm").submit();*/
+			$('#form_revoke_consent_' + consentId).submit();
+		}
+		
+	});
+	
+	$('.cmd-revoke-choice-consent').click(function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var consentId = $(this).attr("value");
+		
+		$('#consent_options_modal_' + consentId).modal('hide');
+		$('#consent_revoke_modal_' + consentId).modal();
+	});
+	
 	$('table#patient_consents_list > tbody > tr').click(function(e){
 		e.preventDefault();
 		e.stopPropagation();
-		consentId=$( this ).find("input").attr("value");
 		
-		var link='downloadPdf.html?consentId='+consentId;
-		window.open(link,'_newtab');
+		var consentId = $( this ).find("input[name='consentId']").attr("value");
+		$('#consent_options_modal_' + consentId).modal();
 	});
+
 	
 	//Bind hidden.bs.modal event handler to clear edit patient profile modal fields & error messages
 	$('#editPatient').on('hidden.bs.modal', function(){

@@ -26,6 +26,7 @@
 package gov.samhsa.consent2share.service.provider;
 
 import gov.samhsa.consent2share.domain.provider.IndividualProvider;
+import gov.samhsa.consent2share.domain.provider.StaffIndividualProvider;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
 
 import java.util.List;
@@ -35,7 +36,7 @@ import org.springframework.security.access.annotation.Secured;
 /**
  * The Interface IndividualProviderService.
  */
-@Secured("ROLE_USER")
+@Secured ({"ROLE_USER", "ROLE_ADMIN"})
 public interface IndividualProviderService {
 
 	/**
@@ -131,5 +132,7 @@ public interface IndividualProviderService {
 	 * @param individualProviderDto the individual provider dto
 	 */
 	public abstract void updateIndividualProvider(IndividualProviderDto individualProviderDto);
+	
+	public abstract List<StaffIndividualProvider> findAllStaffIndividualProviders();
 
 }

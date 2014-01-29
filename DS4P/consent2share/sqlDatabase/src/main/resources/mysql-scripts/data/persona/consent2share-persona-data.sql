@@ -23,7 +23,7 @@ insert into patient(username, first_name, last_name, birth_day, administrative_g
 values('albert.smith', 'Albert', 'Smith', '1983-02-19', 2, 'consent2share@outlook.com', 1,'5555555555','7175 Columbia Gateway Dr','columbia',22,'21246',1);
 insert into patient(username, first_name, last_name, birth_day, administrative_gender_code, email, version,telephone, street_address_line,city, state_code,postal_code,country_code)
 values('appscan', 'Adam', 'Smith', '1960-02-09', 2, 'consent2share@outlook.com', 1,'5555555555','7175 Columbia Gateway Dr','columbia',22,'21246',1);
-insert into provider_admin(username, first_name, last_name,administrative_gender_code, email, version,employeeid)
+insert into staff(username, first_name, last_name,administrative_gender_code, email, version,employeeid)
 values('consent2share.admin', 'Mary', 'Doe', 1, 'consent2share@outlook.com', 1, 'c2s77777');
 
 

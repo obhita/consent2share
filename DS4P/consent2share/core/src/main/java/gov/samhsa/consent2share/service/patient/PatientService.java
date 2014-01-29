@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.patient;
 
+import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.AddConsentOrganizationalProviderDto;
@@ -65,6 +66,14 @@ public interface PatientService {
 	 * @return the long
 	 */
 	Long findIdByUsername(String username);
+	
+	/**
+	 * Find username by id.
+	 *
+	 * @param id the id
+	 * @return the string
+	 */
+	String findUsernameById(long id);
 
 	/**
 	 * Find patient email by username.
@@ -158,4 +167,13 @@ public interface PatientService {
 	 * @return the list
 	 */
 	public List<RecentPatientDto> findRecentPatientDtosById(List<String> ids);
+
+
+	/**
+	 * Find by username.
+	 *
+	 * @param username the username
+	 * @return the patient profile dto
+	 */
+	PatientProfileDto findByUsername(String username);
 }
