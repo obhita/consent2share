@@ -29,5 +29,5 @@ package gov.samhsa.acs.brms.domain;
  * The Enum RefrainPolicy.
  */
 public enum RefrainPolicy {
-	NOAUTH, NODSCLCD, NOPERSIST, NORELINK, NOREUSE, NOVIP, ORCON
+	NOAUTH, NODSCLCD, NORDSCLCD, NOPERSIST, NORELINK, NOREUSE, NOVIP, ORCON
 }

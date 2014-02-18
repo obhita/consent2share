@@ -26,18 +26,21 @@
 package gov.samhsa.consent2share.web;
 
 import gov.samhsa.consent.ConsentGenException;
+import gov.samhsa.consent2share.domain.clinicaldata.ClinicalDocument;
 import gov.samhsa.consent2share.infrastructure.CodedConceptLookupService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
+import gov.samhsa.consent2share.service.clinicaldata.ClinicalDocumentService;
 import gov.samhsa.consent2share.service.consent.ConsentService;
 import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 import gov.samhsa.consent2share.service.dto.AbstractPdfDto;
 import gov.samhsa.consent2share.service.dto.AddConsentFieldsDto;
-import gov.samhsa.consent2share.service.dto.AddConsentOrganizationalProviderDto;
-import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
-import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
+import gov.samhsa.consent2share.service.dto.AddConsentOrganizationalProviderDto;
+import gov.samhsa.consent2share.service.dto.ClinicalDocumentDto;
+import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
+import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
@@ -56,14 +59,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -76,6 +84,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.xml.sax.SAXException;
 
 /**
  * The Class ConsentController.
@@ -100,6 +110,10 @@ public class ConsentController {
 	@Autowired
 	private ClinicalDocumentTypeCodeService clinicalDocumentTypeCodeService;
 
+	/** The clinical document type code service. */
+	@Autowired
+	private ClinicalDocumentService clinicalDocumentService;
+	
 	/** The hippa space coded concept lookup service. */
 	@Autowired
 	private CodedConceptLookupService hippaSpaceCodedConceptLookupService;
@@ -133,6 +147,9 @@ public class ConsentController {
 
 	/** The logger. */
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	public final String C32_DOC_CODE = "34133-9";
+	private Properties properties;
 
 	/**
 	 * Sign consent.
@@ -260,7 +277,7 @@ public class ConsentController {
 				long consentId = Long.parseLong(consentIdString);
 				for (ConsentListDto consentListDto : consentListDtos) {
 					if (consentListDto.getId() == consentId
-							&& consentListDto.getRevokeStage().equals("CONSENT_SIGNED"))
+							&& consentListDto.getRevokeStage().equals("REVOCATION_REVOKED"))
 						isSigned = true;
 				}
 			}
@@ -382,6 +399,8 @@ public class ConsentController {
 			Calendar today = Calendar.getInstance();
 			Calendar oneYearFromNow = Calendar.getInstance();
 			oneYearFromNow.add(Calendar.YEAR, 1);
+			
+			populateLookupCodes(model);
 	
 			List<AddConsentFieldsDto> sensitivityPolicyDto = sensitivityPolicyCodeService
 					.findAllSensitivityPolicyCodesAddConsentFieldsDto();
@@ -667,6 +686,84 @@ public class ConsentController {
 			return null;
 		}
 		return "views/resourceNotFound";
+	}
+	
+	/**
+	 * Return list of C32 documents patient uploaded
+	 * 
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @param consentId
+	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "tryMyPolicyLookupC32Documents/{consentId}", method = RequestMethod.GET)
+	public @ResponseBody List<ClinicalDocumentDto> tryMyPolicyLookupC32Documents(Model model, HttpServletRequest request,
+			HttpServletResponse response, @PathVariable("consentId") Long consentId) throws IOException {
+		
+		AuthenticatedUser currentUser = userContext.getCurrentUser();
+		Long patientId = patientService.findIdByUsername(currentUser
+				.getUsername());
+		
+		List<ClinicalDocument> clinicalDocuments = clinicalDocumentService.findByPatientId(patientId);
+		List<ClinicalDocumentDto> c32Documents = new ArrayList<ClinicalDocumentDto>();
+		
+		for (int i = 0; i < clinicalDocuments.size(); i++) {
+			
+			// return c32 documents only
+			if (clinicalDocuments.get(i).getClinicalDocumentTypeCode().getCode().equals(C32_DOC_CODE)) {
+				ClinicalDocumentDto dto = new ClinicalDocumentDto();
+				dto.setId(clinicalDocuments.get(i).getId());
+				dto.setFilename(clinicalDocuments.get(i).getFilename());
+				
+				c32Documents.add(dto);
+			}
+		}
+
+	    return c32Documents;
+	}
+	
+	/**
+	 * Return tagged C32 transformed wtih xslt
+	 * 
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @param consentId
+	 * @param c32Id
+	 * @return
+	 * @throws ConsentGenException
+	 * @throws IOException
+	 * @throws TransformerConfigurationException
+	 * @throws TransformerException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 */
+	@RequestMapping(value = "tryMyPolicyApply/consentId/{consentId}/c32Id/{c32Id}", method = RequestMethod.GET)
+	public @ResponseBody String tryMyPolicyApply(Model model, HttpServletRequest request,
+			HttpServletResponse response, @PathVariable("consentId") Long consentId, @PathVariable("c32Id") Long c32Id) throws ConsentGenException, IOException, TransformerConfigurationException, TransformerException, ParserConfigurationException, SAXException {
+		
+		//String c32Id = request.getParameter("c32Id");
+		//Long consentId = Long.parseLong(request.getParameter("consentId"));
+		
+		System.out.println("Consent id: " + consentId);
+		System.out.println("C32 id: " + c32Id);
+		
+		// move to service
+		ClinicalDocument document = clinicalDocumentService.findClinicalDocument(c32Id);
+		
+		String originalC32 = new String(document.getContent());
+		
+		// get tagged c32 
+		String taggedC32xml = consentService.getTaggedC32(originalC32, consentId);
+		
+		//response.setContentType("text/xml");
+		response.setContentType("application/xml");
+		
+	    System.out.println("tagged c32: " + taggedC32xml);
+	    
+		return taggedC32xml;
 	}
 	
 	/**

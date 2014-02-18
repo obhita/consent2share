@@ -3,9 +3,11 @@ package gov.samhsa.acs.contexthandler;
 import static org.junit.Assert.assertEquals;
 
 import gov.samhsa.acs.common.dto.XacmlRequest;
+import gov.samhsa.acs.common.dto.XacmlResponse;
 import gov.samhsa.acs.contexthandler.PolicyDecisionPointImpl;
-import gov.samhsa.acs.contexthandler.PolicyDecisionPointImplData;
+import gov.samhsa.acs.contexthandler.PolicyProvider;
 import gov.samhsa.acs.contexthandler.RequestGenerator;
+import gov.samhsa.consent2share.commonunit.io.ResourceFileReader;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -44,13 +46,13 @@ public class PolicyDecisionPointImplTest {
 	private PolicyDecisionPointImpl pdp;
 	private PDP simplePDP;
 	@Mock
-	private PolicyDecisionPointImplData data;
+	private PolicyProvider policyProvider;
 	@Mock
 	private RequestGenerator requestGeneratorMock;
 
 	@Before
 	public void setUp() throws Exception {
-		pdp = new PolicyDecisionPointImpl(data, requestGeneratorMock);
+		pdp = new PolicyDecisionPointImpl(policyProvider, requestGeneratorMock);
 		simplePDP = SimplePDPFactory.getSimplePDP();
 		try {
 			InputStream is = new FileInputStream(
@@ -221,8 +223,44 @@ public class PolicyDecisionPointImplTest {
 	@Test
 	public void testGetPolicies() {
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
-		when(data.getPolicies("1", "", "")).thenReturn(policies);
+		when(policyProvider.getPolicies("1", "", "")).thenReturn(policies);
 		assertEquals(pdp.getPolicies("1", "", ""), policies);
+	}
+
+	@Test
+	public void testEvaluatePolicyForTrying_Given_Correct_Policy_Successds() {
+		// Arrange
+		PolicyDecisionPointImpl thePdp = new PolicyDecisionPointImpl(null, new RequestGenerator());
+		
+		// Read policy file from resource
+		final String policyFileUri = "xacmlPolicyForTrying.xml";
+		String xacmlPolicy = ResourceFileReader
+				.getStringFromResourceFile(policyFileUri);
+		
+		// Act
+		XacmlResponse xacmlResponse =  thePdp.evaluatePolicyForTrying(xacmlPolicy).getXacmlResponse();
+		
+		// Assert
+		assertEquals(xacmlResponse.getPdpDecision().toLowerCase(), "permit");
+		assertEquals(xacmlResponse.getPdpObligation().size(), 11);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testEvaluatePolicyForTrying_Given_Null_XacmlPolicy_Throws_Exception() {
+		// Arrange
+		String xacmlPolicy = null;
+		
+		// Act
+		pdp.evaluatePolicyForTrying(xacmlPolicy);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testEvaluatePolicyForTrying_Given_Empty_XacmlPolicy_Throws_Exception() {
+		// Arrange
+		String xacmlPolicy = " ";
+		
+		// Act
+		pdp.evaluatePolicyForTrying(xacmlPolicy);
 	}
 
 }

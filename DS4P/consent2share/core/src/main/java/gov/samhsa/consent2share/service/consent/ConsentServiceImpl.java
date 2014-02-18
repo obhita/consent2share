@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.consent;
 
+import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.ConsentDoNotShareClinicalDocumentSectionTypeCode;
@@ -41,6 +42,7 @@ import gov.samhsa.consent2share.domain.consent.SignedPDFConsent;
 import gov.samhsa.consent2share.domain.consent.SignedPDFConsentRevocation;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
+import gov.samhsa.consent2share.domain.provider.AbstractProvider;
 import gov.samhsa.consent2share.domain.provider.IndividualProvider;
 import gov.samhsa.consent2share.domain.provider.IndividualProviderRepository;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
@@ -56,7 +58,7 @@ import gov.samhsa.consent2share.domain.reference.SensitivityPolicyCode;
 import gov.samhsa.consent2share.domain.reference.SensitivityPolicyCodeRepository;
 import gov.samhsa.consent2share.infrastructure.ConsentRevokationPdfGenerator;
 import gov.samhsa.consent2share.infrastructure.EchoSignSignatureService;
-import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
+import gov.samhsa.consent2share.infrastructure.TryPolicyService;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 import gov.samhsa.consent2share.service.dto.AbstractPdfDto;
@@ -66,21 +68,55 @@ import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -141,6 +177,10 @@ public class ConsentServiceImpl implements ConsentService {
 	/** The consent export service. */
 	@Autowired
 	private ConsentExportService consentExportService;
+	
+	/**	Try policy service */
+	@Autowired
+	private TryPolicyService tryPolicyService;
 	
 	/** The logger. */
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -554,7 +594,11 @@ public class ConsentServiceImpl implements ConsentService {
     public void saveConsent(ConsentDto consentDto) throws ConsentGenException {
 	Consent consent = makeConsent();
 	Patient patient = patientRepository.findByUsername(consentDto.getUsername());
-
+	Map<String, AbstractProvider> providerMap=new HashMap<String, AbstractProvider>();
+	for (IndividualProvider o:patient.getIndividualProviders())
+		providerMap.put(o.getNpi(),o);
+	for (OrganizationalProvider o:patient.getOrganizationalProviders())
+		providerMap.put(o.getNpi(), o);
 	if (consentDto.getId() != null && consentDto.getId().longValue() > 0)
 	    consent = consentRepository.findOne(consentDto.getId());
 
@@ -562,7 +606,7 @@ public class ConsentServiceImpl implements ConsentService {
 	if (consentDto.getProvidersDisclosureIsMadeTo() != null) {
 	    Set<ConsentIndividualProviderDisclosureIsMadeTo> providersDisclosureIsMadeTo = new HashSet<ConsentIndividualProviderDisclosureIsMadeTo>();
 	    for (String item : consentDto.getProvidersDisclosureIsMadeTo()) {
-		IndividualProvider individualProvider = individualProviderRepository.findByPatientAndNpi(patient, item);
+		IndividualProvider individualProvider = (IndividualProvider) providerMap.get(item);
 		ConsentIndividualProviderDisclosureIsMadeTo consentIndividualProviderPermittedToDisclose = new ConsentIndividualProviderDisclosureIsMadeTo(
 			individualProvider);
 		providersDisclosureIsMadeTo.add(consentIndividualProviderPermittedToDisclose);
@@ -574,7 +618,7 @@ public class ConsentServiceImpl implements ConsentService {
 	if (consentDto.getProvidersPermittedToDisclose() != null) {
 	    Set<ConsentIndividualProviderPermittedToDisclose> providersPermittedToDisclose = new HashSet<ConsentIndividualProviderPermittedToDisclose>();
 	    for (String item : consentDto.getProvidersPermittedToDisclose()) {
-		IndividualProvider individualProvider = individualProviderRepository.findByPatientAndNpi(patient, item);
+		IndividualProvider individualProvider = (IndividualProvider) providerMap.get(item);
 		ConsentIndividualProviderPermittedToDisclose consentIndividualProviderPermittedToDisclose = new ConsentIndividualProviderPermittedToDisclose(
 			individualProvider);
 		providersPermittedToDisclose.add(consentIndividualProviderPermittedToDisclose);
@@ -587,8 +631,7 @@ public class ConsentServiceImpl implements ConsentService {
 	if (consentDto.getOrganizationalProvidersDisclosureIsMadeTo() != null) {
 	    Set<ConsentOrganizationalProviderDisclosureIsMadeTo> organizationalProvidersDisclosureIsMadeTo = new HashSet<ConsentOrganizationalProviderDisclosureIsMadeTo>();
 	    for (String item : consentDto.getOrganizationalProvidersDisclosureIsMadeTo()) {
-		OrganizationalProvider organizationalProvider = organizationalProviderRepository.findByPatientAndNpi(
-			patient, item);
+		OrganizationalProvider organizationalProvider = (OrganizationalProvider) providerMap.get(item);
 		ConsentOrganizationalProviderDisclosureIsMadeTo consentOrganizationalProviderPermittedToDisclose = new ConsentOrganizationalProviderDisclosureIsMadeTo(
 			organizationalProvider);
 		organizationalProvidersDisclosureIsMadeTo.add(consentOrganizationalProviderPermittedToDisclose);
@@ -601,8 +644,7 @@ public class ConsentServiceImpl implements ConsentService {
 	if (consentDto.getOrganizationalProvidersPermittedToDisclose() != null) {
 	    Set<ConsentOrganizationalProviderPermittedToDisclose> organizationalProvidersPermittedToDisclose = new HashSet<ConsentOrganizationalProviderPermittedToDisclose>();
 	    for (String item : consentDto.getOrganizationalProvidersPermittedToDisclose()) {
-		OrganizationalProvider organizationalProvider = organizationalProviderRepository.findByPatientAndNpi(
-			patient, item);
+		OrganizationalProvider organizationalProvider = (OrganizationalProvider) providerMap.get(item);
 		ConsentOrganizationalProviderPermittedToDisclose consentOrganizationalProviderPermittedToDisclose = new ConsentOrganizationalProviderPermittedToDisclose(
 			organizationalProvider);
 		organizationalProvidersPermittedToDisclose.add(consentOrganizationalProviderPermittedToDisclose);
@@ -932,5 +974,203 @@ public class ConsentServiceImpl implements ConsentService {
 		return consentPdfDto;
 		
 	}
+	
+
+	/**
+	 * Return tagged c32. Entry tags that have been removed in segmented c32 were tagged and returned 
+	 * 
+	 * @param originalC32
+	 * @param segmentedC32
+	 * @return
+	 */
+	public String getTaggedC32(String originalC32,
+			Long consentId) {
+		
+		// get segmented doc
+		String segmentedC32 = tryPolicyService.tryPolicy(originalC32, consentId);
+		
+		List<String> originalC32Ids = new ArrayList<String>();
+		List<String> segmentedC32Ids = new ArrayList<String>();
+		List<String> taggedC32Ids = new ArrayList<String>();
+		
+		StringWriter writer = null;
+		ByteArrayOutputStream byteArrayOutputStream = null;
+		
+		try {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setValidating(false);
+		final DocumentBuilder db = dbf.newDocumentBuilder();
+
+		Document taggedC32Doc = db.parse(new InputSource(new ByteArrayInputStream(originalC32.getBytes("utf-8"))));
+		changeXslPath(taggedC32Doc);
+		NodeList taggedC32List = taggedC32Doc.getElementsByTagName("entry");
+		
+		Document segmentedC32Doc = db.parse(new InputSource(new ByteArrayInputStream(segmentedC32.getBytes("utf-8"))));
+		NodeList segmentedC32List = segmentedC32Doc.getElementsByTagName("entry");
+		
+		originalC32Ids = getIds(taggedC32List);
+		segmentedC32Ids = getIds(segmentedC32List);
+		
+		taggedC32Ids = getIdsToTag(originalC32Ids, segmentedC32Ids);
+		
+		tagC32Document(taggedC32List, taggedC32Ids);
+		
+		logger.info("Tagged C32 Entry size: " + taggedC32List.getLength());
+		logger.info("Segmented C32 Entry size: " + segmentedC32List.getLength());
+
+		logger.info("Original C32: " + originalC32);
+		logger.info("Segmented C32: " + segmentedC32);;
+		
+		// write the content into xml file
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = transformerFactory.newTransformer();
+		DOMSource source = new DOMSource(taggedC32Doc);
+		writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+		
+		transformer.transform(source, result);
+		logger.info("Printing tagged file: " + writer.toString());
+				
+		// xslt transformation
+		
+		TransformerFactory tFactory = TransformerFactory.newInstance();
+		InputStream is = Thread.currentThread()
+				.getContextClassLoader().getResourceAsStream("CDA_flag_redact.xsl");
+		StreamSource styleSource = new StreamSource(is);
+		Transformer transformer1 = tFactory.newTransformer(styleSource);
+		
+		byteArrayOutputStream = new ByteArrayOutputStream();
+		transformer1.transform(new DOMSource(taggedC32Doc), new StreamResult(byteArrayOutputStream));
+		logger.info("Printing transformed xslt: " + byteArrayOutputStream.toString());
+
+		} catch (ParserConfigurationException e) {
+			throw new DS4PException(e.toString(), e);
+		} catch (UnsupportedEncodingException e) {
+			throw new DS4PException(e.toString(), e);
+		} catch (SAXException e) {
+			throw new DS4PException(e.toString(), e);
+		} catch (IOException e) {
+			throw new DS4PException(e.toString(), e);
+		} catch (TransformerConfigurationException e) {
+			throw new DS4PException(e.toString(), e);
+		} catch (TransformerException e) {
+			throw new DS4PException(e.toString(), e);
+		}
+		
+		return byteArrayOutputStream.toString();
+	}
+	
+	
+	/**
+	 * Changes xsl path to local xsl
+	 * 
+	 * @param taggedC32Doc
+	 */
+	private void changeXslPath(Document taggedC32Doc) {
+		
+		Element root = taggedC32Doc.getDocumentElement();
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		String expression = "/processing-instruction('xml-stylesheet')";
+		ProcessingInstruction pi = null;
+		try {
+			pi = (ProcessingInstruction)xpath.evaluate(expression, taggedC32Doc, XPathConstants.NODE);
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		pi.setData("type='text/xsl' href='CDA_flag_redact.xsl'");
+		
+		StringWriter writer = null;
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = null;
+		try {
+			transformer = transformerFactory.newTransformer();
+			
+			DOMSource source = new DOMSource(taggedC32Doc);
+			writer = new StringWriter();
+	        StreamResult result = new StreamResult(writer);
+	        
+			transformer.transform(source, result);
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	public List<String> getIds(NodeList c32List) {
+		List<String> listOfIdsInC32 = new ArrayList<String>();
+		
+		for (int i = 0; i < c32List.getLength(); i++) {
+
+			NodeList childNodes = c32List.item(i).getChildNodes();
+			
+		    for (int childIndex = 0; childIndex < childNodes.getLength(); childIndex++) {
+		        Node childNode = childNodes.item(childIndex);
+
+		        if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+		        	
+		            NodeList grandChildNodeList = childNode.getChildNodes();
+		            
+		            for (int grandChildIndex = 0; grandChildIndex < grandChildNodeList.getLength(); grandChildIndex++) {
+				        Node grandChildNode = grandChildNodeList.item(grandChildIndex);
+		            	
+		            	if (grandChildNode.getNodeName().equalsIgnoreCase("ID")) {
+
+		            		listOfIdsInC32.add(grandChildNode.getAttributes().getNamedItem("root").getNodeValue());
+		            	}
+		            }
+		        }
+		    }
+		}
+		return listOfIdsInC32;
+	}
+	
+	public List<String> getIdsToTag(List<String> originalC32Ids,
+			List<String> segmentedC32Ids) {
+		List<String> idsToTag = new ArrayList<String>();
+
+		for (int i = 0; i < originalC32Ids.size(); i++) {
+			if (!segmentedC32Ids.contains(originalC32Ids.get(i))) {
+				idsToTag.add(originalC32Ids.get(i));
+			}
+		}
+
+		return idsToTag;
+	}
+	
+	public void tagC32Document(NodeList taggedC32List, List<String> taggedC32Ids) {
+		
+		for (int i = 0; i < taggedC32List.getLength(); i++) {
+			Element elementToAddAttribute = (Element) taggedC32List.item(i);
+
+			NodeList childNodes = taggedC32List.item(i).getChildNodes();
+			
+		    for (int childIndex = 0; childIndex < childNodes.getLength(); childIndex++) {
+		        Node childNode = childNodes.item(childIndex);
+
+		        if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+		            NodeList grandChildNodeList = childNode.getChildNodes();
+		            
+		            for (int grandChildIndex = 0; grandChildIndex < grandChildNodeList.getLength(); grandChildIndex++) {
+				        Node grandChildNode = grandChildNodeList.item(grandChildIndex);
+		            	
+		            	if (grandChildNode.getNodeName().equalsIgnoreCase("ID")) {
+	            		
+		            		// tag c32 by adding redact attribute to ids that were segmented
+		            		if (taggedC32Ids.contains(grandChildNode.getAttributes().getNamedItem("root").getNodeValue())) {
+		            			logger.info("Match!");
+		            			elementToAddAttribute.setAttribute("redact", "redact");
+		            		}
+		            	}
+		            }
+		        }
+		    }
+		}
+	}
+
 
 }

@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>document-segmentation</artifactId>
-		<version>0.2.0-SNAPSHOT</version>
+		<version>0.3.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>document-segmentation-service</artifactId>
@@ -49,6 +49,10 @@
 		</dependency>
 
 		<!-- Testing -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
 
 		<!-- Web stack-specific dependencies that are internally needed by the 
 			Endpoint object as it exposes a web service -->

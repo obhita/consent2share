@@ -11,7 +11,7 @@ public class SeleniumIntegrationTest {
 	private Selenium selenium;
 	 @Before
 	 public void setUp() throws Exception {
-	  selenium = new DefaultSelenium("localhost", 4444, "*firefox", "https://localhost:8443/");
+	  selenium = new DefaultSelenium("localhost", 4444, "*firefox", "https://localhost:8444/");
 	  selenium.start();
 	 }
 	

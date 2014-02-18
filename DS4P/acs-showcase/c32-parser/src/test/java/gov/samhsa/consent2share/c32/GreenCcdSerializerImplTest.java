@@ -1,6 +1,7 @@
 package gov.samhsa.consent2share.c32;
 
 import gov.samhsa.consent2share.c32.dto.GreenCCD;
+import gov.samhsa.consent2share.commonunit.io.ResourceFileReader;
 
 import org.junit.Assert;
 import org.junit.Test;

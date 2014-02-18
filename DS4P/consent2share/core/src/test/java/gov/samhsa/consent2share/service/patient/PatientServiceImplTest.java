@@ -497,4 +497,16 @@ public class PatientServiceImplTest {
 		when(modelMapper.map(patient2, PatientAdminDto.class)).thenReturn(patientAdminDto2);
 		assertEquals(Arrays.asList(patientAdminDto,patientAdminDto2),sut.findAllPatientByFirstNameAndLastName(new String[] {"john", "smith"}));
 	}
+	
+	@Test
+	public void testFindPatientConnectionByUsername(){
+		Patient patient=mock(Patient.class);
+		when(patientRepository.findByUsername(anyString())).thenReturn(patient);
+	}
+	
+	@Test
+	public void testFindPatientConnectionById(){
+		Patient patient=mock(Patient.class);
+		when(patientRepository.findOne(anyLong())).thenReturn(patient);
+	}
 }

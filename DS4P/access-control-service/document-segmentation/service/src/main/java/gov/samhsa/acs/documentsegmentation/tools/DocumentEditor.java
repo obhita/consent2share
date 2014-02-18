@@ -35,7 +35,12 @@ import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+/**
+ * The Interface DocumentEditor.
+ */
 public interface DocumentEditor {
 
 	/**
@@ -105,4 +110,32 @@ public interface DocumentEditor {
 			String recipientEmailAddress, XacmlResult xacmlResult,
 			String executionResponseContainer, byte[] maskingKeyBytes,
 			byte[] encryptionKeyBytes) throws Exception, IOException;
+
+	/**
+	 * Gets the node list.
+	 * 
+	 * @param xmlDocument
+	 *            the xml document
+	 * @param xPathExprDisplayName
+	 *            the x path expr display name
+	 * @return the node list
+	 * @throws XPathExpressionException
+	 *             the x path expression exception
+	 */
+	public abstract NodeList getNodeList(Document xmlDocument,
+			String xPathExprDisplayName) throws XPathExpressionException;
+
+	/**
+	 * Gets the node.
+	 * 
+	 * @param xmlDocument
+	 *            the xml document
+	 * @param xPathExprDisplayName
+	 *            the x path expr display name
+	 * @return the node
+	 * @throws XPathExpressionException
+	 *             the x path expression exception
+	 */
+	public abstract Node getNode(Document xmlDocument,
+			String xPathExprDisplayName) throws XPathExpressionException;
 }

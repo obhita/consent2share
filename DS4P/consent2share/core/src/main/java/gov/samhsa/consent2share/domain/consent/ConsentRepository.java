@@ -62,7 +62,7 @@ public interface ConsentRepository extends JpaSpecificationExecutor<Consent>,
 	 * @param signStatus the sign status
 	 * @return the list
 	 */
-	List<Consent> findBySignedPdfConsentDocumentSignedStatus(String signStatus);
+	List<Consent> findAllBySignedPdfConsentDocumentSignedStatus(String signStatus);
 	
 	/**
 	 * Find by signed pdf consent revoke document signed status.
@@ -70,7 +70,7 @@ public interface ConsentRepository extends JpaSpecificationExecutor<Consent>,
 	 * @param signStatus the sign status
 	 * @return the list
 	 */
-	List<Consent> findBySignedPdfConsentRevokeDocumentSignedStatus(String signStatus);
+	List<Consent> findAllBySignedPdfConsentRevokeDocumentSignedStatus(String signStatus);
 	
 	/**
 	 * Find by signed pdf consent revoke document signed status not.

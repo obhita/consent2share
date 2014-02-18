@@ -234,9 +234,50 @@
 				<div id="page-subcontent-holder" class="col-sm-9 col-md-10">
 					<div class="row">
 
-						<!-- COMPONENT: Notifications -->
-
+					<!-- GRID: Start Notifications -->
 						<div class="box">
+							<div class="box-header">
+								<h2>
+									<span class="fa fa-inbox"></span><span class="break"></span>Notifications
+								</h2>
+							</div>
+							<div class="box-content">
+								<table class="table table-striped table-hover">
+									  <thead>
+										  <tr>
+											  <th></th>
+											  <th>Message</th>
+											  <th>Created</th>										                                            
+										  </tr>
+									  </thead>   
+									  <tbody>
+	<!-- 									<tr> -->
+	<!-- 										<td class="center"> <span class="fa fa-bell-o"></span></td> -->
+	<!-- 										<td>Your consent has been revoked.</td> -->
+	<!-- 										<td class="center">2012/01/01</td>										                                      -->
+	<!-- 									</tr> -->
+	<!-- 									<tr> -->
+	<!-- 										<td class="center"><span class="fa fa-flag"></span></td> -->
+	<!-- 										<td>Your consent is ready to be signed.</td> -->
+	<!-- 										<td class="center">2012/01/01</td>									                                    -->
+	<!-- 									</tr> -->
+										   <tr th:each="systemNotificationDto : ${systemNotificationDtos}">
+										        <td th:switch="${systemNotificationDto.notificationType}"> 
+										        <span th:case="'consent_needs_signing'"> <span class="fa fa-flag" style="color: #038CD2;"></span></span>
+									        	<span th:case="'consent_revoke_needs_signing'"> <span class="fa fa-flag" style="color: #038CD2;"></span></span>
+										        <span th:case="*"> <span class="fa fa-check" style="color: #468847;"></span></span>
+										        </td>
+									      		<td	th:text="${systemNotificationDto.notificationMessage}">notificationMessage</td>
+									      		<td class="center" th:text="${systemNotificationDto.sendDate==null}? '' : *{#dates.format((systemNotificationDto.sendDate), 'MM/dd/yyyy')}">01/01/2012</td>
+									      </tr>															   
+									  </tbody>
+								 </table>  
+							</div>
+						</div>
+					<!-- GRID: End Notifications -->
+					
+					<!-- COMPONENT: Notifications -->
+				<!--	<div class="box">
 							<div class="box-header">
 								<h2>
 									<span class="glyphicon glyphicon-inbox"></span><span class="break"></span>Notifications
@@ -265,7 +306,7 @@
 										<div style="margin-left: 30px; font-weight: normal;"><em>Welcome Albert Smith! Log in to begin using your Consent2Share.</em></div></span></li>
 								</ul>
 							</div>
-						</div>
+						</div> -->
 
 			<!-- COMPONENT: Education -->				
 		

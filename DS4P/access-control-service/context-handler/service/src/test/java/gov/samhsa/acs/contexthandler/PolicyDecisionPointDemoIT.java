@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import gov.samhsa.acs.common.dto.XacmlResponse;
 import gov.samhsa.acs.contexthandler.PolicyDecisionPoint;
 import gov.samhsa.acs.contexthandler.PolicyDecisionPointImpl;
-import gov.samhsa.acs.contexthandler.PolicyDecisionPointImplData;
+import gov.samhsa.acs.contexthandler.PolicyProvider;
 import gov.samhsa.acs.contexthandler.RequestGenerator;
 
 import java.io.BufferedReader;
@@ -38,7 +38,7 @@ public class PolicyDecisionPointDemoIT {
 	private RequestType request;
 	private PolicyDecisionPoint pdp;
 	@Mock
-	private PolicyDecisionPointImplData dataMock;
+	private PolicyProvider dataMock;
 	@Mock
 	private RequestGenerator requestGeneratorMock;
 

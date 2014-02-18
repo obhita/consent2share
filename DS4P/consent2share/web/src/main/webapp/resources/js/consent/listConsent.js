@@ -37,14 +37,7 @@ function initConsentPresignStatusChecker (sign_revoke_arys) {
 				async:true, 
 				data: {consentPreSignList:sign_revoke_arys.consentPreSignList,
 					consentPreRevokeList:sign_revoke_arys.consentPreRevokeList},
-				beforeSend : function(){
-					valueInterval=valueInterval+1;
-			        if(valueInterval==100)
-			        {
-			        	window.location.replace("../resources/j_spring_security_logout");
-			        }
-			    },
-				
+						
 				success: function (result) { 
 				
 					if(result.trim()=="true")
@@ -64,7 +57,7 @@ function initRevokeModalListeners() {
 	
 	$("#signRevokation").click(function(){
 		if(!($("#optionsRadio1").is(':checked')) && !($("#optionsRadio2").is(':checked'))){
-			alert ("Please select one option.");
+			window.alert("Please select one option.");
 		}
 		else{
 			$("#consentRevokationForm").append('<input name="consentId" style="display: none;" hidden="true" value="'+consentRevokationId+'"/>');
@@ -84,11 +77,11 @@ function initListConsent(sign_revoke_arys) {
 	initSessionTimeoutChecker();
 	
 	$('.consent-entry-input').each(function(){
-		if($(this).data('consentstage')==1){
+		if($(this).data('consentstage')=="CONSENT_SUBMITTED"){
 			sign_revoke_arys.consentPreSignList.push($(this).val());
 		}
 		
-		if($(this).data('revokestage')==1){
+		if($(this).data('revokestage')=="REVOCATION_SUBMITTED"){
 			sign_revoke_arys.consentPreRevokeList.push($(this).val());
 		}
 	});
@@ -98,6 +91,73 @@ function initListConsent(sign_revoke_arys) {
 };
 
 
+function loadTryMyPolicy(consentId) {
+	// TODO (AO): add spinner
+	var tryMyPocilyurl = "tryMyPolicyLookupC32Documents/"+consentId; 
+	$.ajax({
+		url: tryMyPocilyurl,
+		type:"GET",
+		traditional: true,
+		async:true, 
+		data: {consentId: consentId},
+		success: function (data) { 
+			$("#tryMyPolicy_c32Docs").empty();
+			$("#applyMyPolicyForm").append("<input id='consentId' type='hidden' name='consentId' value='" + consentId + "' />");
+			$.each(data, function(index, element) {
+				$("#tryMyPolicy_c32Docs").append('<option value='+element.id+' name="c32Id">'+element.filename+'</option>');
 
+	        });
+		}
+	});
+}
 
+$('#tryMyPolicyApplyButton').click(function(){
 
+    var consentId = $('#consentId').val();
+
+    var c32Id = $("#tryMyPolicy_c32Docs").val();
+
+	var url = "tryMyPolicyApply/consentId/" + consentId + "/c32Id/" + c32Id;
+	window.open(url);
+});
+
+$("#applyMyPolicyForm").submit(function() {
+
+    var url = "tryMyPolicyApply"; // the script where you handle the form input.
+    
+//    var jqxhr = $.ajax({
+//           type: "POST",
+//           url: url,
+//           data: $("#applyMyPolicyForm").serialize(), // serializes the form's elements.
+//           success: function(data)
+//           {
+//        	   window.alert("SUCCESS");
+//               //window.alert("PASS: " + data);
+//               
+//               //var win=window.open('about:blank');
+//               //with(win.document)
+//               //{
+//                 //open();
+//                 //write(data);
+//                 //close();
+//              // }
+//               
+//               //window.open('data:text/xml,' + encodeURIComponent(data) );
+//               
+//              // var win=window.open('Try My Policy');
+//             // $(win.document.body).html(data);
+//           },
+//           error: function(e){
+//        	   window.alert("ERROR: " + e.responseText);
+//           }
+//         });
+    
+//    jqxhr.always(function(){
+//    	window.alert("JQXHR TRIGGER");
+//    	
+//    	window.alert(jqxhr.responseXML);
+//    	
+//    });
+
+    return false; // avoid to execute the actual submit of the form.
+});

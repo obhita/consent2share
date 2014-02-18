@@ -29,6 +29,7 @@ import gov.samhsa.consent2share.domain.clinicaldata.ClinicalDocument;
 import gov.samhsa.consent2share.domain.clinicaldata.ClinicalDocumentRepository;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
+import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCode;
 import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCodeRepository;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
@@ -119,10 +120,10 @@ public class ClinicalDocumentServiceImpl implements ClinicalDocumentService {
 	}
 
 	/**
-	 * Gets the clinical documen from dto.
+	 * Gets the clinical document from dto.
 	 *
 	 * @param clinicalDocumentDto the clinical document dto
-	 * @return the clinical documen from dto
+	 * @return the clinical document from dto
 	 */
 	private ClinicalDocument getClinicalDocumenFromDto(
 			ClinicalDocumentDto clinicalDocumentDto) {
@@ -206,7 +207,14 @@ public class ClinicalDocumentServiceImpl implements ClinicalDocumentService {
 	public List<ClinicalDocument> findByPatient(Patient patient) {
 		return clinicalDocumentRepository.findByPatientId(patient.getId());
 	}
-
+	
+	/**
+	 * Find clinical documents by patient Id
+	 */
+	public List<ClinicalDocument> findByPatientId(long patientId) {
+		return clinicalDocumentRepository.findByPatientId(patientId);
+	}
+	
 	/**
 	 * Find dto by patient.
 	 *

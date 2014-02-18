@@ -221,7 +221,7 @@ public class PepImpl implements Pep {
 					recipientEmailAddress, UUID.randomUUID().toString());
 			EnforcePolicy.Xsparesource xsparesource = setXspaResource(patientId);
 
-			result = contextHandler.enforcePolicy(xspasubject, xsparesource);
+			result = null;
 		} catch (Exception e) {
 			throw new DS4PException(e.toString(), e);
 		}
@@ -631,9 +631,8 @@ public class PepImpl implements Pep {
 			retrieveDocumentSetRequest.getDocumentRequest()
 					.add(documentRequest);
 
-			result = contextHandler.enforcePolicy(
-					enforcePolicy.getXspasubject(),
-					enforcePolicy.getXsparesource());
+			// TODO: Remove this class after checking
+			result = null;
 
 			if (result.getPdpDecision().equals(PERMIT)) {
 
@@ -758,9 +757,7 @@ public class PepImpl implements Pep {
 		Return enforcePolicyResult = null;
 		try {
 
-			enforcePolicyResult = contextHandler.enforcePolicy(
-					enforcePolicy.getXspasubject(),
-					enforcePolicy.getXsparesource());
+			enforcePolicyResult = null;
 
 			// verify identify of the individual and return decision
 			if (enforcePolicyResult.getPdpDecision().equals(PERMIT)) {

@@ -25,11 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.acs.contexthandler;
 
+import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
-import gov.va.ehtac.ds4p.ws.EnforcePolicyResponse.Return;
-import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xspasubject;
-import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource;
 
 /**
  * The Interface ContextHandler.
@@ -39,17 +37,10 @@ public interface ContextHandler {
 	/**
 	 * Enforce policy.
 	 *
-	 * @param xspasubject the XSPASUBJECT
-	 * @param xsparesource the XSPARESOURCE
-	 * @return the result of the enforce policy request
-	 */
-	public Return enforcePolicy(Xspasubject xspasubject, Xsparesource xsparesource);
-	
-	/**
-	 * Enforce policy.
-	 *
 	 * @param xacmlRequest the xacml request
 	 * @return the xacml response
 	 */
 	public XacmlResponse enforcePolicy(XacmlRequest xacmlRequest);
+	
+	public PdpRequestResponse makeDecisionForTryingPolicy(String xacmlPolicy);
 }

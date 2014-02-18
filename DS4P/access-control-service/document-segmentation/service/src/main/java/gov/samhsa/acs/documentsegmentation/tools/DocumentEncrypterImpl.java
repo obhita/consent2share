@@ -25,11 +25,12 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.tools;
 
-import gov.samhsa.acs.common.bean.RuleExecutionContainer;
+import gov.samhsa.acs.brms.domain.ObligationPolicyDocument;
+import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
+import gov.samhsa.acs.brms.domain.RuleExecutionResponse;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.common.util.EncryptTool;
-import gov.va.ds4p.cas.RuleExecutionResponse;
 
 import java.security.Key;
 
@@ -87,7 +88,7 @@ public class DocumentEncrypterImpl implements DocumentEncrypter {
 
 		for (RuleExecutionResponse response : ruleExecutionContainer
 				.getExecutionResponseList()) {
-			if (response.getDocumentObligationPolicy().equals("ENCRYPT")) {
+			if (response.getDocumentObligationPolicy().equals(ObligationPolicyDocument.ENCRYPT)) {
 				encryptDoc = true;
 				break;
 			}

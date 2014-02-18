@@ -12,6 +12,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
+import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
@@ -27,6 +29,7 @@ import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentRespo
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,9 +48,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import static org.mockito.Matchers.argThat;
 
 public class PolicyEnforcementPointImplTest {
 
@@ -114,7 +119,8 @@ public class PolicyEnforcementPointImplTest {
 		retrieveDocumentSetRequest = simpleMarshaller.unmarshallFromXml(
 				RetrieveDocumentSetRequest.class,
 				retrieveDocumentSetRequestString);
-		retrieveDocumentSetResponseString = fileReader.readFile("testRetrieveDocumentSetResponse.xml");
+		retrieveDocumentSetResponseString = fileReader
+				.readFile("testRetrieveDocumentSetResponse.xml");
 		retrieveDocumentSetResponse = simpleMarshaller.unmarshallFromXml(
 				RetrieveDocumentSetResponse.class,
 				retrieveDocumentSetResponseString);
@@ -132,7 +138,8 @@ public class PolicyEnforcementPointImplTest {
 	public void tearDown() throws Exception {
 	}
 
-	//TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing
+	// TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for
+	// testing
 	@Ignore("TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing")
 	@Test
 	public void testRegistryStoredQuery() throws Throwable {
@@ -157,330 +164,347 @@ public class PolicyEnforcementPointImplTest {
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
 				.thenReturn(
-						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");		
+						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
-				.thenReturn(
-						"1114252178");	
+				.thenReturn("1114252178");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
-				.thenReturn(
-						"TREAT");	
+				.thenReturn("TREAT");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
-				.thenReturn(
-						"1760717789");	
-		
+				.thenReturn("1760717789");
+
 		// Act
 		AdhocQueryResponse response = pep.registryStoredQuery(adhocQuery);
 
 		// Assert
 		assertEquals(adhocQueryResponse, response);
 	}
-	
+
 	@Test
-	public void testRegistryStoredQueryWhenAdhocQueryRequestValidationFails() throws Throwable {
-		PolicyEnforcementPointImpl sut=spy(pep);
-		AdhocQueryResponse errorResponse=mock(AdhocQueryResponse.class);
-		when(xdsbErrorFactory.errorAdhocQueryResponseMissingParameters()).thenReturn(errorResponse);
+	public void testRegistryStoredQueryWhenAdhocQueryRequestValidationFails()
+			throws Throwable {
+		PolicyEnforcementPointImpl sut = spy(pep);
+		AdhocQueryResponse errorResponse = mock(AdhocQueryResponse.class);
+		when(xdsbErrorFactory.errorAdhocQueryResponseMissingParameters())
+				.thenReturn(errorResponse);
 		doReturn(false).when(sut).validateAdhocQueryRequest(adhocQuery);
-		
+
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
 				.thenReturn(
-						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");		
+						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
-				.thenReturn(
-						"1114252178");	
+				.thenReturn("1114252178");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
-				.thenReturn(
-						"TREAT");	
+				.thenReturn("TREAT");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
-				.thenReturn(
-						"1760717789");	
-		
+				.thenReturn("1760717789");
+
 		// Act
 		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
-		
+
 		// Assert
 		assertEquals(errorResponse, response);
 	}
-	
+
 	@Test
-	public void testRegistryStoredQueryWhenFormatCodeCheckFails() throws Throwable {
-		PolicyEnforcementPointImpl sut=spy(pep);
-		AdhocQueryResponse errorResponse=mock(AdhocQueryResponse.class);
-		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn("NonEqualCode");
-		when(xdsbErrorFactory.errorAdhocQueryResponseUnsupportedFormatCode("NonEqualCode")).thenReturn(errorResponse);
+	public void testRegistryStoredQueryWhenFormatCodeCheckFails()
+			throws Throwable {
+		PolicyEnforcementPointImpl sut = spy(pep);
+		AdhocQueryResponse errorResponse = mock(AdhocQueryResponse.class);
+		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(
+				"NonEqualCode");
+		when(
+				xdsbErrorFactory
+						.errorAdhocQueryResponseUnsupportedFormatCode("NonEqualCode"))
+				.thenReturn(errorResponse);
 		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
-		
+
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
 				.thenReturn(
-						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");		
+						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
-				.thenReturn(
-						"1114252178");	
+				.thenReturn("1114252178");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
-				.thenReturn(
-						"TREAT");	
+				.thenReturn("TREAT");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
-				.thenReturn(
-						"1760717789");	
-		
-		// Act
-		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
-		// Assert
-		assertEquals(errorResponse, response);
-	}
-	
-	@Test
-	public void testRegistryStoredQueryWhenResponseOptionReturnTypeCheckFails() throws Throwable {
-		PolicyEnforcementPointImpl sut=spy(pep);
-		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
-		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(formatCode)
-		.thenReturn(formatCode);
-		AdhocQueryResponse errorResponse=mock(AdhocQueryResponse.class);
-		when(xdsbRegistry.extractResponseOptionReturnType(adhocQuery)).thenReturn("NonEqualCode");
-		when(xdsbErrorFactory.errorAdhocQueryResponseUnsupportedResponseOptionType(anyString())).thenReturn(errorResponse);
-		
-		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
-				.thenReturn(
-						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");		
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
-				.thenReturn(
-						"1114252178");	
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
-				.thenReturn(
-						"TREAT");	
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
-				.thenReturn(
-						"1760717789");	
-		
-		
-		// Act
-		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
-		// Assert
-		assertEquals(errorResponse, response);
-	}
-	
-	@Test
-	public void testRegistryStoredQueryWhenPatientUniqueIdCheckFails() throws Throwable {
-		PolicyEnforcementPointImpl sut=spy(pep);
-		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
-		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(formatCode)
-		.thenReturn(formatCode);
-		AdhocQueryResponse errorResponse=mock(AdhocQueryResponse.class);
-		when(xdsbRegistry.extractResponseOptionReturnType(adhocQuery)).thenReturn(responseOptionType);
-		when(xdsbRegistry.extractPatientId(adhocQuery)).thenReturn("uniqueID");
-		when(xdsbRegistry.getPatientUniqueId(anyString(),anyString())).thenReturn("anotherID");
-		when(xdsbErrorFactory.errorAdhocQueryResponseInconsistentPatientUniqueId(anyString(), anyString())).thenReturn(errorResponse);
-		
-		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
-				.thenReturn(
-						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");		
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
-				.thenReturn(
-						"1114252178");	
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
-				.thenReturn(
-						"TREAT");	
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
-				.thenReturn(
-						"1760717789");	
-		
-		
-		// Act
-		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
-		// Assert
-		assertEquals(errorResponse, response);
-	}
-	
-	//TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing
-	@Ignore("TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing")
-	@Test
-	public void testRegistryStoredQueryWhenXacmlPolicyCheckFails() throws Throwable {
-		PolicyEnforcementPointImpl sut=spy(pep);
-		XacmlRequest xacmlRequest=mock(XacmlRequest.class);
-		//doReturn(xacmlRequest).when(sut).setXacmlRequest();
-		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
-		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(formatCode)
-		.thenReturn(formatCode);
-		AdhocQueryResponse errorResponse=mock(AdhocQueryResponse.class);
-		when(xdsbRegistry.extractResponseOptionReturnType(adhocQuery)).thenReturn(responseOptionType);
-		when(xdsbRegistry.extractPatientId(adhocQuery)).thenReturn("uniqueID");
-		when(xdsbRegistry.getPatientUniqueId(anyString(),anyString())).thenReturn("uniqueID");
-		when(xdsbErrorFactory.errorAdhocQueryResponseAccessDeniedByPDP()).thenReturn(errorResponse);
-		XacmlResponse denyResponse=mock(XacmlResponse.class);
-		when(denyResponse.getPdpDecision()).thenReturn("DENY");
-		when(contextHandler.enforcePolicy(any(XacmlRequest.class))).thenReturn(denyResponse);
-		
-		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
-				.thenReturn(
-						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");		
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
-				.thenReturn(
-						"1114252178");	
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
-				.thenReturn(
-						"TREAT");	
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
-				.thenReturn(
-						"1760717789");	
-		
-		// Act
-		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
-		// Assert
-		assertEquals(errorResponse, response);
-	}
-	
-	//TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing
-	@Ignore("TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing")
-	@Test
-	public void testRegistryStoredQueryWhenRegistryStoredQueryThrowsException() throws Throwable {
-		PolicyEnforcementPointImpl sut=spy(pep);
-		XacmlRequest xacmlRequest=mock(XacmlRequest.class);
-		//doReturn(xacmlRequest).when(sut).setXacmlRequest();
-		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
-		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(formatCode)
-		.thenReturn(formatCode);
-		AdhocQueryResponse errorResponse=mock(AdhocQueryResponse.class);
-		when(xdsbRegistry.extractResponseOptionReturnType(adhocQuery)).thenReturn(responseOptionType);
-		when(xdsbRegistry.extractPatientId(adhocQuery)).thenReturn("uniqueID");
-		when(xdsbRegistry.getPatientUniqueId(anyString(),anyString())).thenReturn("uniqueID");
-		when(xdsbErrorFactory.errorAdhocQueryResponseRegistryNotAvailable()).thenReturn(errorResponse);
-		XacmlResponse denyResponse=mock(XacmlResponse.class);
-		when(denyResponse.getPdpDecision()).thenReturn("PERMIT");
-		when(contextHandler.enforcePolicy(any(XacmlRequest.class))).thenReturn(denyResponse);
-		
-		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
-				.thenReturn(
-						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");		
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
-				.thenReturn(
-						"1114252178");	
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
-				.thenReturn(
-						"TREAT");	
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
-				.thenReturn(
-						"1760717789");	
-		
-		doThrow(new Exception()).when(xdsbRegistry).registryStoredQuery(any(AdhocQueryRequest.class), anyString());
-		// Act
-		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
-		// Assert
-		assertEquals(errorResponse, response);
-	}
-	
-	//TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing
-	@Ignore("TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing")
-	@Test
-	public void testRegistryStoredQueryWhenIdentifiableIsNull() throws Throwable {
-		PolicyEnforcementPointImpl sut=spy(pep);
-		XacmlRequest xacmlRequest=mock(XacmlRequest.class);
-		//doReturn(xacmlRequest).when(sut).setXacmlRequest();
-		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
-		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(formatCode)
-		.thenReturn(formatCode);
-		AdhocQueryResponse errorResponse=mock(AdhocQueryResponse.class);
-		when(xdsbRegistry.extractResponseOptionReturnType(adhocQuery)).thenReturn(responseOptionType);
-		when(xdsbRegistry.extractPatientId(adhocQuery)).thenReturn("uniqueID");
-		when(xdsbRegistry.getPatientUniqueId(anyString(),anyString())).thenReturn("uniqueID");
-		when(xdsbErrorFactory.errorAdhocQueryResponseNoDocumentsFound(anyString(), anyString())).thenReturn(errorResponse);
-		XacmlResponse denyResponse=mock(XacmlResponse.class);
-		when(denyResponse.getPdpDecision()).thenReturn("PERMIT");
-		when(contextHandler.enforcePolicy(any(XacmlRequest.class))).thenReturn(denyResponse);
-		AdhocQueryResponse mockResponse=mock(AdhocQueryResponse.class);
-		when(xdsbRegistry.registryStoredQuery(adhocQuery,intermediarySubjectNPI)).thenReturn(mockResponse);
-		RegistryObjectListType registryObjectListType=mock(RegistryObjectListType.class);
-		when(mockResponse.getRegistryObjectList()).thenReturn(registryObjectListType);
-		when(registryObjectListType.getIdentifiable()).thenReturn(null);
-		
-		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
-				.thenReturn(
-						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");		
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
-				.thenReturn(
-						"1114252178");	
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
-				.thenReturn(
-						"TREAT");	
-		when(
-				samlTokenParser.parse(samlTokenPrincipal.getToken(),
-						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
-				.thenReturn(
-						"1760717789");	
-		
+				.thenReturn("1760717789");
+
 		// Act
 		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
 		// Assert
 		assertEquals(errorResponse, response);
 	}
 
-	//TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing
+	@Test
+	public void testRegistryStoredQueryWhenResponseOptionReturnTypeCheckFails()
+			throws Throwable {
+		PolicyEnforcementPointImpl sut = spy(pep);
+		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
+		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(formatCode)
+				.thenReturn(formatCode);
+		AdhocQueryResponse errorResponse = mock(AdhocQueryResponse.class);
+		when(xdsbRegistry.extractResponseOptionReturnType(adhocQuery))
+				.thenReturn("NonEqualCode");
+		when(
+				xdsbErrorFactory
+						.errorAdhocQueryResponseUnsupportedResponseOptionType(anyString()))
+				.thenReturn(errorResponse);
+
+		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
+				.thenReturn(
+						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
+				.thenReturn("1114252178");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
+				.thenReturn("TREAT");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
+				.thenReturn("1760717789");
+
+		// Act
+		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
+		// Assert
+		assertEquals(errorResponse, response);
+	}
+
+	@Test
+	public void testRegistryStoredQueryWhenPatientUniqueIdCheckFails()
+			throws Throwable {
+		PolicyEnforcementPointImpl sut = spy(pep);
+		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
+		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(formatCode)
+				.thenReturn(formatCode);
+		AdhocQueryResponse errorResponse = mock(AdhocQueryResponse.class);
+		when(xdsbRegistry.extractResponseOptionReturnType(adhocQuery))
+				.thenReturn(responseOptionType);
+		when(xdsbRegistry.extractPatientId(adhocQuery)).thenReturn("uniqueID");
+		when(xdsbRegistry.getPatientUniqueId(anyString(), anyString()))
+				.thenReturn("anotherID");
+		when(
+				xdsbErrorFactory
+						.errorAdhocQueryResponseInconsistentPatientUniqueId(
+								anyString(), anyString())).thenReturn(
+				errorResponse);
+
+		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
+				.thenReturn(
+						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
+				.thenReturn("1114252178");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
+				.thenReturn("TREAT");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
+				.thenReturn("1760717789");
+
+		// Act
+		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
+		// Assert
+		assertEquals(errorResponse, response);
+	}
+
+	// TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for
+	// testing
+	@Ignore("TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing")
+	@Test
+	public void testRegistryStoredQueryWhenXacmlPolicyCheckFails()
+			throws Throwable {
+		PolicyEnforcementPointImpl sut = spy(pep);
+		XacmlRequest xacmlRequest = mock(XacmlRequest.class);
+		// doReturn(xacmlRequest).when(sut).setXacmlRequest();
+		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
+		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(formatCode)
+				.thenReturn(formatCode);
+		AdhocQueryResponse errorResponse = mock(AdhocQueryResponse.class);
+		when(xdsbRegistry.extractResponseOptionReturnType(adhocQuery))
+				.thenReturn(responseOptionType);
+		when(xdsbRegistry.extractPatientId(adhocQuery)).thenReturn("uniqueID");
+		when(xdsbRegistry.getPatientUniqueId(anyString(), anyString()))
+				.thenReturn("uniqueID");
+		when(xdsbErrorFactory.errorAdhocQueryResponseAccessDeniedByPDP())
+				.thenReturn(errorResponse);
+		XacmlResponse denyResponse = mock(XacmlResponse.class);
+		when(denyResponse.getPdpDecision()).thenReturn("DENY");
+		when(contextHandler.enforcePolicy(any(XacmlRequest.class))).thenReturn(
+				denyResponse);
+
+		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
+				.thenReturn(
+						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
+				.thenReturn("1114252178");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
+				.thenReturn("TREAT");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
+				.thenReturn("1760717789");
+
+		// Act
+		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
+		// Assert
+		assertEquals(errorResponse, response);
+	}
+
+	// TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for
+	// testing
+	@Ignore("TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing")
+	@Test
+	public void testRegistryStoredQueryWhenRegistryStoredQueryThrowsException()
+			throws Throwable {
+		PolicyEnforcementPointImpl sut = spy(pep);
+		XacmlRequest xacmlRequest = mock(XacmlRequest.class);
+		// doReturn(xacmlRequest).when(sut).setXacmlRequest();
+		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
+		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(formatCode)
+				.thenReturn(formatCode);
+		AdhocQueryResponse errorResponse = mock(AdhocQueryResponse.class);
+		when(xdsbRegistry.extractResponseOptionReturnType(adhocQuery))
+				.thenReturn(responseOptionType);
+		when(xdsbRegistry.extractPatientId(adhocQuery)).thenReturn("uniqueID");
+		when(xdsbRegistry.getPatientUniqueId(anyString(), anyString()))
+				.thenReturn("uniqueID");
+		when(xdsbErrorFactory.errorAdhocQueryResponseRegistryNotAvailable())
+				.thenReturn(errorResponse);
+		XacmlResponse denyResponse = mock(XacmlResponse.class);
+		when(denyResponse.getPdpDecision()).thenReturn("PERMIT");
+		when(contextHandler.enforcePolicy(any(XacmlRequest.class))).thenReturn(
+				denyResponse);
+
+		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
+				.thenReturn(
+						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
+				.thenReturn("1114252178");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
+				.thenReturn("TREAT");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
+				.thenReturn("1760717789");
+
+		doThrow(new Exception()).when(xdsbRegistry).registryStoredQuery(
+				any(AdhocQueryRequest.class), anyString());
+		// Act
+		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
+		// Assert
+		assertEquals(errorResponse, response);
+	}
+
+	// TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for
+	// testing
+	@Ignore("TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing")
+	@Test
+	public void testRegistryStoredQueryWhenIdentifiableIsNull()
+			throws Throwable {
+		PolicyEnforcementPointImpl sut = spy(pep);
+		XacmlRequest xacmlRequest = mock(XacmlRequest.class);
+		// doReturn(xacmlRequest).when(sut).setXacmlRequest();
+		doReturn(true).when(sut).validateAdhocQueryRequest(adhocQuery);
+		when(xdsbRegistry.extractFormatCode(adhocQuery)).thenReturn(formatCode)
+				.thenReturn(formatCode);
+		AdhocQueryResponse errorResponse = mock(AdhocQueryResponse.class);
+		when(xdsbRegistry.extractResponseOptionReturnType(adhocQuery))
+				.thenReturn(responseOptionType);
+		when(xdsbRegistry.extractPatientId(adhocQuery)).thenReturn("uniqueID");
+		when(xdsbRegistry.getPatientUniqueId(anyString(), anyString()))
+				.thenReturn("uniqueID");
+		when(
+				xdsbErrorFactory.errorAdhocQueryResponseNoDocumentsFound(
+						anyString(), anyString())).thenReturn(errorResponse);
+		XacmlResponse denyResponse = mock(XacmlResponse.class);
+		when(denyResponse.getPdpDecision()).thenReturn("PERMIT");
+		when(contextHandler.enforcePolicy(any(XacmlRequest.class))).thenReturn(
+				denyResponse);
+		AdhocQueryResponse mockResponse = mock(AdhocQueryResponse.class);
+		when(
+				xdsbRegistry.registryStoredQuery(adhocQuery,
+						intermediarySubjectNPI)).thenReturn(mockResponse);
+		RegistryObjectListType registryObjectListType = mock(RegistryObjectListType.class);
+		when(mockResponse.getRegistryObjectList()).thenReturn(
+				registryObjectListType);
+		when(registryObjectListType.getIdentifiable()).thenReturn(null);
+
+		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
+				.thenReturn(
+						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
+				.thenReturn("1114252178");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
+				.thenReturn("TREAT");
+		when(
+				samlTokenParser.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
+				.thenReturn("1760717789");
+
+		// Act
+		AdhocQueryResponse response = sut.registryStoredQuery(adhocQuery);
+		// Assert
+		assertEquals(errorResponse, response);
+	}
+
+	// TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for
+	// testing
 	@Ignore("TODO: Refactor PolicyEnforcementPoint to inject SAML attributes for testing")
 	@Test
 	public void testRetrieveDocumentSet() throws Throwable {
@@ -505,22 +529,19 @@ public class PolicyEnforcementPointImplTest {
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:resource:resource-id"))
 				.thenReturn(
-						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");		
+						"d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"))
-				.thenReturn(
-						"1114252178");	
+				.thenReturn("1114252178");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse"))
-				.thenReturn(
-						"TREAT");	
+				.thenReturn("TREAT");
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
 						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"))
-				.thenReturn(
-						"1760717789");			
+				.thenReturn("1760717789");
 
 		// Act
 		RetrieveDocumentSetResponse response = pep
@@ -533,10 +554,68 @@ public class PolicyEnforcementPointImplTest {
 				response.getDocumentResponse().get(1).getDocument()));
 	}
 
-	//TODO: Create test case when directEmailSend is implemented
-	@Ignore("Not yet implemented")
 	@Test
-	public void testDirectEmailSend() {
-		fail("Not yet implemented");
+	public void testTryPolicy() throws Throwable {
+		// Arrange
+		String c32Xml = "c32Xml";
+		String xacmlPolicy = "xacmlPolicy";
+		PdpRequestResponse pdpRequestResponse = mock(PdpRequestResponse.class);
+		XacmlRequest xacmlRequest = mock(XacmlRequest.class);
+		XacmlResponse xacmlResponse = mock(XacmlResponse.class);
+		when(xacmlResponse.getPdpObligation()).thenReturn(new ArrayList<String>());
+		when(contextHandler.makeDecisionForTryingPolicy(xacmlPolicy))
+				.thenReturn(pdpRequestResponse);
+		when(pdpRequestResponse.getXacmlRequest()).thenReturn(xacmlRequest);
+		when(pdpRequestResponse.getXacmlResponse()).thenReturn(xacmlResponse);
+		String enforcementPolicies = "String enforcementPolicies";
+		// when(marshaller.marshall(isA(XacmlResult.class))).thenReturn(enforcementPolicies);
+		when(
+				marshaller
+						.marshall(argThat(new IsXacmlResultWithCorrectProperties(
+								xacmlRequest, xacmlResponse)))).thenReturn(
+				enforcementPolicies);
+		SegmentDocumentResponse segmentDocumentResponse = mock(SegmentDocumentResponse.class);
+		String segmentedC32 = "segmentedC32";
+		when(segmentDocumentResponse.getMaskedDocument()).thenReturn(
+				segmentedC32);
+
+		when(
+				documentSegmentation.segmentDocument(c32Xml,
+						enforcementPolicies, false, false, "", "", "UniquId"))
+				.thenReturn(segmentDocumentResponse);
+
+		// Act
+		String result = pep.tryPolicy(c32Xml, xacmlPolicy);
+
+		// Assert
+		assertEquals("Not return expected result", segmentedC32, result);
+	}
+
+	private class IsXacmlResultWithCorrectProperties extends
+			ArgumentMatcher<XacmlResult> {
+		private XacmlRequest xacmlRequest;
+		private XacmlResponse xacmlResponse;
+
+		public IsXacmlResultWithCorrectProperties(XacmlRequest xacmlRequest,
+				XacmlResponse xacmlResponse) {
+			this.xacmlRequest = xacmlRequest;
+			this.xacmlResponse = xacmlResponse;
+		}
+
+		@Override
+		public boolean matches(Object argument) {
+			XacmlResult xacmlResult = (XacmlResult) argument;
+			if (xacmlResult.getHomeCommunityId() == xacmlRequest
+					.getHomeCommunityId()
+					&& xacmlResult.getSubjectPurposeOfUse() == xacmlRequest
+							.getPatientUniqueId()
+					&& xacmlResult.getPdpDecision() == xacmlResponse
+							.getPdpDecision()
+					&& xacmlResult.getPdpObligations() == xacmlResponse
+							.getPdpObligation()) {
+				return true;
+			}
+			return false;
+		}
 	}
 }

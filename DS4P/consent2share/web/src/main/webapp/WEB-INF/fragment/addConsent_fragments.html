@@ -97,7 +97,7 @@
 
 														<div id="authorize-list" class="modal_checkbox_list">
 															<!-- adding new consent -->
-															<div th:if="${addConsent}">
+															<div id="authorize-list-container" th:if="${addConsent}">
 																<div
 																	th:each="individualProvider:${individualProvidersDto}">
 																	<label for="inidividualProvider"
@@ -135,7 +135,7 @@
 															</div>
 
 															<!-- editing existing consent -->
-															<div th:if="${!addConsent}">
+															<div id="authorize-list-container" th:if="${!addConsent}">
 																<div
 																	th:each="individualProvider:${individualProvidersDto}">
 																	<label for="inidividualProvider"
@@ -214,6 +214,114 @@
 							</div>
 
 							<!-- AUTHORIZE MODAL - END -->
+							
+							
+							<!-- FAVORITE PROVIDERS MODAL (ADMIN/STAFF ONLY) - START -->
+							<div th:if="${isProviderAdminUser}" id="selectFavorites-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selectFavorites-modal_label" aria-hidden="true">
+							  <div class="modal-dialog">
+							    <div class="modal-content">
+							      <div class="modal-header">
+							        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							        <h4 class="modal-title" id="selectFavorites-modal_label">Staff Favorite Providers</h4>
+							      </div>
+							      <div class="modal-body">
+							        <div>
+											<div>
+												<label style="margin-left: -20px" for="favorite-select-list">Select the favorite
+													individual(s) and/or organization(s) to add to patient's contacts:</label>
+												<div id="favorite-select-list" class="modal_checkbox_list">
+													<div id="favorite-list-container">
+														<div th:each="favoriteIndividualProvider:${favoriteIndividualProviders}" th:with="crd_provider_name=${favoriteIndividualProvider.lastName+', '+favoriteIndividualProvider.firstName}, crd_provider_npi=${favoriteIndividualProvider.npi}, crd_provider_specialty=${favoriteIndividualProvider.providerTaxonomyDescription}, crd_provider_phone=${favoriteIndividualProvider.practiceLocationAddressTelephoneNumber}, crd_provider_firstLinePracticeLocationAddress=${favoriteIndividualProvider.firstLinePracticeLocationAddress}, crd_provider_practiceLocationAddressCityName=${favoriteIndividualProvider.practiceLocationAddressCityName}, crd_provider_practiceLocationAddressStateName=${favoriteIndividualProvider.practiceLocationAddressStateName}, crd_provider_practiceLocationAddressPostalCode=${favoriteIndividualProvider.practiceLocationAddressPostalCode}, crd_provider_id=${favoriteIndividualProvider.id}, crd_provider_type='IND'">
+									                		<div th:substituteby="fragment/provider_card_fragments :: providerCardFragment_favorites" class="provider_record_space">
+									                			<div class="provider_record_box">
+																	<div class="provider_record_header">
+																		<p class="result_row">
+																			<span class="result_field provider_name_field" th:text="${crd_provider_name}">Healthcare Provider Name</span>
+																			<span class="result_field" th:text="'[NPI: '+${crd_provider_npi}+']'">[NPI: 0123456789]</span>
+																			<span class="favorite"><span class="favorite-false"></span></span>
+																		</p>
+																		<p class="result_row add_button_space">
+																			<span class="result_field"><button class="btn btn-xs btn-danger"><span class="fa fa-minus fa-white"></span></button></span>Remove this Provider.
+																		</p>
+																	</div>
+																	<p class="result_row"><span class="result_field provider_specialty_field" th:text="${crd_provider_specialty}">Provider Specialty Field</span></p>
+																	<input type="hidden" th:id="'prov-address-input-NPI'+${crd_provider_npi}" class="prov-address-input" th:attr="data-npi=${crd_provider_npi},data-streetaddress=${crd_provider_firstLinePracticeLocationAddress},data-city=${crd_provider_practiceLocationAddressCityName},data-state=${crd_provider_practiceLocationAddressStateName},data-zip=${crd_provider_practiceLocationAddressPostalCode}" />
+																	<p class="result_row"><span th:id="'prov-address-display-NPI'+${crd_provider_npi}" class="result_field prov-address-display">123 Main Street, Anytown, MD 12345-1234</span></p>
+																	<p class="result_row"><span th:id="'crd-prov-phone-display-NPI'+${crd_provider_npi}" class="result_field prov-phone-display" th:text="${crd_provider_phone}">(800) 888-8888</span></p>
+																</div>
+									                		</div>                			               			
+									                	</div>
+									                	
+									                	<div th:each="favoriteOrganizationalProvider:${favoriteOrganizationalProviders}" th:with="crd_provider_name=${favoriteOrganizationalProvider.orgName}, crd_provider_npi=${favoriteOrganizationalProvider.npi}, crd_provider_specialty=${favoriteOrganizationalProvider.providerTaxonomyDescription}, crd_provider_phone=${favoriteOrganizationalProvider.practiceLocationAddressTelephoneNumber}, crd_provider_firstLinePracticeLocationAddress=${favoriteOrganizationalProvider.firstLinePracticeLocationAddress}, crd_provider_practiceLocationAddressCityName=${favoriteOrganizationalProvider.practiceLocationAddressCityName}, crd_provider_practiceLocationAddressStateName=${favoriteOrganizationalProvider.practiceLocationAddressStateName}, crd_provider_practiceLocationAddressPostalCode=${favoriteOrganizationalProvider.practiceLocationAddressPostalCode}, crd_provider_id=${favoriteOrganizationalProvider.id}, crd_provider_type='ORG'">
+									                		<div th:substituteby="fragment/provider_card_fragments :: providerCardFragment_favorites" class="provider_record_space">
+									                			<div class="provider_record_box">
+																	<div class="provider_record_header">
+																		<p class="result_row">
+																			<span class="result_field provider_name_field" th:text="${crd_provider_name}">Healthcare Provider Name</span>
+																			<span class="result_field" th:text="'[NPI: '+${crd_provider_npi}+']'">[NPI: 0123456789]</span>
+																			<span class="favorite"><span class="favorite-false"></span></span>
+																		</p>
+																		<p class="result_row add_button_space">
+																			<span class="result_field"><button class="btn btn-xs btn-danger"><span class="fa fa-minus fa-white"></span></button></span>Remove this Provider.
+																		</p>
+																	</div>
+																	<p class="result_row"><span class="result_field provider_specialty_field" th:text="${crd_provider_specialty}">Provider Specialty Field</span></p>
+																	<input type="hidden" th:id="'prov-address-input-NPI'+${crd_provider_npi}" class="prov-address-input" th:attr="data-npi=${crd_provider_npi},data-streetaddress=${crd_provider_firstLinePracticeLocationAddress},data-city=${crd_provider_practiceLocationAddressCityName},data-state=${crd_provider_practiceLocationAddressStateName},data-zip=${crd_provider_practiceLocationAddressPostalCode}" />
+																	<p class="result_row"><span th:id="'prov-address-display-NPI'+${crd_provider_npi}" class="result_field prov-address-display">123 Main Street, Anytown, MD 12345-1234</span></p>
+																	<p class="result_row"><span th:id="'crd-prov-phone-display-NPI'+${crd_provider_npi}" class="result_field prov-phone-display" th:text="${crd_provider_phone}">(800) 888-8888</span></p>
+																</div>
+									                		</div>                			               			
+									                	</div>
+													
+														<!--
+														<div
+															th:each="favoriteIndividualProvider:${favoriteIndividualProviders}">
+															<label for="favoriteInidividualProvider"
+																th:for="'fav-ind-'+${favoriteIndividualProvider.npi}" class="">
+																<input class="favProvList fav-IND-provList" id="inidividualFavoriteProviderNPI"
+																th:id="'fav-ind-'+${favoriteIndividualProvider.npi}"
+																value="1234567890"
+																th:value="${favoriteIndividualProvider.npi}" type="checkbox"
+																name="individualFavoriteProviderNPI" style="float: none;" /><span
+																th:text="${favoriteIndividualProvider.lastName+', '+favoriteIndividualProvider.firstName}">
+																	Doe, John</span>
+															</label>
+														</div>
+														
+														<div
+															th:each="favoriteOrganizationalProvider:${favoriteOrganizationalProvidersDto}">
+															<label for="favoriteOrganizationalProvider"
+																th:for="'fav-org-'+${favoriteOrganizationalProvider.npi}" class="">
+																<input class="favProvList fav-IND-provList"
+																id="organizationalFavoriteProviderNPI"
+																th:id="'fav-org-'+${favoriteOrganizationalProvider.npi}"
+																value="1234567890"
+																th:value="${favoriteOrganizationalProvider.npi}"
+																type="checkbox" name="organizationalFavoriteProviderNPI"
+																style="float: none;" /><span
+																th:text="${favoriteOrganizationalProvider.orgName}">
+																	Organization Name</span>
+															</label>
+														</div>
+														 -->
+
+													</div>
+												</div>
+											</div>
+
+									</div>
+							      </div>
+							      <div class="modal-footer">
+							        <button id="btn-cancelSelectFromFavorites" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+							        <button id="btn-skipSelectFromFavorites" type="button" class="btn btn-primary" data-dismiss="modal">Skip Favorites</button>
+							      </div>
+							    </div>
+							  </div>
+							</div>
+							<!-- FAVORITE PROVIDERS MODAL (ADMIN/STAFF ONLY) - END -->
+							
+							
+							
 							
 							<!-- start ADD PROVIDER Search modal -->							
 							<div id="addProviderSearch-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
@@ -487,7 +595,7 @@
 
 															</div>
 															<!-- editing existing consent -->
-															<div th:if="${!addConsent}">
+															<div id="disclose-list-container" th:if="${!addConsent}">
 																<div
 																	th:each="individualProvider:${individualProvidersDto}">
 																	<label for="inidividualProvider"
@@ -1229,8 +1337,9 @@
 								</section>
 							</div>
 						</section>
-
 						<!-- CONSENT DATES END -->
+						
+						<!-- SAVE/CANCEL BUTTONS -->
 						<section class="save-cancel-buttons-group top-margin10">
 							<div th:switch="${isProviderAdminUser}" class="controls" style="padding-top: 15px;">
 								<button th:case="true" id="consent-add-cancel" type="button"
@@ -1348,6 +1457,7 @@
 	</ul>
 	
 	<input type="hidden" class="input_hidden" id="input_isAddConsent" th:value="${addConsent}" value="" />
+	<input type="hidden" class="input_hidden" id="input_isProviderAdminUser" th:value="${isProviderAdminUser}" value="" />
 	
 	<div th:switch="${isProviderAdminUser}" style="display:none;">
 		<form th:case="true" style="display: none;" id="formToBeSubmitted" action="#"

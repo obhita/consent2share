@@ -28,11 +28,13 @@ package gov.samhsa.consent2share.service.provider;
 import gov.samhsa.consent2share.domain.provider.IndividualProvider;
 import gov.samhsa.consent2share.domain.provider.StaffIndividualProvider;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
+import gov.samhsa.consent2share.service.dto.StaffIndividualProviderDto;
 
 import java.util.List;
 
 import org.springframework.security.access.annotation.Secured;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Interface IndividualProviderService.
  */
@@ -133,6 +135,61 @@ public interface IndividualProviderService {
 	 */
 	public abstract void updateIndividualProvider(IndividualProviderDto individualProviderDto);
 	
+	/**
+	 * Add new individual provider
+	 * 
+	 *    Returns true if added successfully;
+	 *    Returns false if add fails (e.g. if added provider already exists)
+	 *
+	 * @param individualProviderDto the individual provider dto
+	 * @return boolean isSuccess
+	 */
+	public abstract boolean addNewIndividualProvider(IndividualProviderDto individualProviderDto);
+	
+	/**
+	 * Find all staff favorite individual providers.
+	 *
+	 * @return the list
+	 */
 	public abstract List<StaffIndividualProvider> findAllStaffIndividualProviders();
+	
+	
+	/**
+	 * Find all staff favorite individual providers dto.
+	 *
+	 * @return the list
+	 */
+	public abstract List<StaffIndividualProviderDto> findAllStaffIndividualProvidersDto();
+	
+	/**
+	 * @param id
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public abstract boolean isFavoriteIndividualProvider(long id) throws IllegalArgumentException;
+
+
+	/**
+	 * Adds the favorite individual provider.
+	 *
+	 * @param id the id
+	 */
+	public boolean addFavoriteIndividualProvider(long id) throws IllegalArgumentException;
+	
+	/**
+	 * Adds the favourite individual provider.
+	 *
+	 * @param individualProvider the individual provider
+	 */
+	public void addFavouriteIndividualProvider(IndividualProvider individualProvider);
+
+
+	/**
+	 * Delete favorite individual provider.
+	 *
+	 * @param id the id
+	 */
+	public abstract void deleteFavoriteIndividualProvider(long id) throws IllegalArgumentException;
+	
 
 }

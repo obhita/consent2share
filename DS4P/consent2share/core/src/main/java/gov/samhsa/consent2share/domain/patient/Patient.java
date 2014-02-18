@@ -181,11 +181,11 @@ public class Patient {
 	private Set<Consent> consents = new HashSet<Consent>();
 
 	/** The individual providers. */
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "patient")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<IndividualProvider> individualProviders = new HashSet<IndividualProvider>();
 
 	/** The organizational providers. */
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "patient")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<OrganizationalProvider> organizationalProviders = new HashSet<OrganizationalProvider>();
 
 	/** The clinical documents. */

@@ -25,10 +25,10 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.provider;
 
-import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
 import gov.samhsa.consent2share.domain.provider.StaffOrganizationalProvider;
 import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
+import gov.samhsa.consent2share.service.dto.StaffOrganizationalProviderDto;
 
 import java.util.List;
 
@@ -72,14 +72,6 @@ public interface OrganizationalProviderService {
 	public abstract OrganizationalProvider findOrganizationalProvider(Long id);
 	
 	/**
-	 * Find organizational provider by npi.
-	 *
-	 * @param npi the npi
-	 * @return the organizational provider
-	 */
-	public abstract OrganizationalProvider findOrganizationalProviderByNpi(String npi);
-	
-	/**
 	 * Find organizational provider dto.
 	 *
 	 * @param id the id
@@ -88,20 +80,26 @@ public interface OrganizationalProviderService {
 	public abstract OrganizationalProviderDto findOrganizationalProviderDto(Long id);
 	
 	/**
-	 * Find organizational provider by patient and npi.
-	 *
-	 * @param patient the patient
-	 * @param npi the npi
-	 * @return the organizational provider
-	 */
-	public abstract OrganizationalProvider findOrganizationalProviderByPatientAndNpi(Patient patient, String npi);
-	
-	/**
 	 * Update organizational provider.
 	 *
 	 * @param organizationalProviderDto the organizational provider dto
 	 */
 	public abstract void updateOrganizationalProvider(OrganizationalProviderDto organizationalProviderDto);
+	
+	
+	
+	/**
+	 * Add new organizational provider
+	 * 
+	 *    Returns true if added successfully;
+	 *    Returns false if add fails (e.g. if added provider already exists)
+	 * 
+	 * @param organizationalProviderDto
+	 * @return boolean isSuccess
+	 */
+	public abstract boolean addNewOrganizationalProvider(OrganizationalProviderDto organizationalProviderDto);
+	
+	
 
 	/**
 	 * Find all organizational providers.
@@ -138,10 +136,27 @@ public interface OrganizationalProviderService {
 	public abstract OrganizationalProvider updateOrganizationalProvider(OrganizationalProvider organizationalProvider);
 	
 	/**
-	 * Find all staff organizational providers.
+	 * Find all staff favorite organizational providers.
 	 *
 	 * @return the list
 	 */
-	public abstract List<StaffOrganizationalProvider> findAllStaffOrganizationalProviders();
+	public abstract List<StaffOrganizationalProvider> findAllFavoriteOrganizationalProviders();
+	
+	/**
+	 * Find all staff favorite organizational providers dto.
+	 *
+	 * @return the list
+	 */
+	public abstract List<StaffOrganizationalProviderDto> findAllStaffOrganizationalProvidersDto();
+	
+	
+	public abstract boolean isFavoriteOrganizationalProvider(long id) throws IllegalArgumentException;
+
+	public void addFavouriteOrganizationalProvider(OrganizationalProvider organizationalProvider);
+	
+	public abstract boolean addFavoriteOrganizationalProvider(long id) throws IllegalArgumentException;
+
+
+	public abstract void deleteFavoriteOrganizationalProvider(long id) throws IllegalArgumentException;
 
 }

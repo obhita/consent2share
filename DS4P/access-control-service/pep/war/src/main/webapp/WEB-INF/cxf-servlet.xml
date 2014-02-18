@@ -56,6 +56,10 @@
 	<jaxws:endpoint id="xdsdocumentservice" implementor="#XDSDocumentServiceImpl"
 		wsdlLocation="classpath:wsdl/XDSDocumentService.wsdl" address="/xdsdocumentservice">
 	</jaxws:endpoint>
+	
+	<jaxws:endpoint id="policyTryingService" implementor="#policyTryingServiceImpl"
+		wsdlLocation="classpath:wsdl/TryPolicy.wsdl" address="/policyTryingService">
+	</jaxws:endpoint>
 
 	<bean id="XDSDocumentServiceImpl"
 		class="gov.samhsa.acs.pep.ws.XDSDocumentServiceImpl"
@@ -159,34 +163,15 @@
 	</bean>
 	
 	<!-- PDP -->
-	<!-- PDP: data - PolicyDecisionPointImplDataXdsb -->
+	<!-- PDP: XdsbPolicyProvider -->
 	<bean id="xacmlPolicyListFilter"
 		class="gov.samhsa.acs.contexthandler.XacmlPolicyListFilter"
 		scope="prototype" autowire="constructor">
 	</bean>
-	<bean id="policyDecisionPointImplDataXdsb"
-		class="gov.samhsa.acs.contexthandler.PolicyDecisionPointImplDataXdsb"
+	<bean id="xdsbPolicyProvider"
+		class="gov.samhsa.acs.contexthandler.XdsbPolicyProvider"
 		scope="prototype" autowire="constructor">
 	</bean>
-	
-	<!-- Uncomment the following to Use PolicyDecisionPointImplDataJdbc instead of PolicyDecisionPointImplDataXdsb -->
-	
-	<!-- <bean id="policyDecisionPointImplData"
-		class="gov.samhsa.acs.contexthandler.PolicyDecisionPointImplDataJdbc"
-		scope="prototype" autowire="constructor">
-	</bean>
-	<bean id="dataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3306/consent2share?autoReconnect=true" />
-		<property name="username" value="root" />
-		<property name="password" value="admin" />
-	</bean>
-	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler">
-        <property name="nativeJdbcExtractor" ref="nativeJdbcExtractor"/>
-    </bean>
-    <bean id="nativeJdbcExtractor"
-		class="org.springframework.jdbc.support.nativejdbc.C3P0NativeJdbcExtractor"
-		lazy-init="true" /> -->
 	
 	<!-- PDP: request generator -->
 	<bean id="requestGenerator"
@@ -287,6 +272,11 @@
 	<!-- PEP: pep-ws -->
 	<bean id="pepPortTypeImpl"
 		class="gov.samhsa.acs.pep.ws.PepPortTypeImpl"
+		scope="prototype" autowire="constructor" />
+		
+	<!-- PEP: PolicyTrying Web Service -->
+	<bean id="policyTryingServiceImpl"
+		class="gov.samhsa.acs.pep.ws.PolicyTryingServiceImpl"
 		scope="prototype" autowire="constructor" />
 		
 </beans>

@@ -2,38 +2,94 @@ var result4ajaxJSON;
 
 npiLists=new Array();
 
-const providerSearchResultRedirect = "adminPatientViewCreateConsent.html?id=";
-
 //Control the triangle in the expandable tags
 $(function(){
 	
 	//Append csrf token to ajax call
 	var token = $("meta[name='_csrf']").attr("content");
     var header = $("meta[name='_csrf_header']").attr("content");
+    
     $(document).ajaxSend(function(e, xhr, options) {
         xhr.setRequestHeader(header, token);
     });
 	
+    
 	$("#expand1").click(function(){
+		if ($("#expandTriangle1").text()=="\u25BC"){
+			$("#expandTriangle1").text("\u25B6");
+		}else{
+			$("#expandTriangle1").text("\u25BC");
+			$("#expandTriangle2").text("\u25B6");
+		}
 		
-	if ($("#expandTriangle1").text()=="\u25BC")
-		$("#expandTriangle1").text("\u25B6");
-		
-	else
-		$("#expandTriangle1").text("\u25BC");
-		$("#expandTriangle2").text("\u25B6");
-		
-});
+	});
 	
 	$("#expand2").click(function(){
-		
-		if ($("#expandTriangle2").text()=="\u25BC")
+		if ($("#expandTriangle2").text()=="\u25BC"){
 			$("#expandTriangle2").text("\u25B6");
-		else
+		}else{
 			$("#expandTriangle2").text("\u25BC");
 			$("#expandTriangle1").text("\u25B6");
+		}
+		
 	});
+	
 });
+
+$(function(){
+	switch($('body').attr("id")){
+		case "adminPatientView-page":
+			$('div#patient_providers_container').delegate("div.modal-body div.provider_record_header span.favorite > span.favorite-icon", "click", function(element){
+				var clickedElement = $(this);
+				if(clickedElement.hasClass("favorite-false")){
+					var provType = clickedElement.parents('div.provider_record_space').data("prov-type");
+					var provId = clickedElement.parents('div.provider_record_space').data("prov-id");
+					
+					switch(provType){
+					case "IND":
+						$.ajax({
+							url: "addStaffFavoriteIndividualProvider",
+							type: "POST",
+							data: {providerid: provId},
+							success: function(response){
+								
+								clickedElement.removeClass("favorite-false");
+								clickedElement.addClass("favorite-true");
+							},
+							error: function(e){
+								window.alert("ERROR: " + e.responseText);
+							}
+						});
+						break;
+					case "ORG":
+						$.ajax({
+							url: "addStaffFavoriteOrganizationalProvider",
+							type: "POST",
+							data: {providerid: provId},
+							success: function(response){
+								
+								clickedElement.removeClass("favorite-false");
+								clickedElement.addClass("favorite-true");
+							},
+							error: function(e){
+								window.alert("ERROR: " + e.responseText);
+							}
+						});
+						break;
+					default:
+						break;
+					}
+					
+				}
+			});
+			
+			break;
+		default:
+			break;
+	}
+});
+
+
 
 $(function(){
 	
@@ -41,21 +97,142 @@ $(function(){
 		var entryId=$(this).attr("id").substr(27,$(this).attr("id").length-27);
 		var serializedQueryResult=JSON.stringify(result4ajaxJSON["providers"][entryId]);
 		
-		var in_patientId = $('input#patientId').val();
-		var in_patientUsername = $('input#patientUsername').val();
+		switch($('body').attr("id")){
 		
-		$.ajax({
-			  url: "connectionProviderAdd.html",
-			  type: "POST",
-			  data: {querySent: serializedQueryResult,
-				  	 patientId: in_patientId,
-				  	 patientusername: in_patientUsername},
-			  success:function() {
-				  $('provider_search_modal').modal('hide');
-				  //window.location.replace(providerSearchResultRedirect + in_patientId);
-				  location.reload();
-			  }
-			});
+			case "adminPatientView-page":
+				var in_patientId = $('input#patientId').val();
+				var lastName = result4ajaxJSON["providers"][entryId]["providerLastName"];
+				var firstName = result4ajaxJSON["providers"][entryId]["providerFirstName"];
+				var speciality = result4ajaxJSON["providers"][entryId]["healthcareProviderTaxonomy_1"];
+				var npi = result4ajaxJSON["providers"][entryId]["npi"];
+				
+				var firstlinestreet = result4ajaxJSON["providers"][entryId]["providerFirstLineBusinessPracticeLocationAddress"];
+				var city = result4ajaxJSON["providers"][entryId]["providerBusinessPracticeLocationAddressCityName"];
+				var state = result4ajaxJSON["providers"][entryId]["providerBusinessPracticeLocationAddressStateName"];
+				var zip = result4ajaxJSON["providers"][entryId]["providerBusinessPracticeLocationAddressPostalCode"];
+				
+				var phonenum = result4ajaxJSON["providers"][entryId]["providerBusinessPracticeLocationAddressTelephoneNumber"];
+				
+				$.ajax({
+					  url: "connectionProviderAdd.html",
+					  type: "POST",
+					  data: {querySent: serializedQueryResult,
+						  	 patientId: in_patientId},
+					  success:function(response) {
+						  $('table#patient_providers_list > tbody').append("<tr data-npi='" + npi + "' id='provider_row_NPI" + npi + "'>" +
+						  		"<td class='center'>" + lastName + ", " + firstName + "</td>" +
+						  		"<td>" + speciality + "</td>" +
+						  		"<td>" +
+						  			"<input type='hidden' id='prov-phone-input-NPI" + npi + "' class='prov-phone-input' data-npi='" + npi + "' value='" + phonenum + "' />" +
+						  			"<span id='prov-phone-display-NPI" + npi + "' class='prov-phone-display'></span>" +
+						  		"</td>" +
+						  	"</tr>");
+						  
+						  $('table#patient_providers_list').parent().prepend("<div class='modal fade' id='crd_provider_modal_NPI" + npi +"' tabindex='-1' role='dialog' aria-labelledby='crd_provider_modal-title_NPI" + npi + "' aria-hidden='true'>" +
+											  "<div class='modal-dialog'>" +
+											    "<div class='modal-content'>" +
+											      "<div class='modal-header'>" +
+											        "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>" +
+											        "<h3 class='modal-title' id='crd_provider_modal-title_NPI" + npi + "'>Provider Details</h3>" +
+											      "</div>" +
+											      "<div class='modal-body'>" +
+											      	"<div>" +
+								                		"<div class='provider_record_space'>" +
+								                			"<div class='provider_record_box'>" +
+																"<div class='provider_record_header'>" +
+																	"<p class='result_row'>" +
+																		"<span class='result_field provider_name_field'>" + lastName + ", " + firstName + "</span>" +
+																		"<span class='result_field'>[NPI: "+ npi +"]</span>" +
+																		"<span class='favorite'><span class='favorite-icon favorite-false'></span></span>" +
+																	"</p>" +
+																	"<p class='result_row add_button_space'>" +
+																		"<span class='result_field'><button class='btn btn-xs btn-danger'><span class='fa fa-minus fa-white'></span></button></span>Remove this Provider." +
+																	"</p>" +
+																"</div>" +
+																"<p class='result_row'><span class='result_field provider_specialty_field'>" + speciality + "</span></p>" +
+																"<input type='hidden' id='prov-address-input-NPI" + npi + "' class='prov-address-input' data-npi='" + npi + "' data-streetaddress='" + firstlinestreet + "' data-city='" + city + "' data-state='" + state + "' data-zip='" + zip + "' />" +
+																"<p class='result_row'><span id='prov-address-display-NPI" + npi + "' class='result_field prov-address-display'></span></p>" +
+																"<p class='result_row'><span id='crd-prov-phone-display-NPI" + npi + "' class='result_field prov-phone-display'>" + phonenum + "</span></p>" +
+															"</div>" +
+								                			"</div>" +                			               			
+								                		"</div>" +
+							                		"</div>" +
+											      "<div class='modal-footer'>" +
+											        "<button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>" +
+											      "</div>" +
+											    "</div>" +
+											  "</div>" +
+											"</div>");
+						  
+						  initPhoneNumbers();
+						  initAddresses();
+						  $('#provider_search_modal').modal('hide');
+					  },
+					  error: function(e){
+						  window.alert("ERROR: " + e.responseText);
+					  }
+				});
+				
+				break;
+		
+			default:
+				var in_patientId = $('input#patientId').val();
+				var in_patientUsername = $('input#patientUsername').val();
+				
+				$.ajax({
+					  url: "connectionProviderAdd.html",
+					  type: "POST",
+					  data: {querySent: serializedQueryResult,
+						  	 patientId: in_patientId,
+						  	 patientusername: in_patientUsername},
+					  success:function(response) {
+						  $('input.isMadeToList').iCheck('destroy');
+						  $('input.toDiscloseList').iCheck('destroy');
+						  
+						  $('div#disclose-list-container').append("<div>" +
+						  			"<label for='to" + result4ajaxJSON["providers"][entryId].npi + "'>" +
+						  					"<input class='isMadeToList' id='to" + result4ajaxJSON["providers"][entryId].npi + "' " +
+						  						"value='" + result4ajaxJSON["providers"][entryId].npi + "' " +
+						  						"type='checkbox' name='providersDisclosureIsMadeTo' style='float: none;' />" +
+						  					"<input type='hidden' name='_providersDisclosureIsMadeTo' value='on' />" +
+						  					"<span>" + result4ajaxJSON["providers"][entryId].providerLastName + ", " +
+						  						result4ajaxJSON["providers"][entryId].providerFirstName + "</span>" +
+						  			"</label></div>");
+						  
+						  $('div#authorize-list-container').append("<div>" +
+								  	"<label for='from" + result4ajaxJSON["providers"][entryId].npi + "'>" +
+				  						"<input class='toDiscloseList' id='from" + result4ajaxJSON["providers"][entryId].npi + "' " +
+				  							"value='" + result4ajaxJSON["providers"][entryId].npi + "' " +
+				  							"type='checkbox' name='providersPermittedToDisclose' style='float: none;' />" +
+				  							"<input type='hidden' name='_providersPermittedToDisclose' value='on' />" +
+				  							"<span>" + result4ajaxJSON["providers"][entryId].providerLastName + ", " +
+				  								result4ajaxJSON["providers"][entryId].providerFirstName + "</span>" +
+				  					"</label></div>");
+						  
+						  $('input.isMadeToList').iCheck({
+							    checkboxClass: 'icheckbox_square-blue',
+							    radioClass: 'iradio_square-blue',
+							    increaseArea: '20%',
+						  });
+						  
+						  $('input.toDiscloseList').iCheck({
+							    checkboxClass: 'icheckbox_square-blue',
+							    radioClass: 'iradio_square-blue',
+							    increaseArea: '20%',
+						  });
+						  
+						  loadAllProviders();
+						  
+						  $('#provider_search_modal').modal('hide');
+						  $('#disclose-modal').modal();
+					  },
+					  error: function(e){
+						  window.alert("ERROR: " + e.responseText);
+					  }
+				});
+				
+				break;
+		}
 	});
 });
 
@@ -66,27 +243,197 @@ $(function(){
 		var entryId=$(this).attr("id").substr(31,$(this).attr("id").length-31);
 		var serializedQueryResult=JSON.stringify(result4ajaxJSON["providers"][entryId]);
 		
-		var in_patientId = $('input#patientId').val();
-		var in_patientUsername = $('input#patientUsername').val();
+		switch($('body').attr("id")){
 		
-		$.ajax({
-			  url: "connectionProviderAdd.html",
-			  type: "POST",
-			  data: {querySent: serializedQueryResult,
-				  	 patientId: in_patientId,
-				  	 patientusername: in_patientUsername},
-			  success:function() {
-				  $('provider_search_modal').modal('hide');
-			      //window.location.replace(providerSearchResultRedirect + in_patientId);
-				  location.reload();
-			  }
+		case "adminPatientView-page":
+			var in_patientId = $('input#patientId').val();
+			var orgName = result4ajaxJSON["providers"][entryId]["providerOrganizationName"];
+			var speciality = result4ajaxJSON["providers"][entryId]["healthcareProviderTaxonomy_1"];
+			var npi = result4ajaxJSON["providers"][entryId]["npi"];
+			
+			var firstlinestreet = result4ajaxJSON["providers"][entryId]["providerFirstLineBusinessPracticeLocationAddress"];
+			var city = result4ajaxJSON["providers"][entryId]["providerBusinessPracticeLocationAddressCityName"];
+			var state = result4ajaxJSON["providers"][entryId]["providerBusinessPracticeLocationAddressStateName"];
+			var zip = result4ajaxJSON["providers"][entryId]["providerBusinessPracticeLocationAddressPostalCode"];
+			
+			var phonenum = result4ajaxJSON["providers"][entryId]["providerBusinessPracticeLocationAddressTelephoneNumber"];
+			
+			$.ajax({
+				  url: "connectionProviderAdd.html",
+				  type: "POST",
+				  data: {querySent: serializedQueryResult,
+					  	 patientId: in_patientId},
+				  success:function(response) {
+					  $('table#patient_providers_list > tbody').append("<tr data-npi='" + npi + "' id='provider_row_NPI" + npi + "'>" +
+					  		"<td class='center'>" + orgName + "</td>" +
+					  		"<td>" + speciality + "</td>" +
+					  		"<td>" +
+					  			"<input type='hidden' id='prov-phone-input-NPI" + npi + "' class='prov-phone-input' data-npi='" + npi + "' value='" + phonenum + "' />" +
+					  			"<span id='prov-phone-display-NPI" + npi + "' class='prov-phone-display'></span>" +
+					  		"</td>" +
+					  	"</tr>");
+					  
+					  $('table#patient_providers_list').parent().prepend("<div class='modal fade' id='crd_provider_modal_NPI" + npi +"' tabindex='-1' role='dialog' aria-labelledby='crd_provider_modal-title_NPI" + npi + "' aria-hidden='true'>" +
+							  "<div class='modal-dialog'>" +
+							    "<div class='modal-content'>" +
+							      "<div class='modal-header'>" +
+							        "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>" +
+							        "<h3 class='modal-title' id='crd_provider_modal-title_NPI" + npi + "'>Provider Details</h3>" +
+							      "</div>" +
+							      "<div class='modal-body'>" +
+							      	"<div>" +
+				                		"<div class='provider_record_space'>" +
+				                			"<div class='provider_record_box'>" +
+												"<div class='provider_record_header'>" +
+													"<p class='result_row'>" +
+														"<span class='result_field provider_name_field'>" + orgName + "</span>" +
+														"<span class='result_field'>[NPI: "+ npi +"]</span>" +
+														"<span class='favorite'><span class='favorite-icon favorite-false'></span></span>" +
+													"</p>" +
+													"<p class='result_row add_button_space'>" +
+														"<span class='result_field'><button class='btn btn-xs btn-danger'><span class='fa fa-minus fa-white'></span></button></span>Remove this Provider." +
+													"</p>" +
+												"</div>" +
+												"<p class='result_row'><span class='result_field provider_specialty_field'>" + speciality + "</span></p>" +
+												"<input type='hidden' id='prov-address-input-NPI" + npi + "' class='prov-address-input' data-npi='" + npi + "' data-streetaddress='" + firstlinestreet + "' data-city='" + city + "' data-state='" + state + "' data-zip='" + zip + "' />" +
+												"<p class='result_row'><span id='prov-address-display-NPI" + npi + "' class='result_field prov-address-display'></span></p>" +
+												"<p class='result_row'><span id='crd-prov-phone-display-NPI" + npi + "' class='result_field prov-phone-display'>" + phonenum + "</span></p>" +
+											"</div>" +
+				                			"</div>" +                			               			
+				                		"</div>" +
+			                		"</div>" +
+							      "<div class='modal-footer'>" +
+							        "<button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>" +
+							      "</div>" +
+							    "</div>" +
+							  "</div>" +
+							"</div>");
+					  
+					  initPhoneNumbers();
+					  initAddresses();
+					  $('#provider_search_modal').modal('hide');
+				  },
+				  error: function(e){
+					  window.alert("ERROR: " + e.responseText);
+				  }
 			});
+			
+			break;
+	
+		default:
+			var in_patientId = $('input#patientId').val();
+			var in_patientUsername = $('input#patientUsername').val();
+			
+			$.ajax({
+				  url: "connectionProviderAdd.html",
+				  type: "POST",
+				  data: {querySent: serializedQueryResult,
+					  	 patientId: in_patientId,
+					  	 patientusername: in_patientUsername},
+				  success: function(response) {
+					  $('input.isMadeToList').iCheck('destroy');
+					  $('input.toDiscloseList').iCheck('destroy');
+					  
+					  $('div#disclose-list-container').append("<div>" +
+					  			"<label for='to" + result4ajaxJSON["providers"][entryId].npi + "'>" +
+					  					"<input class='isMadeToList' id='to" + result4ajaxJSON["providers"][entryId].npi + "' " +
+					  						"value='" + result4ajaxJSON["providers"][entryId].npi + "' " +
+					  						"type='checkbox' name='organizationalProvidersDisclosureIsMadeTo' style='float: none;' />" +
+					  					"<input type='hidden' name='_organizationalProvidersDisclosureIsMadeTo' value='on' />" +
+					  					"<span>" + result4ajaxJSON["providers"][entryId].providerOrganizationName + "</span>" +
+					  			"</label></div>");
+					  
+					  $('div#authorize-list-container').append("<div>" +
+					  			"<label for='from" + result4ajaxJSON["providers"][entryId].npi + "'>" +
+					  					"<input class='toDiscloseList' id='from" + result4ajaxJSON["providers"][entryId].npi + "' " +
+					  						"value='" + result4ajaxJSON["providers"][entryId].npi + "' " +
+					  						"type='checkbox' name='organizationalProvidersPermittedToDisclose' style='float: none;' />" +
+					  					"<input type='hidden' name='_organizationalProvidersPermittedToDisclose' value='on' />" +
+					  					"<span>" + result4ajaxJSON["providers"][entryId].providerOrganizationName + "</span>" +
+					  			"</label></div>");
+					  
+					  $('input.isMadeToList').iCheck({
+						    checkboxClass: 'icheckbox_square-blue',
+						    radioClass: 'iradio_square-blue',
+						    increaseArea: '20%',
+					  });
+					  
+					  $('input.toDiscloseList').iCheck({
+						    checkboxClass: 'icheckbox_square-blue',
+						    radioClass: 'iradio_square-blue',
+						    increaseArea: '20%',
+					  });
+					  
+					  loadAllProviders();
+					  
+					  $('#provider_search_modal').modal('hide');
+					  $('#disclose-modal').modal();
+				  },
+				 error: function(e){
+					 window.alert("ERROR: " + e.responseText);
+				 }
+			});
+			
+			break;
+		}
 	});
 });
 
+//Check if a provider is a favorite
+function isProviderFavorite(in_provId, in_provType){
+	var search_provId = in_provId;
+	var search_provType = in_provType;
+	var isFav = null;
+	
+	switch(search_provType){
+	case "IND":
+		$.ajax({
+			url: "isStaffFavoriteIndividualProvider",
+			type: "GET",
+			async: false,
+			data: {
+				providerid: search_provId
+			},
+			success: function(response){
+				isFav = response;
+			},
+			error: function(e){
+				throw new Error("ERROR - The server returned an error: " + e.responseText);
+			}
+		});
+		break;
+	case "ORG":
+		$.ajax({
+			url: "isStaffFavoriteOrganizationalProvider",
+			type: "GET",
+			async: false,
+			data: {
+				providerid: search_provId
+			},
+			success: function(response){
+				isFav = response;
+			},
+			error: function(e){
+				throw new Error("ERROR - The server returned an error: " + e.responseText);
+			}
+		});
+		break;
+	default:
+		break;
+	}
+	
+	if(isFav == "true"){
+		return true;
+	}else if(isFav == "false"){
+		return false;
+	}else{
+		throw new TypeError("ERROR: Invalid data type returned from server.");
+	}
+}
+
+
 jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage )
 {
-	//alert( 'items_per_page = '+ items_per_page );
 	var lnkCnt4most = 8 ;
 	var lnkCnt4short = 2 ;
 	var currentPage = 0 ;
@@ -169,6 +516,103 @@ function triggerLookup(){
 	lookup();
 }
 
+function dashboardTriggerLookup(){
+	$('#addProviderSearch-modal').modal('hide');
+	dashboardLookup();
+}
+
+function dashboardLookup(){
+    var providerSearchForm="";
+    var ajaxFinishedFlag=0;
+
+    var arrProviderHtmStr = new Array();
+	var items_per_page = 10 ;
+    var rsHtmStrDeli = "<rsHtmStrDeli>" ;
+	$("#Pagination").empty();
+    
+	$("#resultList").hide();
+	$("#noResult").hide();
+	$("#noResponse").hide();
+	$("#resultList").empty();
+
+	if ($("#search_city_name").val() != ""){
+		providerSearchForm+="&city="+$("#search_city_name").val();
+	}
+	if ($("#search_state_name").val() != ""){
+		providerSearchForm+="&usstate="+$("#search_state_name").val();
+	}
+	if ($("#search_zip_code").val() != ""){
+		providerSearchForm+="&zipcode="+$("#search_zip_code").val();
+	}
+	if ($("#search_gender").val() != ""){
+		var gender=null;
+		if ($("#search_gender").val()=="M")
+			gender='MALE';
+		if ($("#search_gender").val()=="F")
+			gender="FEMALE";
+		providerSearchForm+="&gender="+gender;
+	}
+	if ($("#search_specialty").val() != ""){
+		providerSearchForm+="&specialty="+$("#search_specialty").val();
+	}
+	if ($("#search_phone1").val() != ""){
+		providerSearchForm+="&phone="+$("#search_phone1").val()+$("#search_phone2").val()+$("#search_phone3").val();
+	}
+	if ($("#search_first_name").val() != ""){
+		providerSearchForm+="&firstname="+$("#search_first_name").val();
+	}
+	
+	if ($("#search_last_name").val() != ""){
+		providerSearchForm+="&lastname="+$("#search_last_name").val();
+	}
+	$("#provider_search_modal .search-loading").show();
+	
+	setTimeout( killAjaxCall, 10000); 
+    
+	var myAjaxCall= $.ajax({
+    	dataType: "json",
+		url: "providerSearch.html",
+		type:"GET",
+		async:true, 
+		data: providerSearchForm,
+		success: function (queryResult) { 
+			ajaxFinishedFlag++;
+			if(queryResult==null) 
+			{
+				showResult( queryResult, items_per_page );
+				return;
+			}
+			
+			result4ajaxJSON=queryResult;
+			
+			for (var i=0;i<queryResult["providers"].length;i++) {
+				addable="true";
+				for(var j=0;j<npiLists.length;j++)
+					{
+
+					if(queryResult["providers"][i]["npi"]==npiLists[j])
+						addable="false";
+					}
+				arrProviderHtmStr[i] = getResultRowHtmStr( i, queryResult["providers"][i], addable );
+			}
+			
+			showResult( arrProviderHtmStr, items_per_page );
+		}
+    
+		});
+	
+	function killAjaxCall(){  // if no response, abort both getJson requests
+	    if(ajaxFinishedFlag==0){
+	    myAjaxCall.abort();
+	    setTimeout( function() { $("#provider_search_modal .search-loading").fadeOut({ duration: 400}); }, 200 );
+	    $("#noResponse").show();
+	    }
+	
+}
+
+
+}
+
 function lookup(){
 	    var providerSearchForm="";
 	    var ajaxFinishedFlag=0;
@@ -214,7 +658,6 @@ function lookup(){
 			providerSearchForm+="&lastname="+$("#last_name").val();
 		}
 		$("#provider_search_modal .search-loading").show();
-	    //alert( providerSearchForm );
 		
 		setTimeout( killAjaxCall, 10000); 
 	    
@@ -262,6 +705,7 @@ function lookup(){
 
 }
 
+
 function getResultRowHtmStr( i, rs, addable )
 {
 	var showOrg = ( rs["entityType"] == "Organization" );
@@ -292,13 +736,12 @@ function getResultRowHtmStr( i, rs, addable )
 
 function showResult( arrHtmlStr, items_per_page )
 {
-	//if( arrHtmlStr ) alert( 'arrHtmlStr.length = '+ arrHtmlStr.length );
+	//if( arrHtmlStr ) window.alert( 'arrHtmlStr.length = '+ arrHtmlStr.length );
 	setTimeout( function() { $("#provider_search_modal .search-loading").fadeOut({ duration: 400}); }, 200 );
 
     if( arrHtmlStr != null && arrHtmlStr.length > 0)
     {
 		$("#Pagination").buildPagingBar( arrHtmlStr, items_per_page, showCurrentPage ); 
-		//alert( 'b4 Pagination.show/hide' );
 		( arrHtmlStr.length > items_per_page ) ? $("#Pagination").show() : $("#Pagination").hide() ; 
     	$("#resultList").show();
 	}
@@ -310,7 +753,6 @@ function showResult( arrHtmlStr, items_per_page )
 
 function showCurrentPage( arrHtmlStr, page_index, items_per_page )
 {
-	//alert( 'page_index = '+ page_index );
     var max_elem = Math.min((page_index+1) * items_per_page, arrHtmlStr.length );
     var newcontent = '';
  

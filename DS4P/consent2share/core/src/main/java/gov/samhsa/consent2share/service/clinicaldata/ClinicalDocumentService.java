@@ -27,6 +27,7 @@ package gov.samhsa.consent2share.service.clinicaldata;
 
 import gov.samhsa.consent2share.domain.clinicaldata.ClinicalDocument;
 import gov.samhsa.consent2share.domain.patient.Patient;
+import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCode;
 import gov.samhsa.consent2share.service.dto.ClinicalDocumentDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 
@@ -117,7 +118,15 @@ public interface ClinicalDocumentService {
 	 */
 	public abstract  List<ClinicalDocument> findByPatient(Patient patient);
 	
-	
+
+	/**
+	 * Find by patient Id
+	 * 
+	 * @param patientId
+	 * @return
+	 */
+	public abstract List<ClinicalDocument> findByPatientId(long patientId);
+
 	/**
 	 * Find dto by patient dto.
 	 *
@@ -134,6 +143,5 @@ public interface ClinicalDocumentService {
 	 * @return true, if is document belongs to this user
 	 */
 	public abstract boolean isDocumentBelongsToThisUser(ClinicalDocumentDto clinicalDocumentDto);
-
 
 }

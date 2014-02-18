@@ -369,6 +369,12 @@
 										<input type="hidden" name="consentId"
 											th:value="${consentEntry.id}" />
 									</form>
+									
+									<form th:name="@{'try_my_policy_' + ${consentEntry.id}}"
+										th:action="@{/consents/tryMyPolicy.html}" method="post">
+										<input type="hidden" name="consentId"
+											th:value="${consentEntry.id}" /> 
+									</form>									
 
 									<div class="top-margin10">
 										<ul id="consent-3buttons" role="list"
@@ -418,6 +424,13 @@
 																                	<a th:case="CONSENT_SIGNED" href="#" th:href="@{'exportXACMLConsents/'+ ${consentEntry.id}}" class="btn btn-sm btn-success">  Export to XACML</a>
 																                	</li>
 											<li class="help-inline" role="listitem"></li>
+
+											<li> 
+												<button id="loadTryMyPolicyButton" data-toggle="modal"
+													type="button" class="btn btn-sm btn-success"
+													href="#try_my_policy_modal"
+													th:onclick="'javascript:loadTryMyPolicy(\'' + ${consentEntry.id} + '\');'">Try My Policy</button>
+											</li>
 
 											<!-- Button to trigger modal -->
 											<li th:switch="${consentEntry.revokeStage}" class="help-inline" role="listitem">
@@ -595,7 +608,40 @@
 					</div>
 				</div>
 			</div>
+			
+			
+			<!-- Try My Policy Modal -->
+			<div class="modal fade" id="try_my_policy_modal" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
 
+						<form class="form-horizontal" th:action="@{/consents/tryMyPolicyApply}" method="post" id="applyMyPolicyForm" >
+							<div class="modal-header">
+								<h4>Apply My Record</h4>
+							</div>
+							<div class="modal-body">
+
+								<div class="form-group">
+									<div>
+										<label class="control-label col-lg-4" for="c32Docs">Select C32 Document: </label>
+										<div class="controls col-lg-4">
+											<select name="c32Id" id="tryMyPolicy_c32Docs" class="form-control">
+											</select>
+										</div>
+									</div>
+								</div>
+
+							</div>
+							
+							<div class="modal-footer">
+								<a class="btn btn-default" data-dismiss="modal">Close</a>
+								<button id="tryMyPolicyApplyButton" class="btn btn-primary" type="submit">Apply</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			
 		</div>
 		<!-- end first row -->
 	</div>

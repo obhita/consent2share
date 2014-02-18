@@ -25,15 +25,14 @@
  ******************************************************************************/
 package gov.samhsa.acs.contexthandler;
 
+import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
-import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource;
-import gov.va.ehtac.ds4p.ws.EnforcePolicy.Xspasubject;
-import gov.va.ehtac.ds4p.ws.EnforcePolicyResponse.Return;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 /**
  * The Class ContextHandlerImpl.
@@ -63,33 +62,21 @@ public class ContextHandlerImpl implements ContextHandler {
 	 * (non-Javadoc)
 	 * 
 	 * @see gov.samhsa.acs.contexthandler.ContextHandler#enforcePolicy(
-	 * gov.va.ehtac.ds4p.ws.EnforcePolicy.Xspasubject,
-	 * gov.va.ehtac.ds4p.ws.EnforcePolicy.Xsparesource)
-	 */
-	@Override
-	public Return enforcePolicy(Xspasubject xspasubject,
-			Xsparesource xsparesource) {
-
-		// ContextHandlerWebServiceClient contextHandlerWebServiceClient = new
-		// ContextHandlerWebServiceClient(endpointAddress);
-
-		// Return result =
-		// contextHandlerWebServiceClient.enforcePolicy(xspasubject,
-		// xsparesource);
-
-		// return result;
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see gov.samhsa.acs.contexthandler.ContextHandler#enforcePolicy(
 	 * gov.samhsa.acs.common.dto.XacmlRequest)
 	 */
 	@Override
 	public XacmlResponse enforcePolicy(XacmlRequest xacmlRequest) {
 		LOGGER.debug("policyDesicionPoint.evaluateRequest(xacmlRequest) is invoked");
 		return policyDesicionPoint.evaluateRequest(xacmlRequest);
+	}
+
+	/* (non-Javadoc)
+	 * @see gov.samhsa.acs.contexthandler.ContextHandler#makeDecisionForTryingPolicy(java.lang.String)
+	 */
+	@Override
+	public PdpRequestResponse makeDecisionForTryingPolicy(String xacmlPolicy) {
+		LOGGER.debug("makeDecisionForTryingPolicy(xacmlPolicy) is invoked");
+		Assert.hasText(xacmlPolicy, "Xaml policy is not set");
+		return policyDesicionPoint.evaluatePolicyForTrying(xacmlPolicy);
 	}
 }

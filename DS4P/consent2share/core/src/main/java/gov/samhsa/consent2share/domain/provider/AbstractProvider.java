@@ -153,11 +153,6 @@ public abstract class AbstractProvider {
     @Size(max = 255)
     private String providerTaxonomyDescription;
     
-    /** The patient. */
-    @ManyToOne
-   
-    private Patient patient;
-    
     /*
 
 	public String toJson() {
@@ -624,23 +619,5 @@ public abstract class AbstractProvider {
 	public void setVersion(Integer version) {
         this.version = version;
     }
-
-	/**
-	 * Gets the patient.
-	 *
-	 * @return the patient
-	 */
-	public Patient getPatient() {
-		return patient;
-	}
-
-	/**
-	 * Sets the patient.
-	 *
-	 * @param patient the new patient
-	 */
-	public void setPatient(Patient patient) {
-		this.patient = patient;
-	}
 
 }

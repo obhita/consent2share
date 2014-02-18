@@ -884,7 +884,40 @@ used more than once per page.
 	
 	
 /* ----------------------------------------------------[ Providers ] */
+	.favorite {
+		float: right;
 		
+		.favorite-false {
+			&:before {
+				content: "\f006";		
+				font-family: FontAwesome;
+				font-size: large;			
+			}		
+			margin-right: 10px;
+			/*	color: #7396ce;*/
+			color: #008aba;
+			
+			&:hover {		
+				/*	&:before {content: "\f185";} */
+				color: #003791;
+			}
+		}	
+		.favorite-true {		
+			&:before {
+				content: "\f005";		
+				font-family: FontAwesome;
+				font-size: large;
+			}
+			margin-right: 10px;
+			/*	color: #227D02; */
+			color: #008aba;
+			&:hover {
+				/*	&:before {content: "\f087";} */
+				color: #003791;
+			}
+		}		
+	}
+	
 	.provider_record_space {
     	margin: 10px 0;
     	
@@ -909,32 +942,33 @@ used more than once per page.
     		border: solid lightblue 1px;
     		padding: 5px;
     		margin: 0 0 10px;
-    		
+			
 	    	.provider_record_header {
-	    		&.unassigned {
-	    			background-color: #edf5fa !important;
-	    			.add_button_space {
-	    				color:#A57575 !important;
-	    			}
-	    		}
-	    		&.assigned {
-	    			background-color: #CBe7CA !important;
-	    			.add_button_space {
-	    				color: #338A3A !important;
-	    			}
-	    		}
-	    		
-	    		.add_button_space {
-	    			margin-left: 20px;
-	    			color: green;
-	    			
-	    		}
-				
 				background-color: #edf5fa;
 	    		padding: 5px;
+				
+				.add_button_space {
+					margin-left: 20px;
+					color:#A57575; 
+				}
 	    	}
 	    	
     	}
+		
+		&.assigned {
+			.provider_record_box {
+				.provider_record_header {
+					background-color: #CBe7CA !important;
+					
+					.add_button_space {
+						color: #338A3A !important;
+					}
+					
+				}
+				
+			}
+			
+		}
     	
     }
 	

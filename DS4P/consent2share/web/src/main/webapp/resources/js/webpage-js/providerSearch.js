@@ -69,7 +69,7 @@ $(function(){
 
 jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage )
 {
-	//alert( 'items_per_page = '+ items_per_page );
+	//window.alert( 'items_per_page = '+ items_per_page );
 	var lnkCnt4most = 8 ;
 	var lnkCnt4short = 2 ;
 	var currentPage = 0 ;
@@ -192,7 +192,7 @@ function lookup (){
 			providerSearchForm+="&lastname="+$("#last_name").val();
 		}
 		$("#provider_search_modal .search-loading").show();
-	    //alert( providerSearchForm );
+	    //window.alert( providerSearchForm );
 		
 		setTimeout( killAjaxCall, 10000); 
 	    
@@ -270,13 +270,13 @@ function getResultRowHtmStr( i, rs, addable )
 
 function showResult( arrHtmlStr, items_per_page )
 {
-	//if( arrHtmlStr ) alert( 'arrHtmlStr.length = '+ arrHtmlStr.length );
+	//if( arrHtmlStr ) window.alert( 'arrHtmlStr.length = '+ arrHtmlStr.length );
 	setTimeout( function() { $("#provider_search_modal .search-loading").fadeOut({ duration: 400}); }, 200 );
 
     if( arrHtmlStr != null && arrHtmlStr.length > 0)
     {
 		$("#Pagination").buildPagingBar( arrHtmlStr, items_per_page, showCurrentPage ); 
-		//alert( 'b4 Pagination.show/hide' );
+		//window.alert( 'b4 Pagination.show/hide' );
 		( arrHtmlStr.length > items_per_page ) ? $("#Pagination").show() : $("#Pagination").hide() ; 
     	$("#resultList").show();
 	}
@@ -288,7 +288,7 @@ function showResult( arrHtmlStr, items_per_page )
 
 function showCurrentPage( arrHtmlStr, page_index, items_per_page )
 {
-	//alert( 'page_index = '+ page_index );
+	//window.alert( 'page_index = '+ page_index );
     var max_elem = Math.min((page_index+1) * items_per_page, arrHtmlStr.length );
     var newcontent = '';
  

@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.acs.contexthandler;
 
+import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
 
@@ -51,7 +52,7 @@ public interface PolicyDecisionPoint {
 	 *            the policies
 	 * @return the xacml response
 	 */
-	public abstract XacmlResponse evaluateRequest(PDP pdp, RequestType request,
+	public XacmlResponse evaluateRequest(PDP pdp, RequestType request,
 			List<Evaluatable> policies);
 
 	/**
@@ -70,7 +71,7 @@ public interface PolicyDecisionPoint {
 	 *            the intermediary subject npi
 	 * @return the xacml response
 	 */
-	public abstract XacmlResponse evaluateRequest(PDP pdp, RequestType request,
+	public XacmlResponse evaluateRequest(PDP pdp, RequestType request,
 			String patientUniqueId, String recipientSubjectNPI,
 			String intermediarySubjectNPI);
 
@@ -88,7 +89,7 @@ public interface PolicyDecisionPoint {
 	 *            the intermediary subject npi
 	 * @return the xacml response
 	 */
-	public abstract XacmlResponse evaluateRequest(RequestType request,
+	public XacmlResponse evaluateRequest(RequestType request,
 			String patientUniqueId, String recipientSubjectNPI,
 			String intermediarySubjectNPI);
 
@@ -100,7 +101,7 @@ public interface PolicyDecisionPoint {
 	 *            the xacml request
 	 * @return the xacml response
 	 */
-	public abstract XacmlResponse evaluateRequest(XacmlRequest xacmlRequest);
+	public XacmlResponse evaluateRequest(XacmlRequest xacmlRequest);
 
 	/**
 	 * Evaluate the request using the simplePDP and retrieve the response from
@@ -112,6 +113,8 @@ public interface PolicyDecisionPoint {
 	 *            the policies
 	 * @return the xacml response
 	 */
-	public abstract XacmlResponse evaluateRequest(RequestType request,
+	public XacmlResponse evaluateRequest(RequestType request,
 			List<Evaluatable> policies);
+	
+	public PdpRequestResponse evaluatePolicyForTrying(String xacmlPolicy);
 }

@@ -25,11 +25,11 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.notification;
 
-import java.util.Set;
-
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
+
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -130,6 +130,17 @@ public class NotificationServiceImpl implements NotificationService {
 		}
 		return false;
 	}
+
+
+	@Override
+	public String notificationValuesetMgmt(String username, String notify, String message){
+		
+		String msg = (notify != null) ? message:"";
+
+		return msg;
+	}
+	
+
 
 
 	

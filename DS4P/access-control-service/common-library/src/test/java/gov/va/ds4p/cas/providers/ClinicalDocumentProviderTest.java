@@ -3,7 +3,7 @@ package gov.va.ds4p.cas.providers;
 import static org.junit.Assert.*;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
-import gov.samhsa.acs.common.test.XmlComparator;
+import gov.samhsa.consent2share.commonunit.xml.XmlComparator;
 import gov.va.ds4p.policy.reference.Addr;
 import gov.va.ds4p.policy.reference.AssignedAuthor;
 import gov.va.ds4p.policy.reference.AssignedAuthoringDevice;

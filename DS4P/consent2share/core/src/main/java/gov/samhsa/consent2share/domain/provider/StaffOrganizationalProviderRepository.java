@@ -27,8 +27,6 @@ package gov.samhsa.consent2share.domain.provider;
 
 import java.util.List;
 
-import gov.samhsa.consent2share.domain.patient.Patient;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -40,4 +38,6 @@ import org.springframework.stereotype.Repository;
 public interface StaffOrganizationalProviderRepository extends JpaRepository<StaffOrganizationalProvider, Long>, JpaSpecificationExecutor<StaffOrganizationalProvider> {
 
 	public abstract List<StaffOrganizationalProvider> findAll();
+	
+	public abstract StaffOrganizationalProvider findByOrganizationalProvider(OrganizationalProvider organizationalProvider);
 }

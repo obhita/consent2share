@@ -75,7 +75,7 @@
 		as="xs:string">
 		<xsl:param name="refrainPolicyString" />
 		<xsl:choose>
-			<xsl:when test="$refrainPolicyString = 'NODSCLCD'">No redisclosure without privacy consent</xsl:when>
+			<xsl:when test="$refrainPolicyString = 'NORDSCLCD'">No redisclosure without privacy consent</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="$refrainPolicyString" />
 			</xsl:otherwise>

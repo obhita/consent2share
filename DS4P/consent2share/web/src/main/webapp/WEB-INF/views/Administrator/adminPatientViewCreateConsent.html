@@ -53,7 +53,7 @@
 
 	<!-- START: Page Header -->
 	<header class="navbar navbar-static-top" role="banner"
-		th:with="currentPageTitle='Admin Add Consent',currentPageURI='/Administrator/adminPatientViewCreateConsent.html',backPageURI='/Administrator/adminPatientView.html?id='+${patientId}">
+		th:with="currentPageTitle=(${!addConsent} ? #{header_staff_edit_consent} : #{header_staff_add_consent}),currentPageURI='/Administrator/adminPatientViewCreateConsent.html',backPageURI='/Administrator/adminPatientView.html?id='+${patientId}">
 		<div class="container">
 			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/admin_fragments :: admin-navbarHeaderFragmentBackButtonNoFacilityName">
 				<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE navbarHeaderFragment -->
@@ -1267,7 +1267,7 @@
 		<script src="../../../resources/js/bootstrap-datepicker.js"
 				th:src="@{/resources/js/bootstrap-datepicker.js}" 
 				type="text/javascript"></script>
-		<script src="../../../resources/js/jquery.joyride-2.0.3.js" 
+	 	<script src="../../../resources/js/jquery.joyride-2.0.3.js" 
 				th:src="@{/resources/js/jquery.joyride-2.0.3.js}"
 				type="text/javascript"></script>
 		<script src="../../../resources/js/modernizr.mq.js" 
@@ -1294,13 +1294,14 @@
 		<script src="../../resources/js/webpage-js/providerSearchCriteriaValidation.js"
 			th:src="@{/resources/js/webpage-js/providerSearchCriteriaValidation.js}" 
 			type="text/javascript"></script>
-		<script src="../../resources/js/webpage-js/Administrator/adminProviderSearch.js"
-			th:src="@{/resources/js/webpage-js/Administrator/adminProviderSearch.js}" 
-			type="text/javascript"></script>
 		
 		<script src="../../../resources/js/consent/addConsent.js" 
 				th:src="@{/resources/js/consent/addConsent.js}"
 				type="text/javascript" th:inline="javascript"></script>
+				
+		<script src="../../resources/js/webpage-js/Administrator/adminProviderSearch.js"
+			th:src="@{/resources/js/webpage-js/Administrator/adminProviderSearch.js}" 
+			type="text/javascript"></script>
 
 </body>
 </html>

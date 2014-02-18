@@ -57,8 +57,6 @@ public class SamlTokenParser {
 			List<AttributeStatement> stmt = samlAssertion.getAttributeStatements();
 			String nameId = samlAssertion.getSubject().getNameID().getValue();
 			
-			System.out.println("Name Id: " + nameId);
-			
 			/** Below code works with OpenSAML API to check Authentication,
             * Authorization, and attributes. Using the XPath API with the
             * assertionElement above would probably be an easier and more

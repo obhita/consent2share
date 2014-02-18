@@ -62,5 +62,14 @@ public interface NotificationService {
 	 * @return true, if successful
 	 */
 	boolean checkConsentSignedStatus(Set<Consent> consents);
+	
+	/**
+	 * Notification stage.
+	 *
+	 * @param username the username
+	 * @param notify the notify
+	 * @return the string
+	 */
+	public String notificationValuesetMgmt(String username, String notify, String message);	
 
 }

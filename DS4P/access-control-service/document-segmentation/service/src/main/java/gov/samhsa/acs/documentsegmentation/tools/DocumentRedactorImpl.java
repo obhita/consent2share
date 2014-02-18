@@ -25,16 +25,22 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.tools;
 
-import gov.samhsa.acs.common.bean.RuleExecutionContainer;
+import javax.xml.xpath.XPathExpressionException;
+
+import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
+import gov.samhsa.acs.brms.domain.RuleExecutionResponse;
+import gov.samhsa.acs.brms.domain.Sensitivity;
 import gov.samhsa.acs.common.bean.XacmlResult;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
-import gov.va.ds4p.cas.RuleExecutionResponse;
 
+import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * The Class DocumentRedactorImpl.
@@ -79,9 +85,9 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see gov.samhsa.acs.documentsegmentation.tools
-	 * .DocumentRedactor#redactDocument(java.lang.String,
-	 * gov.samhsa.acs.common.bean.RuleExecutionContainer,
+	 * @see
+	 * gov.samhsa.acs.documentsegmentation.tools.DocumentRedactor#redactDocument
+	 * (java.lang.String, gov.samhsa.acs.brms.domain.RuleExecutionContainer,
 	 * gov.samhsa.acs.common.bean.XacmlResult)
 	 */
 	@Override
@@ -94,38 +100,51 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 
 		try {
 			xmlDocument = documentXmlConverter.loadDocument(document);
+			
+			// Section based redaction
+			String xPathExprSection = "//hl7:component[hl7:section[hl7:code[@code='%']]]";
+			for (String c32SectionLoincCode : xacmlResult.getPdpObligations()) {
+				redactElement(xmlDocument, xPathExprSection,
+						c32SectionLoincCode);
+				xmlDocument.normalize();
+			}
 
+			// Entry based redaction
 			for (RuleExecutionResponse response : ruleExecutionContainer
 					.getExecutionResponseList()) {
 				if (containsRedactObligation(xacmlResult, response)) {
 					String observationId = response.getObservationId();
 					String displayName = response.getDisplayName();
+					String code = response.getCode();
 
-					// redact display Name
-					String xPathExprDisplayName = "//hl7:td[.='%']/parent::hl7:tr";
-					xPathExprDisplayName = xPathExprDisplayName.replace("%",
-							displayName);
+					// Redact Human-readable text
+					// redact display Name (in section/text)
+					String xPathExprHumanReadableTextNode = "//hl7:section/hl7:text//*/text()[contains(lower-case(.), '%')]";
+					redactNodes(xmlDocument, xPathExprHumanReadableTextNode,
+							displayName.toLowerCase());
+					// redact code (in section/text)
+					redactNodes(xmlDocument, xPathExprHumanReadableTextNode,
+							code.toLowerCase());
 
-					Element elementToBeRedacted = documentEditor.getElement(
-							xmlDocument, xPathExprDisplayName);
-
-					elementToBeRedacted.getParentNode().removeChild(
-							elementToBeRedacted);
-
-					// redact entry
+					// Redact entry
 					String xPathExprObservationId = "//hl7:id[@root='%']/ancestor::hl7:entry";
-					xPathExprObservationId = xPathExprObservationId.replace(
-							"%", observationId);
-
-					elementToBeRedacted = documentEditor.getElement(
-							xmlDocument, xPathExprObservationId);
-
-					elementToBeRedacted.getParentNode().removeChild(
-							elementToBeRedacted);
+					redactElement(xmlDocument, xPathExprObservationId,
+							observationId);
 
 					xmlDocument.normalize();
+					response.setItemAction(RuleExecutionResponse.ITEM_ACTION_REDACT);
+				}
+
+				// Set itemAction="REDACT" for the sections that will be
+				// removed. If the itemAction is not set like this, the tagging
+				// code will not ignore redacted sections while calculating
+				// document level confidentiality code.
+				if (xacmlResult.getPdpObligations().contains(
+						response.getC32SectionLoincCode())) {
+					response.setItemAction(RuleExecutionResponse.ITEM_ACTION_REDACT);
 				}
 			}
+
 			// Debug
 			// FileHelper.writeDocToFile(xmlDocument, "Redacted_C32.xml");
 			xmlString = documentXmlConverter.convertXmlDocToString(xmlDocument);
@@ -135,6 +154,77 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 		}
 
 		return xmlString;
+	}
+
+	/**
+	 * Redact element. If no element is found at the XPath, nothing will be
+	 * done.
+	 * 
+	 * @param xmlDocument
+	 *            the xml document
+	 * @param xPathExprToElement
+	 *            the XPath expression to the element to be redacted
+	 * @param variableValue
+	 *            the variable value. the '%' character in xPathExprToElement
+	 *            (if exists) will be replaced with this value.
+	 * @throws XPathExpressionException
+	 *             the x path expression exception
+	 * @throws XMLEncryptionException
+	 *             the xML encryption exception
+	 * @throws Exception
+	 *             the exception
+	 */
+	private void redactElement(Document xmlDocument, String xPathExprToElement,
+			String variableValue) throws XPathExpressionException,
+			XMLEncryptionException, Exception {
+		String redactXpathExprSection = xPathExprToElement.replace("%",
+				variableValue);
+		Element elementToBeRedacted = documentEditor.getElement(xmlDocument,
+				redactXpathExprSection);
+
+		redactNodeIfNotNull(elementToBeRedacted);
+	}
+
+	/**
+	 * Redact nodes.
+	 * 
+	 * @param xmlDocument
+	 *            the xml document
+	 * @param xPathExprToElement
+	 *            the x path expr to element
+	 * @param variableValue
+	 *            the variable value
+	 * @throws XPathExpressionException
+	 *             the x path expression exception
+	 * @throws XMLEncryptionException
+	 *             the xML encryption exception
+	 * @throws Exception
+	 *             the exception
+	 */
+	private void redactNodes(Document xmlDocument, String xPathExprToElement,
+			String variableValue) throws XPathExpressionException,
+			XMLEncryptionException, Exception {
+		String redactXpathExprSection = xPathExprToElement.replace("%",
+				variableValue);
+		NodeList nodesToBeRedacted = documentEditor.getNodeList(xmlDocument,
+				redactXpathExprSection);
+		if (nodesToBeRedacted != null) {
+			for (int i = 0; i < nodesToBeRedacted.getLength(); i++) {
+				redactNodeIfNotNull(nodesToBeRedacted.item(i));
+			}
+		}
+	}
+
+	/**
+	 * Redact node if not null.
+	 * 
+	 * @param nodeToBeRedacted
+	 *            the node to be redacted
+	 */
+	private void redactNodeIfNotNull(Node nodeToBeRedacted) {
+		if (nodeToBeRedacted != null) {
+			nodeToBeRedacted.getParentNode().removeChild(nodeToBeRedacted);
+		}
 	}
 
 	/**
@@ -152,10 +242,11 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 		// commented out for redact-only application
 		// return
 		// xacmlResult.getPdpObligations().contains(PDP_OBLIGATION_PREFIX_REDACT+response.getSensitivity());
-		logger.debug("xacmlResult.getPdpObligations().contains(response.getSensitivity())= "
-				+ Boolean.toString(xacmlResult.getPdpObligations().contains(
-						response.getSensitivity())));
-		return xacmlResult.getPdpObligations().contains(
-				response.getSensitivity());
+		boolean result = false;
+		if (response.getSensitivity() != null) {
+			result = xacmlResult.getPdpObligations().contains(
+					response.getSensitivity().toString());
+		}
+		return result;
 	}
 }

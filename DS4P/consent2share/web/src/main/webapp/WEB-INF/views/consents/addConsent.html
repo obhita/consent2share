@@ -67,7 +67,7 @@
 
 	<!-- START: Page Header -->
 	<header class="navbar navbar-static-top" role="banner"
-		th:with="currentPageTitle='Add Consent',currentPageURI='/consents/addConsent.html',backPageURI='/consents/listConsents.html'">
+		th:with="currentPageTitle=(${!addConsent} ? #{header_edit_consent} : #{header_add_consent}),currentPageURI='/consents/addConsent.html',backPageURI='/consents/listConsents.html'">
 		<div class="container">
 			<div class="navbar-header navbar-inner-header" role="navigation"
 				th:substituteby="fragment/patient_fragments :: navbarHeaderFragmentBackAndLang">
@@ -1369,13 +1369,13 @@
 		<script src="../../resources/js/webpage-js/providerSearchCriteriaValidation.js"
 			th:src="@{/resources/js/webpage-js/providerSearchCriteriaValidation.js}" 
 			type="text/javascript"></script>
-		<script src="../../resources/js/webpage-js/addConsentProviderSearch.js"
-			th:src="@{/resources/js/webpage-js/addConsentProviderSearch.js}" 
-			type="text/javascript"></script>
 		
 		<script src="../../../resources/js/consent/addConsent.js" 
 				th:src="@{/resources/js/consent/addConsent.js}"
 				type="text/javascript" th:inline="javascript"></script>
+		<script src="../../resources/js/webpage-js/addConsentProviderSearch.js"
+			th:src="@{/resources/js/webpage-js/addConsentProviderSearch.js}" 
+			type="text/javascript"></script>
 		
 	<!-- END: JavaScript-->
 </body>

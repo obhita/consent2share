@@ -29,9 +29,13 @@ import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
+import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
+import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.PatientAdminDto;
+import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.RecentAcctivityDto;
+import gov.samhsa.consent2share.service.dto.SystemNotificationDto;
 import gov.samhsa.consent2share.service.patient.PatientService;
 import gov.samhsa.consent2share.service.provider.IndividualProviderService;
 import gov.samhsa.consent2share.service.provider.OrganizationalProviderService;
@@ -42,6 +46,7 @@ import gov.samhsa.consent2share.service.reference.MaritalStatusCodeService;
 import gov.samhsa.consent2share.service.reference.RaceCodeService;
 import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
+import gov.samhsa.consent2share.service.systemnotification.SystemNotificationService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +68,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.NestedServletException;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -73,6 +79,9 @@ public class AdminControllerTest {
 	
 	@Mock
 	ConsentService consentService;
+	
+	@Mock
+	SystemNotificationService systemNotificationService;
 	
 	@Mock
 	UserContext adminUserContext;
@@ -173,15 +182,23 @@ public class AdminControllerTest {
 	@Test
 	public void testAdminPatientView_when_id_is_present() throws Exception{
 		PatientProfileDto patientProfileDto=mock(PatientProfileDto.class);
+		PatientConnectionDto patientConnectionDto=mock(PatientConnectionDto.class);
 		@SuppressWarnings("unchecked")
 		List<ConsentListDto> consentListDto=(List<ConsentListDto>)mock(List.class);
+		List<SystemNotificationDto> systemNotificationDtos=(List<SystemNotificationDto>)mock(List.class);
 		when(patientService.findPatient((long)2)).thenReturn(patientProfileDto);
+		when(patientService.findPatientConnectionById((long)2)).thenReturn(patientConnectionDto);
 		when(consentService.findAllConsentsDtoByPatient((long)2)).thenReturn(consentListDto);
+		when(systemNotificationDtos=systemNotificationService.findAllSystemNotificationDtosByPatient((long)2)).thenReturn(systemNotificationDtos);
+		final AuthenticatedUser currentUser = mock(AuthenticatedUser.class);
+		when(adminUserContext.getCurrentUser()).thenReturn(
+				currentUser);
 		
 		mockMvc.perform(get("/Administrator/adminPatientView.html?id=2"))
 		.andExpect(status().isOk())
 		.andExpect(model().attribute("patientProfileDto",patientProfileDto))
 		.andExpect(model().attribute("consentListDto",consentListDto))
+		.andExpect(model().attribute("systemNotificationDtos",systemNotificationDtos))
 		.andExpect(model().attribute("administrativeGenderCodes", administrativeGenderCodeService.findAllAdministrativeGenderCodes()))
 		.andExpect(model().attribute("maritalStatusCodes", maritalStatusCodeService.findAllMaritalStatusCodes()))
 		.andExpect(model().attribute("religiousAffiliationCodes", religiousAffiliationCodeService.findAllReligiousAffiliationCodes()))
@@ -344,7 +361,7 @@ public class AdminControllerTest {
 	}
 	
 	@Test
-	public void testAddProvider() throws Exception {
+	public void testAddIndividualProvider_when_succeeds() throws Exception {
 		when(Result.get("entityType")).thenReturn("entityTypeValue");
 		when(Result.get("providerOrganizationName")).thenReturn("providerOrganizationNameValue");
 		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
@@ -352,11 +369,107 @@ public class AdminControllerTest {
 		when(Result.get("authorizedOfficialTitleorPosition")).thenReturn("authorizedOfficialTitleorPositionValue");
 		when(Result.get("authorizedOfficialNamePrefixText")).thenReturn("authorizedOfficialNamePrefixTextValue");
 		when(Result.get("authorizedOfficialTelephoneNumber")).thenReturn("authorizedOfficialTelephoneNumberValue");
+		
+		when(individualProviderService.addNewIndividualProvider(any(IndividualProviderDto.class))).thenReturn(true);
+		
 		mockMvc.perform(post("/Administrator/connectionProviderAdd.html").param("querySent", "{\"npi\":\"1114252178\",\"entityType\":\"Individual\",\"replacementNpi\":\"\",\"employerIdentificationNumber\":\"\",\"isSoleProprietor\":false,\"isOrganizationSubpart\":false,\"parentOrganizationLbn\":\"\",\"parentOrganizationTin\":\"\",\"providerOrganizationName\":\"\",\"providerLastName\":\"MORGAN\",\"providerFirstName\":\"TERRENCE\",\"providerMiddleName\":\"\",\"providerNamePrefixText\":\"MR.\",\"providerNameSuffixText\":\"\",\"providerCredentialText\":\"LGSW, CSC-AD\",\"providerFirstLineBusinessMailingAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessMailingAddress\":\"\",\"providerBusinessMailingAddressCityName\":\"BALTIMORE\",\"providerBusinessMailingAddressStateName\":\"MD\",\"providerBusinessMailingAddressPostalCode\":\"212373903\",\"providerBusinessMailingAddressCountryCode\":\"US\",\"providerBusinessMailingAddressTelephoneNumber\":\"4108876465\",\"providerBusinessMailingAddressFaxNumber\":\"4106876005\",\"providerFirstLineBusinessPracticeLocationAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessPracticeLocationAddress\":\"\",\"providerBusinessPracticeLocationAddressCityName\":\"BALTIMORE\",\"providerBusinessPracticeLocationAddressStateName\":\"MD\",\"providerBusinessPracticeLocationAddressPostalCode\":\"212373903\",\"providerBusinessPracticeLocationAddressCountryCode\":\"US\",\"providerBusinessPracticeLocationAddressTelephoneNumber\":\"4108876465\",\"providerBusinessPracticeLocationAddressFaxNumber\":\"4106876005\",\"providerEnumerationDate\":\"10/08/2009\",\"lastUpdateDate\":\"10/08/2009\",\"npideactivationReasonCode\":\"\",\"npideactivationReason\":\"\",\"npideactivationDate\":\"\",\"npireactivationDate\":\"\",\"providerGenderCode\":\"M\",\"providerGender\":\"Male\",\"authorizedOfficialLastName\":\"\",\"authorizedOfficialFirstName\":\"\",\"authorizedOfficialMiddleName\":\"\",\"authorizedOfficialTitleorPosition\":\"\",\"authorizedOfficialNamePrefixText\":\"\",\"authorizedOfficialNameSuffixText\":\"\",\"authorizedOfficialCredentialText\":\"\",\"authorizedOfficialTelephoneNumber\":\"\",\"healthcareProviderTaxonomyCode_1\":\"101YM0800X\",\"providerLicenseNumber_1\":\"14742\",\"providerLicenseNumberStateCode_1\":\"MD\",\"healthcareProviderTaxonomy_1\":\"Mental Health\"}")
 				.param("patientusername", "albert.smith").param("patientId", "1"))
-				.andExpect(view().name("redirect:/Administrator/adminPatientView.html?id=1"));
-		
+				.andExpect(status().isOk())
+				.andExpect(content().string("Success"));
 	}
+	
+	@Test
+	public void testAddIndividualProvider_when_provider_is_already_added() throws Exception {
+		when(Result.get("entityType")).thenReturn("entityTypeValue");
+		when(Result.get("providerOrganizationName")).thenReturn("providerOrganizationNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialTitleorPosition")).thenReturn("authorizedOfficialTitleorPositionValue");
+		when(Result.get("authorizedOfficialNamePrefixText")).thenReturn("authorizedOfficialNamePrefixTextValue");
+		when(Result.get("authorizedOfficialTelephoneNumber")).thenReturn("authorizedOfficialTelephoneNumberValue");
+		
+		when(individualProviderService.addNewIndividualProvider(any(IndividualProviderDto.class))).thenReturn(false);
+		
+		mockMvc.perform(post("/Administrator/connectionProviderAdd.html").param("querySent", "{\"npi\":\"1114252178\",\"entityType\":\"Individual\",\"replacementNpi\":\"\",\"employerIdentificationNumber\":\"\",\"isSoleProprietor\":false,\"isOrganizationSubpart\":false,\"parentOrganizationLbn\":\"\",\"parentOrganizationTin\":\"\",\"providerOrganizationName\":\"\",\"providerLastName\":\"MORGAN\",\"providerFirstName\":\"TERRENCE\",\"providerMiddleName\":\"\",\"providerNamePrefixText\":\"MR.\",\"providerNameSuffixText\":\"\",\"providerCredentialText\":\"LGSW, CSC-AD\",\"providerFirstLineBusinessMailingAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessMailingAddress\":\"\",\"providerBusinessMailingAddressCityName\":\"BALTIMORE\",\"providerBusinessMailingAddressStateName\":\"MD\",\"providerBusinessMailingAddressPostalCode\":\"212373903\",\"providerBusinessMailingAddressCountryCode\":\"US\",\"providerBusinessMailingAddressTelephoneNumber\":\"4108876465\",\"providerBusinessMailingAddressFaxNumber\":\"4106876005\",\"providerFirstLineBusinessPracticeLocationAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessPracticeLocationAddress\":\"\",\"providerBusinessPracticeLocationAddressCityName\":\"BALTIMORE\",\"providerBusinessPracticeLocationAddressStateName\":\"MD\",\"providerBusinessPracticeLocationAddressPostalCode\":\"212373903\",\"providerBusinessPracticeLocationAddressCountryCode\":\"US\",\"providerBusinessPracticeLocationAddressTelephoneNumber\":\"4108876465\",\"providerBusinessPracticeLocationAddressFaxNumber\":\"4106876005\",\"providerEnumerationDate\":\"10/08/2009\",\"lastUpdateDate\":\"10/08/2009\",\"npideactivationReasonCode\":\"\",\"npideactivationReason\":\"\",\"npideactivationDate\":\"\",\"npireactivationDate\":\"\",\"providerGenderCode\":\"M\",\"providerGender\":\"Male\",\"authorizedOfficialLastName\":\"\",\"authorizedOfficialFirstName\":\"\",\"authorizedOfficialMiddleName\":\"\",\"authorizedOfficialTitleorPosition\":\"\",\"authorizedOfficialNamePrefixText\":\"\",\"authorizedOfficialNameSuffixText\":\"\",\"authorizedOfficialCredentialText\":\"\",\"authorizedOfficialTelephoneNumber\":\"\",\"healthcareProviderTaxonomyCode_1\":\"101YM0800X\",\"providerLicenseNumber_1\":\"14742\",\"providerLicenseNumberStateCode_1\":\"MD\",\"healthcareProviderTaxonomy_1\":\"Mental Health\"}")
+				.param("patientusername", "albert.smith").param("patientId", "1"))
+				.andExpect(status().isInternalServerError())
+				.andExpect(content().string("Unable to add this new provider because this provider already exists."));
+	}
+	
+	@Test
+	public void testAddIndividualProvider_when_nonnumeric_patientid_sent() throws Exception {
+		when(Result.get("entityType")).thenReturn("entityTypeValue");
+		when(Result.get("providerOrganizationName")).thenReturn("providerOrganizationNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialTitleorPosition")).thenReturn("authorizedOfficialTitleorPositionValue");
+		when(Result.get("authorizedOfficialNamePrefixText")).thenReturn("authorizedOfficialNamePrefixTextValue");
+		when(Result.get("authorizedOfficialTelephoneNumber")).thenReturn("authorizedOfficialTelephoneNumberValue");
+		
+		when(patientService.findUsernameById(anyLong())).thenThrow(new NumberFormatException());
+		
+		mockMvc.perform(post("/Administrator/connectionProviderAdd.html").param("querySent", "{\"npi\":\"1114252178\",\"entityType\":\"Individual\",\"replacementNpi\":\"\",\"employerIdentificationNumber\":\"\",\"isSoleProprietor\":false,\"isOrganizationSubpart\":false,\"parentOrganizationLbn\":\"\",\"parentOrganizationTin\":\"\",\"providerOrganizationName\":\"\",\"providerLastName\":\"MORGAN\",\"providerFirstName\":\"TERRENCE\",\"providerMiddleName\":\"\",\"providerNamePrefixText\":\"MR.\",\"providerNameSuffixText\":\"\",\"providerCredentialText\":\"LGSW, CSC-AD\",\"providerFirstLineBusinessMailingAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessMailingAddress\":\"\",\"providerBusinessMailingAddressCityName\":\"BALTIMORE\",\"providerBusinessMailingAddressStateName\":\"MD\",\"providerBusinessMailingAddressPostalCode\":\"212373903\",\"providerBusinessMailingAddressCountryCode\":\"US\",\"providerBusinessMailingAddressTelephoneNumber\":\"4108876465\",\"providerBusinessMailingAddressFaxNumber\":\"4106876005\",\"providerFirstLineBusinessPracticeLocationAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessPracticeLocationAddress\":\"\",\"providerBusinessPracticeLocationAddressCityName\":\"BALTIMORE\",\"providerBusinessPracticeLocationAddressStateName\":\"MD\",\"providerBusinessPracticeLocationAddressPostalCode\":\"212373903\",\"providerBusinessPracticeLocationAddressCountryCode\":\"US\",\"providerBusinessPracticeLocationAddressTelephoneNumber\":\"4108876465\",\"providerBusinessPracticeLocationAddressFaxNumber\":\"4106876005\",\"providerEnumerationDate\":\"10/08/2009\",\"lastUpdateDate\":\"10/08/2009\",\"npideactivationReasonCode\":\"\",\"npideactivationReason\":\"\",\"npideactivationDate\":\"\",\"npireactivationDate\":\"\",\"providerGenderCode\":\"M\",\"providerGender\":\"Male\",\"authorizedOfficialLastName\":\"\",\"authorizedOfficialFirstName\":\"\",\"authorizedOfficialMiddleName\":\"\",\"authorizedOfficialTitleorPosition\":\"\",\"authorizedOfficialNamePrefixText\":\"\",\"authorizedOfficialNameSuffixText\":\"\",\"authorizedOfficialCredentialText\":\"\",\"authorizedOfficialTelephoneNumber\":\"\",\"healthcareProviderTaxonomyCode_1\":\"101YM0800X\",\"providerLicenseNumber_1\":\"14742\",\"providerLicenseNumberStateCode_1\":\"MD\",\"healthcareProviderTaxonomy_1\":\"Mental Health\"}")
+				.param("patientusername", "albert.smith").param("patientId", "y"))
+				.andExpect(status().isBadRequest())
+				.andExpect(content().string("Unable to add this new provider because the request parameters contained invalid data."));
+	}
+	
+	
+	@Test
+	public void testAddOrganizationalProvider_when_succeeds() throws Exception {
+		when(Result.get("entityType")).thenReturn("entityTypeValue");
+		when(Result.get("providerOrganizationName")).thenReturn("providerOrganizationNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialTitleorPosition")).thenReturn("authorizedOfficialTitleorPositionValue");
+		when(Result.get("authorizedOfficialNamePrefixText")).thenReturn("authorizedOfficialNamePrefixTextValue");
+		when(Result.get("authorizedOfficialTelephoneNumber")).thenReturn("authorizedOfficialTelephoneNumberValue");
+		
+		when(organizationalProviderService.addNewOrganizationalProvider(any(OrganizationalProviderDto.class))).thenReturn(true);
+		
+		mockMvc.perform(post("/Administrator/connectionProviderAdd.html").param("querySent", "{\"npi\":\"1114252178\",\"entityType\":\"Organization\",\"replacementNpi\":\"\",\"employerIdentificationNumber\":\"\",\"isSoleProprietor\":false,\"isOrganizationSubpart\":false,\"parentOrganizationLbn\":\"\",\"parentOrganizationTin\":\"\",\"providerOrganizationName\":\"SUMMIT ANESTHESIA LLC\",\"providerCredentialText\":\"LGSW, CSC-AD\",\"providerFirstLineBusinessMailingAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessMailingAddress\":\"\",\"providerBusinessMailingAddressCityName\":\"BALTIMORE\",\"providerBusinessMailingAddressStateName\":\"MD\",\"providerBusinessMailingAddressPostalCode\":\"212373903\",\"providerBusinessMailingAddressCountryCode\":\"US\",\"providerBusinessMailingAddressTelephoneNumber\":\"4108876465\",\"providerBusinessMailingAddressFaxNumber\":\"4106876005\",\"providerFirstLineBusinessPracticeLocationAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessPracticeLocationAddress\":\"\",\"providerBusinessPracticeLocationAddressCityName\":\"BALTIMORE\",\"providerBusinessPracticeLocationAddressStateName\":\"MD\",\"providerBusinessPracticeLocationAddressPostalCode\":\"212373903\",\"providerBusinessPracticeLocationAddressCountryCode\":\"US\",\"providerBusinessPracticeLocationAddressTelephoneNumber\":\"4108876465\",\"providerBusinessPracticeLocationAddressFaxNumber\":\"4106876005\",\"providerEnumerationDate\":\"10/08/2009\",\"lastUpdateDate\":\"10/08/2009\",\"npideactivationReasonCode\":\"\",\"npideactivationReason\":\"\",\"npideactivationDate\":\"\",\"npireactivationDate\":\"\",\"providerGenderCode\":\"M\",\"providerGender\":\"Male\",\"authorizedOfficialLastName\":\"\",\"authorizedOfficialFirstName\":\"\",\"authorizedOfficialMiddleName\":\"\",\"authorizedOfficialTitleorPosition\":\"\",\"authorizedOfficialNamePrefixText\":\"\",\"authorizedOfficialNameSuffixText\":\"\",\"authorizedOfficialCredentialText\":\"\",\"authorizedOfficialTelephoneNumber\":\"\",\"healthcareProviderTaxonomyCode_1\":\"101YM0800X\",\"providerLicenseNumber_1\":\"14742\",\"providerLicenseNumberStateCode_1\":\"MD\",\"healthcareProviderTaxonomy_1\":\"Mental Health\"}")
+				.param("patientusername", "albert.smith").param("patientId", "1"))
+				.andExpect(status().isOk())
+				.andExpect(content().string("Success"));
+	}
+	
+	
+	@Test
+	public void testAddOrganizationalProvider_when_provider_is_already_added() throws Exception {
+		when(Result.get("entityType")).thenReturn("entityTypeValue");
+		when(Result.get("providerOrganizationName")).thenReturn("providerOrganizationNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialTitleorPosition")).thenReturn("authorizedOfficialTitleorPositionValue");
+		when(Result.get("authorizedOfficialNamePrefixText")).thenReturn("authorizedOfficialNamePrefixTextValue");
+		when(Result.get("authorizedOfficialTelephoneNumber")).thenReturn("authorizedOfficialTelephoneNumberValue");
+		
+		when(organizationalProviderService.addNewOrganizationalProvider(any(OrganizationalProviderDto.class))).thenReturn(false);
+		
+		mockMvc.perform(post("/Administrator/connectionProviderAdd.html").param("querySent", "{\"npi\":\"1114252178\",\"entityType\":\"Organization\",\"replacementNpi\":\"\",\"employerIdentificationNumber\":\"\",\"isSoleProprietor\":false,\"isOrganizationSubpart\":false,\"parentOrganizationLbn\":\"\",\"parentOrganizationTin\":\"\",\"providerOrganizationName\":\"SUMMIT ANESTHESIA LLC\",\"providerCredentialText\":\"LGSW, CSC-AD\",\"providerFirstLineBusinessMailingAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessMailingAddress\":\"\",\"providerBusinessMailingAddressCityName\":\"BALTIMORE\",\"providerBusinessMailingAddressStateName\":\"MD\",\"providerBusinessMailingAddressPostalCode\":\"212373903\",\"providerBusinessMailingAddressCountryCode\":\"US\",\"providerBusinessMailingAddressTelephoneNumber\":\"4108876465\",\"providerBusinessMailingAddressFaxNumber\":\"4106876005\",\"providerFirstLineBusinessPracticeLocationAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessPracticeLocationAddress\":\"\",\"providerBusinessPracticeLocationAddressCityName\":\"BALTIMORE\",\"providerBusinessPracticeLocationAddressStateName\":\"MD\",\"providerBusinessPracticeLocationAddressPostalCode\":\"212373903\",\"providerBusinessPracticeLocationAddressCountryCode\":\"US\",\"providerBusinessPracticeLocationAddressTelephoneNumber\":\"4108876465\",\"providerBusinessPracticeLocationAddressFaxNumber\":\"4106876005\",\"providerEnumerationDate\":\"10/08/2009\",\"lastUpdateDate\":\"10/08/2009\",\"npideactivationReasonCode\":\"\",\"npideactivationReason\":\"\",\"npideactivationDate\":\"\",\"npireactivationDate\":\"\",\"providerGenderCode\":\"M\",\"providerGender\":\"Male\",\"authorizedOfficialLastName\":\"\",\"authorizedOfficialFirstName\":\"\",\"authorizedOfficialMiddleName\":\"\",\"authorizedOfficialTitleorPosition\":\"\",\"authorizedOfficialNamePrefixText\":\"\",\"authorizedOfficialNameSuffixText\":\"\",\"authorizedOfficialCredentialText\":\"\",\"authorizedOfficialTelephoneNumber\":\"\",\"healthcareProviderTaxonomyCode_1\":\"101YM0800X\",\"providerLicenseNumber_1\":\"14742\",\"providerLicenseNumberStateCode_1\":\"MD\",\"healthcareProviderTaxonomy_1\":\"Mental Health\"}")
+				.param("patientusername", "albert.smith").param("patientId", "1"))
+				.andExpect(status().isInternalServerError())
+				.andExpect(content().string("Unable to add this new provider because this provider already exists."));
+	}
+	
+	@Test
+	public void testAddOrganizationalProvider_when_nonnumeric_patientid_sent() throws Exception {
+		when(Result.get("entityType")).thenReturn("entityTypeValue");
+		when(Result.get("providerOrganizationName")).thenReturn("providerOrganizationNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialLastName")).thenReturn("authorizedOfficialLastNameValue");
+		when(Result.get("authorizedOfficialTitleorPosition")).thenReturn("authorizedOfficialTitleorPositionValue");
+		when(Result.get("authorizedOfficialNamePrefixText")).thenReturn("authorizedOfficialNamePrefixTextValue");
+		when(Result.get("authorizedOfficialTelephoneNumber")).thenReturn("authorizedOfficialTelephoneNumberValue");
+		
+		when(patientService.findUsernameById(anyLong())).thenThrow(new NumberFormatException());
+		
+		mockMvc.perform(post("/Administrator/connectionProviderAdd.html").param("querySent", "{\"npi\":\"1114252178\",\"entityType\":\"Organization\",\"replacementNpi\":\"\",\"employerIdentificationNumber\":\"\",\"isSoleProprietor\":false,\"isOrganizationSubpart\":false,\"parentOrganizationLbn\":\"\",\"parentOrganizationTin\":\"\",\"providerOrganizationName\":\"SUMMIT ANESTHESIA LLC\",\"providerCredentialText\":\"LGSW, CSC-AD\",\"providerFirstLineBusinessMailingAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessMailingAddress\":\"\",\"providerBusinessMailingAddressCityName\":\"BALTIMORE\",\"providerBusinessMailingAddressStateName\":\"MD\",\"providerBusinessMailingAddressPostalCode\":\"212373903\",\"providerBusinessMailingAddressCountryCode\":\"US\",\"providerBusinessMailingAddressTelephoneNumber\":\"4108876465\",\"providerBusinessMailingAddressFaxNumber\":\"4106876005\",\"providerFirstLineBusinessPracticeLocationAddress\":\"9100 FRANKLIN SQUARE DR\",\"providerSecondLineBusinessPracticeLocationAddress\":\"\",\"providerBusinessPracticeLocationAddressCityName\":\"BALTIMORE\",\"providerBusinessPracticeLocationAddressStateName\":\"MD\",\"providerBusinessPracticeLocationAddressPostalCode\":\"212373903\",\"providerBusinessPracticeLocationAddressCountryCode\":\"US\",\"providerBusinessPracticeLocationAddressTelephoneNumber\":\"4108876465\",\"providerBusinessPracticeLocationAddressFaxNumber\":\"4106876005\",\"providerEnumerationDate\":\"10/08/2009\",\"lastUpdateDate\":\"10/08/2009\",\"npideactivationReasonCode\":\"\",\"npideactivationReason\":\"\",\"npideactivationDate\":\"\",\"npireactivationDate\":\"\",\"providerGenderCode\":\"M\",\"providerGender\":\"Male\",\"authorizedOfficialLastName\":\"\",\"authorizedOfficialFirstName\":\"\",\"authorizedOfficialMiddleName\":\"\",\"authorizedOfficialTitleorPosition\":\"\",\"authorizedOfficialNamePrefixText\":\"\",\"authorizedOfficialNameSuffixText\":\"\",\"authorizedOfficialCredentialText\":\"\",\"authorizedOfficialTelephoneNumber\":\"\",\"healthcareProviderTaxonomyCode_1\":\"101YM0800X\",\"providerLicenseNumber_1\":\"14742\",\"providerLicenseNumberStateCode_1\":\"MD\",\"healthcareProviderTaxonomy_1\":\"Mental Health\"}")
+				.param("patientusername", "albert.smith").param("patientId", "y"))
+				.andExpect(status().isBadRequest())
+				.andExpect(content().string("Unable to add this new provider because the request parameters contained invalid data."));
+	}
+	
 	
 	@Test
 	public void testSignConsentRevokation_when_authentication_succeeds() throws Exception{

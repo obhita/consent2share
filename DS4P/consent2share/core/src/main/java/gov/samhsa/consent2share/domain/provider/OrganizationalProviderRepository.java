@@ -25,8 +25,6 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.domain.provider;
 
-import gov.samhsa.consent2share.domain.patient.Patient;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -44,14 +42,4 @@ public interface OrganizationalProviderRepository extends JpaRepository<Organiza
 	 * @return the organizational provider
 	 */
 	public abstract OrganizationalProvider findByNpi(String npi);
-	
-		
-	/**
-	 * Find by patient and npi.
-	 *
-	 * @param patient the patient
-	 * @param npi the npi
-	 * @return the organizational provider
-	 */
-	public abstract OrganizationalProvider findByPatientAndNpi(Patient patient, String npi);
 }

@@ -25,16 +25,36 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.infrastructure.domain;
 
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import gov.samhsa.consent2share.domain.AbstractDomainEventHandler;
+import gov.samhsa.consent2share.domain.consent.Consent;
+import gov.samhsa.consent2share.domain.consent.ConsentRepository;
 import gov.samhsa.consent2share.domain.consent.event.ConsentRevokedEvent;
+import gov.samhsa.consent2share.domain.systemnotification.SystemNotification;
+import gov.samhsa.consent2share.domain.systemnotification.SystemNotificationRepository;
 
 /**
  * The Class ConsentRevokedEventHandler.
  */
 @Component
 public class ConsentRevokedEventHandler extends AbstractDomainEventHandler<ConsentRevokedEvent> {
+	
+	@Value("${notification_consent_revoked}")
+	private String notificationMessage;
+	
+	/** The consent repository. */
+	@Autowired
+    private ConsentRepository consentRepository;
+	
+	
+	/** The notification repository. */
+	@Autowired
+    private SystemNotificationRepository systemNotificationRepository;
 
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.domain.AbstractDomainEventHandler#getEventClass()
@@ -49,5 +69,16 @@ public class ConsentRevokedEventHandler extends AbstractDomainEventHandler<Conse
 	 */
 	@Override
 	public void handle(ConsentRevokedEvent event) {
+		
+		Consent consent=consentRepository.findOne(event.getConsentId());
+		
+		SystemNotification notification=new SystemNotification();
+		notification.setConsentId(consent.getId());
+		notification.setPatientId(consent.getPatient().getId());
+		notification.setNotificationMessage(notificationMessage);
+		notification.setNotificationType("consent_revoked");
+		notification.setSendDate(new Date());
+		
+		systemNotificationRepository.save(notification);
 	}
 }

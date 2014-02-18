@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>access-control-service</artifactId>
-		<version>0.2.0-SNAPSHOT</version>
+		<version>0.3.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>common-library</artifactId>
 
@@ -54,6 +54,12 @@
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-unit</artifactId>
 			<scope>test</scope>
 		</dependency>
 

@@ -117,9 +117,17 @@
 							    <br />
 							    <br />
 								<button class="btn btn-primary" onClick="window.location.href=document.referrer;" style="margin: 0 10px 10px 0;">Back to previous Page</button>
-								<p th:if="${error}" th:text="${error}">No error</p>
-								<p th:if="${errorCode}" th:text="${errorCode}">No errorCode</p>
-				        		<p th:if="${errorMessage}" th:utext="${errorMessage}">No Error Message</p>
+								<p
+									th:if="${exception} or (${message} and ${message.length() != 0})">
+									<b>Cause:</b> <span th:if="${exception}" th:text="${exception.message}">exception
+										...</span> <span th:if="${message} and ${message.length() != 0}"
+										th:text="${message}">message ...</span>
+								</p>								
+								
+								<p th:if="${url}">
+									<b>Page:</b> <span th:text="${url}">Page URL</span>
+								</p>							
+								
 					    	</fieldset>
 				    	</section>
 			    	</div>

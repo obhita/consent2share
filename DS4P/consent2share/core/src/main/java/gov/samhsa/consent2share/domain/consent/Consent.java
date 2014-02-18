@@ -25,6 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.domain.consent;
 
+import gov.samhsa.consent2share.domain.DomainEventManager;
+import gov.samhsa.consent2share.domain.consent.event.ConsentRevokeSubmittedEvent;
+import gov.samhsa.consent2share.domain.consent.event.ConsentSubmittedEvent;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.reference.ClinicalConceptCode;
 
@@ -325,6 +328,7 @@ public class Consent {
 	 */
 	public void setSignedPdfConsent(SignedPDFConsent signedPdfConsent) {
 		this.signedPdfConsent = signedPdfConsent;
+		DomainEventManager.raise(new ConsentSubmittedEvent(id));
 	}
 
 	/**
@@ -715,6 +719,7 @@ public class Consent {
 	 */
 	public void setSignedPdfConsentRevoke(SignedPDFConsentRevocation signedPdfConsentRevoke) {
 		this.signedPdfConsentRevoke = signedPdfConsentRevoke;
+		DomainEventManager.raise(new ConsentRevokeSubmittedEvent(id));
 	}
 
 	/**

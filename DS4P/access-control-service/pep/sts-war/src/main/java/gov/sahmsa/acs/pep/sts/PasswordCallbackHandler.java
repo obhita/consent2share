@@ -19,6 +19,7 @@ public class PasswordCallbackHandler implements CallbackHandler {
                         pc.setPassword("stskpass");
                     }
                 } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN) {
+                	// TODO: remove  hard coding
                     if ("alice".equals(pc.getIdentifier())) {
                         pc.setPassword("clarinet");
                     }

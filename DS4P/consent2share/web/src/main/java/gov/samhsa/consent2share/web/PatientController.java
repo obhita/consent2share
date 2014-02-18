@@ -26,12 +26,15 @@
 package gov.samhsa.consent2share.web;
 
 
+import java.util.List;
+
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.PixQueryService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
+import gov.samhsa.consent2share.service.dto.SystemNotificationDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
 import gov.samhsa.consent2share.service.patient.PatientService;
 import gov.samhsa.consent2share.service.reference.AdministrativeGenderCodeService;
@@ -40,6 +43,7 @@ import gov.samhsa.consent2share.service.reference.MaritalStatusCodeService;
 import gov.samhsa.consent2share.service.reference.RaceCodeService;
 import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
+import gov.samhsa.consent2share.service.systemnotification.SystemNotificationService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -102,6 +106,9 @@ public class PatientController extends AbstractController{
 	@Autowired
 	private PixQueryService pixQueryService;
 	
+	@Autowired
+	SystemNotificationService systemNotificationService;
+	
 	
 	/**
 	 * Home.
@@ -112,13 +119,17 @@ public class PatientController extends AbstractController{
 	@RequestMapping(value = "home.html") 
 	public String home(Model model, HttpServletRequest request) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
-		
 		String username=currentUser.getUsername();
+		PatientProfileDto patientProfileDto = patientService.findPatientProfileByUsername(username);
+		
+		List<SystemNotificationDto> systemNotificationDtos=systemNotificationService.findAllSystemNotificationDtosByPatient(patientProfileDto.getId());
+		
 		String notify = request.getParameter("notify");
 		
 		model.addAttribute("notifyevent", notify);
 		
 		String notification=notificationService.notificationStage(username,null);
+		model.addAttribute("systemNotificationDtos", systemNotificationDtos);
 		model.addAttribute("currentUser", currentUser);
 		model.addAttribute("notification", notification);
 		return "views/patients/home";

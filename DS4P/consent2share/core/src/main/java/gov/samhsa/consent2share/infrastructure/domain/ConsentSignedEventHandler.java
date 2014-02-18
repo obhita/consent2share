@@ -25,14 +25,19 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.infrastructure.domain;
 
+import java.util.Date;
+
 import gov.samhsa.consent2share.domain.AbstractDomainEventHandler;
+import gov.samhsa.consent2share.domain.consent.Consent;
+import gov.samhsa.consent2share.domain.consent.ConsentRepository;
 import gov.samhsa.consent2share.domain.consent.event.ConsentSignedEvent;
+import gov.samhsa.consent2share.domain.systemnotification.SystemNotification;
+import gov.samhsa.consent2share.domain.systemnotification.SystemNotificationRepository;
 import gov.samhsa.consent2share.infrastructure.rabbit.MessageSender;
-import gov.samhsa.consent2share.service.consent.ConsentService;
-import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,8 +47,21 @@ import org.springframework.stereotype.Component;
 public class ConsentSignedEventHandler extends
 		AbstractDomainEventHandler<ConsentSignedEvent> {
 	
+	
+	@Value("${notification_consent_signed}")
+	private String notificationMessage;
+	
 	@Autowired
 	private MessageSender messageSender;
+	
+	/** The consent repository. */
+	@Autowired
+    private ConsentRepository consentRepository;
+	
+	
+	/** The notification repository. */
+	@Autowired
+    private SystemNotificationRepository systemNotificationRepository;
 
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.domain.AbstractDomainEventHandler#getEventClass()
@@ -62,5 +80,16 @@ public class ConsentSignedEventHandler extends
 		messageProperties.setHeader("messageType", event.getClass().getName());
 		messageProperties.setContentType("text/plain");
 		messageSender.send(event.getConsentId().toString(), messageProperties);
+		
+		Consent consent=consentRepository.findOne(event.getConsentId());
+		
+		SystemNotification notification=new SystemNotification();
+		notification.setConsentId(consent.getId());
+		notification.setPatientId(consent.getPatient().getId());
+		notification.setNotificationMessage(notificationMessage);
+		notification.setNotificationType("consent_signed");
+		notification.setSendDate(new Date());
+		
+		systemNotificationRepository.save(notification);
 	}
 }

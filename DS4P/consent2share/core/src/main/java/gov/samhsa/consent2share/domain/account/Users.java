@@ -36,7 +36,7 @@ org.springframework.security.core.userdetails.UserDetails{
 	
 	public Users(int failedLoginAttempts,String username, String password, boolean enabled, boolean accountNonExpired,
             boolean credentialsNonExpired, Set<GrantedAuthority> authorities) {
-		this(failedLoginAttempts,username, password, true, true, true, authorities,null);
+		this(failedLoginAttempts,username, password, enabled, accountNonExpired, credentialsNonExpired, authorities,null);
     }
 	
 	public Users(int failedLoginAttempts,String username, String password, boolean enabled, boolean accountNonExpired,

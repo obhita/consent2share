@@ -26,7 +26,7 @@
 package gov.samhsa.acs.documentsegmentation;
 
 import gov.samhsa.acs.brms.RuleExecutionService;
-import gov.samhsa.acs.common.bean.RuleExecutionContainer;
+import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.common.bean.XacmlResult;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
@@ -205,6 +205,8 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 			// redact document
 			document = documentRedactor.redactDocument(document,
 					ruleExecutionContainer, xacmlResult);
+			// to get the itemActions from documentRedactor
+			executionResponseContainer = marshaller.marshall(ruleExecutionContainer);
 
 			// tag document
 			document = documentTagger.tagDocument(document,
@@ -261,6 +263,9 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 			segmentDocumentResponse.setProcessedDocument(new DataHandler(
 					rawData));
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw new DS4PException(e.toString(), e);
+		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 			throw new DS4PException(e.toString(), e);
 		}

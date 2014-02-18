@@ -12,6 +12,7 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
+import java.util.Scanner;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -33,8 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
-//
-//import javax.xml.ws.BindingProvider;
 
 public class WSClient {
 
@@ -50,10 +49,7 @@ public class WSClient {
 			"http://www.samhsa.gov/ds4ppilot/contract/pep", "PepService");
 
 	public static void main(String[] args) throws Throwable {
-
 		String address = "http://localhost:8080/Pep/services/PepService";
-		// QName serviceName = new QName(
-		// "http://www.samhsa.gov/ds4ppilot/contract/pep", "PepService");
 		Properties prop = new Properties();
 		try {
 			wsdlURL = new URL(address + "?wsdl");
@@ -76,43 +72,42 @@ public class WSClient {
 			client.getInInterceptors().add(new LoggingInInterceptor());
 			client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-			// BindingProvider bp = (BindingProvider) port;
-			// STSClient stsClient = (STSClient)
-			// bp.getRequestContext().get("ws-security.sts.client");
+			AdhocQueryResponse response1 = port
+					.registryStoredQuery(constructAdhocQuery());
+			SimpleMarshallerImpl marshaller = new SimpleMarshallerImpl();
 
-			// AdhocQueryResponse response1 = port
-			// .registryStoredQuery(constructAdhocQuery());
-			// SimpleMarshallerImpl marshaller = new SimpleMarshallerImpl();
-			// System.out.println("Adhoc Response: "
-			// + marshaller.marshall(response1));
+			Scanner scan = new Scanner(System.in);
+			System.out.println("Please enter documentUniqueId:");
+			String documentUniqueId = scan.nextLine();
+			RetrieveDocumentSetResponse retrieveDocResp = port
+					.retrieveDocumentSet(constructRetrieveDocumentRequest(documentUniqueId));
 
-			// RetrieveDocumentSetResponse retrieveDocResp = port
-			// .retrieveDocumentSet(constructRetrieveDocumentRequest());
-			// System.out.println("Retrieve Response: "
-			// + marshaller.marshall(retrieveDocResp));
-			// System.out.println(new
-			// String(retrieveDocResp.getDocumentResponse()
-			// .get(0).getDocument()));
 			// FileHelper.writeBytesToFile(retrieveDocResp.getDocumentResponse()
 			// .get(0).getDocument(), "retrievedDocumentForTest.xml");
 
 			// Direct
-			DirectEmailSendRequest directEmailSendRequest = new DirectEmailSendRequest();
-			directEmailSendRequest.setSenderNPI("1114252178");
-			directEmailSendRequest.setRecipientNPI("1760717789");
-			directEmailSendRequest
-					.setResourceId("d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
-			directEmailSendRequest.setPurposeOfUse("TREAT");
-			DirectEmailSendResponse directEmailSendResponse = port
-					.directEmailSend(directEmailSendRequest);
-			System.out.println("Direct response: "
-					+ directEmailSendResponse.getPdpDecision());
-
-			// if (directEmailSendResponse.getPdpDecision().equals("DENY")) {
-			// sendNotification(directEmailSendRequest.get, result);
-			// }
+			/*
+			 * DirectEmailSendRequest directEmailSendRequest = new
+			 * DirectEmailSendRequest();
+			 * directEmailSendRequest.setSenderNPI("1114252178");
+			 * directEmailSendRequest.setRecipientNPI("1760717789");
+			 * directEmailSendRequest .setResourceId(
+			 * "d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO"
+			 * ); directEmailSendRequest.setPurposeOfUse("TREAT");
+			 * DirectEmailSendResponse directEmailSendResponse = port
+			 * .directEmailSend(directEmailSendRequest);
+			 * System.out.println("Direct response: " +
+			 * directEmailSendResponse.getPdpDecision());
+			 */
 
 			printSecurityToken(port);
+
+			System.out.println("Adhoc Response: "
+					+ marshaller.marshall(response1));
+			System.out.println("Retrieve Response: "
+					+ marshaller.marshall(retrieveDocResp));
+			System.out.println(new String(retrieveDocResp.getDocumentResponse()
+					.get(0).getDocument()));
 
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
@@ -203,10 +198,10 @@ public class WSClient {
 		return request;
 	}
 
-	private static RetrieveDocumentSetRequest constructRetrieveDocumentRequest()
+	private static RetrieveDocumentSetRequest constructRetrieveDocumentRequest(String documentUniqueId)
 			throws Exception {
 		SimpleMarshallerImpl marshaller = new SimpleMarshallerImpl();
-		String retrieveDocumentSetString = "<urn:RetrieveDocumentSetRequest xmlns:urn=\"urn:ihe:iti:xds-b:2007\"><urn:DocumentRequest><urn:RepositoryUniqueId>1.3.6.1.4.1.21367.2010.1.2.1040</urn:RepositoryUniqueId><urn:DocumentUniqueId>110201191.31157.4070.115116.143483111549083</urn:DocumentUniqueId></urn:DocumentRequest></urn:RetrieveDocumentSetRequest>";
+		String retrieveDocumentSetString = "<urn:RetrieveDocumentSetRequest xmlns:urn=\"urn:ihe:iti:xds-b:2007\"><urn:DocumentRequest><urn:RepositoryUniqueId>1.3.6.1.4.1.21367.2010.1.2.1040</urn:RepositoryUniqueId><urn:DocumentUniqueId>"+documentUniqueId+"</urn:DocumentUniqueId></urn:DocumentRequest></urn:RetrieveDocumentSetRequest>";
 		RetrieveDocumentSetRequest request = marshaller.unmarshallFromXml(
 				RetrieveDocumentSetRequest.class, retrieveDocumentSetString);
 
@@ -227,8 +222,4 @@ public class WSClient {
 		System.out.println("******************** TOKEN ********************");
 	}
 
-	private static void sendNotification(String senderEmail, String result) {
-		// TODO Auto-generated method stub
-
-	}
 }

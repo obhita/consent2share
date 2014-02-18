@@ -25,11 +25,21 @@
  ******************************************************************************/
 package gov.samhsa.acs.contexthandler;
 
+import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
+import gov.samhsa.acs.common.tool.DocumentXmlConverter;
+import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import org.herasaf.xacml.core.api.PDP;
 import org.herasaf.xacml.core.api.PolicyRepository;
@@ -40,14 +50,20 @@ import org.herasaf.xacml.core.context.impl.ResponseType;
 import org.herasaf.xacml.core.context.impl.ResultType;
 import org.herasaf.xacml.core.policy.Evaluatable;
 import org.herasaf.xacml.core.policy.EvaluatableID;
+import org.herasaf.xacml.core.policy.PolicyMarshaller;
 import org.herasaf.xacml.core.policy.impl.AttributeAssignmentType;
 import org.herasaf.xacml.core.policy.impl.ObligationType;
 import org.herasaf.xacml.core.simplePDP.SimplePDPFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
- * The Class PolicyDecisionPoint.
+ * The Class PolicyDecisionPointImpl.
  */
 public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 
@@ -55,8 +71,8 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PolicyDecisionPointImpl.class);
 
-	/** Data service for policy decision point implementation. */
-	private PolicyDecisionPointImplData data;
+	/** The policy provider. */
+	private PolicyProvider policyProvider;
 
 	/** The request generator. */
 	private RequestGenerator requestGenerator;
@@ -67,15 +83,15 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	/**
 	 * Instantiates a new policy decision point impl.
 	 * 
-	 * @param data
-	 *            the data
+	 * @param policyProvider
+	 *            the policy provider
 	 * @param requestGenerator
 	 *            the request generator
 	 */
-	public PolicyDecisionPointImpl(PolicyDecisionPointImplData data,
+	public PolicyDecisionPointImpl(PolicyProvider policyProvider,
 			RequestGenerator requestGenerator) {
 		super();
-		this.data = data;
+		this.policyProvider = policyProvider;
 		this.requestGenerator = requestGenerator;
 		this.simplePDP = getSimplePDP();
 	}
@@ -94,7 +110,7 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	public List<Evaluatable> getPolicies(String patientUniqueId,
 			String recipientSubjectNPI, String intermediarySubjectNPI) {
 
-		return data.getPolicies(patientUniqueId, recipientSubjectNPI,
+		return policyProvider.getPolicies(patientUniqueId, recipientSubjectNPI,
 				intermediarySubjectNPI);
 	}
 
@@ -381,5 +397,107 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 				+ xacmlResponse.getPdpDecision());
 		LOGGER.debug("xacmlResponse is ready!");
 		return xacmlResponse;
+	}
+
+	/* (non-Javadoc)
+	 * @see gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluatePolicyForTrying(java.lang.String)
+	 */
+	@Override
+	public PdpRequestResponse evaluatePolicyForTrying(String xacmlPolicy) {
+		Assert.hasText(xacmlPolicy, "Xaml policy is not set");
+
+		Node resourceNode = null;
+		NodeList senderNodeList = null;
+		NodeList recipientNodeList = null;
+		NodeList purposeOfUseNodeList = null;
+		try {
+			// Setting up configuration in DocumentXmlConverter is important
+			DocumentXmlConverter documentXmlConverter = new DocumentXmlConverterImpl();
+			
+			Document xmlDoc = documentXmlConverter.loadDocument(xacmlPolicy);
+			XPath xPath = XPathFactory.newInstance().newXPath();
+
+			// XPath ignores namespaces by using local-name() XPath function
+			XPathExpression xPathExpressionResource = xPath
+					.compile("//*[local-name() = 'ResourceAttributeDesignator'][@AttributeId='urn:oasis:names:tc:xacml:1.0:resource:resource-id']/ancestor::*[local-name() = 'ResourceMatch'][1]/*[local-name() = 'AttributeValue']");
+			resourceNode = (Node) xPathExpressionResource.evaluate(xmlDoc,
+					XPathConstants.NODE);
+
+			XPathExpression xPathExpressionSender = xPath
+					.compile("//*[local-name() = 'SubjectAttributeDesignator'][@AttributeId='urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject']/../../*[local-name() = 'AttributeValue']");
+			senderNodeList = (NodeList) xPathExpressionSender.evaluate(xmlDoc,
+					XPathConstants.NODESET);
+
+			XPathExpression xPathExpressionRecipient = xPath
+					.compile("//*[local-name() = 'SubjectAttributeDesignator'][@AttributeId='urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject']/../../*[local-name() = 'AttributeValue']");
+			recipientNodeList = (NodeList) xPathExpressionRecipient.evaluate(
+					xmlDoc, XPathConstants.NODESET);
+
+			XPathExpression xPathExpressionPurposeOfUse = xPath
+					.compile("//*[local-name() = 'SubjectAttributeDesignator'][@AttributeId='gov.samhsa.consent2share.purpose-of-use-code']/../../*[local-name() = 'AttributeValue']");
+			purposeOfUseNodeList = (NodeList) xPathExpressionPurposeOfUse
+					.evaluate(xmlDoc, XPathConstants.NODESET);
+
+			XPathExpression xPathExpressionCurrentDate = xPath
+					.compile("//*[local-name() = 'EnvironmentAttributeDesignator'][@AttributeId='urn:oasis:names:tc:xacml:1.0:environment:current-dateTime']/../..");
+			NodeList currentDateNodeList = (NodeList) xPathExpressionCurrentDate
+					.evaluate(xmlDoc, XPathConstants.NODESET);
+
+			// Remove environment:current-dateTime nodes
+			for (int i = 0; i < currentDateNodeList.getLength(); i++) {
+				Node node = currentDateNodeList.item(i);
+				node.getParentNode().removeChild(node);
+			}
+
+			// Get the updated policy after removing environment:current-dateTime nodes
+			xacmlPolicy = documentXmlConverter.convertXmlDocToString(xmlDoc);
+
+		} catch (Exception e) {
+			LOGGER.error("Exception occured when trying to query and manipulate xaml policy string", e);
+		}
+
+		// Create xacmlRequest 
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		
+		String resourceId = resourceNode.getTextContent();
+		xacmlRequest.setPatientId(resourceId);
+
+		String intermediarySubjectNPI = senderNodeList.item(0).getTextContent();
+		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
+
+		String recepientSubjectNPI = recipientNodeList.item(0).getTextContent();
+		xacmlRequest.setRecepientSubjectNPI(recepientSubjectNPI);
+
+		String purposeOfUse = purposeOfUseNodeList.item(0).getTextContent();
+		xacmlRequest.setPurposeOfUse(purposeOfUse);
+
+		RequestType request = requestGenerator.generateRequest(
+				xacmlRequest.getRecepientSubjectNPI(),
+				xacmlRequest.getIntermediarySubjectNPI(),
+				xacmlRequest.getPurposeOfUse(), xacmlRequest.getPatientId());
+
+		InputSource source = new InputSource(new StringReader(xacmlPolicy));
+
+		Evaluatable policy = null;
+		try {
+			policy = PolicyMarshaller.unmarshal(source);
+		} catch (Exception e) {
+			LOGGER.error("Exception occured when trying to unmarshal xaml policy to be used by PDP engine", e);
+		}
+
+		List<Evaluatable> policies = new ArrayList<Evaluatable>();
+		policies.add(policy);
+
+		deployPolicies(this.simplePDP, policies);
+
+		XacmlResponse xacmlResponse = managePoliciesAndEvaluateRequest(
+				this.simplePDP, request);
+		
+		PdpRequestResponse pdpRequestResponse = new PdpRequestResponse();
+		
+		pdpRequestResponse.setXacmlRequest(xacmlRequest);
+		pdpRequestResponse.setXacmlResponse(xacmlResponse);
+
+		return pdpRequestResponse;
 	}
 }

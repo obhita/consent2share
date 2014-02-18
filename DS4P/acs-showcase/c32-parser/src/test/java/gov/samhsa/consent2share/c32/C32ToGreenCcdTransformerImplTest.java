@@ -1,6 +1,7 @@
 package gov.samhsa.consent2share.c32;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import gov.samhsa.consent2share.commonunit.io.ResourceFileReader;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;

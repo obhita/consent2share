@@ -1,5 +1,7 @@
 package gov.samhsa.consent2share.showcase.service;
 
+import gov.samhsa.consent2share.showcase.exception.AcsShowCaseException;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
@@ -59,16 +61,14 @@ public class MailServiceImpl implements MailService {
 
 		Session session = Session.getInstance(props);
 		try {
-			//TODO: move to property file
-			// session = Session.getDefaultInstance(props, null);
 			Store store = session.getStore("imap");
-			
-			System.out.println("Username2: " + mailDto.getUsername());
-			System.out.println("Password: " + mailDto.getPassword());
+
 			store.connect(mailDto.getImapServerHost(),
 					mailDto.getUsername(), mailDto.getPassword());
 
-			logger.debug("Store: " + store);
+			logger.debug("Store: " + store);			
+			logger.debug("Username: " + mailDto.getUsername());
+			logger.debug("Password: " + mailDto.getPassword());
 
 			// Instantiate a message
 			Message msg = new MimeMessage(session);
@@ -90,7 +90,6 @@ public class MailServiceImpl implements MailService {
 					fd.appendMessages(new Message[] { msg });
 				}
 			}
-
 			// Send the message
 			// Transport.send(msg);
 		} catch (MessagingException mex) {

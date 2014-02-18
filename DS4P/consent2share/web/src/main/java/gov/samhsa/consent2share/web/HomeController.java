@@ -29,10 +29,7 @@ import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
-
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,6 +39,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * The Class HomeController.
@@ -69,7 +67,11 @@ public class HomeController {
                         return "redirect:/defaultLoginPage.html";
         }
 		return "views/index";
-	}	
+	}
+	
+	@RequestMapping(value = "/keep-alive", method = RequestMethod.GET)
+	public @ResponseBody void keepAlive() {
+	}
 	
 	/**
 	 * Index.

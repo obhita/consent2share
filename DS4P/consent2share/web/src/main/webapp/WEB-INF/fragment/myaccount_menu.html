@@ -50,7 +50,7 @@
 		<span class="btn-group btn-group-sm">
 			<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
 				<span class="fa fa-user" style="margin-right: 2px;"></span>
-				<span class="hidden-xs inline-block">Leo Smith</span>
+				<span class="hidden-xs inline-block" th:text="${adminProfileDto.firstName+' '+adminProfileDto.lastName}">Leo Smith</span>
 				<span class="caret inline-block"></span>
 			</a>
 			

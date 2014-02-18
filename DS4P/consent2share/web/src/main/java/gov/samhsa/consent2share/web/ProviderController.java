@@ -64,18 +64,20 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * The Class ProviderController.
  */
 @Controller
 @RequestMapping("/patients")
-public class ProviderController {
+public class ProviderController extends AbstractController {
 
 
 	/** The patient service. */
@@ -312,7 +314,7 @@ public class ProviderController {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		
 		HashMap<String,String> Result=deserializeResult(providerDtoJSON);
-	
+		boolean isSuccess = false;
 	
 		if ((EntityType.valueOf(Result.get("entityType"))==EntityType.Organization)){
 			OrganizationalProviderDto providerDto=new OrganizationalProviderDto();
@@ -324,7 +326,8 @@ public class ProviderController {
 			providerDto.setAuthorizedOfficialNamePrefix(Result.get("authorizedOfficialNamePrefixText"));
 			providerDto.setAuthorizedOfficialTelephoneNumber(Result.get("authorizedOfficialTelephoneNumber"));
 			providerDto.setUsername(currentUser.getUsername());
-			organizationalProviderService.updateOrganizationalProvider(providerDto);
+			
+			isSuccess = organizationalProviderService.addNewOrganizationalProvider(providerDto);
 		}
 		else{
 			IndividualProviderDto providerDto=new IndividualProviderDto();
@@ -336,11 +339,62 @@ public class ProviderController {
 			providerDto.setNameSuffix(Result.get("providerNameSuffixText"));
 			providerDto.setCredential(Result.get("providerCredentialText"));
 			providerDto.setUsername(currentUser.getUsername());
-			individualProviderService.updateIndividualProvider(providerDto);
+			
+			isSuccess = individualProviderService.addNewIndividualProvider(providerDto);
 		}
 		
 		return "redirect:/patients/connectionMain.html";
 	}
+	
+	
+	
+	
+	@RequestMapping(value = "connectionProviderAdd_AJAX.html", method = RequestMethod.POST )
+	public @ResponseBody String providerSearch_AJAX(@RequestParam("querySent") String providerDtoJSON) {
+		AuthenticatedUser currentUser = userContext.getCurrentUser();
+		
+		HashMap<String,String> Result=deserializeResult(providerDtoJSON);
+		boolean isSuccess = false;
+	
+		if ((EntityType.valueOf(Result.get("entityType"))==EntityType.Organization)){
+			OrganizationalProviderDto providerDto=new OrganizationalProviderDto();
+			hashMapResultToProviderDtoConverter.setProviderDto(providerDto,Result);
+			providerDto.setOrgName(Result.get("providerOrganizationName"));
+			providerDto.setAuthorizedOfficialLastName(Result.get("authorizedOfficialLastName"));
+			providerDto.setAuthorizedOfficialFirstName(Result.get("authorizedOfficialFirstName"));
+			providerDto.setAuthorizedOfficialTitle(Result.get("authorizedOfficialTitleorPosition"));
+			providerDto.setAuthorizedOfficialNamePrefix(Result.get("authorizedOfficialNamePrefixText"));
+			providerDto.setAuthorizedOfficialTelephoneNumber(Result.get("authorizedOfficialTelephoneNumber"));
+			providerDto.setUsername(currentUser.getUsername());
+			
+			isSuccess = organizationalProviderService.addNewOrganizationalProvider(providerDto);
+		}
+		else{
+			IndividualProviderDto providerDto=new IndividualProviderDto();
+			hashMapResultToProviderDtoConverter.setProviderDto(providerDto,Result);
+			providerDto.setFirstName(Result.get("providerFirstName"));
+			providerDto.setMiddleName(Result.get("providerMiddleName"));
+			providerDto.setLastName(Result.get("providerLastName"));
+			providerDto.setNamePrefix(Result.get("providerNamePrefixText"));
+			providerDto.setNameSuffix(Result.get("providerNameSuffixText"));
+			providerDto.setCredential(Result.get("providerCredentialText"));
+			providerDto.setUsername(currentUser.getUsername());
+			
+			isSuccess = individualProviderService.addNewIndividualProvider(providerDto);
+		}
+		
+		if(isSuccess){
+			return "Success";
+		}else{
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to add this new provider because this provider already exists.");
+		}
+	}
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * Deserialize result.

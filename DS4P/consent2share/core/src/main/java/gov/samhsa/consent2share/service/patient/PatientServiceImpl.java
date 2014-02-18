@@ -40,6 +40,7 @@ import gov.samhsa.consent2share.domain.patient.PatientRepository;
 import gov.samhsa.consent2share.domain.provider.IndividualProvider;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
 import gov.samhsa.consent2share.infrastructure.DtoToDomainEntityMapper;
+import gov.samhsa.consent2share.infrastructure.EmailType;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
@@ -51,10 +52,8 @@ import gov.samhsa.consent2share.service.dto.PatientAdminDto;
 import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.RecentPatientDto;
-import gov.samhsa.consent2share.infrastructure.EmailType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -71,6 +70,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class PatientServiceImpl.
  */
@@ -130,6 +130,9 @@ public class PatientServiceImpl implements PatientService {
 		return patientDto;
 	}
 	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.patient.PatientService#findAllPatientByFirstNameAndLastName(java.lang.String[])
+	 */
 	@Override
 	public List<PatientAdminDto> findAllPatientByFirstNameAndLastName(
 			String[] tokens) {
@@ -147,6 +150,9 @@ public class PatientServiceImpl implements PatientService {
 		return PatientAdminDtoList;
 	}
 	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.patient.PatientService#findByUsername(java.lang.String)
+	 */
 	@Override
 	public PatientProfileDto findByUsername(String username){
 		Patient patient=patientRepository.findByUsername(username);
@@ -192,81 +198,97 @@ public class PatientServiceImpl implements PatientService {
 	 */
 	public PatientConnectionDto findPatientConnectionByUsername(String username) {
 		Patient patient = patientRepository.findByUsername(username);
-		PatientConnectionDto patientConnectionDto = modelMapper.map(patient,
-				PatientConnectionDto.class);
-		
-		Set<IndividualProvider> consentIndividualProviders=new HashSet<IndividualProvider>();
-		Set<OrganizationalProvider> consentOrganizationalProviders=new HashSet<OrganizationalProvider>();
-		
-		if (patient.getConsents() != null) {
-			Set<Consent> consents = patient.getConsents();
-			for (Consent consent : consents) {
-				Set<ConsentOrganizationalProviderDisclosureIsMadeTo> consentOrganizationalProviderDisclosureIsMadeTos = consent
-						.getOrganizationalProvidersDisclosureIsMadeTo();
-				if (consentOrganizationalProviderDisclosureIsMadeTos.size() != 0)
-					for (ConsentOrganizationalProviderDisclosureIsMadeTo cop : consentOrganizationalProviderDisclosureIsMadeTos) {
-						consentOrganizationalProviders.add(cop
-								.getOrganizationalProvider());
-					}
+		return findPatientConnectionByPatient(patient);
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.patient.PatientService#findPatientConnectionByPatient(gov.samhsa.consent2share.domain.patient.Patient)
+	 */
+	public PatientConnectionDto findPatientConnectionByPatient(Patient patient) {
+	PatientConnectionDto patientConnectionDto = modelMapper.map(patient,
+			PatientConnectionDto.class);
+	
+	Set<IndividualProvider> consentIndividualProviders=new HashSet<IndividualProvider>();
+	Set<OrganizationalProvider> consentOrganizationalProviders=new HashSet<OrganizationalProvider>();
+	
+	if (patient.getConsents() != null) {
+		Set<Consent> consents = patient.getConsents();
+		for (Consent consent : consents) {
+			Set<ConsentOrganizationalProviderDisclosureIsMadeTo> consentOrganizationalProviderDisclosureIsMadeTos = consent
+					.getOrganizationalProvidersDisclosureIsMadeTo();
+			if (consentOrganizationalProviderDisclosureIsMadeTos.size() != 0)
+				for (ConsentOrganizationalProviderDisclosureIsMadeTo cop : consentOrganizationalProviderDisclosureIsMadeTos) {
+					consentOrganizationalProviders.add(cop
+							.getOrganizationalProvider());
+				}
 
-				Set<ConsentOrganizationalProviderPermittedToDisclose> consentOrganizationalProviderPermittedToDiscloses = consent
-						.getOrganizationalProvidersPermittedToDisclose();
-				if (consentOrganizationalProviderPermittedToDiscloses.size() != 0)
-					for (ConsentOrganizationalProviderPermittedToDisclose copp : consentOrganizationalProviderPermittedToDiscloses) {
-						consentOrganizationalProviders.add(copp
-								.getOrganizationalProvider());
-					}
+			Set<ConsentOrganizationalProviderPermittedToDisclose> consentOrganizationalProviderPermittedToDiscloses = consent
+					.getOrganizationalProvidersPermittedToDisclose();
+			if (consentOrganizationalProviderPermittedToDiscloses.size() != 0)
+				for (ConsentOrganizationalProviderPermittedToDisclose copp : consentOrganizationalProviderPermittedToDiscloses) {
+					consentOrganizationalProviders.add(copp
+							.getOrganizationalProvider());
+				}
 
-				Set<ConsentIndividualProviderDisclosureIsMadeTo> consentIndividualProviderDisclosureIsMadeTos = consent
-						.getProvidersDisclosureIsMadeTo();
-				if (consentIndividualProviderDisclosureIsMadeTos.size() != 0)
-					for (ConsentIndividualProviderDisclosureIsMadeTo cip : consentIndividualProviderDisclosureIsMadeTos) {
-						consentIndividualProviders.add(cip
-								.getIndividualProvider());
-					}
+			Set<ConsentIndividualProviderDisclosureIsMadeTo> consentIndividualProviderDisclosureIsMadeTos = consent
+					.getProvidersDisclosureIsMadeTo();
+			if (consentIndividualProviderDisclosureIsMadeTos.size() != 0)
+				for (ConsentIndividualProviderDisclosureIsMadeTo cip : consentIndividualProviderDisclosureIsMadeTos) {
+					consentIndividualProviders.add(cip
+							.getIndividualProvider());
+				}
 
-				Set<ConsentIndividualProviderPermittedToDisclose> consentIndividualProviderPermittedToDiscloses = consent
-						.getProvidersPermittedToDisclose();
-				if (consentIndividualProviderPermittedToDiscloses.size() != 0)
-					for (ConsentIndividualProviderPermittedToDisclose cipp : consentIndividualProviderPermittedToDiscloses) {
-						consentIndividualProviders.add(cipp
-								.getIndividualProvider());
-					}
-			}
+			Set<ConsentIndividualProviderPermittedToDisclose> consentIndividualProviderPermittedToDiscloses = consent
+					.getProvidersPermittedToDisclose();
+			if (consentIndividualProviderPermittedToDiscloses.size() != 0)
+				for (ConsentIndividualProviderPermittedToDisclose cipp : consentIndividualProviderPermittedToDiscloses) {
+					consentIndividualProviders.add(cipp
+							.getIndividualProvider());
+				}
 		}
-		
-		
-		
-		//check whether the providers in the consent provider list
-		
-		 Set<IndividualProviderDto> individualProviderDtos=patientConnectionDto.getIndividualProviders();
-		 Set<OrganizationalProviderDto> organizationalProviderDtos=patientConnectionDto.getOrganizationalProviders();
-		 if (individualProviderDtos.size() != 0)
-				for (IndividualProviderDto individualProviderDto: individualProviderDtos)
-				{   
-					individualProviderDto.setDeletable(true);
-					for(IndividualProvider individualProvider: consentIndividualProviders)
-					{
-						if(individualProviderDto.getId()==individualProvider.getId()&&individualProviderDto.getNpi().equals(individualProvider.getNpi()))
-							individualProviderDto.setDeletable(false);
-					}
+	}
+	
+	
+	
+	//check whether the providers in the consent provider list
+	
+	 Set<IndividualProviderDto> individualProviderDtos=patientConnectionDto.getIndividualProviders();
+	 Set<OrganizationalProviderDto> organizationalProviderDtos=patientConnectionDto.getOrganizationalProviders();
+	 if (individualProviderDtos.size() != 0)
+			for (IndividualProviderDto individualProviderDto: individualProviderDtos)
+			{   
+				individualProviderDto.setDeletable(true);
+				for(IndividualProvider individualProvider: consentIndividualProviders)
+				{
+					if(individualProviderDto.getId()==individualProvider.getId()&&individualProviderDto.getNpi().equals(individualProvider.getNpi()))
+						individualProviderDto.setDeletable(false);
 				}
-		 
-		 
-		 if (organizationalProviderDtos.size() != 0)
-				for (OrganizationalProviderDto organizationalProviderDto: organizationalProviderDtos)
-				{   
-					organizationalProviderDto.setDeletable(true);
-					for(OrganizationalProvider organizationalProvider: consentOrganizationalProviders)
-					{
-						if(organizationalProviderDto.getId()==organizationalProvider.getId()&&organizationalProviderDto.getNpi().equals(organizationalProvider.getNpi()))
-							organizationalProviderDto.setDeletable(false);
-					}
+			}
+	 
+	 
+	 if (organizationalProviderDtos.size() != 0)
+			for (OrganizationalProviderDto organizationalProviderDto: organizationalProviderDtos)
+			{   
+				organizationalProviderDto.setDeletable(true);
+				for(OrganizationalProvider organizationalProvider: consentOrganizationalProviders)
+				{
+					if(organizationalProviderDto.getId()==organizationalProvider.getId()&&organizationalProviderDto.getNpi().equals(organizationalProvider.getNpi()))
+						organizationalProviderDto.setDeletable(false);
 				}
-		 
-			
+			}
+	 
 		
-		return patientConnectionDto;
+	
+	return patientConnectionDto;
+}
+	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.patient.PatientService#findPatientConnectionById(long)
+	 */
+	public PatientConnectionDto findPatientConnectionById(long id) {
+		Patient patient = patientRepository.findOne(id);
+		return findPatientConnectionByPatient(patient);
 	}
 
 	/* (non-Javadoc)
@@ -385,6 +407,9 @@ public class PatientServiceImpl implements PatientService {
 		return false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.patient.PatientService#findRecentPatientDtosById(java.util.List)
+	 */
 	public List<RecentPatientDto> findRecentPatientDtosById(List<String> ids){
 		List<RecentPatientDto> patients=new ArrayList<RecentPatientDto>();
 		for (String id:ids){
@@ -394,6 +419,12 @@ public class PatientServiceImpl implements PatientService {
 		return patients;
 	}
 	
+	/**
+	 * Map patient list to patient admin dto list.
+	 *
+	 * @param patients the patients
+	 * @return the list
+	 */
 	private List<PatientAdminDto> mapPatientListToPatientAdminDtoList(List<Patient> patients){
 		List<PatientAdminDto> patientAdminDtoList= new ArrayList<PatientAdminDto>();
 		for (Patient patient:patients){

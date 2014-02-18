@@ -57,7 +57,7 @@ public class OrganizationalProviderServiceImplTest {
 	public void testDeleteOrganizationalProviderDto() {
 		OrganizationalProviderDto organizationalProviderDto = mock(OrganizationalProviderDto.class);
 		organizationalProviderService.deleteOrganizationalProviderDto(mock(OrganizationalProviderDto.class));
-		verify(organizationalProviderRepository).findByPatientAndNpi(patientRepository.findByUsername(organizationalProviderDto.getUsername()), organizationalProviderDto.getNpi());
+		verify(patientRepository).save(any(Patient.class));
 	}
 
 	@Test
@@ -70,15 +70,6 @@ public class OrganizationalProviderServiceImplTest {
 	public void testFindOrganizationalProviderByNpi() {
 		organizationalProviderService.findOrganizationalProviderByNpi(anyString());
 		verify(organizationalProviderRepository).findByNpi(anyString());
-	}
-
-	@Test
-	public void testFindOrganizationalProviderByPatientAndNpi() {
-		Patient patient = mock(Patient.class);
-		OrganizationalProviderDto organizationalProviderDto = mock(OrganizationalProviderDto.class);
-		when(organizationalProviderDto.getNpi()).thenReturn("npi");
-		organizationalProviderService.findOrganizationalProviderByPatientAndNpi(patient, organizationalProviderDto.getNpi());
-		verify(organizationalProviderRepository).findByPatientAndNpi(any(Patient.class), anyString());
 	}
 
 	@Test
@@ -109,7 +100,7 @@ public class OrganizationalProviderServiceImplTest {
 	@Test
 	public void testUpdateOrganizationalProviderOrganizationalProviderDto() {
 		organizationalProviderService.updateOrganizationalProvider(mock(OrganizationalProviderDto.class));
-		verify(organizationalProviderRepository).save(any(OrganizationalProvider.class));
+		verify(patientRepository).save(any(Patient.class));
 	}
 
 }

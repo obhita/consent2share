@@ -1,10 +1,17 @@
+var lastProviderState={};
+
 /**********************************************************************************
  * DOCUMENT.READY FUNCTION
 **********************************************************************************/
 $(document).ready(function() {
 	var addConsent_tmp = null;
-	var in_addConsent_tmp = $('#input_isAddConsent').val();
+	var isProviderAdminUser_tmp = null;
+	
+	var in_addConsent_tmp = $('input#input_isAddConsent').val();
+	var in_isProviderAdminUser_tmp = $('input#input_isProviderAdminUser').val();
 
+
+	//Convert string input for in_addConsent_tmp to boolean type
 	if(in_addConsent_tmp === "true"){
 		addConsent_tmp = true;
 	}else if(in_addConsent_tmp === "false"){
@@ -15,11 +22,27 @@ $(document).ready(function() {
 
 	//Check if addConsent is a valid boolean value
 	if((addConsent_tmp !== true) && (addConsent_tmp !== false)){
-		console.log(addConsent_tmp);
 		addConsent_tmp = null;
 		throw new ReferenceError("addConsent_tmp variable is not a valid boolean value");
 	}
+	
+	
+	//Convert string input for in_isProviderAdminUser_tmp to boolean type
+	if(in_isProviderAdminUser_tmp === "true"){
+		isProviderAdminUser_tmp = true;
+	}else if(in_isProviderAdminUser_tmp === "false"){
+		isProviderAdminUser_tmp = false;
+	}else{
+		isProviderAdminUser_tmp = false;
+	}
 
+	//Check if isProviderAdminUser_tmp is a valid boolean value
+	if((isProviderAdminUser_tmp !== true) && (isProviderAdminUser_tmp !== false)){
+		isProviderAdminUser_tmp = null;
+		throw new ReferenceError("isProviderAdminUser_tmp variable is not a valid boolean value");
+	}
+	
+	
 	var specMedSetObj_tmp = null;
 
 	if(addConsent_tmp === false){
@@ -36,19 +59,26 @@ $(document).ready(function() {
 		});
 	}
 
-	setupPage(addConsent_tmp, specMedSetObj_tmp);
+	setupPage(addConsent_tmp, isProviderAdminUser_tmp, specMedSetObj_tmp);
 });
 
 /***********************************************************************************
  * START OF setupPage
 ************************************************************************************/
-function setupPage(addConsent_tmp, specMedSetObj_tmp) {
+function setupPage(addConsent_tmp, isProviderAdminUser_tmp, specMedSetObj_tmp) {
 	var addConsent = addConsent_tmp;
+	var isProviderAdminUser = isProviderAdminUser_tmp;
     
 	//Check if addConsent is a valid boolean value
 	if((addConsent !== true) && (addConsent !== false)){
 		addConsent = null;
 	    throw new ReferenceError("addConsent variable is not a valid boolean value");
+    }
+	
+	//Check if isProviderAdminUser is a valid boolean value
+	if((isProviderAdminUser !== true) && (isProviderAdminUser !== false)){
+		isProviderAdminUser = null;
+	    throw new ReferenceError("isProviderAdminUser variable is not a valid boolean value");
     }
 	
 	//Set popover 'a' element data attributes based on dynamic hidden form values prior to popup initialization
@@ -118,7 +148,7 @@ function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 	});
 	
 	//Initialize page for adding/editing consent
-	initAddConsent(addConsent, specMedSet);
+	initAddConsent(addConsent, isProviderAdminUser, specMedSet);
 
 	//Initialize popovers
 	$('[data-toggle=popover]').popover();
@@ -320,13 +350,19 @@ function setupPage(addConsent_tmp, specMedSetObj_tmp) {
 /***********************************************************************************
  * FUNCTION TO INITIALIZE PAGE WHEN ADDING/EDITING A CONSENT
 ***********************************************************************************/
-function initAddConsent(addConsent, specMedSet) {
-	
+function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
+				
 				//Check if addConsent is a valid boolean value
 				if((addConsent !== true) && (addConsent !== false)){
-				    throw new ReferenceError("addConsent variable is not a valid boolean value");
+					throw new ReferenceError("addConsent variable is not a valid boolean value");
+				}
+				
+				//Check if isProviderAdminUser is a valid boolean value
+				if((isProviderAdminUser !== true) && (isProviderAdminUser !== false)){
+				    throw new ReferenceError("isProviderAdminUser variable is not a valid boolean value");
 			    }
-	
+				
+				
 				/*******************************************************************************************
 				 * MAIN CODE
 				*******************************************************************************************/
@@ -337,20 +373,20 @@ function initAddConsent(addConsent, specMedSet) {
 				var lastInfoState={};
 				var lastSpecificMedicalInfoState={};
 				var lastPurposeState={};
-				var lastProviderState={};
 				var isSaveButtonClicked=false;
 				
-				//date picker start
+				lastProviderState={};
+				
+				/********* Initialize Date Picker **********/
 				var dateTemp;
 				var startDate;
 				var endDate;
 				
-				if (addConsent == true) {				
+				if (addConsent === true) {				
 			        dateTemp = new Date();
 			        startDate = new Date(dateTemp.getFullYear(), dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
 			        endDate=new Date(dateTemp.getFullYear()+1, dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
 				} else {
-					
 					dateTemp = new Date($('#date-picker-start').attr('value'));
 					startDate = new Date(dateTemp.getFullYear(), dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
 					dateTemp = new Date($('#date-picker-end').attr('value'));
@@ -361,8 +397,6 @@ function initAddConsent(addConsent, specMedSet) {
 					for(var i = 0; i < intAryLength; i++){
 						initSpecMedInfoArray(specMedSet[i]);
 					}
-					
-					
 				}
 				
 		        $('#date-picker-start').datepicker('setValue',startDate);
@@ -371,10 +405,11 @@ function initAddConsent(addConsent, specMedSet) {
 			    $('#date-picker-end').datepicker('setValue',endDate);
 			    $('#date-picker-end').attr('value',$('#date-picker-end').attr('value'));
 			    
-			    //Date Picker End
+			    /********* End Inititialize Date Picker **********/
 				 
+			    
 			    //Check if adding or editing consent
-			    if (addConsent == true) {
+			    if (addConsent === true) {
 			    	//ADDING CONSENT:
 			    	$("#allInfo").iCheck("check");
 			    	$("#edit1").hide();
@@ -389,12 +424,7 @@ function initAddConsent(addConsent, specMedSet) {
 					$(".isMadeToList").each(function(){
 						var providerId=$(this).attr("id").substr(2,$(this).attr("id").length-2);
 						if($("#from"+providerId).prop('checked')==true){
-							$("#to"+providerId).iCheck('disable');
-							$("#to"+providerId).closest('label').addClass("joe");
-						}
-						else{
-							$("#to"+providerId).iCheck('enable');
-							$("#to"+providerId).closest('label').removeClass("joe");
+							toggleToProviderDisabled(providerId);
 						}
 					}); 
 					 
@@ -402,12 +432,7 @@ function initAddConsent(addConsent, specMedSet) {
 					$(".toDiscloseList").each(function(){
 						var providerId=$(this).attr("id").substr(4,$(this).attr("id").length-4);
 						if($("#to"+providerId).prop('checked')==true){
-							$("#from"+providerId).iCheck('disable');
-							$("#from"+providerId).closest('label').addClass("joe");
-						}
-						else{
-							$("#from"+providerId).iCheck('enable');
-							$("#from"+providerId).closest('label').removeClass("joe");
+							toggleFromProviderDisabled(providerId);
 						}
 					});
 					
@@ -498,28 +523,14 @@ function initAddConsent(addConsent, specMedSet) {
 						$("#entry"+entryId).remove();
 					});
 				
-				$(".isMadeToList").on("ifToggled",function(){
+				$("div#disclose-list-container").on("ifToggled", "input.isMadeToList", function(){
 					var providerId=$(this).attr("id").substr(2,$(this).attr("id").length-2);
-					if($("#from"+providerId).prop('disabled')==false){
-						$("#from"+providerId).iCheck('disable');
-						$("#from"+providerId).closest('label').addClass("joe");
-					}
-					else{
-						$("#from"+providerId).iCheck('enable');
-						$("#from"+providerId).closest('label').removeClass("joe");
-					}
+					toggleFromProviderDisabled(providerId);
 				});
 				
-				$(".toDiscloseList").on("ifToggled",function(){
+				$("div#authorize-list-container").on("ifToggled", "input.toDiscloseList", function(){
 					var providerId=$(this).attr("id").substr(4,$(this).attr("id").length-4);
-					if($("#to"+providerId).prop('disabled')==false){
-						$("#to"+providerId).iCheck('disable');
-						$("#to"+providerId).closest('label').addClass("joe");
-					}
-					else{
-						$("#to"+providerId).iCheck('enable');
-						$("#to"+providerId).closest('label').removeClass("joe");
-					}
+					toggleToProviderDisabled(providerId);
 				});
 				
 				$("#consent-add-save").click(function(){
@@ -730,10 +741,27 @@ function initAddConsent(addConsent, specMedSet) {
 					
 				});
 				
-				$('#btn_add_provider_search').click(function(e){
-					$('#disclose-modal').modal('hide');
-					$('#addProviderSearch-modal').modal();
-				});
+				
+				//Check if user is a provider admin/staff user
+				if(isProviderAdminUser === true){
+					//Show favorite providers list modal when add provider button is clicked
+					$('#btn_add_provider_search').click(function(e){
+						$('#disclose-modal').modal('hide');
+						$('#selectFavorites-modal').modal();
+					});
+					
+					//Show search for providers modal when skip favorites button is clicked
+					$('#btn-skipSelectFromFavorites').click(function(e){
+						$('#selectFavorites-modal').modal('hide');
+						$('#addProviderSearch-modal').modal();
+					});
+				}else{
+					//Show search for providers modal when add provider button is clicked
+					$('#btn_add_provider_search').click(function(e){
+						$('#disclose-modal').modal('hide');
+						$('#addProviderSearch-modal').modal();
+					});
+				}
 				
 				
 				/******************************************************************************************
@@ -881,12 +909,7 @@ function initAddConsent(addConsent, specMedSet) {
 					});
 				}
 				
-				function loadAllProviders(){
-					$(".inputformPerson input").each(function(){
-						if($(this).prop("id")!=null)
-							lastProviderState[$(this).prop("id")]=$(this).prop("checked");
-					});
-				}
+				
 				
 				function loadAllLastSpecificMedicalInfoState(){
 					clearLastSpecificMedicalInfo();
@@ -1099,6 +1122,55 @@ function initAddConsent(addConsent, specMedSet) {
 /***********************************************************************************
  * GLOBAL SCOPE FUNCTIONS
 ***********************************************************************************/
+
+function loadAllProviders(){
+	$(".inputformPerson input.toDiscloseList").each(function(){
+		if($(this).prop("id")!=null)
+			lastProviderState[$(this).prop("id")]=$(this).prop("checked");
+	});
+	
+	$(".inputformPerson input.isMadeToList").each(function(){
+		if($(this).prop("id")!=null)
+			lastProviderState[$(this).prop("id")]=$(this).prop("checked");
+	});
+}
+
+//Toggle from provider state disabled/enabled
+function toggleFromProviderDisabled(in_providerID){
+	var providerId = in_providerID;
+	
+	if(isNaN(providerId)){
+		throw new ReferenceError("providerId variable is not a valid numeric value");
+	}
+	
+	if($("#from"+providerId).prop('disabled')==false){
+		$("#from"+providerId).iCheck('disable');
+		$("#from"+providerId).closest('label').addClass("joe");
+	}
+	else{
+		$("#from"+providerId).iCheck('enable');
+		$("#from"+providerId).closest('label').removeClass("joe");
+	}
+}
+
+//Toggle to provider state disabled/enabled
+function toggleToProviderDisabled(in_providerID){
+	var providerId = in_providerID;
+	
+	if(isNaN(providerId)){
+		throw new ReferenceError("providerId variable is not a valid numeric value");
+	}
+
+	if($("#to"+providerId).prop('disabled')==false){
+		$("#to"+providerId).iCheck('disable');
+		$("#to"+providerId).closest('label').addClass("joe");
+	}
+	else{
+		$("#to"+providerId).iCheck('enable');
+		$("#to"+providerId).closest('label').removeClass("joe");
+	}
+}
+
 
 function createSpecMedInfoObj(str_code, str_codeSystem, str_displayName){
 	newEntry = new Object();

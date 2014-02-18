@@ -20,7 +20,7 @@ create unique index ix_auth_username on authorities
 
 
 # Section two: The following is generated from domain using JPA mapping and JSR303 validation annotations
-
+    
     create table address_use_code (
         id bigint not null auto_increment,
         code varchar(250) not null,
@@ -190,6 +190,90 @@ create unique index ix_auth_username on authorities
         original_text varchar(250),
         version integer,
         primary key (id)
+    ) ENGINE=InnoDB
+;
+
+    create table code_system (
+        code_system_id bigint not null auto_increment,
+        code varchar(255) not null,
+        creation_time datetime,
+        modification_time datetime,
+        name varchar(255) not null,
+        user_name varchar(255) not null,
+        code_system_oid varchar(255) not null unique,
+        display_name varchar(255),
+        primary key (code_system_id)
+    ) ENGINE=InnoDB
+;
+
+    create table code_system_aud (
+        code_system_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        code_system_oid varchar(255),
+        display_name varchar(255),
+        primary key (code_system_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table concept_code (
+        concept_id bigint not null auto_increment,
+        code varchar(255) not null unique,
+        creation_time datetime,
+        modification_time datetime,
+        name varchar(255) not null,
+        user_name varchar(255) not null,
+        description varchar(255),
+        primary key (concept_id)
+    ) ENGINE=InnoDB
+;
+
+    create table concept_code_aud (
+        concept_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        description varchar(255),
+        primary key (concept_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table concept_code_system_membership (
+        code_system_id bigint not null auto_increment,
+        concept_id bigint not null,
+        upload_effective_date datetime,
+        code_system bigint,
+        concept_code bigint,
+        primary key (code_system_id, concept_id)
+    ) ENGINE=InnoDB
+;
+
+    create table concept_code_system_membership_aud (
+        code_system_id bigint not null,
+        concept_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        upload_effective_date datetime,
+        primary key (code_system_id, concept_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table concept_code_value_set_version_membership (
+        concept_id bigint not null auto_increment,
+        value_set_version_id bigint not null,
+        upload_effective_date datetime not null,
+        user_name varchar(255) not null,
+        concept_code bigint,
+        value_set_version bigint,
+        primary key (concept_id, value_set_version_id)
+    ) ENGINE=InnoDB
+;
+
+    create table concept_code_value_set_version_membership_aud (
+        concept_id bigint not null,
+        value_set_version_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        primary key (concept_id, value_set_version_id, rev)
     ) ENGINE=InnoDB
 ;
 
@@ -416,7 +500,6 @@ create unique index ix_auth_username on authorities
         middle_name varchar(30) not null,
         name_prefix varchar(30) not null,
         name_suffix varchar(30) not null,
-        patient bigint,
         primary key (id)
     ) ENGINE=InnoDB
 ;
@@ -453,7 +536,6 @@ create unique index ix_auth_username on authorities
         middle_name varchar(30),
         name_prefix varchar(30),
         name_suffix varchar(30),
-        patient bigint,
         primary key (id, rev)
     ) ENGINE=InnoDB
 ;
@@ -605,7 +687,6 @@ create unique index ix_auth_username on authorities
         authorized_official_title varchar(30) not null,
         org_name varchar(255) not null,
         other_org_name varchar(30),
-        patient bigint,
         primary key (id)
     ) ENGINE=InnoDB
 ;
@@ -643,7 +724,6 @@ create unique index ix_auth_username on authorities
         authorized_official_title varchar(30),
         org_name varchar(255),
         other_org_name varchar(30),
-        patient bigint,
         primary key (id, rev)
     ) ENGINE=InnoDB
 ;
@@ -709,6 +789,23 @@ create unique index ix_auth_username on authorities
     ) ENGINE=InnoDB
 ;
 
+    create table patient_individual_providers (
+        patient bigint not null,
+        individual_providers bigint not null,
+        primary key (patient, individual_providers),
+        unique (individual_providers)
+    ) ENGINE=InnoDB
+;
+
+    create table patient_individual_providers_aud (
+        rev bigint not null,
+        patient bigint not null,
+        individual_providers bigint not null,
+        revtype tinyint,
+        primary key (rev, patient, individual_providers)
+    ) ENGINE=InnoDB
+;
+
     create table patient_legal_representative_association (
         id bigint not null auto_increment,
         relationship_end_date datetime,
@@ -731,6 +828,23 @@ create unique index ix_auth_username on authorities
         legal_representative bigint,
         patient bigint,
         primary key (id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table patient_organizational_providers (
+        patient bigint not null,
+        organizational_providers bigint not null,
+        primary key (patient, organizational_providers),
+        unique (organizational_providers)
+    ) ENGINE=InnoDB
+;
+
+    create table patient_organizational_providers_aud (
+        rev bigint not null,
+        patient bigint not null,
+        organizational_providers bigint not null,
+        revtype tinyint,
+        primary key (rev, patient, organizational_providers)
     ) ENGINE=InnoDB
 ;
 
@@ -1089,149 +1203,15 @@ create unique index ix_auth_username on authorities
 
     create table staff_individual_provider (
         id bigint not null auto_increment,
-        entity_type integer,
-        enumeration_date varchar(30) not null,
-        first_line_mailing_address varchar(255) not null,
-        first_line_practice_location_address varchar(255) not null,
-        last_update_date varchar(30) not null,
-        mailing_address_city_name varchar(30) not null,
-        mailing_address_country_code varchar(30) not null,
-        mailing_address_fax_number varchar(30) not null,
-        mailing_address_postal_code varchar(30) not null,
-        mailing_address_state_name varchar(30) not null,
-        mailing_address_telephone_number varchar(30) not null,
-        npi varchar(30),
-        practice_location_address_city_name varchar(30) not null,
-        practice_location_address_country_code varchar(30) not null,
-        practice_location_address_fax_number varchar(30) not null,
-        practice_location_address_postal_code varchar(30) not null,
-        practice_location_address_state_name varchar(30) not null,
-        practice_location_address_telephone_number varchar(30) not null,
-        provider_taxonomy_code varchar(30) not null,
-        provider_taxonomy_description varchar(255) not null,
-        second_line_mailing_address varchar(255) not null,
-        second_line_practice_location_address varchar(255) not null,
-        version integer,
-        credential varchar(30) not null,
-        first_name varchar(30) not null,
-        last_name varchar(30) not null,
-        middle_name varchar(30) not null,
-        name_prefix varchar(30) not null,
-        name_suffix varchar(30) not null,
-        staff bigint,
+        individual_provider bigint,
         primary key (id)
-    ) ENGINE=InnoDB
-;
-
-    create table staff_individual_provider_audit (
-        id bigint not null,
-        rev bigint not null,
-        revtype tinyint,
-        entity_type integer,
-        enumeration_date varchar(30),
-        first_line_mailing_address varchar(255),
-        first_line_practice_location_address varchar(255),
-        last_update_date varchar(30),
-        mailing_address_city_name varchar(30),
-        mailing_address_country_code varchar(30),
-        mailing_address_fax_number varchar(30),
-        mailing_address_postal_code varchar(30),
-        mailing_address_state_name varchar(30),
-        mailing_address_telephone_number varchar(30),
-        npi varchar(30),
-        practice_location_address_city_name varchar(30),
-        practice_location_address_country_code varchar(30),
-        practice_location_address_fax_number varchar(30),
-        practice_location_address_postal_code varchar(30),
-        practice_location_address_state_name varchar(30),
-        practice_location_address_telephone_number varchar(30),
-        provider_taxonomy_code varchar(30),
-        provider_taxonomy_description varchar(255),
-        second_line_mailing_address varchar(255),
-        second_line_practice_location_address varchar(255),
-        credential varchar(30),
-        first_name varchar(30),
-        last_name varchar(30),
-        middle_name varchar(30),
-        name_prefix varchar(30),
-        name_suffix varchar(30),
-        staff bigint,
-        primary key (id, rev)
     ) ENGINE=InnoDB
 ;
 
     create table staff_organizational_provider (
         id bigint not null auto_increment,
-        entity_type integer,
-        enumeration_date varchar(30) not null,
-        first_line_mailing_address varchar(255) not null,
-        first_line_practice_location_address varchar(255) not null,
-        last_update_date varchar(30) not null,
-        mailing_address_city_name varchar(30) not null,
-        mailing_address_country_code varchar(30) not null,
-        mailing_address_fax_number varchar(30) not null,
-        mailing_address_postal_code varchar(30) not null,
-        mailing_address_state_name varchar(30) not null,
-        mailing_address_telephone_number varchar(30) not null,
-        npi varchar(30),
-        practice_location_address_city_name varchar(30) not null,
-        practice_location_address_country_code varchar(30) not null,
-        practice_location_address_fax_number varchar(30) not null,
-        practice_location_address_postal_code varchar(30) not null,
-        practice_location_address_state_name varchar(30) not null,
-        practice_location_address_telephone_number varchar(30) not null,
-        provider_taxonomy_code varchar(30) not null,
-        provider_taxonomy_description varchar(255) not null,
-        second_line_mailing_address varchar(255) not null,
-        second_line_practice_location_address varchar(255) not null,
-        version integer,
-        authorized_official_first_name varchar(30) not null,
-        authorized_official_last_name varchar(30) not null,
-        authorized_official_name_prefix varchar(30) not null,
-        authorized_official_telephone_number varchar(30) not null,
-        authorized_official_title varchar(30) not null,
-        org_name varchar(255) not null,
-        other_org_name varchar(30),
-        staff bigint,
+        individual_provider bigint,
         primary key (id)
-    ) ENGINE=InnoDB
-;
-
-    create table staff_organizational_provider_audit (
-        id bigint not null,
-        rev bigint not null,
-        revtype tinyint,
-        entity_type integer,
-        enumeration_date varchar(30),
-        first_line_mailing_address varchar(255),
-        first_line_practice_location_address varchar(255),
-        last_update_date varchar(30),
-        mailing_address_city_name varchar(30),
-        mailing_address_country_code varchar(30),
-        mailing_address_fax_number varchar(30),
-        mailing_address_postal_code varchar(30),
-        mailing_address_state_name varchar(30),
-        mailing_address_telephone_number varchar(30),
-        npi varchar(30),
-        practice_location_address_city_name varchar(30),
-        practice_location_address_country_code varchar(30),
-        practice_location_address_fax_number varchar(30),
-        practice_location_address_postal_code varchar(30),
-        practice_location_address_state_name varchar(30),
-        practice_location_address_telephone_number varchar(30),
-        provider_taxonomy_code varchar(30),
-        provider_taxonomy_description varchar(255),
-        second_line_mailing_address varchar(255),
-        second_line_practice_location_address varchar(255),
-        authorized_official_first_name varchar(30),
-        authorized_official_last_name varchar(30),
-        authorized_official_name_prefix varchar(30),
-        authorized_official_telephone_number varchar(30),
-        authorized_official_title varchar(30),
-        org_name varchar(255),
-        other_org_name varchar(30),
-        staff bigint,
-        primary key (id, rev)
     ) ENGINE=InnoDB
 ;
 
@@ -1243,6 +1223,18 @@ create unique index ix_auth_username on authorities
         display_name varchar(250) not null,
         original_text varchar(250),
         version integer,
+        primary key (id)
+    ) ENGINE=InnoDB
+;
+
+    create table system_notification (
+        id bigint not null auto_increment,
+        consent_id bigint not null,
+        dismissed boolean not null,
+        notification_message varchar(255),
+        notification_type varchar(255),
+        patient_id bigint not null,
+        send_date datetime,
         primary key (id)
     ) ENGINE=InnoDB
 ;
@@ -1280,6 +1272,57 @@ create unique index ix_auth_username on authorities
         original_text varchar(250),
         version integer,
         primary key (id)
+    ) ENGINE=InnoDB
+;
+
+    create table value_set (
+        valueset_id bigint not null auto_increment,
+        code varchar(255) not null unique,
+        creation_time datetime,
+        modification_time datetime,
+        name varchar(255) not null,
+        user_name varchar(255) not null,
+        description varchar(255),
+        primary key (valueset_id)
+    ) ENGINE=InnoDB
+;
+
+    create table value_set_aud (
+        valueset_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        description varchar(255),
+        primary key (valueset_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table value_set_category (
+        vs_cat_id bigint not null auto_increment,
+        code varchar(255) not null unique,
+        creation_time datetime,
+        modification_time datetime,
+        name varchar(255) not null,
+        user_name varchar(255) not null,
+        description varchar(255),
+        primary key (vs_cat_id)
+    ) ENGINE=InnoDB
+;
+
+    create table value_set_category_aud (
+        vs_cat_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        description varchar(255),
+        primary key (vs_cat_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table value_set_version (
+        value_set_version_id bigint not null auto_increment,
+        upload_effective_date datetime not null,
+        user_name varchar(255) not null,
+        valueset_id bigint,
+        primary key (value_set_version_id)
     ) ENGINE=InnoDB
 ;
 
@@ -1335,6 +1378,62 @@ create unique index ix_auth_username on authorities
     alter table clinical_document_audit 
         add index FK62DCE63CDA971CE (rev), 
         add constraint FK62DCE63CDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table code_system_aud 
+        add index FK4A7E0E32CDA971CE (rev), 
+        add constraint FK4A7E0E32CDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table concept_code_aud 
+        add index FK2B9D8555CDA971CE (rev), 
+        add constraint FK2B9D8555CDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table concept_code_system_membership 
+        add index FK8CF8DCB40102E48 (concept_code), 
+        add constraint FK8CF8DCB40102E48 
+        foreign key (concept_code) 
+        references concept_code (concept_id)
+;
+
+    alter table concept_code_system_membership 
+        add index FK8CF8DCB1C7CB0EE (code_system), 
+        add constraint FK8CF8DCB1C7CB0EE 
+        foreign key (code_system) 
+        references code_system (code_system_id)
+;
+
+    alter table concept_code_system_membership_aud 
+        add index FKD79A5A3CCDA971CE (rev), 
+        add constraint FKD79A5A3CCDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table concept_code_value_set_version_membership 
+        add index FKA3E9EC2340102E48 (concept_code), 
+        add constraint FKA3E9EC2340102E48 
+        foreign key (concept_code) 
+        references concept_code (concept_id)
+;
+
+    alter table concept_code_value_set_version_membership 
+        add index FKA3E9EC2347B40F83 (value_set_version), 
+        add constraint FKA3E9EC2347B40F83 
+        foreign key (value_set_version) 
+        references value_set_version (value_set_version_id)
+;
+
+    alter table concept_code_value_set_version_membership_aud 
+        add index FK872DCC94CDA971CE (rev), 
+        add constraint FK872DCC94CDA971CE 
         foreign key (rev) 
         references revinfo (rev)
 ;
@@ -1500,13 +1599,6 @@ create unique index ix_auth_username on authorities
         references consent (id)
 ;
 
-    alter table individual_provider 
-        add index FKDB6670D7B2036D5 (patient), 
-        add constraint FKDB6670D7B2036D5 
-        foreign key (patient) 
-        references patient (id)
-;
-
     alter table individual_provider_audit 
         add index FK5D83273CDA971CE (rev), 
         add constraint FK5D83273CDA971CE 
@@ -1561,13 +1653,6 @@ create unique index ix_auth_username on authorities
         add constraint FK9D17762BE1C7106 
         foreign key (revision) 
         references revinfo (rev)
-;
-
-    alter table organizational_provider 
-        add index FK29E59072B2036D5 (patient), 
-        add constraint FK29E59072B2036D5 
-        foreign key (patient) 
-        references patient (id)
 ;
 
     alter table organizational_provider_audit 
@@ -1654,6 +1739,27 @@ create unique index ix_auth_username on authorities
         references revinfo (rev)
 ;
 
+    alter table patient_individual_providers 
+        add index FKA2245F76B2036D5 (patient), 
+        add constraint FKA2245F76B2036D5 
+        foreign key (patient) 
+        references patient (id)
+;
+
+    alter table patient_individual_providers 
+        add index FKA2245F76F690A37 (individual_providers), 
+        add constraint FKA2245F76F690A37 
+        foreign key (individual_providers) 
+        references individual_provider (id)
+;
+
+    alter table patient_individual_providers_aud 
+        add index FK31885E67CDA971CE (rev), 
+        add constraint FK31885E67CDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
     alter table patient_legal_representative_association 
         add index FKE2CB081FB2036D5 (patient), 
         add constraint FKE2CB081FB2036D5 
@@ -1678,6 +1784,27 @@ create unique index ix_auth_username on authorities
     alter table patient_legal_representative_association_aud 
         add index FKF7E88A90CDA971CE (rev), 
         add constraint FKF7E88A90CDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table patient_organizational_providers 
+        add index FK5BD2263BB2036D5 (patient), 
+        add constraint FK5BD2263BB2036D5 
+        foreign key (patient) 
+        references patient (id)
+;
+
+    alter table patient_organizational_providers 
+        add index FK5BD2263B6806E81 (organizational_providers), 
+        add constraint FK5BD2263B6806E81 
+        foreign key (organizational_providers) 
+        references organizational_provider (id)
+;
+
+    alter table patient_organizational_providers_aud 
+        add index FK3DBB3AACCDA971CE (rev), 
+        add constraint FK3DBB3AACCDA971CE 
         foreign key (rev) 
         references revinfo (rev)
 ;
@@ -1816,29 +1943,36 @@ create unique index ix_auth_username on authorities
 ;
 
     alter table staff_individual_provider 
-        add index FK1DE190F8BCBBC9E6 (staff), 
-        add constraint FK1DE190F8BCBBC9E6 
-        foreign key (staff) 
-        references staff (id)
-;
-
-    alter table staff_individual_provider_audit 
-        add index FKD928F5D4CDA971CE (rev), 
-        add constraint FKD928F5D4CDA971CE 
-        foreign key (rev) 
-        references revinfo (rev)
+        add index FK1DE190F85967D092 (individual_provider), 
+        add constraint FK1DE190F85967D092 
+        foreign key (individual_provider) 
+        references individual_provider (id)
 ;
 
     alter table staff_organizational_provider 
-        add index FK7BA1B813BCBBC9E6 (staff), 
-        add constraint FK7BA1B813BCBBC9E6 
-        foreign key (staff) 
-        references staff (id)
+        add index FK7BA1B813CF1A6117 (individual_provider), 
+        add constraint FK7BA1B813CF1A6117 
+        foreign key (individual_provider) 
+        references organizational_provider (id)
 ;
 
-    alter table staff_organizational_provider_audit 
-        add index FK8E381CAFCDA971CE (rev), 
-        add constraint FK8E381CAFCDA971CE 
+    alter table value_set_aud 
+        add index FKD2A59C85CDA971CE (rev), 
+        add constraint FKD2A59C85CDA971CE 
         foreign key (rev) 
         references revinfo (rev)
+;
+
+    alter table value_set_category_aud 
+        add index FKB7F8D5BACDA971CE (rev), 
+        add constraint FKB7F8D5BACDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table value_set_version 
+        add index FKD25A4C2D8F14C1EB (valueset_id), 
+        add constraint FKD25A4C2D8F14C1EB 
+        foreign key (valueset_id) 
+        references value_set (valueset_id)
 ;

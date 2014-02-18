@@ -25,17 +25,24 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.domain.provider;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
+import gov.samhsa.consent2share.domain.reference.EntityType;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.hibernate.envers.AuditTable;
@@ -45,52 +52,451 @@ import org.hibernate.envers.Audited;
  * The Class OrganizationalProvider.
  */
 @Entity
-@Audited(auditParents=StaffAbstractProvider.class)
-@AuditTable("Staff_Organizational_Provider_audit")
 @SequenceGenerator(name="idgen", sequenceName="ORGPROV_SEQ", initialValue = 1)
-public class StaffOrganizationalProvider extends StaffAbstractProvider {
+public class StaffOrganizationalProvider{
 
-    /** The org name. */
-    @NotNull
-    @Size(max = 255)
-    private String orgName;
-
-    /** The other org name. */
-    @Size(max = 30)
-    private String otherOrgName;
-
-    /** The authorized official last name. */
-    @NotNull
-    @Size(max = 30)
-    private String authorizedOfficialLastName;
-
-    /** The authorized official first name. */
-    @NotNull
-    @Size(max = 30)
-    private String authorizedOfficialFirstName;
-
-    /** The authorized official title. */
-    @NotNull
-    @Size(max = 30)
-    private String authorizedOfficialTitle;
-
-    /** The authorized official name prefix. */
-    @NotNull
-    @Size(max = 30)
-    private String authorizedOfficialNamePrefix;
-
-    /** The authorized official telephone number. */
-    @NotNull
-    @Size(max = 30)
-    private String authorizedOfficialTelephoneNumber;
+	@OneToOne
+    @JoinColumn(name = "individual_Provider")
+    private OrganizationalProvider organizationalProvider;
     
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "idgen")
+    @Column(name = "id")
+    private Long id;
+    
+    public StaffOrganizationalProvider(){
+    	super();
+    	this.id = (long) -1;
+    }
+
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public long getId(){
+		return this.id;
+	}
+
+	public OrganizationalProvider getOrganizationalProvider() {
+		return organizationalProvider;
+	}
+
+	public void setOrganizationalProvider(
+			OrganizationalProvider organizationalProvider) {
+		this.organizationalProvider = organizationalProvider;
+	}
+	
 	/**
-	 * To json.
+     * Gets the npi.
+     *
+     * @return the npi
+     */
+    public String getNpi() {
+        return this.organizationalProvider.getNpi();
+    }
+
+	/**
+	 * Sets the npi.
 	 *
-	 * @return the string
+	 * @param npi the new npi
 	 */
+	public void setNpi(String npi) {
+        this.organizationalProvider.setNpi(npi);
+    }
+
+	/**
+	 * Gets the entity type.
+	 *
+	 * @return the entity type
+	 */
+	public EntityType getEntityType() {
+        return this.organizationalProvider.getEntityType();
+    }
+
+	/**
+	 * Sets the entity type.
+	 *
+	 * @param entityType the new entity type
+	 */
+	public void setEntityType(EntityType entityType) {
+        this.organizationalProvider.setEntityType(entityType);
+    }
+
+	/**
+	 * Gets the first line mailing address.
+	 *
+	 * @return the first line mailing address
+	 */
+	public String getFirstLineMailingAddress() {
+        return this.organizationalProvider.getFirstLineMailingAddress();
+    }
+
+	/**
+	 * Sets the first line mailing address.
+	 *
+	 * @param firstLineMailingAddress the new first line mailing address
+	 */
+	public void setFirstLineMailingAddress(String firstLineMailingAddress) {
+        this.organizationalProvider.setFirstLineMailingAddress(firstLineMailingAddress);
+    }
+
+	/**
+	 * Gets the second line mailing address.
+	 *
+	 * @return the second line mailing address
+	 */
+	public String getSecondLineMailingAddress() {
+        return this.organizationalProvider.getSecondLineMailingAddress();
+    }
+
+	/**
+	 * Sets the second line mailing address.
+	 *
+	 * @param secondLineMailingAddress the new second line mailing address
+	 */
+	public void setSecondLineMailingAddress(String secondLineMailingAddress) {
+        this.organizationalProvider.setSecondLineMailingAddress(secondLineMailingAddress);
+    }
+
+	/**
+	 * Gets the mailing address city name.
+	 *
+	 * @return the mailing address city name
+	 */
+	public String getMailingAddressCityName() {
+        return this.organizationalProvider.getMailingAddressCityName();
+    }
+
+	/**
+	 * Sets the mailing address city name.
+	 *
+	 * @param mailingAddressCityName the new mailing address city name
+	 */
+	public void setMailingAddressCityName(String mailingAddressCityName) {
+        this.organizationalProvider.setMailingAddressCityName(mailingAddressCityName);
+    }
+
+	/**
+	 * Gets the mailing address state name.
+	 *
+	 * @return the mailing address state name
+	 */
+	public String getMailingAddressStateName() {
+        return this.organizationalProvider.getMailingAddressStateName();
+    }
+
+	/**
+	 * Sets the mailing address state name.
+	 *
+	 * @param mailingAddressStateName the new mailing address state name
+	 */
+	public void setMailingAddressStateName(String mailingAddressStateName) {
+        this.organizationalProvider.setMailingAddressStateName(mailingAddressStateName);
+    }
+
+	/**
+	 * Gets the mailing address postal code.
+	 *
+	 * @return the mailing address postal code
+	 */
+	public String getMailingAddressPostalCode() {
+        return this.organizationalProvider.getMailingAddressPostalCode();
+    }
+
+	/**
+	 * Sets the mailing address postal code.
+	 *
+	 * @param mailingAddressPostalCode the new mailing address postal code
+	 */
+	public void setMailingAddressPostalCode(String mailingAddressPostalCode) {
+        this.organizationalProvider.setMailingAddressPostalCode(mailingAddressPostalCode);
+    }
+
+	/**
+	 * Gets the mailing address country code.
+	 *
+	 * @return the mailing address country code
+	 */
+	public String getMailingAddressCountryCode() {
+        return this.organizationalProvider.getMailingAddressCountryCode();
+    }
+
+	/**
+	 * Sets the mailing address country code.
+	 *
+	 * @param mailingAddressCountryCode the new mailing address country code
+	 */
+	public void setMailingAddressCountryCode(String mailingAddressCountryCode) {
+        this.organizationalProvider.setMailingAddressCountryCode(mailingAddressCountryCode);
+    }
+
+	/**
+	 * Gets the mailing address telephone number.
+	 *
+	 * @return the mailing address telephone number
+	 */
+	public String getMailingAddressTelephoneNumber() {
+        return this.organizationalProvider.getMailingAddressTelephoneNumber();
+    }
+
+	/**
+	 * Sets the mailing address telephone number.
+	 *
+	 * @param mailingAddressTelephoneNumber the new mailing address telephone number
+	 */
+	public void setMailingAddressTelephoneNumber(String mailingAddressTelephoneNumber) {
+        this.organizationalProvider.setMailingAddressTelephoneNumber(mailingAddressTelephoneNumber);
+    }
+
+	/**
+	 * Gets the mailing address fax number.
+	 *
+	 * @return the mailing address fax number
+	 */
+	public String getMailingAddressFaxNumber() {
+        return this.organizationalProvider.getMailingAddressFaxNumber();
+    }
+
+	/**
+	 * Sets the mailing address fax number.
+	 *
+	 * @param mailingAddressFaxNumber the new mailing address fax number
+	 */
+	public void setMailingAddressFaxNumber(String mailingAddressFaxNumber) {
+        this.organizationalProvider.setMailingAddressFaxNumber(mailingAddressFaxNumber);
+    }
+
+	/**
+	 * Gets the first line practice location address.
+	 *
+	 * @return the first line practice location address
+	 */
+	public String getFirstLinePracticeLocationAddress() {
+        return this.organizationalProvider.getFirstLinePracticeLocationAddress();
+    }
+
+	/**
+	 * Sets the first line practice location address.
+	 *
+	 * @param firstLinePracticeLocationAddress the new first line practice location address
+	 */
+	public void setFirstLinePracticeLocationAddress(String firstLinePracticeLocationAddress) {
+        this.organizationalProvider.setFirstLinePracticeLocationAddress(firstLinePracticeLocationAddress);
+    }
+
+	/**
+	 * Gets the second line practice location address.
+	 *
+	 * @return the second line practice location address
+	 */
+	public String getSecondLinePracticeLocationAddress() {
+        return this.organizationalProvider.getSecondLinePracticeLocationAddress();
+    }
+
+	/**
+	 * Sets the second line practice location address.
+	 *
+	 * @param secondLinePracticeLocationAddress the new second line practice location address
+	 */
+	public void setSecondLinePracticeLocationAddress(String secondLinePracticeLocationAddress) {
+        this.organizationalProvider.setSecondLinePracticeLocationAddress(secondLinePracticeLocationAddress);
+    }
+
+	/**
+	 * Gets the practice location address city name.
+	 *
+	 * @return the practice location address city name
+	 */
+	public String getPracticeLocationAddressCityName() {
+        return this.organizationalProvider.getPracticeLocationAddressCityName();
+    }
+
+	/**
+	 * Sets the practice location address city name.
+	 *
+	 * @param practiceLocationAddressCityName the new practice location address city name
+	 */
+	public void setPracticeLocationAddressCityName(String practiceLocationAddressCityName) {
+        this.organizationalProvider.setPracticeLocationAddressCityName(practiceLocationAddressCityName);
+    }
+
+	/**
+	 * Gets the practice location address state name.
+	 *
+	 * @return the practice location address state name
+	 */
+	public String getPracticeLocationAddressStateName() {
+        return this.organizationalProvider.getPracticeLocationAddressStateName();
+    }
+
+	/**
+	 * Sets the practice location address state name.
+	 *
+	 * @param practiceLocationAddressStateName the new practice location address state name
+	 */
+	public void setPracticeLocationAddressStateName(String practiceLocationAddressStateName) {
+        this.organizationalProvider.setPracticeLocationAddressStateName(practiceLocationAddressStateName);
+    }
+
+	/**
+	 * Gets the practice location address postal code.
+	 *
+	 * @return the practice location address postal code
+	 */
+	public String getPracticeLocationAddressPostalCode() {
+        return this.organizationalProvider.getPracticeLocationAddressPostalCode();
+    }
+
+	/**
+	 * Sets the practice location address postal code.
+	 *
+	 * @param practiceLocationAddressPostalCode the new practice location address postal code
+	 */
+	public void setPracticeLocationAddressPostalCode(String practiceLocationAddressPostalCode) {
+        this.organizationalProvider.setPracticeLocationAddressPostalCode(practiceLocationAddressPostalCode);
+    }
+
+	/**
+	 * Gets the practice location address country code.
+	 *
+	 * @return the practice location address country code
+	 */
+	public String getPracticeLocationAddressCountryCode() {
+        return this.organizationalProvider.getPracticeLocationAddressCountryCode();
+    }
+
+	/**
+	 * Sets the practice location address country code.
+	 *
+	 * @param practiceLocationAddressCountryCode the new practice location address country code
+	 */
+	public void setPracticeLocationAddressCountryCode(String practiceLocationAddressCountryCode) {
+        this.organizationalProvider.setPracticeLocationAddressCountryCode(practiceLocationAddressCountryCode);
+    }
+
+	/**
+	 * Gets the practice location address telephone number.
+	 *
+	 * @return the practice location address telephone number
+	 */
+	public String getPracticeLocationAddressTelephoneNumber() {
+        return this.organizationalProvider.getPracticeLocationAddressTelephoneNumber();
+    }
+
+	/**
+	 * Sets the practice location address telephone number.
+	 *
+	 * @param practiceLocationAddressTelephoneNumber the new practice location address telephone number
+	 */
+	public void setPracticeLocationAddressTelephoneNumber(String practiceLocationAddressTelephoneNumber) {
+        this.organizationalProvider.setPracticeLocationAddressTelephoneNumber(practiceLocationAddressTelephoneNumber);
+    }
+
+	/**
+	 * Gets the practice location address fax number.
+	 *
+	 * @return the practice location address fax number
+	 */
+	public String getPracticeLocationAddressFaxNumber() {
+        return this.organizationalProvider.getPracticeLocationAddressFaxNumber();
+    }
+
+	/**
+	 * Sets the practice location address fax number.
+	 *
+	 * @param practiceLocationAddressFaxNumber the new practice location address fax number
+	 */
+	public void setPracticeLocationAddressFaxNumber(String practiceLocationAddressFaxNumber) {
+        this.organizationalProvider.setPracticeLocationAddressFaxNumber(practiceLocationAddressFaxNumber);
+    }
+
+	/**
+	 * Gets the enumeration date.
+	 *
+	 * @return the enumeration date
+	 */
+	public String getEnumerationDate() {
+        return this.organizationalProvider.getEnumerationDate();
+    }
+
+	/**
+	 * Sets the enumeration date.
+	 *
+	 * @param enumerationDate the new enumeration date
+	 */
+	public void setEnumerationDate(String enumerationDate) {
+        this.organizationalProvider.setEnumerationDate(enumerationDate);
+    }
+
+	/**
+	 * Gets the last update date.
+	 *
+	 * @return the last update date
+	 */
+	public String getLastUpdateDate() {
+        return this.organizationalProvider.getLastUpdateDate();
+    }
+
+	/**
+	 * Sets the last update date.
+	 *
+	 * @param lastUpdateDate the new last update date
+	 */
+	public void setLastUpdateDate(String lastUpdateDate) {
+        this.organizationalProvider.setLastUpdateDate(lastUpdateDate);
+    }
+
+	/**
+	 * Gets the provider taxonomy code.
+	 *
+	 * @return the provider taxonomy code
+	 */
+	public String getProviderTaxonomyCode() {
+        return this.organizationalProvider.getProviderTaxonomyCode();
+    }
+
+	/**
+	 * Sets the provider taxonomy code.
+	 *
+	 * @param providerTaxonomyCode the new provider taxonomy code
+	 */
+	public void setProviderTaxonomyCode(String providerTaxonomyCode) {
+        this.organizationalProvider.setProviderTaxonomyCode(providerTaxonomyCode);
+    }
+
+	/**
+	 * Gets the provider taxonomy description.
+	 *
+	 * @return the provider taxonomy description
+	 */
+	public String getProviderTaxonomyDescription() {
+        return this.organizationalProvider.getProviderTaxonomyDescription();
+    }
+
+	/**
+	 * Sets the provider taxonomy description.
+	 *
+	 * @param providerTaxonomyDescription the new provider taxonomy description
+	 */
+	public void setProviderTaxonomyDescription(String providerTaxonomyDescription) {
+        this.organizationalProvider.setProviderTaxonomyDescription(providerTaxonomyDescription);
+    }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public String toJson() {
-        return new JSONSerializer().exclude("*.class").deepSerialize(this);
+        return new JSONSerializer().exclude("*.class").deepSerialize(this.organizationalProvider);
     }
 
 	/**
@@ -129,7 +535,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @return the org name
 	 */
 	public String getOrgName() {
-        return this.orgName;
+        return this.organizationalProvider.getOrgName();
     }
 
 	/**
@@ -138,7 +544,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @param orgName the new org name
 	 */
 	public void setOrgName(String orgName) {
-        this.orgName = orgName;
+        this.organizationalProvider.setOrgName(orgName);
     }
 
 	/**
@@ -147,7 +553,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @return the other org name
 	 */
 	public String getOtherOrgName() {
-        return this.otherOrgName;
+        return this.organizationalProvider.getOtherOrgName();
     }
 
 	/**
@@ -156,7 +562,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @param otherOrgName the new other org name
 	 */
 	public void setOtherOrgName(String otherOrgName) {
-        this.otherOrgName = otherOrgName;
+        this.organizationalProvider.setOtherOrgName(otherOrgName);
     }
 
 	/**
@@ -165,7 +571,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @return the authorized official last name
 	 */
 	public String getAuthorizedOfficialLastName() {
-        return this.authorizedOfficialLastName;
+        return this.organizationalProvider.getAuthorizedOfficialLastName();
     }
 
 	/**
@@ -174,7 +580,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @param authorizedOfficialLastName the new authorized official last name
 	 */
 	public void setAuthorizedOfficialLastName(String authorizedOfficialLastName) {
-        this.authorizedOfficialLastName = authorizedOfficialLastName;
+        this.organizationalProvider.setAuthorizedOfficialLastName(authorizedOfficialLastName);
     }
 
 	/**
@@ -183,7 +589,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @return the authorized official first name
 	 */
 	public String getAuthorizedOfficialFirstName() {
-        return this.authorizedOfficialFirstName;
+        return this.organizationalProvider.getAuthorizedOfficialFirstName();
     }
 
 	/**
@@ -192,7 +598,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @param authorizedOfficialFirstName the new authorized official first name
 	 */
 	public void setAuthorizedOfficialFirstName(String authorizedOfficialFirstName) {
-        this.authorizedOfficialFirstName = authorizedOfficialFirstName;
+        this.organizationalProvider.setAuthorizedOfficialFirstName(authorizedOfficialFirstName);
     }
 
 	/**
@@ -201,7 +607,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @return the authorized official title
 	 */
 	public String getAuthorizedOfficialTitle() {
-        return this.authorizedOfficialTitle;
+        return this.organizationalProvider.getAuthorizedOfficialTitle();
     }
 
 	/**
@@ -210,7 +616,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @param authorizedOfficialTitle the new authorized official title
 	 */
 	public void setAuthorizedOfficialTitle(String authorizedOfficialTitle) {
-        this.authorizedOfficialTitle = authorizedOfficialTitle;
+        this.organizationalProvider.setAuthorizedOfficialTitle(authorizedOfficialTitle);
     }
 
 	/**
@@ -219,7 +625,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @return the authorized official name prefix
 	 */
 	public String getAuthorizedOfficialNamePrefix() {
-        return this.authorizedOfficialNamePrefix;
+        return this.organizationalProvider.getAuthorizedOfficialNamePrefix();
     }
 
 	/**
@@ -228,7 +634,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @param authorizedOfficialNamePrefix the new authorized official name prefix
 	 */
 	public void setAuthorizedOfficialNamePrefix(String authorizedOfficialNamePrefix) {
-        this.authorizedOfficialNamePrefix = authorizedOfficialNamePrefix;
+        this.organizationalProvider.setAuthorizedOfficialNamePrefix(authorizedOfficialNamePrefix);
     }
 
 	/**
@@ -237,7 +643,7 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @return the authorized official telephone number
 	 */
 	public String getAuthorizedOfficialTelephoneNumber() {
-        return this.authorizedOfficialTelephoneNumber;
+        return this.organizationalProvider.getAuthorizedOfficialTelephoneNumber();
     }
 
 	/**
@@ -246,14 +652,15 @@ public class StaffOrganizationalProvider extends StaffAbstractProvider {
 	 * @param authorizedOfficialTelephoneNumber the new authorized official telephone number
 	 */
 	public void setAuthorizedOfficialTelephoneNumber(String authorizedOfficialTelephoneNumber) {
-        this.authorizedOfficialTelephoneNumber = authorizedOfficialTelephoneNumber;
+        this.organizationalProvider.setAuthorizedOfficialTelephoneNumber(authorizedOfficialTelephoneNumber);
     }
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        return ReflectionToStringBuilder.toString(this.organizationalProvider, ToStringStyle.SHORT_PREFIX_STYLE);
     }
+
 
 }

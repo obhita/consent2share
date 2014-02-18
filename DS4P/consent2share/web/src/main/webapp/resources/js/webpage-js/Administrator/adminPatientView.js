@@ -119,11 +119,50 @@ function initOrigDataVals() {
 			state, zip, phone, ssn, mrn, marital_status, religion, lang);
 }
 
+function initPhoneNumbers() {
+	$('.prov-phone-input').each(function(){
+		var provNPI = $(this).data('npi');
+		var rawphonenum = $(this).val();
+		var formatphonenum = phoneNumberParser(rawphonenum);
+
+		$('span#prov-phone-display-NPI' + provNPI).text(formatphonenum);
+		$('span#crd-prov-phone-display-NPI' + provNPI).text(formatphonenum);
+	});
+}
+
+function initAddresses() {
+	$('input.prov-address-input').each(function(){
+		var provNPI = $(this).data('npi');
+		var streetaddress = $(this).data('streetaddress');
+		var city = $(this).data('city');
+		var state = $(this).data('state');
+		//Zip is retrieved via .attr instead of .data to overcome a type conversion issue when zip starts with 0
+		var zip = $(this).attr('data-zip');
+
+		var fulladdress;
+		try{
+			fulladdress = addressParserZip5(streetaddress, city, state, zip);
+		}catch(e){
+			fulladdress = addressParserZip5(streetaddress, city, state, "12345");
+		}
+
+		$('span#prov-address-display-NPI' + provNPI).text(fulladdress);
+	});
+}
+
 
 //Code to execute on document.ready event for Administrator/adminPatientView.html page
 $(document).ready(function(){
+	initPhoneNumbers();
+	initAddresses();
 	initAllDOBFields();
 	initOrigDataVals();
+	
+	
+	
+	/** 
+	 * Bind Event Handlers: 
+	 **/
 	
 	$('.cmd-view-consent').click(function(e){
 		e.preventDefault();
@@ -167,24 +206,12 @@ $(document).ready(function(){
 		$('#consent_options_modal_' + consentId).modal('hide');
 	});
 	
-/*	$('.cmd-revoke-consent').click(function(e){
-		e.preventDefault();
-		e.stopPropagation();
-		
-		var consentId = $(this).attr("value");
-		
-		$('#form_revoke_consent_' + consentId).submit();
-		$('#consent_options_modal_' + consentId).modal('hide');
-	});*/
-	
 	$(".cmd-submit-revokation").click(function(){
 		var consentId = $(this).attr("value");
 		if(!($('#optionsRadio1_'+consentId).is(':checked')) && !($('#optionsRadio2_'+consentId).is(':checked'))){
-			alert ("Please select one option.");
+			window.alert("Please select one option.");
 		}
 		else{
-			/*$("#consentRevokationForm").append('<input name="consentId" style="display: none;" hidden="true" value="'+consentRevokationId+'"/>');*/
-			/*$("#consentRevokationForm").submit();*/
 			$('#form_revoke_consent_' + consentId).submit();
 		}
 		
@@ -206,6 +233,21 @@ $(document).ready(function(){
 		
 		var consentId = $( this ).find("input[name='consentId']").attr("value");
 		$('#consent_options_modal_' + consentId).modal();
+	});
+	
+	
+	$('table#patient_providers_list > tbody').delegate("tr", "click", function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		
+		//crd_provider_modal_NPI
+		var provNPI = $(this).data("npi");
+		$('div#crd_provider_modal_NPI' + provNPI).modal();
+	});
+	
+	
+	$('#btn_add_providers').click(function(e){
+		$('div#addProviderSearch-modal').modal();
 	});
 
 	

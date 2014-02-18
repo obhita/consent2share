@@ -31,6 +31,12 @@ import javax.xml.bind.annotation.XmlTransient;
  * The Class RuleExecutionResponse.
  */
 public class RuleExecutionResponse {
+	
+	/** The Constant ITEM_ACTION_REDACT. */
+	public static final String ITEM_ACTION_REDACT = "REDACT";
+	
+	/** The Constant ITEM_ACTION_NO_ACTION. */
+	public static final String ITEM_ACTION_NO_ACTION = "NO_ACTION";
 
     /** The Implied conf section. */
     private Confidentiality ImpliedConfSection;
@@ -38,8 +44,8 @@ public class RuleExecutionResponse {
     /** The Sensitivity. */
     private Sensitivity Sensitivity;
     
-//    /** The Item action. */
-//    private String ItemAction;
+    /** The Item action. */
+    private String ItemAction;
     
     /** The US privacy law. */
     private UsPrivacyLaw USPrivacyLaw;
@@ -79,7 +85,7 @@ public class RuleExecutionResponse {
      * Instantiates a new rule execution response.
      */
     public RuleExecutionResponse() {
-        
+    	ItemAction = ITEM_ACTION_NO_ACTION;
     } 
    
     
@@ -198,23 +204,23 @@ public class RuleExecutionResponse {
 		Sensitivity = sensitivity;
 	}
 
-//	/**
-//	 * Gets the item action.
-//	 *
-//	 * @return the ItemAction
-//	 */
-//    public String getItemAction() {
-//        return ItemAction;
-//    }
+	/**
+	 * Gets the item action.
+	 *
+	 * @return the ItemAction
+	 */
+    public String getItemAction() {
+        return ItemAction;
+    }
 
-//    /**
-//     * Sets the item action.
-//     *
-//     * @param ItemAction the ItemAction to set
-//     */
-//    public void setItemAction(String ItemAction) {
-//        this.ItemAction = ItemAction;
-//    }
+    /**
+     * Sets the item action.
+     *
+     * @param ItemAction the ItemAction to set
+     */
+    public void setItemAction(String ItemAction) {
+        this.ItemAction = ItemAction;
+    }
 
 
 	/**

@@ -26,8 +26,11 @@
 package gov.samhsa.consent2share.web;
 
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * The Class AbstractController.
@@ -44,5 +47,12 @@ public abstract class AbstractController {
     {
       binder.registerCustomEditor(String.class, new  StringTrimmerEditor(false));
     }
+	
+	
+	@ExceptionHandler (AjaxException.class)
+	public @ResponseBody ResponseEntity<String> handleAjaxException(AjaxException e){
+		
+		return new ResponseEntity<String>(e.getErrorMessage(), e.getHttpStatus());
+	}
 
 }

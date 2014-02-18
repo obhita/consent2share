@@ -98,6 +98,22 @@ public interface PatientService {
 	 * @return the patient connection dto
 	 */
 	PatientConnectionDto findPatientConnectionByUsername(String username);
+	
+	/**
+	 * Find patient connection by patient.
+	 *
+	 * @param patient the patient
+	 * @return the patient connection dto
+	 */
+	PatientConnectionDto findPatientConnectionByPatient(Patient patient); 
+	
+	/**
+	 * Find patient connection by username.
+	 *
+	 * @param id the id
+	 * @return the patient connection dto
+	 */
+	PatientConnectionDto findPatientConnectionById(long id);
 
 	/**
 	 * Find patient entries.

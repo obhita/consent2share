@@ -1,6 +1,7 @@
 package gov.samhsa.acs.pep;
 
 import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
 import gov.samhsa.acs.common.exception.DS4PException;
@@ -42,7 +43,8 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class PolicyEnforcementPointImpl.
  */
-public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
+public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
+		PolicyTrying {
 	// Constants
 	/** The Constant PERMIT. */
 	private static final String PERMIT = "PERMIT";
@@ -71,20 +73,20 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 
 	/** The marshaller. */
 	private SimpleMarshaller marshaller;
-	
+
 	@Resource
 	private WebServiceContext context;
 
 	private SamlTokenParser samlTokenParser;
-	
+
 	private SAMLTokenPrincipal samlTokenPrincipal;
 
 	/** The data handler to bytes converter. */
-	private  DataHandlerToBytesConverter dataHandlerToBytesConverter;
-	
-	
-	public PolicyEnforcementPointImpl(){}
-	
+	private DataHandlerToBytesConverter dataHandlerToBytesConverter;
+
+	public PolicyEnforcementPointImpl() {
+	}
+
 	/**
 	 * Instantiates a new policy enforcement point impl.
 	 * 
@@ -106,7 +108,8 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 			XdsbErrorFactory xdsbErrorFactory, ContextHandler contextHandler,
 			DocumentSegmentation documentSegmentation,
 			SimpleMarshaller marshaller, WebServiceContext context,
-			SamlTokenParser parser, DataHandlerToBytesConverter dataHandlerToBytesConverter) {
+			SamlTokenParser parser,
+			DataHandlerToBytesConverter dataHandlerToBytesConverter) {
 		super();
 		this.xdsbRegistry = xdsbRegistry;
 		this.xdsbRepository = xdsbRepository;
@@ -130,14 +133,23 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 		if (samlTokenParser == null) {
 			samlTokenParser = new SamlTokenParser();
 		}
-		samlTokenPrincipal = (SAMLTokenPrincipal)(context.getUserPrincipal());
-		
-		String resourceId = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:resource:resource-id");
-		String intermediarySubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject");
-		String purposeOfUse = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
-		String recipientSubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject");
-		XacmlRequest xacmlRequest = setXacmlRequest(resourceId, purposeOfUse, intermediarySubject, recipientSubject);
-		
+		samlTokenPrincipal = (SAMLTokenPrincipal) (context.getUserPrincipal());
+
+		String resourceId = samlTokenParser.parse(
+				samlTokenPrincipal.getToken(),
+				"urn:oasis:names:tc:xacml:1.0:resource:resource-id");
+		String intermediarySubject = samlTokenParser
+				.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject");
+		String purposeOfUse = samlTokenParser.parse(
+				samlTokenPrincipal.getToken(),
+				"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
+		String recipientSubject = samlTokenParser
+				.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject");
+		XacmlRequest xacmlRequest = setXacmlRequest(resourceId, purposeOfUse,
+				intermediarySubject, recipientSubject);
+
 		// Validate input parameters
 		if (!validateAdhocQueryRequest(req)) {
 			return xdsbErrorFactory.errorAdhocQueryResponseMissingParameters();
@@ -164,17 +176,18 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 		if (!patientUniqueId.equals(xacmlRequest.getPatientUniqueId())) {
 			return xdsbErrorFactory
 					.errorAdhocQueryResponseInconsistentPatientUniqueId(
-							patientUniqueId, xdsbRegistry.getPatientUniqueId(
-									xacmlRequest.getPatientId(), xacmlRequest.getHomeCommunityId()));
+							patientUniqueId,
+							xdsbRegistry.getPatientUniqueId(
+									xacmlRequest.getPatientId(),
+									xacmlRequest.getHomeCommunityId()));
 		}
 		XacmlResponse xacmlResponse = null;
-		try{
-			xacmlResponse = contextHandler
-				.enforcePolicy(xacmlRequest);
-		}
-		catch(NoPolicyFoundException e){
+		try {
+			xacmlResponse = contextHandler.enforcePolicy(xacmlRequest);
+		} catch (NoPolicyFoundException e) {
 			logger.error(e.getMessage(), e);
-			return xdsbErrorFactory.errorAdhocQueryResponseNoConsentsFound(patientUniqueId);
+			return xdsbErrorFactory
+					.errorAdhocQueryResponseNoConsentsFound(patientUniqueId);
 		}
 		// If PDP returns PERMIT
 		if (PERMIT.equals(xacmlResponse.getPdpDecision())) {
@@ -211,7 +224,6 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 		}
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -221,37 +233,45 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	@Override
 	public RetrieveDocumentSetResponse retrieveDocumentSet(
 			RetrieveDocumentSetRequest input) {
-		
+
 		if (samlTokenParser == null) {
 			samlTokenParser = new SamlTokenParser();
 		}
-	    samlTokenPrincipal = (SAMLTokenPrincipal)(context.getUserPrincipal());
-		
-		String resourceId = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:resource:resource-id");
-		String intermediarySubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject");
-		String purposeOfUse = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
-		String recipientSubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject");
-		XacmlRequest xacmlRequest = setXacmlRequest(resourceId, purposeOfUse, intermediarySubject, recipientSubject);
-		
-		
+		samlTokenPrincipal = (SAMLTokenPrincipal) (context.getUserPrincipal());
+
+		String resourceId = samlTokenParser.parse(
+				samlTokenPrincipal.getToken(),
+				"urn:oasis:names:tc:xacml:1.0:resource:resource-id");
+		String intermediarySubject = samlTokenParser
+				.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject");
+		String purposeOfUse = samlTokenParser.parse(
+				samlTokenPrincipal.getToken(),
+				"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
+		String recipientSubject = samlTokenParser
+				.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject");
+		XacmlRequest xacmlRequest = setXacmlRequest(resourceId, purposeOfUse,
+				intermediarySubject, recipientSubject);
+
 		if (!validateRetrieveDocumentSetRequest(input)) {
 			return xdsbErrorFactory
 					.errorRetrieveDocumentSetResponseMultipleRepositoryId();
 		}
-		
+
 		XacmlResponse xacmlResponse = null;
-		try{
-			xacmlResponse = contextHandler
-				.enforcePolicy(xacmlRequest);
-		}
-		catch(NoPolicyFoundException e){
+		try {
+			xacmlResponse = contextHandler.enforcePolicy(xacmlRequest);
+		} catch (NoPolicyFoundException e) {
 			logger.error(e.getMessage(), e);
-			return xdsbErrorFactory.errorRetrieveDocumentSetResponseNoConsentsFound(resourceId);
+			return xdsbErrorFactory
+					.errorRetrieveDocumentSetResponseNoConsentsFound(resourceId);
 		}
 		if (PERMIT.equals(xacmlResponse.getPdpDecision())) {
 			RetrieveDocumentSetResponse response;
 			try {
-				response = xdsbRepository.retrieveDocumentSet(input, xacmlRequest.getPatientId(),
+				response = xdsbRepository.retrieveDocumentSet(input,
+						xacmlRequest.getPatientId(),
 						xacmlRequest.getIntermediarySubjectNPI());
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
@@ -307,63 +327,70 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 	 * .ds4ppilot.schema.pep.DirectEmailSendRequest)
 	 */
 	@Override
-	public DirectEmailSendResponse directEmailSend(
-			DirectEmailSendRequest input) {
+	public DirectEmailSendResponse directEmailSend(DirectEmailSendRequest input) {
 		DirectEmailSendResponse response = new DirectEmailSendResponse();
-			
+
 		if (samlTokenParser == null) {
 			samlTokenParser = new SamlTokenParser();
 		}
-	    samlTokenPrincipal = (SAMLTokenPrincipal)(context.getUserPrincipal());
-		
-		String resourceId = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:resource:resource-id");
-		String intermediarySubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject");
-		String purposeOfUse = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
-		String recipientSubject = samlTokenParser.parse(samlTokenPrincipal.getToken(), "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject");
-		XacmlRequest xacmlRequest = setXacmlRequest(resourceId, purposeOfUse, intermediarySubject, recipientSubject);
-		
-		
-//		if (!validateRetrieveDocumentSetRequest(input)) {
-//			return xdsbErrorFactory
-//					.errorRetrieveDocumentSetResponseMultipleRepositoryId();
-//		}
-		
+		samlTokenPrincipal = (SAMLTokenPrincipal) (context.getUserPrincipal());
+
+		String resourceId = samlTokenParser.parse(
+				samlTokenPrincipal.getToken(),
+				"urn:oasis:names:tc:xacml:1.0:resource:resource-id");
+		String intermediarySubject = samlTokenParser
+				.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject");
+		String purposeOfUse = samlTokenParser.parse(
+				samlTokenPrincipal.getToken(),
+				"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
+		String recipientSubject = samlTokenParser
+				.parse(samlTokenPrincipal.getToken(),
+						"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject");
+		XacmlRequest xacmlRequest = setXacmlRequest(resourceId, purposeOfUse,
+				intermediarySubject, recipientSubject);
+
+		// if (!validateRetrieveDocumentSetRequest(input)) {
+		// return xdsbErrorFactory
+		// .errorRetrieveDocumentSetResponseMultipleRepositoryId();
+		// }
+
 		XacmlResponse xacmlResponse = null;
-		try{
-			xacmlResponse = contextHandler
-				.enforcePolicy(xacmlRequest);
-		}
-		catch(NoPolicyFoundException e){
+		try {
+			xacmlResponse = contextHandler.enforcePolicy(xacmlRequest);
+		} catch (NoPolicyFoundException e) {
 			logger.error(e.getMessage(), e);
-//			return xdsbErrorFactory.errorRetrieveDocumentSetResponseNoConsentsFound(resourceId);
+			// return
+			// xdsbErrorFactory.errorRetrieveDocumentSetResponseNoConsentsFound(resourceId);
 			response.setPdpDecision("NO_POLICY");
 			return response;
 		}
-		
+
 		if (PERMIT.equals(xacmlResponse.getPdpDecision())) {
 			response.setPdpDecision(PERMIT);
 			String originalC32 = input.getC32();
 
 			byte[] processedPayload;
-			
+
 			try {
-				XacmlResult xacmlResult = createXacmlResult(xacmlRequest, xacmlResponse);
-//				JAXBContext jaxbContext = JAXBContext
-//						.newInstance(XacmlResult.class);
-//				Marshaller marshaller = jaxbContext.createMarshaller();
-//				marshaller.setProperty("com.sun.xml.bind.xmlDeclaration",
-//						Boolean.FALSE);
-//				marshaller.marshal(xacmlResult, xacmlResponseXml);
+				XacmlResult xacmlResult = createXacmlResult(xacmlRequest,
+						xacmlResponse);
+				// JAXBContext jaxbContext = JAXBContext
+				// .newInstance(XacmlResult.class);
+				// Marshaller marshaller = jaxbContext.createMarshaller();
+				// marshaller.setProperty("com.sun.xml.bind.xmlDeclaration",
+				// Boolean.FALSE);
+				// marshaller.marshal(xacmlResult, xacmlResponseXml);
 				String xacmlResultString = marshaller.marshall(xacmlResult);
 
 				String xdsDocumentEntryUniqueId = "";
 				// packageAsXdm = input.getPackageAsXdm()
 				boolean packageAsXdm = true;
 				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
-						.segmentDocument(originalC32,
-								xacmlResultString, packageAsXdm,
-								true, input.getSenderEmail(),
-								input.getRecipientEmail(), xdsDocumentEntryUniqueId);
+						.segmentDocument(originalC32, xacmlResultString,
+								packageAsXdm, true, input.getSenderEmail(),
+								input.getRecipientEmail(),
+								xdsDocumentEntryUniqueId);
 
 				processedPayload = dataHandlerToBytesConverter
 						.toByteArray(segmentDocumentResponse
@@ -380,41 +407,73 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 				throw new DS4PException(e.toString(), e);
 			} catch (Throwable e) {
 				e.printStackTrace();
-			}			
-		}
-		else {
+			}
+		} else {
 			response.setPdpDecision("DENY");
 		}
 		return response;
 	}
-	
 
+	@Override
+	public String tryPolicy(String c32Xml, String xacmlPolicy) {
+		PdpRequestResponse pdpRequestResponse = contextHandler
+				.makeDecisionForTryingPolicy(xacmlPolicy);
+		XacmlResponse xacmlResponse = pdpRequestResponse.getXacmlResponse();
+		
+		XacmlRequest xacmlRequest = pdpRequestResponse.getXacmlRequest();
+
+		XacmlResult xacmlResult = createXacmlResult(xacmlRequest, xacmlResponse);
+		
+
+		String enforcementPolicies = null;
+
+		try {
+			enforcementPolicies = marshaller.marshall(xacmlResult);
+		} catch (Throwable e) {
+			logger.error("Error in tryPolicy", e);
+		}
+
+		boolean packageAsXdm = false;
+		boolean encryptDocument = false;
+		String senderEmailAddress = "";
+		String recipientEmailAddress = "";
+		String xdsDocumentEntryUniqueId = "UniquId";
+		SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
+				.segmentDocument(c32Xml, enforcementPolicies, packageAsXdm,
+						encryptDocument, senderEmailAddress,
+						recipientEmailAddress, xdsDocumentEntryUniqueId);
+		String segmentedC32 = segmentDocumentResponse.getMaskedDocument();
+
+		return segmentedC32;
+	}
 
 	/**
 	 * Sets the xacml request.
 	 * 
 	 * @return the xacml request
 	 */
-	public XacmlRequest setXacmlRequest(String resourceId, String purposeOfUse, String intermediarySubject, String recipientSubject) {
+	public XacmlRequest setXacmlRequest(String resourceId, String purposeOfUse,
+			String intermediarySubject, String recipientSubject) {
 
 		XacmlRequest xacmlRequest = new XacmlRequest();
-		
+
 		String homeCommunityId = "";
 		String patientId = "";
-		
-		// Sample resourceId: "d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO"
+
+		// Sample resourceId:
+		// "d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO"
 		StringTokenizer tokenizer = new StringTokenizer(resourceId, "&");
 		patientId = tokenizer.nextToken().replace("^^^", "");
 		homeCommunityId = tokenizer.nextToken();
-		
+
 		xacmlRequest.setHomeCommunityId(homeCommunityId);
 		xacmlRequest.setIntermediarySubjectNPI(intermediarySubject);
 		xacmlRequest.setMessageId(UUID.randomUUID().toString());
 		xacmlRequest.setPurposeOfUse(purposeOfUse);
 		xacmlRequest.setRecepientSubjectNPI(recipientSubject);
 		xacmlRequest.setPatientId(patientId);
-		
-		xacmlRequest.setPatientUniqueId("'"+resourceId+"'");
+
+		xacmlRequest.setPatientUniqueId("'" + resourceId + "'");
 		return xacmlRequest;
 	}
 
@@ -485,5 +544,4 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint {
 		xacmlResult.setSubjectPurposeOfUse(xacmlRequest.getPurposeOfUse());
 		return xacmlResult;
 	}
-	
 }

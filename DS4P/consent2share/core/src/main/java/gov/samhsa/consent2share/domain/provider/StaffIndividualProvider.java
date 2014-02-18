@@ -25,211 +25,629 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.domain.provider;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.hibernate.envers.AuditTable;
-import org.hibernate.envers.Audited;
 
+import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
+import gov.samhsa.consent2share.domain.reference.EntityType;
 
 @Entity
-@Audited(auditParents=StaffAbstractProvider.class)
-@AuditTable("Staff_Individual_Provider_audit")
-@SequenceGenerator(name="idgen", sequenceName="INDPROV_SEQ", initialValue = 1)
-public class StaffIndividualProvider extends StaffAbstractProvider {
+@SequenceGenerator(name = "idgen", sequenceName = "INDPROV_SEQ", initialValue = 1)
+public class StaffIndividualProvider {
+	
+	public StaffIndividualProvider(){
+		super();
+		this.id = (long) -1;
+	}
 
-    /** The last name. */
-    @NotNull
-    @Size(max = 30)
-    private String lastName;
+	@OneToOne
+	private IndividualProvider individualProvider;
 
-    /** The first name. */
-    @NotNull
-    @Size(max = 30)
-    private String firstName;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "idgen")
+	@Column(name = "id")
+	private Long id;
 
-    /** The middle name. */
-    @NotNull
-    @Size(max = 30)
-    private String middleName;
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public long getId(){
+		return this.id;
+	}
 
-    /** The name prefix. */
-    @NotNull
-    @Size(max = 30)
-    private String namePrefix;
+	public IndividualProvider getIndividualProvider() {
+		return individualProvider;
+	}
 
-    /** The name suffix. */
-    @NotNull
-    @Size(max = 30)
-    private String nameSuffix;
+	public void setIndividualProvider(IndividualProvider individualProvider) {
+		this.individualProvider = individualProvider;
+	}
 
-    /** The credential. */
-    @NotNull
-    @Size(max = 30)
-    private String credential;
-    
 	/**
 	 * To json.
-	 *
+	 * 
 	 * @return the string
 	 */
 	public String toJson() {
-        return new JSONSerializer().exclude("*.class").deepSerialize(this);
-    }
+		return new JSONSerializer().exclude("*.class").deepSerialize(this.individualProvider);
+	}
 
 	/**
 	 * From json to individual provider.
-	 *
-	 * @param json the json
+	 * 
+	 * @param json
+	 *            the json
 	 * @return the individual provider
 	 */
 	public static IndividualProvider fromJsonToIndividualProvider(String json) {
-        return new JSONDeserializer<IndividualProvider>().use(null, IndividualProvider.class).deserialize(json);
-    }
+		return new JSONDeserializer<IndividualProvider>().use(null,
+				IndividualProvider.class).deserialize(json);
+	}
 
 	/**
 	 * To json array.
-	 *
-	 * @param collection the collection
+	 * 
+	 * @param collection
+	 *            the collection
 	 * @return the string
 	 */
 	public static String toJsonArray(Collection<IndividualProvider> collection) {
-        return new JSONSerializer().exclude("*.class").deepSerialize(collection);
-    }
+		return new JSONSerializer().exclude("*.class")
+				.deepSerialize(collection);
+	}
 
 	/**
 	 * From json array to individual providers.
-	 *
-	 * @param json the json
+	 * 
+	 * @param json
+	 *            the json
 	 * @return the collection
 	 */
-	public static Collection<IndividualProvider> fromJsonArrayToIndividualProviders(String json) {
-        return new JSONDeserializer<List<IndividualProvider>>().use(null, ArrayList.class).use("values", IndividualProvider.class).deserialize(json);
-    }
+	public static Collection<IndividualProvider> fromJsonArrayToIndividualProviders(
+			String json) {
+		return new JSONDeserializer<List<IndividualProvider>>()
+				.use(null, ArrayList.class)
+				.use("values", IndividualProvider.class).deserialize(json);
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-    }
+		return ReflectionToStringBuilder.toString(this.individualProvider,
+				ToStringStyle.SHORT_PREFIX_STYLE);
+	}
 
 	/**
 	 * Gets the last name.
-	 *
+	 * 
 	 * @return the last name
 	 */
 	public String getLastName() {
-        return this.lastName;
-    }
+		return this.individualProvider.getLastName();
+	}
 
 	/**
 	 * Sets the last name.
-	 *
-	 * @param lastName the new last name
+	 * 
+	 * @param lastName
+	 *            the new last name
 	 */
 	public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+		this.individualProvider.setLastName(lastName) ;
+	}
 
 	/**
 	 * Gets the first name.
-	 *
+	 * 
 	 * @return the first name
 	 */
 	public String getFirstName() {
-        return this.firstName;
-    }
+		return this.individualProvider.getFirstName();
+	}
 
 	/**
 	 * Sets the first name.
-	 *
-	 * @param firstName the new first name
+	 * 
+	 * @param firstName
+	 *            the new first name
 	 */
 	public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+		this.individualProvider.setFirstName(firstName);
+	}
 
 	/**
 	 * Gets the middle name.
-	 *
+	 * 
 	 * @return the middle name
 	 */
 	public String getMiddleName() {
-        return this.middleName;
-    }
+		return this.individualProvider.getMiddleName();
+	}
 
 	/**
 	 * Sets the middle name.
-	 *
-	 * @param middleName the new middle name
+	 * 
+	 * @param middleName
+	 *            the new middle name
 	 */
 	public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
+		this.individualProvider.setMiddleName(middleName);
+	}
 
 	/**
 	 * Gets the name prefix.
-	 *
+	 * 
 	 * @return the name prefix
 	 */
 	public String getNamePrefix() {
-        return this.namePrefix;
-    }
+		return this.individualProvider.getNamePrefix();
+	}
 
 	/**
 	 * Sets the name prefix.
-	 *
-	 * @param namePrefix the new name prefix
+	 * 
+	 * @param namePrefix
+	 *            the new name prefix
 	 */
 	public void setNamePrefix(String namePrefix) {
-        this.namePrefix = namePrefix;
-    }
+		this.individualProvider.setNamePrefix(namePrefix);
+	}
 
 	/**
 	 * Gets the name suffix.
-	 *
+	 * 
 	 * @return the name suffix
 	 */
 	public String getNameSuffix() {
-        return this.nameSuffix;
-    }
+		return this.individualProvider.getNameSuffix();
+	}
 
 	/**
 	 * Sets the name suffix.
-	 *
-	 * @param nameSuffix the new name suffix
+	 * 
+	 * @param nameSuffix
+	 *            the new name suffix
 	 */
 	public void setNameSuffix(String nameSuffix) {
-        this.nameSuffix = nameSuffix;
-    }
+		this.individualProvider.setNameSuffix(nameSuffix);
+	}
 
 	/**
 	 * Gets the credential.
-	 *
+	 * 
 	 * @return the credential
 	 */
 	public String getCredential() {
-        return this.credential;
-    }
+		return this.individualProvider.getCredential();
+	}
 
 	/**
 	 * Sets the credential.
-	 *
-	 * @param credential the new credential
+	 * 
+	 * @param credential
+	 *            the new credential
 	 */
 	public void setCredential(String credential) {
-        this.credential = credential;
+		this.individualProvider.setCredential(credential);
+	}
+	
+	
+	
+	
+	
+	
+	/**
+     * Gets the npi.
+     *
+     * @return the npi
+     */
+    public String getNpi() {
+        return this.individualProvider.getNpi();
+    }
+
+	/**
+	 * Sets the npi.
+	 *
+	 * @param npi the new npi
+	 */
+	public void setNpi(String npi) {
+        this.individualProvider.setNpi(npi);
+    }
+
+	/**
+	 * Gets the entity type.
+	 *
+	 * @return the entity type
+	 */
+	public EntityType getEntityType() {
+        return this.individualProvider.getEntityType();
+    }
+
+	/**
+	 * Sets the entity type.
+	 *
+	 * @param entityType the new entity type
+	 */
+	public void setEntityType(EntityType entityType) {
+        this.individualProvider.setEntityType(entityType);
+    }
+
+	/**
+	 * Gets the first line mailing address.
+	 *
+	 * @return the first line mailing address
+	 */
+	public String getFirstLineMailingAddress() {
+        return this.individualProvider.getFirstLineMailingAddress();
+    }
+
+	/**
+	 * Sets the first line mailing address.
+	 *
+	 * @param firstLineMailingAddress the new first line mailing address
+	 */
+	public void setFirstLineMailingAddress(String firstLineMailingAddress) {
+        this.individualProvider.setFirstLineMailingAddress(firstLineMailingAddress);
+    }
+
+	/**
+	 * Gets the second line mailing address.
+	 *
+	 * @return the second line mailing address
+	 */
+	public String getSecondLineMailingAddress() {
+        return this.individualProvider.getSecondLineMailingAddress();
+    }
+
+	/**
+	 * Sets the second line mailing address.
+	 *
+	 * @param secondLineMailingAddress the new second line mailing address
+	 */
+	public void setSecondLineMailingAddress(String secondLineMailingAddress) {
+        this.individualProvider.setSecondLineMailingAddress(secondLineMailingAddress);
+    }
+
+	/**
+	 * Gets the mailing address city name.
+	 *
+	 * @return the mailing address city name
+	 */
+	public String getMailingAddressCityName() {
+        return this.individualProvider.getMailingAddressCityName();
+    }
+
+	/**
+	 * Sets the mailing address city name.
+	 *
+	 * @param mailingAddressCityName the new mailing address city name
+	 */
+	public void setMailingAddressCityName(String mailingAddressCityName) {
+        this.individualProvider.setMailingAddressCityName(mailingAddressCityName);
+    }
+
+	/**
+	 * Gets the mailing address state name.
+	 *
+	 * @return the mailing address state name
+	 */
+	public String getMailingAddressStateName() {
+        return this.individualProvider.getMailingAddressStateName();
+    }
+
+	/**
+	 * Sets the mailing address state name.
+	 *
+	 * @param mailingAddressStateName the new mailing address state name
+	 */
+	public void setMailingAddressStateName(String mailingAddressStateName) {
+        this.individualProvider.setMailingAddressStateName(mailingAddressStateName);
+    }
+
+	/**
+	 * Gets the mailing address postal code.
+	 *
+	 * @return the mailing address postal code
+	 */
+	public String getMailingAddressPostalCode() {
+        return this.individualProvider.getMailingAddressPostalCode();
+    }
+
+	/**
+	 * Sets the mailing address postal code.
+	 *
+	 * @param mailingAddressPostalCode the new mailing address postal code
+	 */
+	public void setMailingAddressPostalCode(String mailingAddressPostalCode) {
+        this.individualProvider.setMailingAddressPostalCode(mailingAddressPostalCode);
+    }
+
+	/**
+	 * Gets the mailing address country code.
+	 *
+	 * @return the mailing address country code
+	 */
+	public String getMailingAddressCountryCode() {
+        return this.individualProvider.getMailingAddressCountryCode();
+    }
+
+	/**
+	 * Sets the mailing address country code.
+	 *
+	 * @param mailingAddressCountryCode the new mailing address country code
+	 */
+	public void setMailingAddressCountryCode(String mailingAddressCountryCode) {
+        this.individualProvider.setMailingAddressCountryCode(mailingAddressCountryCode);
+    }
+
+	/**
+	 * Gets the mailing address telephone number.
+	 *
+	 * @return the mailing address telephone number
+	 */
+	public String getMailingAddressTelephoneNumber() {
+        return this.individualProvider.getMailingAddressTelephoneNumber();
+    }
+
+	/**
+	 * Sets the mailing address telephone number.
+	 *
+	 * @param mailingAddressTelephoneNumber the new mailing address telephone number
+	 */
+	public void setMailingAddressTelephoneNumber(String mailingAddressTelephoneNumber) {
+        this.individualProvider.setMailingAddressTelephoneNumber(mailingAddressTelephoneNumber);
+    }
+
+	/**
+	 * Gets the mailing address fax number.
+	 *
+	 * @return the mailing address fax number
+	 */
+	public String getMailingAddressFaxNumber() {
+        return this.individualProvider.getMailingAddressFaxNumber();
+    }
+
+	/**
+	 * Sets the mailing address fax number.
+	 *
+	 * @param mailingAddressFaxNumber the new mailing address fax number
+	 */
+	public void setMailingAddressFaxNumber(String mailingAddressFaxNumber) {
+        this.individualProvider.setMailingAddressFaxNumber(mailingAddressFaxNumber);
+    }
+
+	/**
+	 * Gets the first line practice location address.
+	 *
+	 * @return the first line practice location address
+	 */
+	public String getFirstLinePracticeLocationAddress() {
+        return this.individualProvider.getFirstLinePracticeLocationAddress();
+    }
+
+	/**
+	 * Sets the first line practice location address.
+	 *
+	 * @param firstLinePracticeLocationAddress the new first line practice location address
+	 */
+	public void setFirstLinePracticeLocationAddress(String firstLinePracticeLocationAddress) {
+        this.individualProvider.setFirstLinePracticeLocationAddress(firstLinePracticeLocationAddress);
+    }
+
+	/**
+	 * Gets the second line practice location address.
+	 *
+	 * @return the second line practice location address
+	 */
+	public String getSecondLinePracticeLocationAddress() {
+        return this.individualProvider.getSecondLinePracticeLocationAddress();
+    }
+
+	/**
+	 * Sets the second line practice location address.
+	 *
+	 * @param secondLinePracticeLocationAddress the new second line practice location address
+	 */
+	public void setSecondLinePracticeLocationAddress(String secondLinePracticeLocationAddress) {
+        this.individualProvider.setSecondLinePracticeLocationAddress(secondLinePracticeLocationAddress);
+    }
+
+	/**
+	 * Gets the practice location address city name.
+	 *
+	 * @return the practice location address city name
+	 */
+	public String getPracticeLocationAddressCityName() {
+        return this.individualProvider.getPracticeLocationAddressCityName();
+    }
+
+	/**
+	 * Sets the practice location address city name.
+	 *
+	 * @param practiceLocationAddressCityName the new practice location address city name
+	 */
+	public void setPracticeLocationAddressCityName(String practiceLocationAddressCityName) {
+        this.individualProvider.setPracticeLocationAddressCityName(practiceLocationAddressCityName);
+    }
+
+	/**
+	 * Gets the practice location address state name.
+	 *
+	 * @return the practice location address state name
+	 */
+	public String getPracticeLocationAddressStateName() {
+        return this.individualProvider.getPracticeLocationAddressStateName();
+    }
+
+	/**
+	 * Sets the practice location address state name.
+	 *
+	 * @param practiceLocationAddressStateName the new practice location address state name
+	 */
+	public void setPracticeLocationAddressStateName(String practiceLocationAddressStateName) {
+        this.individualProvider.setPracticeLocationAddressStateName(practiceLocationAddressStateName);
+    }
+
+	/**
+	 * Gets the practice location address postal code.
+	 *
+	 * @return the practice location address postal code
+	 */
+	public String getPracticeLocationAddressPostalCode() {
+        return this.individualProvider.getPracticeLocationAddressPostalCode();
+    }
+
+	/**
+	 * Sets the practice location address postal code.
+	 *
+	 * @param practiceLocationAddressPostalCode the new practice location address postal code
+	 */
+	public void setPracticeLocationAddressPostalCode(String practiceLocationAddressPostalCode) {
+        this.individualProvider.setPracticeLocationAddressPostalCode(practiceLocationAddressPostalCode);
+    }
+
+	/**
+	 * Gets the practice location address country code.
+	 *
+	 * @return the practice location address country code
+	 */
+	public String getPracticeLocationAddressCountryCode() {
+        return this.individualProvider.getPracticeLocationAddressCountryCode();
+    }
+
+	/**
+	 * Sets the practice location address country code.
+	 *
+	 * @param practiceLocationAddressCountryCode the new practice location address country code
+	 */
+	public void setPracticeLocationAddressCountryCode(String practiceLocationAddressCountryCode) {
+        this.individualProvider.setPracticeLocationAddressCountryCode(practiceLocationAddressCountryCode);
+    }
+
+	/**
+	 * Gets the practice location address telephone number.
+	 *
+	 * @return the practice location address telephone number
+	 */
+	public String getPracticeLocationAddressTelephoneNumber() {
+        return this.individualProvider.getPracticeLocationAddressTelephoneNumber();
+    }
+
+	/**
+	 * Sets the practice location address telephone number.
+	 *
+	 * @param practiceLocationAddressTelephoneNumber the new practice location address telephone number
+	 */
+	public void setPracticeLocationAddressTelephoneNumber(String practiceLocationAddressTelephoneNumber) {
+        this.individualProvider.setPracticeLocationAddressTelephoneNumber(practiceLocationAddressTelephoneNumber);
+    }
+
+	/**
+	 * Gets the practice location address fax number.
+	 *
+	 * @return the practice location address fax number
+	 */
+	public String getPracticeLocationAddressFaxNumber() {
+        return this.individualProvider.getPracticeLocationAddressFaxNumber();
+    }
+
+	/**
+	 * Sets the practice location address fax number.
+	 *
+	 * @param practiceLocationAddressFaxNumber the new practice location address fax number
+	 */
+	public void setPracticeLocationAddressFaxNumber(String practiceLocationAddressFaxNumber) {
+        this.individualProvider.setPracticeLocationAddressFaxNumber(practiceLocationAddressFaxNumber);
+    }
+
+	/**
+	 * Gets the enumeration date.
+	 *
+	 * @return the enumeration date
+	 */
+	public String getEnumerationDate() {
+        return this.individualProvider.getEnumerationDate();
+    }
+
+	/**
+	 * Sets the enumeration date.
+	 *
+	 * @param enumerationDate the new enumeration date
+	 */
+	public void setEnumerationDate(String enumerationDate) {
+        this.individualProvider.setEnumerationDate(enumerationDate);
+    }
+
+	/**
+	 * Gets the last update date.
+	 *
+	 * @return the last update date
+	 */
+	public String getLastUpdateDate() {
+        return this.individualProvider.getLastUpdateDate();
+    }
+
+	/**
+	 * Sets the last update date.
+	 *
+	 * @param lastUpdateDate the new last update date
+	 */
+	public void setLastUpdateDate(String lastUpdateDate) {
+        this.individualProvider.setLastUpdateDate(lastUpdateDate);
+    }
+
+	/**
+	 * Gets the provider taxonomy code.
+	 *
+	 * @return the provider taxonomy code
+	 */
+	public String getProviderTaxonomyCode() {
+        return this.individualProvider.getProviderTaxonomyCode();
+    }
+
+	/**
+	 * Sets the provider taxonomy code.
+	 *
+	 * @param providerTaxonomyCode the new provider taxonomy code
+	 */
+	public void setProviderTaxonomyCode(String providerTaxonomyCode) {
+        this.individualProvider.setProviderTaxonomyCode(providerTaxonomyCode);
+    }
+
+	/**
+	 * Gets the provider taxonomy description.
+	 *
+	 * @return the provider taxonomy description
+	 */
+	public String getProviderTaxonomyDescription() {
+        return this.individualProvider.getProviderTaxonomyDescription();
+    }
+
+	/**
+	 * Sets the provider taxonomy description.
+	 *
+	 * @param providerTaxonomyDescription the new provider taxonomy description
+	 */
+	public void setProviderTaxonomyDescription(String providerTaxonomyDescription) {
+        this.individualProvider.setProviderTaxonomyDescription(providerTaxonomyDescription);
     }
 
 }

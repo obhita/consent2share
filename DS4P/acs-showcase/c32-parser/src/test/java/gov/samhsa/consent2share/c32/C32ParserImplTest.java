@@ -4,6 +4,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import gov.samhsa.consent2share.c32.dto.GreenCCD;
+import gov.samhsa.consent2share.commonunit.io.ResourceFileReader;
 
 import org.junit.Assert;
 import org.junit.Test;

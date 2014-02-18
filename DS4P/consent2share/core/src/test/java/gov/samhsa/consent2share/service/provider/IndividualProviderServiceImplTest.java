@@ -57,8 +57,7 @@ public class IndividualProviderServiceImplTest {
 	public void testUpdateIndividualProviderDto() {
 		IndividualProviderDto individualProviderDto = mock(IndividualProviderDto.class);
 		individualProviderService.updateIndividualProvider(individualProviderDto);
-		verify(individualProviderRepository).findByPatientAndNpi(patientRepository.findByUsername(individualProviderDto.getUsername()), individualProviderDto.getNpi());
-		verify(individualProviderRepository).save(any(IndividualProvider.class));
+		verify(patientRepository).save(any(Patient.class));
 	}
 	
 	@Test
@@ -77,7 +76,7 @@ public class IndividualProviderServiceImplTest {
 	public void testDeleteIndividualProviderDto() {
 		IndividualProviderDto individualProviderDto = mock(IndividualProviderDto.class);
 		individualProviderService.deleteIndividualProviderDto(mock(IndividualProviderDto.class));
-		verify(individualProviderRepository).findByPatientAndNpi(patientRepository.findByUsername(individualProviderDto.getUsername()), individualProviderDto.getNpi());
+		verify(patientRepository).save(any(Patient.class));
 	}
 
 	@Test

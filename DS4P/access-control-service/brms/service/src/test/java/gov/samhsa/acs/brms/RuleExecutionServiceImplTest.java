@@ -13,8 +13,8 @@ import gov.samhsa.acs.brms.domain.FactModel;
 import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.brms.guvnor.GuvnorService;
-import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
+import gov.samhsa.consent2share.commonunit.io.ResourceFileReader;
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
 
 import java.io.IOException;
@@ -43,8 +43,6 @@ public class RuleExecutionServiceImplTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-
-	private FileReaderImpl fileReader = new FileReaderImpl();
 
 	@Spy
 	@InjectMocks
@@ -156,7 +154,7 @@ public class RuleExecutionServiceImplTest {
 	@Test
 	public void testCreateStatefulKnowledgeSession() throws IOException {
 		// Arrange
-		String rulesMock = fileReader.readFile("unitTestRules.txt");
+		String rulesMock = ResourceFileReader.getStringFromResourceFile("unitTestRules.txt");
 		when(guvnorServiceMock.getVersionedRulesFromPackage()).thenReturn(
 				rulesMock);
 

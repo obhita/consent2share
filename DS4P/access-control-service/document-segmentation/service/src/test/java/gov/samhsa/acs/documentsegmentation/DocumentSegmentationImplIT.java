@@ -1,8 +1,8 @@
 package gov.samhsa.acs.documentsegmentation;
 
 import gov.samhsa.acs.brms.RuleExecutionServiceImpl;
+import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.brms.guvnor.GuvnorServiceImpl;
-import gov.samhsa.acs.common.bean.RuleExecutionContainer;
 import gov.samhsa.acs.common.bean.XacmlResult;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReaderImpl;

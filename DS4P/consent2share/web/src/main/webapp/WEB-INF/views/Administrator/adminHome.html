@@ -48,7 +48,7 @@
 
 <div class="container outmost-holder">
 	<!-- !START: Page Header -->
-	<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='Administrator Home'">
+	<header class="navbar navbar-static-top" role="banner" th:with="currentPageTitle=#{header_staff_home}">
 		<div class="container">
 			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/admin_fragments :: admin-navbarHeaderFragment">
 			
@@ -262,8 +262,8 @@
 <!-- END MODAL -->			
 						
 			<div class="row">
-				<section class="col-sm-12">
-					<div class="box">
+				<section class="box col-sm-6">
+					
 						<div class="box-header">
 								<h2>
 									<span class="fa fa-user"></span><span class="break"></span>Recent Patient Activity
@@ -308,10 +308,124 @@
                               	</tbody>
                        		</table> 
                 		</div>
-                	</div>
+                	
 				</section>
 			
-<!-- 				<section class="col-md-6 col-sm-6"> -->
+				<section class="box col-md-6 col-sm-6">
+					<div class="box-header">
+								<h2>
+									<span class="fa fa-list"></span><span class="break"></span>Favorite Providers
+								</h2>
+								<div style="float: right; margin-right: 5px;">
+									<button class="btn btn-info btn-xs add-btn" data-toggle="modal" data-target="#providerInfo">
+										<span class="fa fa-star fa-white"></span>
+									</button>
+							<!--  	<button id="btn_add_providers" class="btn btn-success btn-xs add-btn">
+										<span class="fa fa-plus fa-white"><span style="margin-left: 3px;">Add Providers</span></span>
+									</button> -->
+								</div>
+					
+<!-- providerInfo Modal -->
+							<div  id="providerInfo" class="modal fade"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+							  <div class="modal-dialog">
+							    <div class="modal-content">
+								  <div class="modal-header">
+								    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+								    <h3 id="myModalLabel">Favorite Provider Information</h3>
+								  </div>
+								  <div class="modal-body">
+								 	
+								 	<section>
+					                	<div>
+					                		<div class="provider_record_space">
+					                			<div class="provider_record_box">
+					                				<div class="provider_record_header unassigned">
+					                					<div class="result_row">
+					                						<span class="result_field provider_name_field">Healthcare Provider Name</span>
+					                						<span class="result_field">[NPI: 0123456789]</span>
+					                				<!--  	<a href="#"><span class="fa fa-star-o favorite"></span></a> -->
+					                						<a href="#" class="favorite"><span class="favorite-true"></span></a>
+					                					</div>
+					                			<!--	<div class="result_row add_button_space">
+					                						<span class="result_field"><button class="btn btn-xs btn-danger"><span class="fa fa-minus fa-white"></span></button></span>Remove from Favorite Provider List.
+					                					</div> -->
+					                				</div>
+					                				<p class="result_row"><span class="result_field provider_specialty_field">Provider Specialty Field</span></p>
+					                				<p class="result_row"><span class="result_field">123 Main Street, Anytown, MD 12345-1234</span></p>
+					                				<p class="result_row"><span class="result_field">(800) 888-8888</span></p>
+					                			</div>                			               			
+					                		</div>
+					                		<div class="provider_record_space">
+					                			<div class="provider_record_box">
+					                				<div class="provider_record_header assigned">
+					                					<div class="result_row">
+					                						<span class="result_field provider_name_field">Second Healthcare Provider Name</span>
+					                						<span class="result_field">[NPI: 0123456789]</span>
+					                				<!--  	<a href="#"><span class="fa fa-star favorite favorite-true"></span></a> -->
+					                						<a href="#" class="favorite"><span class="favorite-true"></span></a>
+					                					</div>
+					                			<!--	<div class="result_row add_button_space inline-block">
+					                						
+					                					 	<span  data-trigger="hover" data-toggle="popover"
+									 		     		    	data-placement="top" data-content="You can not delete a Provider attached to an active Consent.">
+					                							<div class="inline-block">
+					                								<div class="btn btn-xs btn-default" disabled="disabled">
+					                									<span class="fa fa-minus fa-white"></span>
+					                								</div>
+					                							</div>
+					                						</span>
+					                						<em>Provider currently assigned to Consent.</em>
+					                						<span class="result_field"><button class="btn btn-xs btn-danger"><span class="fa fa-minus fa-white"></span></button></span>Remove from Favorite Provider List. 
+														</div> -->
+					                				</div>
+					                				<p class="result_row"><span class="result_field provider_specialty_field">Provider Specialty Field</span></p>
+					                				<p class="result_row"><span class="result_field">123 Main Street, Anytown, MD 12345-1234</span></p>
+					                				<p class="result_row"><span class="result_field">(800) 888-8888</span></p>
+					                			</div>
+					                		</div>
+					                	</div>
+					                </section>
+								 	
+								 	
+								  </div>
+								  <div class="modal-footer">
+								    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+							   <!-- <button class="btn btn-primary">Save changes</button> -->
+								  </div>
+								</div>
+							  </div>
+							</div>
+							
+<!-- end of providerInfo modal -->
+					
+					</div>
+					<div class="box-content">
+								<table id="patient_providers_list" class="table table-striped table-hover">
+								  <thead>
+									  <tr>
+									  	<th>Provider</th>
+										<th>Specialty</th>
+										<th>Phone Number</th>														                                         
+									  </tr>
+								  </thead>   
+								  <tbody>
+								   	<tr>
+								      	<td	class="center">Static, Sammy</td>
+			                   		 	<td >Clinical</td>
+			                   		 	<td>(123) 456-7890</td>
+			                   		 	<!-- <td><a href="#" class="favorite"><span class="favorite-true"></span></a></td> -->
+								    </tr>
+								    
+									<tr>
+										<td class="center">Provider Name</td>
+										<td>Specialty</td>									
+										<td class="center">(123) 456-7890</td>
+										<!-- <td><a href="#" class="favorite"><span class="favorite-true"></span></a></td> -->
+										                                         
+									</tr>
+								  </tbody>
+								</table>  
+						</div>
 <!-- 					<div class="box"> -->
 <!-- 						<div class="box-header"> -->
 <!-- 								<h2> -->
@@ -340,7 +454,7 @@
 <!--                             </table> -->
 <!--                 		</div> -->
 <!--                 	</div> -->
-<!-- 				</section>			 -->
+				</section>
 			</div>
 			
 <!-- 		<div class="row">

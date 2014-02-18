@@ -47,6 +47,7 @@ public class PatientDto {
 	private MCCIIN000002UV01 xdsbRegAddMsg;
 	private MCCIIN000002UV01 xdsbRegUpdateMsg;
 	private RegistryResponse xdsbRepoProvideMsg;
+	private String pushC32Msg;
 	private String eId;
 
 	public String geteId() {
@@ -175,5 +176,13 @@ public class PatientDto {
 
 	public void setXdsbRepoProvideMsg(RegistryResponse xdsbRepoProvideMsg) {
 		this.xdsbRepoProvideMsg = xdsbRepoProvideMsg;
+	}
+	
+	public String getPushC32Msg() {
+		return pushC32Msg;
+	}
+
+	public void setPushC32Msg(String pushC32Msg) {
+		this.pushC32Msg = pushC32Msg;
 	}
 }

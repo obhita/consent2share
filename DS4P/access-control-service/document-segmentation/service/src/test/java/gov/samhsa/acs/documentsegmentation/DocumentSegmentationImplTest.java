@@ -11,7 +11,13 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import gov.samhsa.acs.brms.RuleExecutionService;
-import gov.samhsa.acs.common.bean.RuleExecutionContainer;
+import gov.samhsa.acs.brms.domain.Confidentiality;
+import gov.samhsa.acs.brms.domain.ObligationPolicyDocument;
+import gov.samhsa.acs.brms.domain.RefrainPolicy;
+import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
+import gov.samhsa.acs.brms.domain.RuleExecutionResponse;
+import gov.samhsa.acs.brms.domain.Sensitivity;
+import gov.samhsa.acs.brms.domain.UsPrivacyLaw;
 import gov.samhsa.acs.common.bean.XacmlResult;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
@@ -32,7 +38,6 @@ import gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl;
 import gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
-import gov.va.ds4p.cas.RuleExecutionResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -58,6 +63,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class DocumentSegmentationImplTest {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -95,8 +101,7 @@ public class DocumentSegmentationImplTest {
 	private static DocumentSegmentation documentSegmentation;
 
 	@BeforeClass
-	public static void setUp() throws XPathExpressionException,
-			XMLEncryptionException, Exception {
+	public static void setUp() throws Throwable {
 		senderEmailAddress = "leo.smith@direct.obhita-stage.org";
 		recipientEmailAddress = "Duane_Decouteau@direct.healthvault-stage.com";
 
@@ -159,6 +164,8 @@ public class DocumentSegmentationImplTest {
 		when(
 				marshallerMock.unmarshallFromXml(eq(XacmlResult.class),
 						anyString())).thenReturn(xacmlResultObj);
+		when(marshallerMock.marshall(ruleExecutionContainerObj)).thenReturn(
+				testExecutionResponseContainer_xml);
 
 		// Documnent redactor
 		documentRedactorMock = mock(DocumentRedactorImpl.class);
@@ -266,7 +273,7 @@ public class DocumentSegmentationImplTest {
 
 	@Test
 	public void testSegmentDocument_Given_XdmTrue_EncryptTrue()
-			throws IOException {
+			throws IOException, SAXException {
 		boolean xdm = true;
 		boolean ecrypt = true;
 		// Act
@@ -280,7 +287,7 @@ public class DocumentSegmentationImplTest {
 
 	@Test
 	public void testSegmentDocument_Given_XdmFalse_EncryptTrue()
-			throws IOException {
+			throws IOException, SAXException {
 		// Arrange
 		boolean xdm = false;
 		boolean ecrypt = true;
@@ -296,7 +303,7 @@ public class DocumentSegmentationImplTest {
 
 	@Test
 	public void testSegmentDocument_Given_XdmTrue_EncryptFalse()
-			throws IOException {
+			throws IOException, SAXException {
 		// Arrange
 		boolean xdm = true;
 		boolean ecrypt = false;
@@ -312,7 +319,7 @@ public class DocumentSegmentationImplTest {
 
 	@Test
 	public void testSegmentDocument_Given_XdmFalse_EncryptFalse()
-			throws IOException {
+			throws IOException, SAXException {
 		// Arrange
 		boolean xdm = false;
 		boolean ecrypt = false;
@@ -422,7 +429,8 @@ public class DocumentSegmentationImplTest {
 		}
 	}
 
-	private void validateResponse(SegmentDocumentResponse resp, boolean encrypt) {
+	private void validateResponse(SegmentDocumentResponse resp, boolean encrypt)
+			throws SAXException, IOException {
 		// Assert masked document
 		logger.debug(resp.getMaskedDocument());
 		assertEquals(testMasked_C32_xml, resp.getMaskedDocument());
@@ -487,26 +495,26 @@ public class DocumentSegmentationImplTest {
 		r1.setCode("66214007");
 		r1.setCodeSystemName("SNOMED CT");
 		r1.setDisplayName("Substance Abuse Disorder");
-		r1.setDocumentObligationPolicy("ENCRYPT");
-		r1.setDocumentRefrainPolicy("NORDSLCD");
-		r1.setImpliedConfSection(RuleExecutionResponse.Confidentiality.R);
+		r1.setDocumentObligationPolicy(ObligationPolicyDocument.ENCRYPT);		
+		r1.setDocumentRefrainPolicy(RefrainPolicy.NODSCLCD);
+		r1.setImpliedConfSection(Confidentiality.R);
 		r1.setItemAction("REDACT");
 		r1.setObservationId("e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7");
-		r1.setSensitivity("ETH");
-		r1.setUSPrivacyLaw("42CFRPart2");
+		r1.setSensitivity(Sensitivity.ETH);
+		r1.setUSPrivacyLaw(UsPrivacyLaw._42CFRPart2);
 		RuleExecutionResponse r2 = new RuleExecutionResponse();
 		r2.setC32SectionLoincCode("11450-4");
 		r2.setC32SectionTitle("Problems");
 		r2.setCode("111880001");
 		r2.setCodeSystemName("SNOMED CT");
 		r2.setDisplayName("Acute HIV");
-		r2.setDocumentObligationPolicy("ENCRYPT");
-		r2.setDocumentRefrainPolicy("NORDSLCD");
-		r2.setImpliedConfSection(RuleExecutionResponse.Confidentiality.R);
+		r2.setDocumentObligationPolicy(ObligationPolicyDocument.ENCRYPT);
+		r2.setDocumentRefrainPolicy(RefrainPolicy.NODSCLCD);
+		r2.setImpliedConfSection(Confidentiality.R);
 		r2.setItemAction("MASK");
 		r2.setObservationId("d11275e7-67ae-11db-bd13-0800200c9a66");
-		r2.setSensitivity("HIV");
-		r2.setUSPrivacyLaw("42CFRPart2");
+		r2.setSensitivity(Sensitivity.HIV);
+		r2.setUSPrivacyLaw(UsPrivacyLaw._42CFRPart2);
 		List<RuleExecutionResponse> list = new LinkedList<RuleExecutionResponse>();
 		list.add(r1);
 		list.add(r2);

@@ -18,7 +18,6 @@ acsShowCase.config(function($routeProvider) {
 // TODO: Using $http is really a bad idea, should be encapsulated in service
 // layer
 function EhrNumOneController($scope, $http) {
-	alert("In EHR1 controller");
 	$http({
 		method : 'GET',
 		url : 'api/ehrNumOne'
@@ -34,7 +33,6 @@ function EhrNumOneController($scope, $http) {
 	});
 
 	$scope.getC32 = function(patient) {
-		alert("In getc32");
 		// Reset first
 		delete patient.c32Xml;
 		delete patient.greenCcd;
@@ -474,7 +472,6 @@ function EhrNumOneController($scope, $http) {
 }
 
 function PushC32Controller($scope, $http) {
-	alert("In Push controller");
 	
 	$http({
 		method : 'GET',
@@ -495,7 +492,6 @@ function PushC32Controller($scope, $http) {
 		// Reset first
 		delete patient.c32Xml;
 		delete patient.greenCcd;
-		alert("HERE");
 		$scope.ehrNumOne.selectedPatient = patient;
 		
 		$http({
@@ -504,10 +500,20 @@ function PushC32Controller($scope, $http) {
 		}).success(function(data, status) {
 			$scope.ehrNumOne.selectedPatient.c32Xml = data;
 			$scope.show = "";
-			toastr.success("Get C32 Succeeded");
+			
+			if (data.indexOf("Failure!") !== -1) {
+				toastr.error("Push C32 Failed! Please check your inbox!");
+				$scope.ehrNumOne.selectedPatient.isError = true;
+			} else {
+				toastr.success("Push C32 Succeeded");
+				$scope.ehrNumOne.selectedPatient.isError = false;
+			}
 		}).error(function(data, status) {
 			$scope.status = status;
-			toastr.error("Get C32 Failed");
+			toastr.error("Push C32 Operation Failed!");
 		});
 	};
+	
+	$scope.options = [{ name: "a", id: 1 }, { name: "b", id: 2 }];
+	$scope.selectedOption = $scope.options[1];
 }

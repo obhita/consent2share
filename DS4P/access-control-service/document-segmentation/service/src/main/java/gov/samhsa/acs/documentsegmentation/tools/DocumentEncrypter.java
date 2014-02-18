@@ -25,7 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.tools;
 
-import gov.samhsa.acs.common.bean.RuleExecutionContainer;
+import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 
 import java.security.Key;
 

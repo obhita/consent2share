@@ -31,19 +31,20 @@ import gov.samhsa.consent2share.domain.provider.IndividualProvider;
 import gov.samhsa.consent2share.domain.provider.IndividualProviderRepository;
 import gov.samhsa.consent2share.domain.provider.StaffIndividualProvider;
 import gov.samhsa.consent2share.domain.provider.StaffIndividualProviderRepository;
-import gov.samhsa.consent2share.domain.reference.EntityType;
-import gov.samhsa.consent2share.service.dto.AbstractProviderDto;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
+import gov.samhsa.consent2share.service.dto.StaffIndividualProviderDto;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Class IndividualProviderServiceImpl.
@@ -51,6 +52,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class IndividualProviderServiceImpl implements IndividualProviderService {
+	
+	/** The logger. */
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/** The individual provider repository. */
 	@Autowired
@@ -78,9 +82,16 @@ public class IndividualProviderServiceImpl implements IndividualProviderService 
 	 * @see gov.samhsa.consent2share.service.provider.IndividualProviderService#updateIndividualProvider(gov.samhsa.consent2share.service.dto.IndividualProviderDto)
 	 */
 	public void updateIndividualProvider(IndividualProviderDto individualProviderDto){
-		IndividualProvider individualProvider=individualProviderRepository.findByPatientAndNpi(
-				patientRepository.findByUsername(individualProviderDto.getUsername()), 
-				individualProviderDto.getNpi());
+		Patient patient=patientRepository.findByUsername(individualProviderDto.getUsername());
+		Set<IndividualProvider> individualProviders=patient.getIndividualProviders();
+		IndividualProvider individualProvider=null;
+		for (IndividualProvider o:individualProviders){
+			if (o.getNpi().equals(individualProviderDto.getNpi())){
+				individualProvider=o;
+				break;
+			}
+				
+		}
 		if (individualProvider==null)
 			individualProvider=new IndividualProvider();
 		individualProvider.setFirstName(individualProviderDto.getFirstName());
@@ -111,9 +122,10 @@ public class IndividualProviderServiceImpl implements IndividualProviderService 
 		individualProvider.setLastUpdateDate(individualProviderDto.getLastUpdateDate());
 		individualProvider.setProviderTaxonomyCode(individualProviderDto.getProviderTaxonomyCode());
 		individualProvider.setProviderTaxonomyDescription(individualProviderDto.getProviderTaxonomyDescription());
-		individualProvider.setPatient(patientRepository.findByUsername(individualProviderDto.getUsername()));
+		individualProviders.add(individualProvider);
+		patient.setIndividualProviders(individualProviders);
 
-		individualProviderRepository.save(individualProvider);
+		patientRepository.save(patient);
 		
 	}
 
@@ -129,9 +141,16 @@ public class IndividualProviderServiceImpl implements IndividualProviderService 
 	 */
 	public void deleteIndividualProviderDto(IndividualProviderDto individualProviderDto) {
 		
-		IndividualProvider individualProvider=findIndividualProviderByPatientAndNpi(patientRepository.findByUsername(individualProviderDto.getUsername()),individualProviderDto.getNpi());
-		if(individualProvider!=null)
-		individualProviderRepository.delete(individualProvider);
+		Patient patient = patientRepository.findByUsername(individualProviderDto.getUsername());
+		Set<IndividualProvider> individualProviders=patient.getIndividualProviders();
+		for (IndividualProvider o:individualProviders){
+			if(o.getNpi().equals(individualProviderDto.getNpi())){
+				individualProviders.remove(o);
+				break;
+			}
+		}
+		patient.setIndividualProviders(individualProviders);
+		patientRepository.save(patient);
 		
     }
 	
@@ -145,17 +164,6 @@ public class IndividualProviderServiceImpl implements IndividualProviderService 
 		return individualProviderRepository.findByNpi(npi);
 	}
 
-	/**
-	 * Find individual provider by patient and npi.
-	 *
-	 * @param patient the patient
-	 * @param npi the npi
-	 * @return the individual provider
-	 */
-	public IndividualProvider findIndividualProviderByPatientAndNpi(Patient patient,String npi) {
-		return individualProviderRepository.findByPatientAndNpi(patient,npi);
-	}
-	
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.provider.IndividualProviderService#findIndividualProvider(java.lang.Long)
 	 */
@@ -190,6 +198,60 @@ public class IndividualProviderServiceImpl implements IndividualProviderService 
 	public IndividualProvider updateIndividualProvider(IndividualProvider individualProvider) {
         return individualProviderRepository.save(individualProvider);
     }
+	
+	public boolean addNewIndividualProvider(IndividualProviderDto individualProviderDto) {
+		Patient patient=patientRepository.findByUsername(individualProviderDto.getUsername());
+		Set<IndividualProvider> individualProviders=patient.getIndividualProviders();
+		IndividualProvider in_individualProvider=null;
+		for (IndividualProvider o:individualProviders){
+			if (o.getNpi().equals(individualProviderDto.getNpi())){
+				in_individualProvider=o;
+				break;
+			}
+				
+		}
+		if (in_individualProvider != null){
+			return false;
+		}else{
+			IndividualProvider individualProvider=new IndividualProvider();
+			
+			individualProvider.setFirstName(individualProviderDto.getFirstName());
+			individualProvider.setMiddleName(individualProviderDto.getMiddleName());
+			individualProvider.setLastName(individualProviderDto.getLastName());
+			individualProvider.setNamePrefix(individualProviderDto.getNamePrefix());
+			individualProvider.setNameSuffix(individualProviderDto.getNameSuffix());
+			individualProvider.setCredential(individualProviderDto.getCredential());
+			individualProvider.setNpi(individualProviderDto.getNpi());
+			individualProvider.setEntityType(individualProviderDto.getEntityType());
+			individualProvider.setFirstLineMailingAddress(individualProviderDto.getFirstLineMailingAddress());
+			individualProvider.setSecondLineMailingAddress(individualProviderDto.getSecondLineMailingAddress());
+			individualProvider.setMailingAddressCityName(individualProviderDto.getMailingAddressCityName());
+			individualProvider.setMailingAddressStateName(individualProviderDto.getMailingAddressStateName());
+			individualProvider.setMailingAddressPostalCode(individualProviderDto.getMailingAddressPostalCode());
+			individualProvider.setMailingAddressCountryCode(individualProviderDto.getMailingAddressCountryCode());
+			individualProvider.setMailingAddressTelephoneNumber(individualProviderDto.getMailingAddressTelephoneNumber());
+			individualProvider.setMailingAddressFaxNumber(individualProviderDto.getMailingAddressFaxNumber());
+			individualProvider.setFirstLinePracticeLocationAddress(individualProviderDto.getFirstLinePracticeLocationAddress());
+			individualProvider.setSecondLinePracticeLocationAddress(individualProviderDto.getSecondLinePracticeLocationAddress()); 
+			individualProvider.setPracticeLocationAddressCityName(individualProviderDto.getPracticeLocationAddressCityName());
+			individualProvider.setPracticeLocationAddressStateName(individualProviderDto.getPracticeLocationAddressStateName());
+			individualProvider.setPracticeLocationAddressPostalCode(individualProviderDto.getPracticeLocationAddressPostalCode()); 
+			individualProvider.setPracticeLocationAddressCountryCode(individualProviderDto.getPracticeLocationAddressCountryCode()); 
+			individualProvider.setPracticeLocationAddressTelephoneNumber(individualProviderDto.getPracticeLocationAddressTelephoneNumber());
+			individualProvider.setPracticeLocationAddressFaxNumber(individualProviderDto.getPracticeLocationAddressFaxNumber());
+			individualProvider.setEnumerationDate(individualProviderDto.getEnumerationDate());
+			individualProvider.setLastUpdateDate(individualProviderDto.getLastUpdateDate());
+			individualProvider.setProviderTaxonomyCode(individualProviderDto.getProviderTaxonomyCode());
+			individualProvider.setProviderTaxonomyDescription(individualProviderDto.getProviderTaxonomyDescription());
+			individualProviders.add(individualProvider);
+			patient.setIndividualProviders(individualProviders);
+	
+			patientRepository.save(patient);
+			
+			return true;
+		}
+	}
+	
 
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.provider.IndividualProviderService#findAllIndividualProvidersDto()
@@ -221,5 +283,67 @@ public class IndividualProviderServiceImpl implements IndividualProviderService 
 	@Override
 	public List<StaffIndividualProvider> findAllStaffIndividualProviders() {
 		return staffIndividualProviderRepository.findAll();
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.provider.IndividualProviderService#findAllStaffIndividualProvidersDto()
+	 */
+	@Override
+	public List<StaffIndividualProviderDto> findAllStaffIndividualProvidersDto() {
+		List<StaffIndividualProviderDto> providers = new ArrayList<StaffIndividualProviderDto>();		
+		
+		for (StaffIndividualProvider entity : staffIndividualProviderRepository.findAll()) {
+			providers.add( modelMapper.map(entity, StaffIndividualProviderDto.class));
+		}
+		 return providers;
+	}
+	
+	
+	@Override
+	public void addFavouriteIndividualProvider(IndividualProvider individualProvider){
+		StaffIndividualProvider staffIndividualProvider=new StaffIndividualProvider();
+		staffIndividualProvider.setIndividualProvider(individualProvider);
+		staffIndividualProvider.setId((long)0);
+		staffIndividualProviderRepository.save(staffIndividualProvider);
+	}
+	public boolean isFavoriteIndividualProvider(long id) throws IllegalArgumentException {
+		StaffIndividualProvider searchedProvider = null;
+		IndividualProvider individualProvider = findIndividualProvider(id);
+		searchedProvider = staffIndividualProviderRepository.findByIndividualProvider(individualProvider);
+		
+		if(searchedProvider == null){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	@Override
+	public boolean addFavoriteIndividualProvider(long id) throws IllegalArgumentException {
+		boolean isAlreadyFavorite = false;
+		isAlreadyFavorite = isFavoriteIndividualProvider(id);
+		
+		if(isAlreadyFavorite == true){
+			logger.info("Individual Provider with id = '" + id + "' is already a favorite.");
+			return false;
+		}else{
+			StaffIndividualProvider staffIndividualProvider=new StaffIndividualProvider();
+			IndividualProvider individualProvider = findIndividualProvider(id);
+			
+			if(individualProvider == null){
+				logger.warn("Unable to find an individual provider with id = '" + id + "'.");
+				throw new NullPointerException("findIndividualProvider(" + id + ") in IndividualProviderService returned null");
+			}
+			
+			staffIndividualProvider.setIndividualProvider(individualProvider);
+			staffIndividualProviderRepository.save(staffIndividualProvider);
+			return true;
+		}
+	}
+	
+	@Override
+	public void deleteFavoriteIndividualProvider(long id) throws IllegalArgumentException {
+		staffIndividualProviderRepository.delete(id);
 	}
 }

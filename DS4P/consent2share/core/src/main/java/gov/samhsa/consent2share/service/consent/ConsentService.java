@@ -35,11 +35,17 @@ import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.springframework.security.access.annotation.Secured;
+import org.xml.sax.SAXException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -258,4 +264,12 @@ public interface ConsentService {
 	 */
 	List<ConsentListDto> findAllConsentsDtoByUserName(String userName);
 
+	/**
+	 * Return tagged c32. Entry tags that have been removed in segmented c32 were tagged and returned 
+	 * 
+	 * @param originalC32
+	 * @param consentId
+	 * @return
+	 */
+	public String getTaggedC32(String originalC32, Long consentId);
 }

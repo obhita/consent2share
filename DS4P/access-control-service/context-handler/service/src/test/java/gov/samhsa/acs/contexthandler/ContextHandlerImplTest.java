@@ -2,6 +2,7 @@ package gov.samhsa.acs.contexthandler;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
+import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
 import gov.samhsa.acs.contexthandler.ContextHandler;
@@ -12,10 +13,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import static org.mockito.Mockito.*;
 
 public class ContextHandlerImplTest {
 
@@ -198,6 +201,33 @@ public class ContextHandlerImplTest {
 
 		// Assert
 		assertTrue(isXacmlResponseDeny(resp));
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testMakeDecisionForTryingPolicy_Given_Null_XacmlPolicy_Throws_Exception(){
+		ContextHandlerImpl sut = new ContextHandlerImpl(policyDesicionPointMock);
+		sut.makeDecisionForTryingPolicy(null);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testMakeDecisionForTryingPolicy_Given_Empty_XacmlPolicy_Throws_Exception(){
+		ContextHandlerImpl sut = new ContextHandlerImpl(policyDesicionPointMock);
+		sut.makeDecisionForTryingPolicy(" ");
+	}
+	
+	public void testMakeDecisionForTryingPolicy_XacmlResponse_Returned_By_PdpDecisionPoint(){
+		// Arrange
+		String xacmlPolicy = "Whatever Policy";
+		PolicyDecisionPoint policyDecisionPoint = mock(PolicyDecisionPoint.class);
+		PdpRequestResponse pdpRequestResponse = mock(PdpRequestResponse.class);
+		when(policyDecisionPoint.evaluatePolicyForTrying(xacmlPolicy)).thenReturn(pdpRequestResponse);
+		ContextHandlerImpl sut = new ContextHandlerImpl(policyDesicionPointMock);
+		
+		// Act
+		PdpRequestResponse returned = sut.makeDecisionForTryingPolicy(xacmlPolicy);
+		
+		// Assert
+		Assert.assertEquals(pdpRequestResponse, returned);
 	}
 
 	private boolean isXacmlResponseDeny(XacmlResponse resp) {

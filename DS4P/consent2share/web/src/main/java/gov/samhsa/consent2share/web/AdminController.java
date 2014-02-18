@@ -61,6 +61,7 @@ import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
+import gov.samhsa.consent2share.service.dto.StaffIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.PatientAdminDto;
@@ -68,7 +69,8 @@ import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.RecentAcctivityDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
-import gov.samhsa.consent2share.service.notification.NotificationService;
+import gov.samhsa.consent2share.service.dto.StaffOrganizationalProviderDto;
+import gov.samhsa.consent2share.service.dto.SystemNotificationDto;
 import gov.samhsa.consent2share.service.patient.PatientNotFoundException;
 import gov.samhsa.consent2share.service.patient.PatientService;
 import gov.samhsa.consent2share.service.provider.IndividualProviderService;
@@ -84,6 +86,7 @@ import gov.samhsa.consent2share.service.reference.RaceCodeService;
 import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeService;
 import gov.samhsa.consent2share.service.reference.SensitivityPolicyCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
+import gov.samhsa.consent2share.service.systemnotification.SystemNotificationService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -133,6 +136,9 @@ public class AdminController extends AbstractController {
 	/** The patient audit service. */
 	@Autowired
 	AdminAuditService adminAuditService;
+	
+	@Autowired
+	SystemNotificationService systemNotificationService;
 
 	/** The individual provider service. */
 	@Autowired
@@ -229,6 +235,9 @@ public class AdminController extends AbstractController {
 
 		List<RecentAcctivityDto> recentActivityDtos = adminAuditService
 				.findAdminHistoryByUsername(currentUser.getUsername());
+		AdminProfileDto adminProfileDto = adminService
+				.findAdminProfileByUsername(currentUser.getUsername());
+		model.addAttribute("adminProfileDto", adminProfileDto);
 
 		model.addAttribute("notifyevent", notify);
 		model.addAttribute(basicPatientAccountDto);
@@ -259,10 +268,14 @@ public class AdminController extends AbstractController {
 			@RequestParam(value = "status", required = false) String status) {
 		PatientProfileDto patientProfileDto;
 		List<ConsentListDto> consentListDto;
+		List<SystemNotificationDto> systemNotificationDtos = null;
+		PatientConnectionDto patientConnectionDto = null;
 		if (patientId != -1) {
 			patientProfileDto = patientService.findPatient(patientId);
 			consentListDto = consentService
 					.findAllConsentsDtoByPatient(patientId);
+			patientConnectionDto=patientService.findPatientConnectionById(patientId);
+			systemNotificationDtos=systemNotificationService.findAllSystemNotificationDtosByPatient(patientId);
 		} else if (userName != null) {
 			patientProfileDto = patientService.findByUsername(userName);
 			consentListDto = consentService
@@ -270,9 +283,15 @@ public class AdminController extends AbstractController {
 		} else {
 			return "redirect:adminHome.html";
 		}
-
+		AuthenticatedUser currentUser = adminUserContext.getCurrentUser();
+		AdminProfileDto adminProfileDto = adminService
+				.findAdminProfileByUsername(currentUser.getUsername());
+		model.addAttribute("adminProfileDto", adminProfileDto);
+		model.addAttribute("individualProviders", patientConnectionDto.getIndividualProviders());
+		model.addAttribute("organizationalProviders", patientConnectionDto.getOrganizationalProviders());
 		model.addAttribute("patientProfileDto", patientProfileDto);
 		model.addAttribute("consentListDto", consentListDto);
+		model.addAttribute("systemNotificationDtos", systemNotificationDtos);
 		model.addAttribute("notifyEvent", notify);
 		model.addAttribute("statusEvent", status);
 		populateLookupCodes(model);
@@ -408,6 +427,10 @@ public class AdminController extends AbstractController {
 			List<AddConsentOrganizationalProviderDto> organizationalProvidersDto = patientService
 					.findAddConsentOrganizationalProviderDtoByUsername(currentPatient
 							.getUsername());
+			
+			List<StaffIndividualProviderDto> favoriteIndividualProviders = individualProviderService.findAllStaffIndividualProvidersDto();
+			List<StaffOrganizationalProviderDto> favoriteOrganizationalProviders = organizationalProviderService.findAllStaffOrganizationalProvidersDto();
+			
 			ConsentDto consentDto = consentService.makeConsentDto();
 
 			consentDto.setUsername(currentPatient.getUsername());
@@ -427,6 +450,10 @@ public class AdminController extends AbstractController {
 					.findAllClinicalDocumentTypeCodesAddConsentFieldsDto();
 			
 			populateLookupCodes(model);
+			AuthenticatedUser currentUser = adminUserContext.getCurrentUser();
+			AdminProfileDto adminProfileDto = adminService
+					.findAdminProfileByUsername(currentUser.getUsername());
+			model.addAttribute("adminProfileDto", adminProfileDto);
 			
 			model.addAttribute("defaultStartDate",
 					dateFormat.format(today.getTime()));
@@ -437,6 +464,8 @@ public class AdminController extends AbstractController {
 			model.addAttribute("patient_fname", currentPatient.getFirstName());
 			model.addAttribute("consentDto", consentDto);
 			model.addAttribute("individualProvidersDto", individualProvidersDto);
+			model.addAttribute("favoriteIndividualProviders", favoriteIndividualProviders);
+			model.addAttribute("favoriteOrganizationalProviders", favoriteOrganizationalProviders);
 			model.addAttribute("clinicalDocumentSectionType",
 					clinicalDocumentSectionTypeDto);
 			model.addAttribute("clinicalDocumentType", clinicalDocumentTypeDto);
@@ -614,6 +643,10 @@ public class AdminController extends AbstractController {
 					.findAllClinicalDocumentTypeCodesAddConsentFieldsDto();
 			
 			populateLookupCodes(model);
+			AuthenticatedUser currentUser = adminUserContext.getCurrentUser();
+			AdminProfileDto adminProfileDto = adminService
+					.findAdminProfileByUsername(currentUser.getUsername());
+			model.addAttribute("adminProfileDto", adminProfileDto);
 			
 			model.addAttribute("defaultStartDate",
 					dateFormat.format(today.getTime()));
@@ -774,12 +807,30 @@ public class AdminController extends AbstractController {
 	 * @param patientId
 	 * @return
 	 */
+	/*TODO: Remove patientusername from list of @RequestParam's, and from all calls to this function from other files */
 	@RequestMapping(value = "connectionProviderAdd.html", method = RequestMethod.POST)
-	public String providerSearch(
+	public @ResponseBody String addProvider(
 			@RequestParam("querySent") String providerDtoJSON,
-			@RequestParam("patientusername") String patientUserName,
+			@RequestParam(value = "patientusername", defaultValue = "") String patientUserName,
 			@RequestParam("patientId") String patientId) {
 		HashMap<String, String> Result = deserializeResult(providerDtoJSON);
+		boolean isSuccess = false;
+		
+		try{
+			patientUserName = patientService.findUsernameById(Long.valueOf(patientId).longValue());
+		}catch(IllegalArgumentException e){
+			/* this catches the exception thrown by Long.valueOf() in case
+			   the input patientId string value cannot be converted to a long type,
+			   and then throws an AjaxException to trigger the 400 HTTP Status Code
+			   error to be returned to the client-side Ajax listener */
+			isSuccess = false;
+			throw new AjaxException(HttpStatus.BAD_REQUEST, "Unable to add this new provider because the request parameters contained invalid data.");
+		}catch(RuntimeException e){
+			logger.warn("An exception was caught in addProvider() method.");
+			logger.warn("The exception stack trace is: ", e);
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occurred.");			
+		}
+		
 		if ((EntityType.valueOf(Result.get("entityType")) == EntityType.Organization)) {
 			OrganizationalProviderDto providerDto = new OrganizationalProviderDto();
 			hashMapResultToProviderDtoConverter.setProviderDto(providerDto,
@@ -796,8 +847,8 @@ public class AdminController extends AbstractController {
 			providerDto.setAuthorizedOfficialTelephoneNumber(Result
 					.get("authorizedOfficialTelephoneNumber"));
 			providerDto.setUsername(patientUserName);
-			organizationalProviderService
-					.updateOrganizationalProvider(providerDto);
+			
+			isSuccess = organizationalProviderService.addNewOrganizationalProvider(providerDto);
 		} else {
 			IndividualProviderDto providerDto = new IndividualProviderDto();
 			hashMapResultToProviderDtoConverter.setProviderDto(providerDto,
@@ -809,10 +860,15 @@ public class AdminController extends AbstractController {
 			providerDto.setNameSuffix(Result.get("providerNameSuffixText"));
 			providerDto.setCredential(Result.get("providerCredentialText"));
 			providerDto.setUsername(patientUserName);
-			individualProviderService.updateIndividualProvider(providerDto);
+			
+			isSuccess = individualProviderService.addNewIndividualProvider(providerDto);
 		}
 
-		return "redirect:/Administrator/adminPatientView.html?id=" + patientId;
+		if(isSuccess){
+			return "Success";
+		}else{
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to add this new provider because this provider already exists.");
+		}
 	}
 
 	/**
@@ -874,6 +930,90 @@ public class AdminController extends AbstractController {
 				+ username;
 
 	}
+	
+	@RequestMapping(value = "/addStaffFavoriteIndividualProvider", method = RequestMethod.POST)
+	public @ResponseBody String addStaffFavoriteIndividualProvider(@RequestParam("providerid") long providerId){
+		boolean isSuccess = false;
+		
+		try{
+			isSuccess = individualProviderService.addFavoriteIndividualProvider(providerId);
+		}catch(IllegalArgumentException e){
+			isSuccess = false;
+			throw new AjaxException(HttpStatus.BAD_REQUEST, "Unable to add this provider to favorites because the request parameters contained invalid data.");
+		}catch(RuntimeException e){
+			logger.warn("An exception was caught in addStaffFavoriteIndividualProvider() method.");
+			logger.warn("The exception stack trace is: ", e);
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occurred.");			
+		}
+		
+		if(isSuccess == true){
+			return "Success";
+		}else{
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to add this provider to favorites because this provider is already a favorite.");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/isStaffFavoriteIndividualProvider", method = RequestMethod.GET)
+	public @ResponseBody String isStaffFavoriteIndividualProvider(@RequestParam("providerid") long providerId){
+		boolean isFav = false;
+		
+		
+		try{
+			isFav = individualProviderService.isFavoriteIndividualProvider(providerId);
+		}catch(IllegalArgumentException e){
+			throw new AjaxException(HttpStatus.BAD_REQUEST, "Unable to determine if this provider is a favorite because the request parameters contained invalid data.");
+		}catch(RuntimeException e){
+			logger.warn("An exception was caught in isStaffFavoriteIndividualProvider() method.");
+			logger.warn("The exception stack trace is: ", e);
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occurred.");			
+		}
+		
+		return Boolean.toString(isFav);
+	}
+	
+	
+	@RequestMapping(value = "/isStaffFavoriteOrganizationalProvider", method = RequestMethod.GET)
+	public @ResponseBody String isStaffFavoriteOrganizationalProvider(@RequestParam("providerid") long providerId){
+		boolean isFav = false;
+		
+		
+		try{
+			isFav = organizationalProviderService.isFavoriteOrganizationalProvider(providerId);
+		}catch(IllegalArgumentException e){
+			throw new AjaxException(HttpStatus.BAD_REQUEST, "Unable to determine if this provider is a favorite because the request parameters contained invalid data.");
+		}catch(RuntimeException e){
+			logger.warn("An exception was caught in isStaffFavoriteOrganizationalProvider() method.");
+			logger.warn("The exception stack trace is: ", e);
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occurred.");			
+		}
+		
+		return Boolean.toString(isFav);
+	}
+	
+	
+	@RequestMapping(value = "/addStaffFavoriteOrganizationalProvider", method = RequestMethod.POST)
+	public @ResponseBody String addStaffFavoriteOrganizationalProvider(@RequestParam("providerid") long providerId){
+		boolean isSuccess = false;
+		
+		try{
+			isSuccess = organizationalProviderService.addFavoriteOrganizationalProvider(providerId);
+		}catch(IllegalArgumentException e){
+			isSuccess = false;
+			throw new AjaxException(HttpStatus.BAD_REQUEST, "Unable to add this provider to favorites because the request parameters contained invalid data.");
+		}catch(RuntimeException e){
+			logger.warn("An exception was caught in addStaffFavoriteOrganizationalProvider() method.");
+			logger.warn("The exception stack trace is: ", e);
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occurred.");			
+		}
+		
+		if(isSuccess == true){
+			return "Success";
+		}else{
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to add this provider to favorites because this provider is already a favorite.");
+		}
+	}
+	
 
 	/**
 	 * AJAX search for a provider
@@ -917,19 +1057,19 @@ public class AdminController extends AbstractController {
 
 	}
 
-	// For prove of concept purpose
-	// /**
-	// * Test read patient audit rev.
-	// *
-	// * @return the string
-	// */
-	// @RequestMapping("/testjdbc/readPatientAuditRev")
-	// public String testReadPatientAuditRev(){
-	// StaffIndividualProvider
-	// s=staffIndividualProviderRepository.findByNpi("1083949036");
-	// System.out.println(s.getNpi());
-	// return "redirect:/Administrator/adminHome.html";
-	// }
+//	 For prove of concept purpose
+//	 @RequestMapping("/test")
+//	 public String testReadPatientAuditRev(){
+//		 IndividualProvider individualProvider=individualProviderService.findIndividualProvider((long)1);
+//		 individualProviderService.addFavouriteIndividualProvider(individualProvider);
+//		 return "redirect:/Administrator/adminHome.html";
+//	 }
+//	 
+//	 @RequestMapping("/test2")
+//	 public String testReadPatientAuditRev2(){
+//		 individualProviderService.deleteFavouriteIndividualProvider((long)1);
+//		 return "redirect:/Administrator/adminHome.html";
+//	 }
 
 	/**
 	 * Populate lookup codes.

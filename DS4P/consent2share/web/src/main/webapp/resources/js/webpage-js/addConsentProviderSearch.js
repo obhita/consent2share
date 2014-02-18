@@ -45,14 +45,54 @@ $(function(){
 		var in_patientUsername = $('input#patientUsername').val();
 		
 		$.ajax({
-			  url: "../patients/connectionProviderAdd.html",
+			  url: "../patients/connectionProviderAdd_AJAX.html",
 			  type: "POST",
 			  data: {querySent: serializedQueryResult,
 				  	 patientId: in_patientId,
 				  	 patientusername: in_patientUsername},
 			  success:function() {
-				  $('provider_search_modal').modal('hide');
-				  window.location.replace(providerSearchRedirectString);
+				  $('input.isMadeToList').iCheck('destroy');
+				  $('input.toDiscloseList').iCheck('destroy');
+				  
+				  $('div#disclose-list-container').append("<div>" +
+				  			"<label for='to" + result4ajaxJSON["providers"][entryId].npi + "'>" +
+				  					"<input class='isMadeToList' id='to" + result4ajaxJSON["providers"][entryId].npi + "' " +
+				  						"value='" + result4ajaxJSON["providers"][entryId].npi + "' " +
+				  						"type='checkbox' name='providersDisclosureIsMadeTo' style='float: none;' />" +
+				  					"<input type='hidden' name='_providersDisclosureIsMadeTo' value='on' />" +
+				  					"<span>" + result4ajaxJSON["providers"][entryId].providerLastName + ", " +
+				  						result4ajaxJSON["providers"][entryId].providerFirstName + "</span>" +
+				  			"</label></div>");
+				  
+				  $('div#authorize-list-container').append("<div>" +
+						  	"<label for='from" + result4ajaxJSON["providers"][entryId].npi + "'>" +
+		  						"<input class='toDiscloseList' id='from" + result4ajaxJSON["providers"][entryId].npi + "' " +
+		  							"value='" + result4ajaxJSON["providers"][entryId].npi + "' " +
+		  							"type='checkbox' name='providersPermittedToDisclose' style='float: none;' />" +
+		  							"<input type='hidden' name='_providersPermittedToDisclose' value='on' />" +
+		  							"<span>" + result4ajaxJSON["providers"][entryId].providerLastName + ", " +
+		  								result4ajaxJSON["providers"][entryId].providerFirstName + "</span>" +
+		  					"</label></div>");
+				  
+				  $('input.isMadeToList').iCheck({
+					    checkboxClass: 'icheckbox_square-blue',
+					    radioClass: 'iradio_square-blue',
+					    increaseArea: '20%',
+				  });
+				  
+				  $('input.toDiscloseList').iCheck({
+					    checkboxClass: 'icheckbox_square-blue',
+					    radioClass: 'iradio_square-blue',
+					    increaseArea: '20%',
+				  });
+				  
+				  loadAllProviders();
+				  
+				  $('#provider_search_modal').modal('hide');
+				  $('#disclose-modal').modal();
+			  },
+			  error: function(e){
+				  window.alert("ERROR: " + e.responseText);
 			  }
 			});
 	});
@@ -69,14 +109,52 @@ $(function(){
 		var in_patientUsername = $('input#patientUsername').val();
 		
 		$.ajax({
-			  url: "../patients/connectionProviderAdd.html",
+			  url: "../patients/connectionProviderAdd_AJAX.html",
 			  type: "POST",
 			  data: {querySent: serializedQueryResult,
 				  	 patientId: in_patientId,
 				  	 patientusername: in_patientUsername},
 			  success:function() {
-				  $('provider_search_modal').modal('hide');
-			      window.location.replace(providerSearchRedirectString);
+				  $('input.isMadeToList').iCheck('destroy');
+				  $('input.toDiscloseList').iCheck('destroy');
+				  
+				  $('div#disclose-list-container').append("<div>" +
+				  			"<label for='to" + result4ajaxJSON["providers"][entryId].npi + "'>" +
+				  					"<input class='isMadeToList' id='to" + result4ajaxJSON["providers"][entryId].npi + "' " +
+				  						"value='" + result4ajaxJSON["providers"][entryId].npi + "' " +
+				  						"type='checkbox' name='organizationalProvidersDisclosureIsMadeTo' style='float: none;' />" +
+				  					"<input type='hidden' name='_organizationalProvidersDisclosureIsMadeTo' value='on' />" +
+				  					"<span>" + result4ajaxJSON["providers"][entryId].providerOrganizationName + "</span>" +
+				  			"</label></div>");
+				  
+				  $('div#authorize-list-container').append("<div>" +
+				  			"<label for='from" + result4ajaxJSON["providers"][entryId].npi + "'>" +
+				  					"<input class='toDiscloseList' id='from" + result4ajaxJSON["providers"][entryId].npi + "' " +
+				  						"value='" + result4ajaxJSON["providers"][entryId].npi + "' " +
+				  						"type='checkbox' name='organizationalProvidersPermittedToDisclose' style='float: none;' />" +
+				  					"<input type='hidden' name='_organizationalProvidersPermittedToDisclose' value='on' />" +
+				  					"<span>" + result4ajaxJSON["providers"][entryId].providerOrganizationName + "</span>" +
+				  			"</label></div>");
+				  
+				  $('input.isMadeToList').iCheck({
+					    checkboxClass: 'icheckbox_square-blue',
+					    radioClass: 'iradio_square-blue',
+					    increaseArea: '20%',
+				  });
+				  
+				  $('input.toDiscloseList').iCheck({
+					    checkboxClass: 'icheckbox_square-blue',
+					    radioClass: 'iradio_square-blue',
+					    increaseArea: '20%',
+				  });
+				  
+				  loadAllProviders();
+				  
+				  $('#provider_search_modal').modal('hide');
+				  $('#disclose-modal').modal();
+			  },
+			  error: function(e){
+				  window.alert("ERROR: " + e.responseText);
 			  }
 			});
 	});
@@ -84,7 +162,7 @@ $(function(){
 
 jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage )
 {
-	//alert( 'items_per_page = '+ items_per_page );
+	//window.alert( 'items_per_page = '+ items_per_page );
 	var lnkCnt4most = 8 ;
 	var lnkCnt4short = 2 ;
 	var currentPage = 0 ;
@@ -212,7 +290,7 @@ function lookup(){
 			providerSearchForm+="&lastname="+$("#last_name").val();
 		}
 		$("#provider_search_modal .search-loading").show();
-	    //alert( providerSearchForm );
+	    //window.alert( providerSearchForm );
 		
 		setTimeout( killAjaxCall, 10000); 
 	    
@@ -290,13 +368,13 @@ function getResultRowHtmStr( i, rs, addable )
 
 function showResult( arrHtmlStr, items_per_page )
 {
-	//if( arrHtmlStr ) alert( 'arrHtmlStr.length = '+ arrHtmlStr.length );
+	//if( arrHtmlStr ) window.alert( 'arrHtmlStr.length = '+ arrHtmlStr.length );
 	setTimeout( function() { $("#provider_search_modal .search-loading").fadeOut({ duration: 400}); }, 200 );
 
     if( arrHtmlStr != null && arrHtmlStr.length > 0)
     {
 		$("#Pagination").buildPagingBar( arrHtmlStr, items_per_page, showCurrentPage ); 
-		//alert( 'b4 Pagination.show/hide' );
+		//window.alert( 'b4 Pagination.show/hide' );
 		( arrHtmlStr.length > items_per_page ) ? $("#Pagination").show() : $("#Pagination").hide() ; 
     	$("#resultList").show();
 	}
@@ -308,7 +386,7 @@ function showResult( arrHtmlStr, items_per_page )
 
 function showCurrentPage( arrHtmlStr, page_index, items_per_page )
 {
-	//alert( 'page_index = '+ page_index );
+	//window.alert( 'page_index = '+ page_index );
     var max_elem = Math.min((page_index+1) * items_per_page, arrHtmlStr.length );
     var newcontent = '';
  

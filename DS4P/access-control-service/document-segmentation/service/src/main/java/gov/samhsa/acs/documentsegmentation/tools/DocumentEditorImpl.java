@@ -47,6 +47,7 @@ import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * The Class DocumentEditorImpl.
@@ -62,10 +63,14 @@ public class DocumentEditorImpl implements DocumentEditor {
 	/** The document xml converter. */
 	private DocumentXmlConverter documentXmlConverter;
 
+	/** The xpath fact. */
+	private XPathFactory xpathFact;
+
 	/**
 	 * Instantiates a new document editor impl.
 	 */
 	public DocumentEditorImpl() {
+		this.xpathFact = XPathFactory.newInstance();
 	}
 
 	/**
@@ -84,6 +89,7 @@ public class DocumentEditorImpl implements DocumentEditor {
 		this.metadataGenerator = metadataGenerator;
 		this.fileReader = fileReader;
 		this.documentXmlConverter = documentXmlConverter;
+		this.xpathFact = XPathFactory.newInstance();
 	}
 
 	/*
@@ -120,16 +126,47 @@ public class DocumentEditorImpl implements DocumentEditor {
 	public Element getElement(Document xmlDocument, String xPathExprDisplayName)
 			throws XPathExpressionException, XMLEncryptionException, Exception {
 
+		Node node = getNode(xmlDocument, xPathExprDisplayName);
+
+		return (Element) node;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.acs.documentsegmentation.tools.DocumentEditor#getNode(org.
+	 * w3c.dom.Document, java.lang.String)
+	 */
+	@Override
+	public Node getNode(Document xmlDocument, String xPathExprDisplayName)
+			throws XPathExpressionException {
 		// Create XPath instance
-		XPathFactory xpathFact = XPathFactory.newInstance();
-		XPath xpath = xpathFact.newXPath();
-		xpath.setNamespaceContext(new PepNamespaceContext());
+		XPath xpath = createXPathInstance();
 
 		// Evaluate XPath expression against parsed document
 		Node node = (Node) xpath.evaluate(xPathExprDisplayName, xmlDocument,
 				XPathConstants.NODE);
+		return node;
+	}
 
-		return (Element) node;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.acs.documentsegmentation.tools.DocumentEditor#getNodeList(
+	 * org.w3c.dom.Document, java.lang.String)
+	 */
+	@Override
+	public NodeList getNodeList(Document xmlDocument,
+			String xPathExprDisplayName) throws XPathExpressionException {
+		// Create XPath instance
+		XPath xpath = createXPathInstance();
+
+		// Evaluate XPath expression against parsed document
+		NodeList nodeList = (NodeList) xpath.evaluate(xPathExprDisplayName,
+				xmlDocument, XPathConstants.NODESET);
+		return nodeList;
 	}
 
 	/*
@@ -168,5 +205,17 @@ public class DocumentEditorImpl implements DocumentEditor {
 
 		rawData = new ByteArrayDataSource(documentPayload);
 		return rawData;
+	}
+
+	/**
+	 * Creates the x path instance.
+	 * 
+	 * @return the x path
+	 */
+	private XPath createXPathInstance() {
+		// Create XPath instance
+		XPath xpath = this.xpathFact.newXPath();
+		xpath.setNamespaceContext(new PepNamespaceContext());
+		return xpath;
 	}
 }

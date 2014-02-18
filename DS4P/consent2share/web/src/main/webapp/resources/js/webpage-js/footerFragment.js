@@ -9,7 +9,10 @@ $(document).ready(function() {
 
 		switch(curPage){
 		case "home":
-			document.getElementById("sidenav_home").className += " active";
+			if(document.getElementById("sidenav_home"))
+				document.getElementById("sidenav_home").className += " active";
+			if(document.getElementById("sidenav_codeSystems"))
+				document.getElementById("sidenav_codeSystems").className += " active";
 			break;
 		case "listConsents":
 			document.getElementById("sidenav_consents").className += " active";
@@ -26,8 +29,24 @@ $(document).ready(function() {
 		case "activityHistory":
 			document.getElementById("sidenav_activityhist").className += " active";
 			break;
-		case "medicalinfo":
-			document.getElementById("sidenav_meddocs").className += " active";
+		case "codeSystemAdd":
+		case "codeSystemEdit":
+			document.getElementById("sidenav_codeSystems").className += " active";
+			break;			
+		case "valueSetList":
+		case "valueSetAdd":
+		case "valueSetEdit":
+			document.getElementById("sidenav_valueSets").className += " active";
+			break;
+		case "conceptCodeList":
+		case "conceptCodeAdd":
+		case "conceptCodeEdit":
+			document.getElementById("sidenav_conceptCodes").className += " active";
+			break;
+		case "valueSetCategoryList":
+		case "valueSetCategoryAdd":
+		case "valueSetCategoryEdit":
+			document.getElementById("sidenav_valueSetCats").className += " active";
 			break;
 		default:
 			break;	

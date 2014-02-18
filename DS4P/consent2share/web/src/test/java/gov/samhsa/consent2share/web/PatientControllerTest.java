@@ -8,14 +8,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
-import gov.samhsa.consent2share.domain.account.Users;
-import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.PixQueryService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.LookupDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
+import gov.samhsa.consent2share.service.dto.SystemNotificationDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
 import gov.samhsa.consent2share.service.patient.PatientService;
 import gov.samhsa.consent2share.service.reference.AdministrativeGenderCodeService;
@@ -24,10 +23,9 @@ import gov.samhsa.consent2share.service.reference.MaritalStatusCodeService;
 import gov.samhsa.consent2share.service.reference.RaceCodeService;
 import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
+import gov.samhsa.consent2share.service.systemnotification.SystemNotificationService;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,8 +34,6 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -50,6 +46,9 @@ public class PatientControllerTest {
 
 	@Mock
 	PatientService patientService;
+	
+	@Mock
+	SystemNotificationService systemNotificationService;
 
 	@Mock
 	AdministrativeGenderCodeService administrativeGenderCodeService;
@@ -229,10 +228,19 @@ public class PatientControllerTest {
 	public void testHome_when_authority_is_ROLE_USER() throws Exception {
 		final String username = "username";
 		final AuthenticatedUser currentUser = mock(AuthenticatedUser.class);
+		final PatientProfileDto patientProfileDto=mock(PatientProfileDto.class);
+		List<SystemNotificationDto> systemNotificationDtos=mock(List.class);
+		
 		when(currentUser.getUsername()).thenReturn(username);
 		when(userContext.getCurrentUser()).thenReturn(currentUser);
+		when(patientService.findPatientProfileByUsername(anyString())).thenReturn(patientProfileDto);
+		when(systemNotificationService.findAllSystemNotificationDtosByPatient(anyLong())).thenReturn(systemNotificationDtos);
+		
+		
 		mockMvc.perform(get("/patients/home.html"))
-			.andExpect(view().name("views/patients/home"));
+			.andExpect(view().name("views/patients/home"))
+			.andExpect(model().attribute("systemNotificationDtos", equalTo(systemNotificationDtos)))
+			.andExpect(model().attribute("currentUser", equalTo(currentUser)));
 	}
 
 
