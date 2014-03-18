@@ -1,6 +1,7 @@
 package gov.samhsa.acs.pep;
 
-import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.brms.domain.SubjectPurposeOfUse;
+import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
@@ -415,9 +416,9 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 	}
 
 	@Override
-	public String tryPolicy(String c32Xml, String xacmlPolicy) {
+	public String tryPolicy(String c32Xml, String xacmlPolicy, String purposeOfUse) {
 		PdpRequestResponse pdpRequestResponse = contextHandler
-				.makeDecisionForTryingPolicy(xacmlPolicy);
+				.makeDecisionForTryingPolicy(xacmlPolicy, purposeOfUse);
 		XacmlResponse xacmlResponse = pdpRequestResponse.getXacmlResponse();
 		
 		XacmlRequest xacmlRequest = pdpRequestResponse.getXacmlRequest();
@@ -541,7 +542,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 		xacmlResult.setMessageId(xacmlRequest.getMessageId());
 		xacmlResult.setPdpDecision(xacmlResponse.getPdpDecision());
 		xacmlResult.setPdpObligations(xacmlResponse.getPdpObligation());
-		xacmlResult.setSubjectPurposeOfUse(xacmlRequest.getPurposeOfUse());
+		xacmlResult.setSubjectPurposeOfUse(SubjectPurposeOfUse.fromAbbreviation(xacmlRequest.getPurposeOfUse()));
 		return xacmlResult;
 	}
 }

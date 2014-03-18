@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
+import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.clinicaldata.ClinicalDocumentService;
@@ -22,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.owasp.esapi.errors.AccessControlException;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -46,13 +48,17 @@ public class ClinicalDocumentControllerTest {
 
 	@Mock
 	AuthenticatedUser authenticatedUser;
+	
+	@Mock 
+	AccessReferenceMapper accessReferenceMapper;
 
 	MockMvc mockMvc;
 
 	@Before
-	public void before() {
+	public void before() throws AccessControlException {
 		mockMvc = MockMvcBuilders.standaloneSetup(
 				this.clinicalDocumentController).build();
+		doReturn((long)1).when(accessReferenceMapper).getDirectReference("ScrambledText");
 		when(userContext.getCurrentUser()).thenReturn(authenticatedUser);
 		when(authenticatedUser.getUsername()).thenReturn("albert.smith");
 	}
@@ -107,7 +113,7 @@ public class ClinicalDocumentControllerTest {
 				.thenReturn(true);
 		when(clinicalDocumentDto.getContent()).thenReturn(byteArray);
 		mockMvc.perform(
-				post("/patients/downloaddoc.html").param("download_id", "1"))
+				post("/patients/downloaddoc.html").param("download_id", "ScrambledText"))
 				.andExpect(status().isOk())
 				.andExpect(header().string("Content-Type", "application/null"));
 
@@ -126,7 +132,7 @@ public class ClinicalDocumentControllerTest {
 				.thenReturn(false);
 		when(clinicalDocumentDto.getContent()).thenReturn(byteArray);
 		mockMvc.perform(
-				post("/patients/downloaddoc.html").param("download_id", "1"))
+				post("/patients/downloaddoc.html").param("download_id", "ScrambledText"))
 				.andExpect(status().isOk());
 		verify(clinicalDocumentDto,never()).getContent();
 
@@ -142,7 +148,7 @@ public class ClinicalDocumentControllerTest {
 						.isDocumentBelongsToThisUser(clinicalDocumentDto))
 				.thenReturn(false);
 		mockMvc.perform(
-				post("/patients/deletedoc.html").param("delete_id", "1"))
+				post("/patients/deletedoc.html").param("delete_id", "ScrambledText"))
 				.andExpect(redirectedUrl("/patients/clinicaldocuments.html"));
 		verify (clinicalDocumentService,never()).deleteClinicalDocument(any(ClinicalDocumentDto.class));
 	}
@@ -157,7 +163,7 @@ public class ClinicalDocumentControllerTest {
 						.isDocumentBelongsToThisUser(clinicalDocumentDto))
 				.thenReturn(true);
 		mockMvc.perform(
-				post("/patients/deletedoc.html").param("delete_id", "1"))
+				post("/patients/deletedoc.html").param("delete_id", "ScrambledText"))
 				.andExpect(redirectedUrl("/patients/clinicaldocuments.html"));
 		verify (clinicalDocumentService).deleteClinicalDocument(any(ClinicalDocumentDto.class));
 	}

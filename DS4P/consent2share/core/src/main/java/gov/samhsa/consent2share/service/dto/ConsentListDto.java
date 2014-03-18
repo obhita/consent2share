@@ -33,10 +33,10 @@ import java.util.Set;
 /**
  * The Class ConsentListDto.
  */
-public class ConsentListDto {
+public class ConsentListDto implements HasId{
 
 	/** The id. */
-	private Long id;
+	private String id;
 
 	/** The to disclose name. */
 	private Set<String> toDiscloseName;
@@ -115,7 +115,7 @@ public class ConsentListDto {
 	 * 
 	 * @return the id
 	 */
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -125,7 +125,7 @@ public class ConsentListDto {
 	 * @param id
 	 *            the new id
 	 */
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

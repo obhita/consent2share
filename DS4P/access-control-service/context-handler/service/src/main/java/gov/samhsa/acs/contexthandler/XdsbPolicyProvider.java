@@ -50,8 +50,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class XdsbPolicyProvider.
  */
-public class XdsbPolicyProvider implements
-		PolicyProvider {
+public class XdsbPolicyProvider implements PolicyProvider {
 
 	/** The Constant URN_POLICY_COMBINING_ALGORITHM_PERMIT_OVERRIDES. */
 	public static final String URN_POLICY_COMBINING_ALGORITHM_PERMIT_OVERRIDES = "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:permit-overrides";
@@ -151,13 +150,22 @@ public class XdsbPolicyProvider implements
 			RetrieveDocumentSetResponse retrieveDocumentSetResponse = xdsbRepository
 					.retrieveDocumentSet(retrieveDocumentSetRequest);
 
-			// Add policy documents to a string list
+			// Retrieve deprecated documentUniqueIds
+			List<String> deprecatedDocumentUniqueIds = this.xdsbRegistry
+					.findDeprecatedDocumentUniqueIds(patientUniqueId,
+							patientUniqueId);
+
+			// Add policy documents to a string list (if they are not
+			// deprecated)
 			for (DocumentResponse docResponse : retrieveDocumentSetResponse
 					.getDocumentResponse()) {
-				String docString = new String(docResponse.getDocument());
-				docString = docString.replace(
-						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
-				policiesString.add(docString);
+				if (!deprecatedDocumentUniqueIds.contains(docResponse
+						.getDocumentUniqueId())) {
+					String docString = new String(docResponse.getDocument());
+					docString = docString.replace(
+							"<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
+					policiesString.add(docString);
+				}
 			}
 
 			// Filter the policiesString List by recipientSubjectNPI and

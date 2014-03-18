@@ -25,18 +25,12 @@
  ******************************************************************************/
 package gov.samhsa.acs.contexthandler;
 
-import gov.samhsa.acs.common.namespace.PepNamespaceContext;
+import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -57,15 +51,22 @@ public class XacmlPolicyListFilter {
 	/** The document xml converter. */
 	private DocumentXmlConverter documentXmlConverter;
 
+	/** The document accessor. */
+	private DocumentAccessor documentAccessor;
+
 	/**
 	 * Instantiates a new xacml policy list filter.
 	 * 
 	 * @param documentXmlConverter
 	 *            the document xml converter
+	 * @param documentAccessor
+	 *            the document accessor
 	 */
-	public XacmlPolicyListFilter(DocumentXmlConverter documentXmlConverter) {
+	public XacmlPolicyListFilter(DocumentXmlConverter documentXmlConverter,
+			DocumentAccessor documentAccessor) {
 		super();
 		this.documentXmlConverter = documentXmlConverter;
+		this.documentAccessor = documentAccessor;
 	}
 
 	/**
@@ -88,8 +89,8 @@ public class XacmlPolicyListFilter {
 
 			String xPathExprIntermediary = XPATH_CONDITION_ATTRIBUTE_VALUE
 					.replace("$", URN_XACML_1_INTERMEDIARY_SUBJECT);
-			NodeList nodeListIntermediaryNPI = getNodeList(policyDoc,
-					xPathExprIntermediary);
+			NodeList nodeListIntermediaryNPI = this.documentAccessor
+					.getNodeList(policyDoc, xPathExprIntermediary);
 			boolean containsIntermediaryNPI = containsInValue(
 					nodeListIntermediaryNPI, intermediarySubjectNPI);
 			if (containsIntermediaryNPI == false) {
@@ -97,8 +98,8 @@ public class XacmlPolicyListFilter {
 			} else {
 				String xPathExprRecipient = XPATH_CONDITION_ATTRIBUTE_VALUE
 						.replace("$", URN_XACML_1_RECIPIENT_SUBJECT);
-				NodeList nodeListRecipientNPI = getNodeList(policyDoc,
-						xPathExprRecipient);
+				NodeList nodeListRecipientNPI = this.documentAccessor
+						.getNodeList(policyDoc, xPathExprRecipient);
 				boolean containsRecipientNPI = containsInValue(
 						nodeListRecipientNPI, recipientSubjectNPI);
 				if (containsRecipientNPI == false) {
@@ -107,36 +108,6 @@ public class XacmlPolicyListFilter {
 			}
 		}
 		policies.removeAll(removeList);
-	}
-
-	/**
-	 * Gets the node list.
-	 * 
-	 * @param xmlDocument
-	 *            the xml document
-	 * @param xPathExpr
-	 *            the x path expr
-	 * @return the node list
-	 * @throws XPathExpressionException
-	 *             the x path expression exception
-	 * @throws XMLEncryptionException
-	 *             the xML encryption exception
-	 * @throws Exception
-	 *             the exception
-	 */
-	public NodeList getNodeList(Document xmlDocument, String xPathExpr)
-			throws XPathExpressionException, XMLEncryptionException, Exception {
-
-		// Create XPath instance
-		XPathFactory xpathFact = XPathFactory.newInstance();
-		XPath xpath = xpathFact.newXPath();
-		xpath.setNamespaceContext(new PepNamespaceContext());
-
-		// Evaluate XPath expression against parsed document
-		NodeList nodeList = (NodeList) xpath.evaluate(xPathExpr, xmlDocument,
-				XPathConstants.NODESET);
-
-		return nodeList;
 	}
 
 	/**

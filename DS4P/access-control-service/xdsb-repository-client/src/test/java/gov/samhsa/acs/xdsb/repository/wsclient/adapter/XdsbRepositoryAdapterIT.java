@@ -87,7 +87,7 @@ public class XdsbRepositoryAdapterIT {
 		// Act
 		RegistryResponse registryResponse = xdsbRepositoryAdapter
 				.provideAndRegisterDocumentSet(c32, OPENEMPI_DOMAIN_ID,
-						XDSB_DOCUMENT_TYPE_CLINICAL_DOCUMENT);
+						XDSB_DOCUMENT_TYPE_CLINICAL_DOCUMENT, null, null);
 		String result = marshaller.marshall(registryResponse);
 		logger.debug("testProvideAndRegisterDocumentSet_C32 Result:");
 		logger.debug(result);
@@ -104,7 +104,7 @@ public class XdsbRepositoryAdapterIT {
 		// Act
 		RegistryResponse registryResponse = xdsbRepositoryAdapter
 				.provideAndRegisterDocumentSet(xacml, OPENEMPI_DOMAIN_ID,
-						XDSB_DOCUMENT_TYPE_PRIVACY_CONSENT);
+						XDSB_DOCUMENT_TYPE_PRIVACY_CONSENT, null, null);
 		String result = marshaller.marshall(registryResponse);
 		logger.debug("testProvideAndRegisterDocumentSet_Xacml_Consent Result:");
 		logger.debug(result);

@@ -50,7 +50,7 @@ public abstract class AbstractController {
 	
 	
 	@ExceptionHandler (AjaxException.class)
-	public @ResponseBody ResponseEntity<String> handleAjaxException(AjaxException e){
+	protected @ResponseBody ResponseEntity<String> handleAjaxException(AjaxException e){
 		
 		return new ResponseEntity<String>(e.getErrorMessage(), e.getHttpStatus());
 	}

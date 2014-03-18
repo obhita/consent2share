@@ -57,12 +57,13 @@ public class PolicyTryingServiceImplTest {
 		final String c32Xml = "";
 		final String xacmlPolicy = "";
 		final String segmentedC32 = "Segmented C32";
+		final String purposeOfUse = "TREAT";
 		
 		TryPolicyService service = new TryPolicyService(wsdlURL, serviceName);
 		TryPolicyPortType port = service.getTryPolicyServicePort();
 		
 		try {
-			when(policyTrying.tryPolicy(c32Xml, xacmlPolicy)).thenReturn(segmentedC32);
+			when(policyTrying.tryPolicy(c32Xml, xacmlPolicy, purposeOfUse)).thenReturn(segmentedC32);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -74,7 +75,7 @@ public class PolicyTryingServiceImplTest {
 		}
 		
 		// Act
-		String result = port.tryPolicy(c32Xml, xacmlPolicy);
+		String result = port.tryPolicy(c32Xml, xacmlPolicy, purposeOfUse);
 
 		// Assert
 		assertEquals(segmentedC32, result);

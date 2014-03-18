@@ -17,6 +17,8 @@ public class AbstractNodeDto {
 	protected String errorMessage;
 	protected String successMessage;
 	
+	protected boolean deletable = true;
+	
 	public Long getId() {
 		return id;
 	}
@@ -59,7 +61,12 @@ public class AbstractNodeDto {
 	public void setSuccessMessage(String successMessage) {
 		this.successMessage = successMessage;
 	}
-	
+	public boolean isDeletable() {
+		return deletable;
+	}
+	public void setDeletable(boolean deletable) {
+		this.deletable = deletable;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

@@ -116,5 +116,5 @@ public interface PolicyDecisionPoint {
 	public XacmlResponse evaluateRequest(RequestType request,
 			List<Evaluatable> policies);
 	
-	public PdpRequestResponse evaluatePolicyForTrying(String xacmlPolicy);
+	public PdpRequestResponse evaluatePolicyForTrying(String xacmlPolicy, String purposeOfUse);
 }

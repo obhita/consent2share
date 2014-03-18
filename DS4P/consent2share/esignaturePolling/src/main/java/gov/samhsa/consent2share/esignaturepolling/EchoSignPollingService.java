@@ -49,7 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component("esignaturePollingService")
 @Transactional
 public class EchoSignPollingService implements EsignaturePollingService {
-	
+
 	/** The logger. */
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -58,15 +58,17 @@ public class EchoSignPollingService implements EsignaturePollingService {
 
 	/** The consent repository. */
 	private ConsentRepository consentRepository;
-	
+
 	/** The signature service. */
 	private EchoSignSignatureService signatureService;
 
 	/**
 	 * Instantiates a new echo sign polling service.
-	 *
-	 * @param ConsentRepository the consent repository
-	 * @param signatureService the signature service
+	 * 
+	 * @param ConsentRepository
+	 *            the consent repository
+	 * @param signatureService
+	 *            the signature service
 	 */
 	@Autowired
 	public EchoSignPollingService(ConsentRepository ConsentRepository,
@@ -85,50 +87,59 @@ public class EchoSignPollingService implements EsignaturePollingService {
 	@Override
 	public void poll() {
 		logger.info("Starts polling at {}...", new Date().toString());
-		
+
 		try {
-			Set<Consent> consentSet=new HashSet<Consent>();
-			consentSet.addAll(consentRepository
-					.findBySignedPdfConsentDocumentSignedStatusNot(Signed_Staus));
-			consentSet.addAll(consentRepository
-					.findBySignedPdfConsentRevokeDocumentSignedStatusNot(Signed_Staus));
+			Set<Consent> consentSet = new HashSet<Consent>();
+			consentSet
+					.addAll(consentRepository
+							.findBySignedPdfConsentDocumentSignedStatusNot(Signed_Staus));
+			consentSet
+					.addAll(consentRepository
+							.findBySignedPdfConsentRevokeDocumentSignedStatusNot(Signed_Staus));
 
 			for (Consent consent : consentSet) {
 				AbstractSignedPDFDocument document = SignedPDFDocumentBinder(consent);
-
-				String documentKey = document.getDocumentId();
-				String signStatus = document.getDocumentSignedStatus();
+				String parentDocumentKey = document.getDocumentId();
+				String childDocumentKey = signatureService
+						.getChildDocumentKey(document.getDocumentId());
 
 				logger.info(
 						"Starts calling adobe echosign web service to get document info at {}...",
 						new Date().toString());
+				DocumentInfo latestDocumentInfo;
+				if (childDocumentKey == null)
+					latestDocumentInfo = signatureService
+							.getDocumentInfo(parentDocumentKey);
+				else
+					latestDocumentInfo = signatureService
+							.getDocumentInfo(childDocumentKey);
 
-				DocumentInfo latestDocumentInfo = signatureService
-						.getDocumentInfo(documentKey);
-
-				logger.info("Ended calling adobe echosign web service to get document info at {}.",
+				logger.info(
+						"Ended calling adobe echosign web service to get document info at {}.",
 						new Date().toString());
 
 				String latestSignStatus = latestDocumentInfo.getStatus()
 						.toString();
 
-				if (!latestSignStatus.equals(signStatus)) {
-					document.setDocumentSignedStatus(latestSignStatus);
+				if (latestSignStatus.equals(Signed_Staus)) {
 
-					if (latestSignStatus.equals(Signed_Staus)) {
-						
-						logger.info(
-								"Starts calling adobe echosign web service to get signed document at {}...",
-								new Date().toString());
-						
-						byte[] latestData = signatureService
-								.getLatestDocument(documentKey);
-						
-						logger.info("Ended calling adobe echosign web service to get signed document at {}.",
-								new Date().toString());
-						
-						document.setContent(latestData, consent.getId());
-					}
+					logger.info(
+							"Starts calling adobe echosign web service to get signed document at {}...",
+							new Date().toString());
+					byte[] latestData = null;
+					if (childDocumentKey == null)
+						latestData = signatureService
+								.getLatestDocument(parentDocumentKey);
+					else
+						latestData = signatureService
+								.getLatestDocument(childDocumentKey);
+
+					logger.info(
+							"Ended calling adobe echosign web service to get signed document at {}.",
+							new Date().toString());
+
+					document.setContent(latestData, consent.getId());
+					document.setDocumentSignedStatus(latestSignStatus);
 				}
 
 				consentRepository.save(consent);
@@ -139,15 +150,17 @@ public class EchoSignPollingService implements EsignaturePollingService {
 
 		logger.info("Ended polling at {}.", new Date().toString());
 	}
-	
+
 	/**
 	 * Signed pdf document binder.
-	 *
-	 * @param consent the consent
+	 * 
+	 * @param consent
+	 *            the consent
 	 * @return the abstract signed pdf document
 	 */
-	private AbstractSignedPDFDocument SignedPDFDocumentBinder(Consent consent){
-		if(consent.getSignedPdfConsent().getDocumentSignedStatus().equals("SIGNED"))
+	private AbstractSignedPDFDocument SignedPDFDocumentBinder(Consent consent) {
+		if (consent.getSignedPdfConsent().getDocumentSignedStatus()
+				.equals("SIGNED"))
 			return consent.getSignedPdfConsentRevoke();
 		return consent.getSignedPdfConsent();
 	}

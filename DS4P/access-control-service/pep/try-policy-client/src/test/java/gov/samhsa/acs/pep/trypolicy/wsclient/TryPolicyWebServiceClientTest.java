@@ -41,8 +41,9 @@ public class TryPolicyWebServiceClientTest {
 	public void testStubWebServiceWorks() {
 		final String c32Xml = "";
 		final String xacmlPolicy = "";
+		final String purposeOfUse = "";
 		
-		String resp = createPort().tryPolicy(c32Xml, xacmlPolicy);
+		String resp = createPort().tryPolicy(c32Xml, xacmlPolicy, purposeOfUse);
 		validateResponse(resp);
 	}
 
@@ -51,9 +52,10 @@ public class TryPolicyWebServiceClientTest {
 	public void testWSClientSOAPCallWorks() {
 		final String c32Xml = "";
 		final String xacmlPolicy = "";
+		final String purposeOfUse = "";
 
 		TryPolicyWebServiceClient wsc = new TryPolicyWebServiceClient(address);
-		String resp = wsc.tryPolicy(c32Xml, xacmlPolicy);
+		String resp = wsc.tryPolicy(c32Xml, xacmlPolicy, purposeOfUse);
 		validateResponse(resp);
 	}
 

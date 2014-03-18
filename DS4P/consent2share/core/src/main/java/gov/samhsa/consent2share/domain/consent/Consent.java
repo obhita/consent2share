@@ -27,7 +27,6 @@ package gov.samhsa.consent2share.domain.consent;
 
 import gov.samhsa.consent2share.domain.DomainEventManager;
 import gov.samhsa.consent2share.domain.consent.event.ConsentRevokeSubmittedEvent;
-import gov.samhsa.consent2share.domain.consent.event.ConsentSubmittedEvent;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.reference.ClinicalConceptCode;
 
@@ -247,6 +246,7 @@ public class Consent {
 	 */
 	public void setId(Long id) {
 		this.id = id;
+		
 	}
 
 	/**
@@ -328,7 +328,7 @@ public class Consent {
 	 */
 	public void setSignedPdfConsent(SignedPDFConsent signedPdfConsent) {
 		this.signedPdfConsent = signedPdfConsent;
-		DomainEventManager.raise(new ConsentSubmittedEvent(id));
+		
 	}
 
 	/**
@@ -494,7 +494,7 @@ public class Consent {
 	/**
 	 * Sets the do not share for purpose of use codes.
 	 *
-	 * @param doNotShareForPurposeOfUseCodes the new do not share for purpose of use codes
+	 * @param shareForPurposeOfUseCodes the new share for purpose of use codes
 	 */
 	public void setShareForPurposeOfUseCodes(
 			Set<ConsentShareForPurposeOfUseCode> shareForPurposeOfUseCodes) {
@@ -756,6 +756,7 @@ public class Consent {
 	 */
 	public void setConsentReferenceId(String consentReferenceId) {
 		this.consentReferenceId = consentReferenceId;
+		
 	}
 	
 	/**
@@ -767,9 +768,12 @@ public class Consent {
 		return xacmlPolicyFile;
 	}
 
+	/**
+	 * Sets the xacml policy file.
+	 *
+	 * @param xacmlPolicyFile the new xacml policy file
+	 */
 	public void setXacmlPolicyFile(byte[] xacmlPolicyFile) {
 		this.xacmlPolicyFile = xacmlPolicyFile;
 	}
-	
-	
 }

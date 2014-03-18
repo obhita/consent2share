@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.*;
+import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReader;
@@ -18,6 +19,7 @@ import gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -32,6 +34,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class XdsbRegistryAdapterTest {
 	// Constants
@@ -50,6 +54,8 @@ public class XdsbRegistryAdapterTest {
 	private DocumentXmlConverter documentXmlConverterMock;
 	@Mock
 	private AdhocQueryResponseFilter responseFilterMock;
+	@Mock
+	private DocumentAccessor documentAccessorMock;
 
 	// Helpers
 	private FileReader fileReader;
@@ -76,7 +82,7 @@ public class XdsbRegistryAdapterTest {
 		MockitoAnnotations.initMocks(this);
 		XdsbRegistryAdapter xdsbRegistryAdapter = new XdsbRegistryAdapter(
 				xdsbRegistryMock, responseFilterMock, marshallerMock,
-				documentXmlConverterMock);
+				documentXmlConverterMock, documentAccessorMock);
 		xdsbRegistryAdapterSpy = spy(xdsbRegistryAdapter);
 	}
 
@@ -378,7 +384,151 @@ public class XdsbRegistryAdapterTest {
 				.registryStoredQuery(patientIdMock, domainIdMock, authorIdMock,
 						xdsbDocumentTypeMock, serviceTimeAwareMock);
 
-		//
+		// Assert
 		assertEquals(filteredResponseMock, actualResponse);
+	}
+
+	@Test
+	public void testFindDeprecatedDocumentUniqueIds() throws Throwable {
+		// Arrange
+		String submissionSetPatientIdMock = "submissionSetPatientIdMock";
+		String submissionSetAuthorPersonMock = "submissionSetAuthorPersonMock";
+		AdhocQueryRequest findSubmissionSetsRequestMock = mock(AdhocQueryRequest.class);
+		AdhocQueryResponse findSubmissionSetsResponseMock = mock(AdhocQueryResponse.class);
+		AdhocQueryRequest getSubmissionSetAndContentsRequestMock = mock(AdhocQueryRequest.class);
+		AdhocQueryResponse getSubmissionSetAndContentsResponseMock = mock(AdhocQueryResponse.class);
+		List<String> extractSubmissionSetUniqueIdsMock = new LinkedList<String>();
+		String extractSubmissionSetUniqueIdMock = "extractSubmissionSetUniqueIdMock";
+		extractSubmissionSetUniqueIdsMock.add(extractSubmissionSetUniqueIdMock);
+		String deprecatedDocumentUniqueIdMock = "deprecatedDocumentUniqueIdMock";
+		when(
+				xdsbRegistryAdapterSpy.createFindSubmissionSetsRequest(
+						submissionSetPatientIdMock,
+						submissionSetAuthorPersonMock)).thenReturn(
+				findSubmissionSetsRequestMock);
+		when(
+				xdsbRegistryMock
+						.registryStoredQuery(findSubmissionSetsRequestMock))
+				.thenReturn(findSubmissionSetsResponseMock);
+		doReturn(extractSubmissionSetUniqueIdsMock)
+				.when(xdsbRegistryAdapterSpy).extractSubmissionSetUniqueIds(
+						findSubmissionSetsResponseMock);
+		when(
+				xdsbRegistryAdapterSpy
+						.createGetSubmissionSetAndContentsRequest(extractSubmissionSetUniqueIdMock))
+				.thenReturn(getSubmissionSetAndContentsRequestMock);
+		when(
+				xdsbRegistryMock
+						.registryStoredQuery(getSubmissionSetAndContentsRequestMock))
+				.thenReturn(getSubmissionSetAndContentsResponseMock);
+		doReturn(deprecatedDocumentUniqueIdMock).when(xdsbRegistryAdapterSpy)
+				.extractDeprecatedDocumentUniqueId(
+						getSubmissionSetAndContentsResponseMock);
+
+		// Act
+		List<String> result = xdsbRegistryAdapterSpy
+				.findDeprecatedDocumentUniqueIds(submissionSetPatientIdMock,
+						submissionSetAuthorPersonMock);
+
+		// Assert
+		assertTrue(result.contains(deprecatedDocumentUniqueIdMock));
+	}
+
+	@Test
+	public void testFindSubmissionSets() throws JAXBException {
+		// Arrange
+		String submissionSetPatientIdMock = "submissionSetPatientIdMock";
+		String submissionSetAuthorPersonMock = "submissionSetAuthorPersonMock";
+		AdhocQueryRequest findSubmissionSetsRequestMock = mock(AdhocQueryRequest.class);
+		AdhocQueryResponse findSubmissionSetsResponseMock = mock(AdhocQueryResponse.class);
+		when(
+				xdsbRegistryAdapterSpy.createFindSubmissionSetsRequest(
+						submissionSetPatientIdMock,
+						submissionSetAuthorPersonMock)).thenReturn(
+				findSubmissionSetsRequestMock);
+		when(
+				xdsbRegistryMock
+						.registryStoredQuery(findSubmissionSetsRequestMock))
+				.thenReturn(findSubmissionSetsResponseMock);
+
+		// Act
+		AdhocQueryResponse actualResponse = xdsbRegistryAdapterSpy
+				.findSubmissionSets(submissionSetPatientIdMock,
+						submissionSetAuthorPersonMock);
+
+		// Assert
+		assertEquals(findSubmissionSetsResponseMock, actualResponse);
+	}
+
+	@Test
+	public void testGetSubmissionSetAndContents() throws JAXBException {
+		// Arrange
+		String submissionSetPatientIdMock = "submissionSetPatientIdMock";
+		AdhocQueryRequest getSubmissionSetAndContentsRequestMock = mock(AdhocQueryRequest.class);
+		AdhocQueryResponse getSubmissionSetAndContentsResponseMock = mock(AdhocQueryResponse.class);
+		when(
+				xdsbRegistryAdapterSpy
+						.createGetSubmissionSetAndContentsRequest(submissionSetPatientIdMock))
+				.thenReturn(getSubmissionSetAndContentsRequestMock);
+		when(
+				xdsbRegistryMock
+						.registryStoredQuery(getSubmissionSetAndContentsRequestMock))
+				.thenReturn(getSubmissionSetAndContentsResponseMock);
+
+		// Act
+		AdhocQueryResponse actualResponse = xdsbRegistryAdapterSpy
+				.getSubmissionSetAndContents(submissionSetPatientIdMock);
+
+		// Assert
+		assertEquals(getSubmissionSetAndContentsResponseMock, actualResponse);
+	}
+
+	@Test
+	public void testExtractSubmissionSetUniqueIds() throws Throwable {
+		// Arrange
+		AdhocQueryResponse responseMock = mock(AdhocQueryResponse.class);
+		String responseXmlMock = "responseXmlMock";
+		Document documentMock = mock(Document.class);
+		NodeList nodeListMock = mock(NodeList.class);
+		Node nodeMock = mock(Node.class);
+		String nodeValueMock = "nodeValueMock";
+		when(marshallerMock.marshall(responseMock)).thenReturn(responseXmlMock);
+		when(documentXmlConverterMock.loadDocument(responseXmlMock))
+				.thenReturn(documentMock);
+		when(documentAccessorMock.getNodeList(eq(documentMock), anyString()))
+				.thenReturn(nodeListMock);
+		when(nodeListMock.getLength()).thenReturn(1);
+		when(nodeListMock.item(0)).thenReturn(nodeMock);
+		when(nodeMock.getNodeValue()).thenReturn(nodeValueMock);
+
+		// Act
+		List<String> submissionSetUniqueIds = xdsbRegistryAdapterSpy
+				.extractSubmissionSetUniqueIds(responseMock);
+
+		// Assert
+		assertTrue(submissionSetUniqueIds.contains(nodeValueMock));
+	}
+
+	@Test
+	public void testExtractDeprecatedDocumentUniqueId() throws Throwable {
+		// Arrange
+		AdhocQueryResponse responseMock = mock(AdhocQueryResponse.class);
+		String responseXmlMock = "responseXmlMock";
+		Document documentMock = mock(Document.class);
+		Node nodeMock = mock(Node.class);
+		String nodeValueMock = "nodeValueMock";
+		when(marshallerMock.marshall(responseMock)).thenReturn(responseXmlMock);
+		when(documentXmlConverterMock.loadDocument(responseXmlMock))
+				.thenReturn(documentMock);
+		when(documentAccessorMock.getNode(eq(documentMock), anyString()))
+				.thenReturn(nodeMock);
+		when(nodeMock.getNodeValue()).thenReturn(nodeValueMock);
+
+		// Act
+		String deprecatedDocumentUniqueId = xdsbRegistryAdapterSpy
+				.extractDeprecatedDocumentUniqueId(responseMock);
+
+		// Assert
+		assertEquals(nodeValueMock, deprecatedDocumentUniqueId);
 	}
 }

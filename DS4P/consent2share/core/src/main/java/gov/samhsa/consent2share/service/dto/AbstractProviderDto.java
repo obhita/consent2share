@@ -35,10 +35,10 @@ import javax.validation.constraints.Size;
 /**
  * The Class ProviderDto.
  */
-public abstract class AbstractProviderDto {
+public abstract class AbstractProviderDto implements HasId{
 	
 	/** The id. */
-	private long id;
+	private String id;
 
 	/** The npi. */
     @Size(min = 3, max = 30)
@@ -185,7 +185,7 @@ public abstract class AbstractProviderDto {
      *
      * @return the id
      */
-    public long getId() {
+    public String getId() {
 		return id;
 	}
 
@@ -195,7 +195,7 @@ public abstract class AbstractProviderDto {
 	 *
 	 * @param id the new id
 	 */
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

@@ -28,20 +28,20 @@ package gov.samhsa.consent2share.infrastructure;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.ConsentDoNotShareClinicalDocumentSectionTypeCode;
 import gov.samhsa.consent2share.domain.consent.ConsentDoNotShareClinicalDocumentTypeCode;
-import gov.samhsa.consent2share.domain.consent.ConsentShareForPurposeOfUseCode;
 import gov.samhsa.consent2share.domain.consent.ConsentDoNotShareSensitivityPolicyCode;
 import gov.samhsa.consent2share.domain.consent.ConsentIndividualProviderDisclosureIsMadeTo;
 import gov.samhsa.consent2share.domain.consent.ConsentIndividualProviderPermittedToDisclose;
 import gov.samhsa.consent2share.domain.consent.ConsentOrganizationalProviderDisclosureIsMadeTo;
 import gov.samhsa.consent2share.domain.consent.ConsentOrganizationalProviderPermittedToDisclose;
 import gov.samhsa.consent2share.domain.consent.ConsentPdfGenerator;
+import gov.samhsa.consent2share.domain.consent.ConsentShareForPurposeOfUseCode;
 import gov.samhsa.consent2share.domain.provider.IndividualProvider;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
 import gov.samhsa.consent2share.domain.reference.ClinicalConceptCode;
 import gov.samhsa.consent2share.domain.reference.ClinicalDocumentSectionTypeCode;
 import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCode;
 import gov.samhsa.consent2share.domain.reference.PurposeOfUseCode;
-import gov.samhsa.consent2share.domain.reference.SensitivityPolicyCode;
+import gov.samhsa.consent2share.domain.valueset.ValueSetCategory;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -381,9 +381,8 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 
 			List<String> nameList = new ArrayList<String>();
 			for (ConsentDoNotShareSensitivityPolicyCode consentSensitivityPolicyCode : consentDoNotShareSensitivityPolicyCodes) {
-				SensitivityPolicyCode code = consentSensitivityPolicyCode
-						.getSensitivityPolicyCode();
-				nameList.add(code.getDisplayName());
+				ValueSetCategory code = consentSensitivityPolicyCode.getValueSetCategory();
+				nameList.add(code.getName());
 			}
 			Collections.sort(nameList);
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, 20);

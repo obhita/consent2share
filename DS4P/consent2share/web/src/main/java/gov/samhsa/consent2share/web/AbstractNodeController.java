@@ -2,7 +2,12 @@ package gov.samhsa.consent2share.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.http.ResponseEntity;
+
 
 public class AbstractNodeController {
 	
@@ -47,5 +52,15 @@ public class AbstractNodeController {
         builder.append(path);
         return builder.toString();
     }
-
+    
+    
+    /**
+     * Automatically Handles thrown AjaxExceptions
+     */
+    @ExceptionHandler (AjaxException.class)
+	protected @ResponseBody ResponseEntity<String> handleAjaxException(AjaxException e){
+		
+		return new ResponseEntity<String>(e.getErrorMessage(), e.getHttpStatus());
+	}
+    
 }

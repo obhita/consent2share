@@ -2,43 +2,46 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="headerFragment">
-<meta charset="utf-8" />
-<!-- title needs to be dynamic -->
-<title>Consent2Share</title>
-<meta name="description" content="Consent Management System" />
-<meta name="author" content="FEiSystems" />
-<!-- END: Meta -->
-<!-- START: Mobile Specific -->
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<!-- END: Mobile Specific -->
-<!-- START: CSS -->
+	<meta charset="utf-8" />
+	<!-- title needs to be dynamic -->
+	<title>Consent2Share</title>
+	<meta name="description" content="Consent Management System" />
+	<meta name="author" content="FEiSystems" />
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<!-- END: Meta -->
+	<!-- START: Mobile Specific -->
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- END: Mobile Specific -->
+	<!-- START: CSS -->
+	
+	<!-- Bootstrap related CSS files -->
+	<link id="bootstrap-style" href="../../resources/css/bootstrap.css"
+		rel="stylesheet" th:href="@{/resources/css/bootstrap.css}" />
+	<link href="../../resources/css/font-awesome.css"
+		th:href="@{/resources/css/font-awesome.css}" rel="stylesheet" />
+	<link href="../../resources/css/jquery-ui.css"
+		th:href="@{/resources/css/jquery-ui.css}" rel="stylesheet" />
+	<!-- Plug-in Stylesheets -->
+	<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet"
+		th:href="@{/resources/css/joyride-2.0.3.css}" />
+	
+	<!-- Custom CSS Files -->
+	<link href="../../resources/css/themes-style.css" rel="stylesheet"
+		th:href="@{/resources/css/themes-style.css}" />
+	<link href="../../resources/css/sentinel-style.css" rel="stylesheet"
+		th:href="@{/resources/css/sentinel-style.css}" />
+	
+	<!-- END: CSS -->
+	
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
+	<!-- START: Favicon -->
+	<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
+	<!-- END: Favicon -->
 
-<!-- Bootstrap related CSS files -->
-<link id="bootstrap-style" href="../../resources/css/bootstrap.css"
-	rel="stylesheet" th:href="@{/resources/css/bootstrap.css}" />
-<link href="../../resources/css/font-awesome.css"
-	th:href="@{/resources/css/font-awesome.css}" rel="stylesheet" />
-<link href="../../resources/css/jquery-ui.css"
-	th:href="@{/resources/css/jquery-ui.css}" rel="stylesheet" />
-<!-- Plug-in Stylesheets -->
-<link href="../../resources/css/joyride-2.0.3.css" rel="stylesheet"
-	th:href="@{/resources/css/joyride-2.0.3.css}" />
-
-<!-- Custom CSS Files -->
-<link href="../../resources/css/themes-style.css" rel="stylesheet"
-	th:href="@{/resources/css/themes-style.css}" />
-<link href="../../resources/css/sentinel-style.css" rel="stylesheet"
-	th:href="@{/resources/css/sentinel-style.css}" />
-
-<!-- END: CSS -->
-
-<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
-<!--[if lt IE 9]>
-        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-<!-- START: Favicon -->
-<!--    <link rel="shortcut icon" href="images/favicon.ico"> -->
-<!-- END: Favicon -->
 
 </head>
 <body>

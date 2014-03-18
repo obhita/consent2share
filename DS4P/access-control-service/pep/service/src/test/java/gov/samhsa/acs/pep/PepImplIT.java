@@ -6,8 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import gov.samhsa.acs.brms.RuleExecutionServiceImpl;
+import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.brms.guvnor.GuvnorServiceImpl;
-import gov.samhsa.acs.common.bean.XacmlResult;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
@@ -22,6 +22,7 @@ import gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypterImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentFactModelExtractorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentMaskerImpl;
+import gov.samhsa.acs.documentsegmentation.tools.DocumentRedactor;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl;
 import gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl;
@@ -84,7 +85,7 @@ public class PepImplIT {
 	private static DocumentEditorImpl documentEditor;
 	private static DocumentTaggerImpl documentTagger;
 	private static DocumentEncrypterImpl documentEncrypter;
-	private static DocumentRedactorImpl documentRedactor;
+	private static DocumentRedactor documentRedactor;
 	private static DocumentMaskerImpl documentMasker;
 	private static DocumentFactModelExtractorImpl documentFactModelExtractor;
 	private static FileReaderImpl fileReader;
@@ -110,8 +111,7 @@ public class PepImplIT {
 		marshaller = new SimpleMarshallerImpl();
 		documentTagger = new DocumentTaggerImpl();
 		documentEncrypter = new DocumentEncrypterImpl();
-		documentRedactor = new DocumentRedactorImpl(documentEditor,
-				new DocumentXmlConverterImpl());
+		documentRedactor = new DocumentRedactorImpl(new DocumentXmlConverterImpl(), null);
 		documentMasker = new DocumentMaskerImpl();
 		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
 		additionalMetadataGeneratorForSegmentedClinicalDocumentImpl = new AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl();
@@ -137,7 +137,7 @@ public class PepImplIT {
 						endpointAddressForAuditServcie), documentEditor,
 				marshaller, documentEncrypter, documentRedactor,
 				documentMasker, documentTagger, documentFactModelExtractor,
-				additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
+				null, null, additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
 
 	}
 

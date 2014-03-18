@@ -26,12 +26,12 @@
 package gov.samhsa.acs.xdsb.registry.wsclient.adapter;
 
 import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentReference;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient;
-
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest.DocumentRequest;
 
@@ -42,18 +42,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
+
+import javax.xml.bind.JAXBException;
 
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.ResponseOptionType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.AdhocQueryType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ClassificationType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ValueListType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -79,6 +80,9 @@ public class XdsbRegistryAdapter {
 	/** The document xml converter. */
 	private DocumentXmlConverter documentXmlConverter;
 
+	/** The document accessor. */
+	private DocumentAccessor documentAccessor;
+
 	// Supported XDS.b Format Codes
 	/** The Constant FORMAT_CODE_CLINICAL_DOCUMENT. */
 	public static final String FORMAT_CODE_CLINICAL_DOCUMENT = "'2.16.840.1.113883.10.20.1^^HITSP'";
@@ -97,11 +101,38 @@ public class XdsbRegistryAdapter {
 	public static final String SLOT_NAME_XDS_DOCUMENT_ENTRY_STATUS = "$XDSDocumentEntryStatus";
 
 	// UUIDs
+	/** The Constant UUID_XDS_DOCUMENTENTRY. */
+	public static final String UUID_XDS_DOCUMENTENTRY = "urn:uuid:7edca82f-054d-47f2-a032-9b2a5b5186c1";
+
 	/** The Constant UUID_XDS_DOCUMENTENTRY_UNIQUEID. */
 	public static final String UUID_XDS_DOCUMENTENTRY_UNIQUEID = "urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab";
 
 	/** The Constant UUID_XDS_DOCUMENTENTRY_AUTHOR. */
 	public static final String UUID_XDS_DOCUMENTENTRY_AUTHOR = "urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d";
+
+	/** The Constant UUID_XDS_SUBMISSION_SET_UNIQUEID. */
+	public static final String UUID_XDS_SUBMISSION_SET_UNIQUEID = "urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8";
+
+	// Stored Queries
+	// Find Submission Sets
+	/** The Constant STORED_QUERY_FIND_SUBMISSION_SETS. */
+	private static final String STORED_QUERY_FIND_SUBMISSION_SETS = "<ns3:AdhocQueryRequest xmlns:ns2=\"urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0\" xmlns:ns3=\"urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0\" xmlns:ns4=\"urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0\"><ns3:ResponseOption returnComposedObjects=\"true\" returnType=\"LeafClass\"/><ns2:AdhocQuery id=\"urn:uuid:f26abbcb-ac74-4422-8a30-edb644bbc1a9\"><ns2:Slot name=\"$XDSSubmissionSetPatientId\"><ns2:ValueList><ns2:Value>@XDSSubmissionSetPatientId</ns2:Value></ns2:ValueList></ns2:Slot><ns2:Slot name=\"$XDSSubmissionSetAuthorPerson\"><ns2:ValueList><ns2:Value>@XDSSubmissionSetAuthorPerson</ns2:Value></ns2:ValueList></ns2:Slot><ns2:Slot name=\"$XDSSubmissionSetStatus\"><ns2:ValueList><ns2:Value>('urn:oasis:names:tc:ebxml-regrep:StatusType:Approved')</ns2:Value></ns2:ValueList></ns2:Slot></ns2:AdhocQuery></ns3:AdhocQueryRequest>";
+
+	/** The Constant PARAM_XDS_SUBMISSION_SET_PATIENT_ID. */
+	private static final String PARAM_XDS_SUBMISSION_SET_PATIENT_ID = "@XDSSubmissionSetPatientId";
+
+	/** The Constant PARAM_XDS_SUBMISSION_SET_AUTHOR_PERSON. */
+	private static final String PARAM_XDS_SUBMISSION_SET_AUTHOR_PERSON = "@XDSSubmissionSetAuthorPerson";
+
+	// Get Submission Set and Contents
+	/** The Constant STORED_QUERY_GET_SUBMISSION_SET_AND_CONTENTS. */
+	private static final String STORED_QUERY_GET_SUBMISSION_SET_AND_CONTENTS = "<ns3:AdhocQueryRequest xmlns:ns2=\"urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0\" xmlns:ns3=\"urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0\" xmlns:ns4=\"urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0\"><ns3:ResponseOption returnComposedObjects=\"true\" returnType=\"LeafClass\"/><ns2:AdhocQuery id=\"urn:uuid:e8e3cb2c-e39c-46b9-99e4-c12f57260b83\"><ns2:Slot name=\"$XDSSubmissionSetUniqueId\"><ns2:ValueList><!-- This operation only works for the first value, do not pass multiple values here.--><ns2:Value>'@XDSSubmissionSetUniqueId'</ns2:Value></ns2:ValueList></ns2:Slot></ns2:AdhocQuery></ns3:AdhocQueryRequest>";
+
+	/** The Constant PARAM_XDS_SUBMISSION_SET_UNIQUEID. */
+	private static final String PARAM_XDS_SUBMISSION_SET_UNIQUEID = "@XDSSubmissionSetUniqueId";
+
+	/** The Constant SUBMISSION_SET_STATUS_DEPRECATED. */
+	private static final String SUBMISSION_SET_STATUS_DEPRECATED = "urn:oasis:names:tc:ebxml-regrep:StatusType:Deprecated";
 
 	/**
 	 * Instantiates a new xdsb registry adapter.
@@ -114,16 +145,19 @@ public class XdsbRegistryAdapter {
 	 *            the marshaller
 	 * @param documentXmlConverter
 	 *            the document xml converter
+	 * @param documentAccessor
+	 *            the document accessor
 	 */
 	public XdsbRegistryAdapter(XdsbRegistryWebServiceClient xdsbRegistry,
 			AdhocQueryResponseFilter responseFilter,
 			SimpleMarshaller marshaller,
-			DocumentXmlConverter documentXmlConverter) {
+			DocumentXmlConverter documentXmlConverter,
+			DocumentAccessor documentAccessor) {
 		this.xdsbRegistry = xdsbRegistry;
 		this.responseFilter = responseFilter;
 		this.marshaller = marshaller;
 		this.documentXmlConverter = documentXmlConverter;
-
+		this.documentAccessor = documentAccessor;
 	}
 
 	/**
@@ -210,6 +244,136 @@ public class XdsbRegistryAdapter {
 	public AdhocQueryResponse registryStoredQuery(AdhocQueryRequest req,
 			String authorNPI) throws Throwable {
 		return registryStoredQueryFilterByAuthorNPI(req, authorNPI);
+	}
+
+	/**
+	 * Find deprecated document unique ids.
+	 * 
+	 * @param submissionSetPatientId
+	 *            the submission set patient id
+	 * @param submissionSetAuthorPerson
+	 *            the submission set author person
+	 * @return the list
+	 * @throws Throwable
+	 *             the throwable
+	 */
+	public List<String> findDeprecatedDocumentUniqueIds(
+			String submissionSetPatientId, String submissionSetAuthorPerson)
+			throws Throwable {
+		submissionSetPatientId = submissionSetPatientId.replaceAll("&(?!amp;)", "&amp;");
+		submissionSetAuthorPerson = submissionSetAuthorPerson.replaceAll("&(?!amp;)", "&amp;");
+
+		List<String> deprecatedDocumentUniqueIds = new LinkedList<String>();
+		AdhocQueryResponse findSubmissionSetsResponse = findSubmissionSets(
+				submissionSetPatientId, submissionSetAuthorPerson);
+		List<String> submissionSetUniqueIds = extractSubmissionSetUniqueIds(findSubmissionSetsResponse);
+		for (String submissionSetUniqueId : submissionSetUniqueIds) {
+			AdhocQueryResponse getSubmissionSetAndContentsResponse = getSubmissionSetAndContents(submissionSetUniqueId);
+			String deprecatedDocumentUniqueId = extractDeprecatedDocumentUniqueId(getSubmissionSetAndContentsResponse);
+			if (deprecatedDocumentUniqueId != null) {
+				deprecatedDocumentUniqueIds.add(deprecatedDocumentUniqueId);
+			}
+		}
+		return deprecatedDocumentUniqueIds;
+	}
+
+	/**
+	 * Find submission sets.
+	 * 
+	 * @param submissionSetPatientId
+	 *            the submission set patient id
+	 * @param submissionSetAuthorPerson
+	 *            the submission set author person
+	 * @return the adhoc query response
+	 * @throws JAXBException
+	 *             the jAXB exception
+	 */
+	public AdhocQueryResponse findSubmissionSets(String submissionSetPatientId,
+			String submissionSetAuthorPerson) throws JAXBException {
+		Assert.notNull(submissionSetPatientId);
+		Assert.notNull(submissionSetAuthorPerson);
+
+		AdhocQueryRequest findSubmissionSetsRequest = createFindSubmissionSetsRequest(
+				submissionSetPatientId, submissionSetAuthorPerson);
+
+		return registryStoredQuery(findSubmissionSetsRequest);
+	}
+
+	/**
+	 * Gets the submission set and contents.
+	 * 
+	 * @param submissionSetUniqueId
+	 *            the submission set unique id
+	 * @return the gets the submission set and contents
+	 * @throws JAXBException
+	 *             the jAXB exception
+	 */
+	public AdhocQueryResponse getSubmissionSetAndContents(
+			String submissionSetUniqueId) throws JAXBException {
+		// Invoke this method for each submissionSetId at a time. This stored
+		// query doesn't support retrieval of multiple submission sets, do not
+		// try to implement it.
+
+		Assert.notNull(submissionSetUniqueId);
+
+		AdhocQueryRequest getSubmissionSetAndContentsRequest = createGetSubmissionSetAndContentsRequest(submissionSetUniqueId);
+
+		return registryStoredQuery(getSubmissionSetAndContentsRequest);
+	}
+
+	/**
+	 * Extract submission set unique ids.
+	 * 
+	 * @param response
+	 *            the response
+	 * @return the list
+	 * @throws Throwable
+	 *             the throwable
+	 */
+	public List<String> extractSubmissionSetUniqueIds(
+			AdhocQueryResponse response) throws Throwable {
+		List<String> submissionSetUniqueIdList = new LinkedList<String>();
+		String responseXml = this.marshaller.marshall(response);
+		Document responseDoc = this.documentXmlConverter
+				.loadDocument(responseXml);
+		String xPathExpr = "//rim:ExternalIdentifier[@identificationScheme='$']/@value";
+		NodeList nodeList = this.documentAccessor.getNodeList(responseDoc,
+				xPathExpr.replace("$", UUID_XDS_SUBMISSION_SET_UNIQUEID));
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			submissionSetUniqueIdList.add(nodeList.item(i).getNodeValue());
+		}
+		return submissionSetUniqueIdList;
+	}
+
+	/**
+	 * Extract deprecated document unique id.
+	 * 
+	 * @param response
+	 *            the response
+	 * @return the string
+	 * @throws Throwable
+	 *             the throwable
+	 */
+	public String extractDeprecatedDocumentUniqueId(AdhocQueryResponse response)
+			throws Throwable {
+		String responseXml = this.marshaller.marshall(response);
+		Document responseDoc = this.documentXmlConverter
+				.loadDocument(responseXml);
+		// Extract documentUniqueId if there is an association in the submission
+		// set with a NewStatus slot having SUBMISSION_SET_STATUS_DEPRECATED
+		// value. Return null, if there is not any.
+		String xPathExpr = "//rim:Association[descendant::rim:Slot[@name='NewStatus']][descendant::rim:Value[.='"
+				+ SUBMISSION_SET_STATUS_DEPRECATED
+				+ "']]/preceding-sibling::rim:ExtrinsicObject[@objectType='"
+				+ UUID_XDS_DOCUMENTENTRY
+				+ "']/descendant::rim:ExternalIdentifier[@identificationScheme='"
+				+ UUID_XDS_DOCUMENTENTRY_UNIQUEID + "']/@value";
+		Node node = this.documentAccessor.getNode(responseDoc, xPathExpr);
+		if (node == null) {
+			return null;
+		} else {
+			return node.getNodeValue();
+		}
 	}
 
 	/**
@@ -429,6 +593,50 @@ public class XdsbRegistryAdapter {
 	}
 
 	/**
+	 * Creates the find submission sets request.
+	 * 
+	 * @param submissionSetPatientId
+	 *            the submission set patient id
+	 * @param submissionSetAuthorPerson
+	 *            the submission set author person
+	 * @return the adhoc query request
+	 * @throws JAXBException
+	 *             the jAXB exception
+	 */
+	AdhocQueryRequest createFindSubmissionSetsRequest(
+			String submissionSetPatientId, String submissionSetAuthorPerson)
+			throws JAXBException {
+		AdhocQueryRequest findSubmissionSetsRequest = this.marshaller
+				.unmarshallFromXml(
+						AdhocQueryRequest.class,
+						STORED_QUERY_FIND_SUBMISSION_SETS.replace(
+								PARAM_XDS_SUBMISSION_SET_PATIENT_ID,
+								submissionSetPatientId).replace(
+								PARAM_XDS_SUBMISSION_SET_AUTHOR_PERSON,
+								submissionSetAuthorPerson));
+		return findSubmissionSetsRequest;
+	}
+
+	/**
+	 * Creates the get submission set and contents request.
+	 * 
+	 * @param submissionSetUniqueId
+	 *            the submission set unique id
+	 * @return the adhoc query request
+	 * @throws JAXBException
+	 *             the jAXB exception
+	 */
+	AdhocQueryRequest createGetSubmissionSetAndContentsRequest(
+			String submissionSetUniqueId) throws JAXBException {
+		AdhocQueryRequest getSubmissionSetAndContentsRequest = this.marshaller
+				.unmarshallFromXml(AdhocQueryRequest.class,
+						STORED_QUERY_GET_SUBMISSION_SET_AND_CONTENTS.replace(
+								PARAM_XDS_SUBMISSION_SET_UNIQUEID,
+								submissionSetUniqueId));
+		return getSubmissionSetAndContentsRequest;
+	}
+
+	/**
 	 * Creates the registry stored query by patient id.
 	 * 
 	 * @param patientUniqueId
@@ -520,32 +728,6 @@ public class XdsbRegistryAdapter {
 		patientIdSlotType.setValueList(patientIdValueListType);
 		adhocQueryType.getSlot().add(patientIdSlotType);
 	}
-
-	// void addAuthorId(AdhocQueryType adhocQueryType, String authorId) {
-	// if(!authorId.startsWith("'") || !authorId.endsWith("'"))
-	// {
-	// authorId = authorId.replace("'", "");
-	// authorId = "'"+authorId+"'";
-	// }
-	// SlotType1 authorIdSlotType = new SlotType1();
-	// authorIdSlotType.setName("$XDSSubmissionSetAuthorPerson");
-	// ValueListType authorIdValueListType = new ValueListType();
-	// authorIdValueListType.getValue().add(authorId); // AuthorId
-	// authorIdSlotType.setValueList(authorIdValueListType);
-	// adhocQueryType.getSlot().add(authorIdSlotType);
-	// // ClassificationType classification = new ClassificationType();
-	// // classification.setClassificationScheme(UUID_XDS_DOCUMENTENTRY_AUTHOR);
-	// // classification.getSlot().add(authorIdSlotType);
-	// //
-	// classification.setClassifiedObject("urn:uuid:be91a84a-5cbf-4231-b97b-1ee84a0dc23b");
-	// // classification.setNodeRepresentation("");
-	// //
-	// classification.setObjectType("urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:Classification");
-	// //
-	// classification.setStatus("urn:oasis:names:tc:ebxml-regrep:StatusType:Submitted");
-	// // classification.setId(UUID.randomUUID().toString());
-	// // adhocQueryType.getClassification().add(classification);
-	// }
 
 	/**
 	 * Adds the entry status approved.

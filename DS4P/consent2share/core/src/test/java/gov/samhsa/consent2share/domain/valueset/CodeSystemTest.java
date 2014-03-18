@@ -38,7 +38,7 @@ public class CodeSystemTest {
     
     private void assertCodeSystem(CodeSystem codeSystem) {    	
 		assertEquals(CODESYSTEM_OID, codeSystem.getCodeSystemOId());
-		assertEquals(CODESYSTEM_CODE, codeSystem.getCode());
+	//	assertEquals(CODESYSTEM_CODE, codeSystem.getCode());
 		assertEquals(CODESYSTEM_NAME, codeSystem.getName());
 		assertEquals(CODESYSTEM_USERNAME, codeSystem.getUserName());
 		assertNull(codeSystem.getCreationTime());
@@ -49,7 +49,7 @@ public class CodeSystemTest {
     
     private void assertUpdateCodeSystem(CodeSystem codeSystem) {    	
 		assertEquals(CODESYSTEM_UPDATE_OID, codeSystem.getCodeSystemOId());
-		assertEquals(CODESYSTEM_UPDATE_CODE, codeSystem.getCode());
+//		assertEquals(CODESYSTEM_UPDATE_CODE, codeSystem.getCode());
 		assertEquals(CODESYSTEM_UPDATE_NAME, codeSystem.getName());
 		assertEquals(CODESYSTEM_UPDATE_USERNAME, codeSystem.getUserName());
 		assertNull(codeSystem.getCreationTime());
@@ -66,7 +66,7 @@ public class CodeSystemTest {
 	public void testCodeSystem() {
 		codeSystem = new CodeSystem();
 		codeSystem.setCodeSystemOId(CODESYSTEM_OID);
-		codeSystem.setCode(CODESYSTEM_CODE);
+//		codeSystem.setCode(CODESYSTEM_CODE);
 		codeSystem.setName(CODESYSTEM_NAME);
 		codeSystem.setDisplayName(CODESYSTEM_DISPLAYNAME);
 		codeSystem.setUserName(CODESYSTEM_USERNAME);

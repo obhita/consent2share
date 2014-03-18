@@ -11,6 +11,7 @@ import java.util.Set;
 
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.HashMapResultToProviderDtoConverter;
+import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
@@ -37,6 +38,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.owasp.esapi.errors.AccessControlException;
 import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -105,12 +107,16 @@ public class ProviderControllerTest {
 	@Mock
 	HashMapResultToProviderDtoConverter hashMapResultToProviderDtoConverter;
 	
+	@Mock 
+	AccessReferenceMapper accessReferenceMapper;
+	
 	MockMvc mockMvc;
 	
 	
 	@Before
-	public void before() {
+	public void before() throws AccessControlException {
 		mockMvc = MockMvcBuilders.standaloneSetup(this.providerController).build();
+		doReturn((long)1).when(accessReferenceMapper).getDirectReference("ScrambledText");
 		PatientConnectionDto patientConnectionDto = mock(PatientConnectionDto.class);
 		Set<IndividualProviderDto> individualProviders = new HashSet<IndividualProviderDto>();
 		Set<OrganizationalProviderDto> organizationalProviders = new HashSet<OrganizationalProviderDto>();
@@ -146,7 +152,7 @@ public class ProviderControllerTest {
 	public void testDeleteIndividualProvider() throws Exception {
 		IndividualProviderDto individualProviderDto = mock(IndividualProviderDto.class);
 		when(individualProviderService.findIndividualProviderDto(anyLong())).thenReturn(individualProviderDto);
-		mockMvc.perform(post("/patients/connectionMain/deleteOrganizationalProvider").param("organizationalProviderid", "10"))
+		mockMvc.perform(post("/patients/connectionMain/deleteOrganizationalProvider").param("organizationalProviderid", "ScrambledText"))
 			.andExpect(redirectedUrl("/patients/connectionMain.html"));
 	}
 
@@ -154,7 +160,7 @@ public class ProviderControllerTest {
 	public void testDeleteOrganizationalProvider() throws Exception {
 		OrganizationalProviderDto organizationalProviderDto = mock(OrganizationalProviderDto.class);
 		when(organizationalProviderService.findOrganizationalProviderDto(anyLong())).thenReturn(organizationalProviderDto);
-		mockMvc.perform(post("/patients/connectionMain/deleteOrganizationalProvider").param("organizationalProviderid", "10"))
+		mockMvc.perform(post("/patients/connectionMain/deleteOrganizationalProvider").param("organizationalProviderid", "ScrambledText"))
 			.andExpect(redirectedUrl("/patients/connectionMain.html"));
 	}
 

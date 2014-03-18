@@ -25,7 +25,9 @@ public class TryPolicyWebServiceClientIT {
 		String xacmlPolicy = SpringBasedResourceFileReader
 				.getStringFromResourceFile("xacmlPolicyForTrying.xml");
 
-		String segmentedC32 = sut.tryPolicy(c32Xml, xacmlPolicy);
+		String purposeOfUse = "TREAT";
+		
+		String segmentedC32 = sut.tryPolicy(c32Xml, xacmlPolicy, purposeOfUse);
 		
 		String expectedSegmentedC32 = SpringBasedResourceFileReader
 				.getStringFromResourceFile("segmentedC32.xml");

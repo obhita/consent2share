@@ -25,7 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.acs.pep;
 
-import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.brms.domain.SubjectPurposeOfUse;
+import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
 import gov.samhsa.acs.common.exception.DS4PException;
@@ -540,7 +541,7 @@ public class PepImpl implements Pep {
 		String metadataString = new XdsbMetadataGeneratorImpl(
 				new UniqueOidProviderImpl(),
 				XdsbDocumentType.CLINICAL_DOCUMENT, marshaller)
-				.generateMetadataXml(documentSet, subjectLocality);
+				.generateMetadataXml(documentSet, subjectLocality, null, null);
 
 		SubmitObjectsRequest submitObjectRequest = null;
 
@@ -1009,7 +1010,7 @@ public class PepImpl implements Pep {
 		xacmlResult.setMessageId(result.getMessageId());
 		xacmlResult.setPdpDecision(result.getPdpDecision());
 		xacmlResult.setPdpObligations(result.getPdpObligation());
-		xacmlResult.setSubjectPurposeOfUse(result.getPurposeOfUse());
+		xacmlResult.setSubjectPurposeOfUse(SubjectPurposeOfUse.fromAbbreviation(result.getPurposeOfUse()));
 		return xacmlResult;
 	}
 
@@ -1029,7 +1030,7 @@ public class PepImpl implements Pep {
 		xacmlResult.setMessageId(xacmlRequest.getMessageId());
 		xacmlResult.setPdpDecision(xacmlResponse.getPdpDecision());
 		xacmlResult.setPdpObligations(xacmlResponse.getPdpObligation());
-		xacmlResult.setSubjectPurposeOfUse(xacmlRequest.getPurposeOfUse());
+		xacmlResult.setSubjectPurposeOfUse(SubjectPurposeOfUse.fromAbbreviation(xacmlRequest.getPurposeOfUse()));
 		return xacmlResult;
 	}
 

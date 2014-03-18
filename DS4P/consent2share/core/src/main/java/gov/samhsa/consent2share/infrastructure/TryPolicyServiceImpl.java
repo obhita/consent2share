@@ -1,9 +1,6 @@
 package gov.samhsa.consent2share.infrastructure;
 
-import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.pep.trypolicy.wsclient.TryPolicyWebServiceClient;
-import gov.samhsa.consent.ConsentGenException;
-import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+/**
+ * The Class TryPolicyServiceImpl.
+ */
 @Component
 public class TryPolicyServiceImpl implements TryPolicyService {
 	
@@ -20,9 +20,6 @@ public class TryPolicyServiceImpl implements TryPolicyService {
 	
 	/** The try my policy service url. */
 	private String tryPolicyServiceUrl;
-	
-	@Autowired
-	private ConsentExportService consentExportService;
 	
 	/**
 	 * Instantiates a new echo sign signature service impl.
@@ -36,16 +33,20 @@ public class TryPolicyServiceImpl implements TryPolicyService {
 		this.tryPolicyServiceUrl = tryPolicyServiceUrl;
 	}
 
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.infrastructure.TryPolicyService#tryPolicy(java.lang.String, java.lang.String, java.lang.String)
+	 */
 	@Override
-	public String tryPolicy(String originalC32, Long consentId) {
-		TryPolicyWebServiceClient client = new TryPolicyWebServiceClient(tryPolicyServiceUrl);
+	public String tryPolicy(String originalC32, String xacml, String purposeOfUse) {
+		TryPolicyWebServiceClient client = new TryPolicyWebServiceClient(
+				tryPolicyServiceUrl);
 		String segmentedC32 = null;
-		try {
-			segmentedC32 = client.tryPolicy(originalC32, consentExportService.exportConsent2XACML(consentId));
-		} catch (ConsentGenException e) {
-			logger.error("Error in try Policy: " + e.getMessage());
-		}
-		
+
+		segmentedC32 = client.tryPolicy(originalC32, xacml, purposeOfUse);
+
+		logger.info("Display origincal C32: " + originalC32);
+		logger.info("Display segmented C32: " + segmentedC32);
+
 		return segmentedC32;
 	}
 }

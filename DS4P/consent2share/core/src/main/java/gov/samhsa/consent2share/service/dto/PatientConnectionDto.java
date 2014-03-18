@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * The Class PatientConnectionDto.
  */
-public class PatientConnectionDto {
+public class PatientConnectionDto{
 
 	/** The username. */
 	private String username;

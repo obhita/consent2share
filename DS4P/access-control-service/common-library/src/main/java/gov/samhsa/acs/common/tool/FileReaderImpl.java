@@ -25,13 +25,21 @@
  ******************************************************************************/
 package gov.samhsa.acs.common.tool;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Class FileReader.
  */
 public class FileReaderImpl implements FileReader {
+
+	/** The logger. */
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/*
 	 * (non-Javadoc)
@@ -42,15 +50,38 @@ public class FileReaderImpl implements FileReader {
 	 */
 	@Override
 	public String readFile(String filename) throws IOException {
-		byte[] bytes;
-
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
 		InputStream is = getClass().getClassLoader().getResourceAsStream(
 				filename);
-		bytes = new byte[is.available()];
-		is.read(bytes);
 
-		is.close();
-
-		return new String(bytes);
+		String line;
+		try {
+			br = new BufferedReader(new InputStreamReader(is));
+			while ((line = br.readLine()) != null) {
+				if (sb.length() > 0) {
+					sb.append("\n");
+				}
+				sb.append(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+			if (is != null) {
+				try {
+					is.close();
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+		}
+		return sb.toString();
 	}
 }

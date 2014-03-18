@@ -27,6 +27,7 @@ package gov.samhsa.consent2share.infrastructure.domain;
 
 import java.util.Date;
 
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -37,6 +38,7 @@ import gov.samhsa.consent2share.domain.consent.ConsentRepository;
 import gov.samhsa.consent2share.domain.consent.event.ConsentRevokedEvent;
 import gov.samhsa.consent2share.domain.systemnotification.SystemNotification;
 import gov.samhsa.consent2share.domain.systemnotification.SystemNotificationRepository;
+import gov.samhsa.consent2share.infrastructure.rabbit.MessageSender;
 
 /**
  * The Class ConsentRevokedEventHandler.
@@ -46,6 +48,9 @@ public class ConsentRevokedEventHandler extends AbstractDomainEventHandler<Conse
 	
 	@Value("${notification_consent_revoked}")
 	private String notificationMessage;
+	
+	@Autowired
+	private MessageSender messageSender;
 	
 	/** The consent repository. */
 	@Autowired
@@ -69,6 +74,10 @@ public class ConsentRevokedEventHandler extends AbstractDomainEventHandler<Conse
 	 */
 	@Override
 	public void handle(ConsentRevokedEvent event) {
+		MessageProperties messageProperties = new MessageProperties();
+		messageProperties.setHeader("messageType", event.getClass().getName());
+		messageProperties.setContentType("text/plain");
+		messageSender.send(event.getConsentId().toString(), messageProperties);
 		
 		Consent consent=consentRepository.findOne(event.getConsentId());
 		

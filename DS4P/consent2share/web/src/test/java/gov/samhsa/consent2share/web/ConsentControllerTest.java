@@ -8,13 +8,16 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.infrastructure.CodedConceptLookupService;
+import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.consent.ConsentService;
@@ -35,10 +38,14 @@ import gov.samhsa.consent2share.service.reference.ClinicalDocumentTypeCodeServic
 import gov.samhsa.consent2share.service.reference.PurposeOfUseCodeService;
 import gov.samhsa.consent2share.service.reference.SensitivityPolicyCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
+import gov.samhsa.consent2share.service.valueset.ValueSetCategoryService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,8 +54,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.owasp.esapi.AccessReferenceMap;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 /**
@@ -89,6 +100,9 @@ public class ConsentControllerTest {
 	@Mock
     SensitivityPolicyCodeService sensitivityPolicyCodeService;
 	
+	@Mock
+	ValueSetCategoryService valueSetCategoryService;
+	
 	/** The administrative gender code service. */
 	@Mock
 	AdministrativeGenderCodeService administrativeGenderCodeService;
@@ -108,6 +122,9 @@ public class ConsentControllerTest {
 	@Mock
 	ConsentExportService consentExportService;
 	
+	@Mock 
+	AccessReferenceMapper accessReferenceMapper;
+	
 	/** The mock mvc. */
 	MockMvc mockMvc;
 	
@@ -119,6 +136,8 @@ public class ConsentControllerTest {
 	@Before
 	public void setUp() throws Exception {
 		mockMvc = MockMvcBuilders.standaloneSetup(this.consentController).build();
+		
+		doReturn((long)1).when(accessReferenceMapper).getDirectReference("ScrambledText");
 		
 		//This mocked user is not a providerAdmin (it's a regular patient account)
 		AuthenticatedUser user=mock(AuthenticatedUser.class); 
@@ -197,9 +216,9 @@ public class ConsentControllerTest {
 	@Test
 	public void testSignConsent_when_Succeeds() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(true);
-		mockMvc.perform(post("/consents/signConsent.html").param("consentId","1"))
-			.andExpect(view().name("redirect:listConsents.html?emailsent=true"));
-		verify(consentService).signConsent(any(ConsentPdfDto.class));
+		mockMvc.perform(post("/consents/signConsent.html").param("consentId","ScrambledText"))
+			.andExpect(view().name("views/consents/signConsent"));
+		verify(consentService).createConsentEmbeddedWidget(any(ConsentPdfDto.class));
 		
 	}
 	
@@ -212,9 +231,9 @@ public class ConsentControllerTest {
 	@Test
 	public void testSignConsent_when_Fails() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(false);
-		mockMvc.perform(post("/consents/signConsent.html").param("consentId","2"))
-			.andExpect(view().name("redirect:listConsents.html?emailsent=false"));
-		verify(consentService,never()).signConsent(any(ConsentPdfDto.class));
+		mockMvc.perform(post("/consents/signConsent.html").param("consentId","ScrambledText"))
+			.andExpect(view().name("redirect:listConsents.html"));
+		verify(consentService,never()).createConsentEmbeddedWidget(any(ConsentPdfDto.class));
 		
 	}
 	
@@ -226,7 +245,7 @@ public class ConsentControllerTest {
 	@Test 
 	public void testDeleteConsent_when_succeeds() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(),anyLong())).thenReturn(true);
-		mockMvc.perform(post("/consents/deleteConsents").param("consentId", "1"))
+		mockMvc.perform(post("/consents/deleteConsents").param("consentId", "ScrambledText"))
 			.andExpect(view().name("redirect:/consents/listConsents.html"));
 		verify(consentService).deleteConsent(anyLong());
 	}
@@ -240,7 +259,7 @@ public class ConsentControllerTest {
 	@Test 
 	public void testDeleteConsent_when_authentication_fails() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(false);
-		mockMvc.perform(post("/consents/deleteConsents").param("consentId", "2"))
+		mockMvc.perform(post("/consents/deleteConsents").param("consentId", "ScrambledText"))
 			.andExpect(view().name("redirect:/consents/listConsents.html"));
 		verify(consentService,never()).deleteConsent(anyLong());
 	}
@@ -254,7 +273,7 @@ public class ConsentControllerTest {
 		when(pdfDto.getContent()).thenReturn(byteArray);
 		when(consentService.findConsentPdfDto(anyLong())).thenReturn(pdfDto);
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(true);
-		mockMvc.perform(post("/consents/downloadPdf.html").param("consentId", "1").param("doctype", "consent"))
+		mockMvc.perform(post("/consents/downloadPdf.html").param("consentId", "ScrambledText").param("doctype", "consent"))
 			.andExpect(status().isOk());
 		verify(consentService).findConsentPdfDto((long)1);
 		
@@ -268,7 +287,7 @@ public class ConsentControllerTest {
 		when(pdfDto.getContent()).thenReturn(byteArray);
 		when(consentService.findConsentRevokationPdfDto(anyLong())).thenReturn(pdfDto);
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(true);
-		mockMvc.perform(post("/consents/downloadPdf.html").param("consentId", "1").param("doctype", "revokation"))
+		mockMvc.perform(post("/consents/downloadPdf.html").param("consentId", "ScrambledText").param("doctype", "revokation"))
 			.andExpect(status().isOk());
 		verify(consentService).findConsentRevokationPdfDto((long)1);
 		
@@ -302,6 +321,7 @@ public class ConsentControllerTest {
 			.thenReturn(organizationalProvidersDto);
 		when(sensitivityPolicyCodeService.findAllSensitivityPolicyCodesAddConsentFieldsDto())
 			.thenReturn(sensitivityPolicyDto);
+		when(valueSetCategoryService.findAllValueSetCategoriesAddConsentFieldsDto()).thenReturn(sensitivityPolicyDto);
 		when(purposeOfUseCodeService.findAllPurposeOfUseCodesAddConsentFieldsDto())
 			.thenReturn(purposeOfUseDto);
 		when(clinicalDocumentSectionTypeCodeService.findAllClinicalDocumentSectionTypeCodesAddConsentFieldsDto())
@@ -323,6 +343,7 @@ public class ConsentControllerTest {
 			.andExpect(model().attribute("organizationalProvidersDto", organizationalProvidersDto))
 			.andExpect(model().attribute("administrativeGenderCodes", administrativeGenderCodeService.findAllAdministrativeGenderCodes()))
 			.andExpect(model().attribute("stateCodes", stateCodeService.findAllStateCodes()))
+			.andExpect(model().attribute("isProviderAdminUser", false))
 			.andExpect(view().name("views/consents/addConsent"));
 		
 	}
@@ -368,8 +389,8 @@ public class ConsentControllerTest {
 		ConsentRevokationPdfDto consentRevokationPdfDto=mock(ConsentRevokationPdfDto.class);
 		when(consentService.findConsentRevokationPdfDto(anyLong())).thenReturn(consentRevokationPdfDto);
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(true);
-		mockMvc.perform(post("/consents/signConsentRevokation").param("consentId", "1").param("revokationType", "NO NEVER"))
-			.andExpect(view().name("redirect:listConsents.html?emailsent=true"));
+		mockMvc.perform(post("/consents/signConsentRevokation").param("consentId", "ScrambledText").param("revokationType", "NO NEVER"))
+			.andExpect(view().name("views/consents/signConsent"));
 		verify(consentRevokationPdfDto).setRevokationType("NO NEVER");
 	}
 	
@@ -378,15 +399,15 @@ public class ConsentControllerTest {
 		ConsentRevokationPdfDto consentRevokationPdfDto=mock(ConsentRevokationPdfDto.class);
 		when(consentService.findConsentRevokationPdfDto(anyLong())).thenReturn(consentRevokationPdfDto);
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(false);
-		mockMvc.perform(post("/consents/signConsentRevokation").param("consentId", "1").param("revokationType", "NO NEVER"))
-			.andExpect(view().name("redirect:listConsents.html?emailsent=false"));
+		mockMvc.perform(post("/consents/signConsentRevokation").param("consentId", "ScrambledText").param("revokationType", "NO NEVER"))
+			.andExpect(view().name("redirect:listConsents.html"));
 		verify(consentService,never()).signConsentRevokation(consentRevokationPdfDto);
 	}
 	
 	@Test
 	public void testExportXACMLConsents_when_authentication_succeeds() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(true);
-		mockMvc.perform(get("/consents/exportXACMLConsents/1"))
+		mockMvc.perform(get("/consents/exportXACMLConsents/ScrambledText"))
 		.andExpect(status().isOk());
 		
 		verify(consentExportService).exportConsent2XACML((long)1);
@@ -395,7 +416,7 @@ public class ConsentControllerTest {
 	@Test
 	public void testExportCDAR2Consents_when_authentication_succeeds() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(true);
-		mockMvc.perform(get("/consents/exportCDAR2Consents/1"))
+		mockMvc.perform(get("/consents/exportCDAR2Consents/ScrambledText"))
 		.andExpect(status().isOk());
 		
 		verify(consentExportService).exportConsent2CDAR2((long)1);
@@ -404,7 +425,7 @@ public class ConsentControllerTest {
 	@Test
 	public void testExportXACMLConsents_when_authentication_fails() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(false);
-		mockMvc.perform(get("/consents/exportXACMLConsents/1"))
+		mockMvc.perform(get("/consents/exportXACMLConsents/ScrambledText"))
 		.andExpect(status().isOk());
 		
 		verify(consentExportService,never()).exportConsent2XACML((long)1);
@@ -413,7 +434,7 @@ public class ConsentControllerTest {
 	@Test
 	public void testExportCDAR2Consents_when_authentication_fails() throws Exception{
 		when(consentService.isConsentBelongToThisUser(anyLong(), anyLong())).thenReturn(false);
-		mockMvc.perform(get("/consents/exportCDAR2Consents/1"))
+		mockMvc.perform(get("/consents/exportCDAR2Consents/ScrambledText"))
 		.andExpect(status().isOk());
 		
 		verify(consentExportService,never()).exportConsent2CDAR2((long)1);
@@ -426,8 +447,10 @@ public class ConsentControllerTest {
 		ConsentListDto consentListDto=mock(ConsentListDto.class);
 		consentListDtos.add(consentListDto);
 		
-		when(consentListDto.getId()).thenReturn((long)2);
-		when(consentListDto.getConsentStage()).thenReturn("CONSENT_SIGNED");
+		when(consentListDto.getId()).thenReturn("2");
+		when(consentListDto.getConsentStage()).thenReturn("CONSENT_SIGND");
+		when(consentListDto.getRevokeStage()).thenReturn("REVOCATION_NOT_SUBMITTED");
+		when(consentService.findAllConsentsDtoByPatient(anyLong())).thenReturn(consentListDtos);
 		
 		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreSignList=2"))
 		.andExpect(status().isOk());	
@@ -441,8 +464,10 @@ public class ConsentControllerTest {
 		ConsentListDto consentListDto=mock(ConsentListDto.class);
 		consentListDtos.add(consentListDto);
 		
-		when(consentListDto.getId()).thenReturn((long)2);
-		when(consentListDto.getConsentStage()).thenReturn("CONSENT_SUBMITTED");
+		when(consentListDto.getId()).thenReturn("2");
+		when(consentListDto.getConsentStage()).thenReturn("CONSENT_SAVED");
+		when(consentListDto.getRevokeStage()).thenReturn("REVOCATION_NOT_SUBMITTED");
+		when(consentService.findAllConsentsDtoByPatient(anyLong())).thenReturn(consentListDtos);
 		
 		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreSignList=2"))
 		.andExpect(status().isOk());	
@@ -456,8 +481,10 @@ public class ConsentControllerTest {
 		ConsentListDto consentListDto=mock(ConsentListDto.class);
 		consentListDtos.add(consentListDto);
 		
-		when(consentListDto.getId()).thenReturn((long)2);
+		when(consentListDto.getId()).thenReturn("2");
+		when(consentListDto.getConsentStage()).thenReturn("CONSENT_SIGND");
 		when(consentListDto.getRevokeStage()).thenReturn("REVOCATION_REVOKED");
+		when(consentService.findAllConsentsDtoByPatient(anyLong())).thenReturn(consentListDtos);
 		
 		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreRevokeList=2"))
 		.andExpect(status().isOk());	
@@ -471,8 +498,10 @@ public class ConsentControllerTest {
 		ConsentListDto consentListDto=mock(ConsentListDto.class);
 		consentListDtos.add(consentListDto);
 		
-		when(consentListDto.getId()).thenReturn((long)2);
+		when(consentListDto.getId()).thenReturn("2");
 		when(consentListDto.getConsentStage()).thenReturn("CONSENT_SUBMITTED");
+		when(consentListDto.getRevokeStage()).thenReturn("REVOCATION_NOT_SUBMITTED");
+		when(consentService.findAllConsentsDtoByPatient(anyLong())).thenReturn(consentListDtos);
 		
 		mockMvc.perform(get("/consents/listConsents.html/checkConsentStatus?consentPreRevokeList=2"))
 		.andExpect(status().isOk());	

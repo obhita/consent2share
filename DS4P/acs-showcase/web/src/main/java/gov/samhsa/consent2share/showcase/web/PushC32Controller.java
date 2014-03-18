@@ -103,7 +103,7 @@ public class PushC32Controller {
 			return "Failure! of C32!!";
 		}
 
-		saveXML(c32Xml, segmentedC32Xml);
+		// saveXML(c32Xml, segmentedC32Xml);
 		
 		return segmentedC32Xml;
 	}

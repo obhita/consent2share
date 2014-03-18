@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- *   
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions are met:
  *       * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *       * Neither the name of the <organization> nor the
  *         names of its contributors may be used to endorse or promote products
  *         derived from this software without specific prior written permission.
- *   
+ *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,25 +28,16 @@ package gov.samhsa.consent2share.si;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter;
-
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * The Class ConsentSignedMessageHandler.
  */
-public class ConsentSignedMessageHandler {
-
-	/** The Constant URN_RESPONSE_SUCCESS. */
-	public static final String URN_RESPONSE_SUCCESS = "urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success";
-
-	/** The consent getter. */
-	@Autowired
-	private ConsentGetter consentGetter;
+public class ConsentSignedMessageHandler extends AbstractConsentMessageHandler {
 
 	/** The xdsb repository. */
 	@Autowired
@@ -56,22 +47,24 @@ public class ConsentSignedMessageHandler {
 	@Autowired
 	private DocumentXmlConverter documentXmlConverter;
 
-	/** The domain id. */
 	@Autowired
-	@Value("${domainId}")
-	private String domainId;
+	private BusController controlBusService;
+
+	@Autowired
+	private NotificationPublisher notificationPublisher;
 
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	/**
-	 * Handle message.
-	 * 
-	 * @param data
-	 *            the data
-	 * @return the string
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * gov.samhsa.consent2share.si.AbstractConsentMessageHandler#handleMessage
+	 * (java.lang.String)
 	 */
-	public String handleMessage(String data) {
+	@Override
+	public String handleMessage(String data) throws Throwable {
 		logger.debug("Consent Signed Message Received: ConsentId"
 				+ new String(data));
 
@@ -85,15 +78,20 @@ public class ConsentSignedMessageHandler {
 		try {
 			response = xdsbRepository.provideAndRegisterDocumentSet(
 					consentDto.getConsent(), domainId,
-					XdsbDocumentType.PRIVACY_CONSENT);
+					XdsbDocumentType.PRIVACY_CONSENT, null, null);
 		} catch (Throwable e) {
 			logger.error("Failed to save in xds.b repository", e);
+
+			throw e;
 		}
-		if (response != null
-				&& URN_RESPONSE_SUCCESS.equals(response.getStatus())) {
-			return "Saved in XDS.b repository";
-		} else {
-			return "Failed to save in XDS.b repository";
+
+		if (!URN_RESPONSE_SUCCESS.equals(response.getStatus())) {
+			String errorMessage = "Failed to save in XDS.b repository becuase response status is not " + URN_RESPONSE_SUCCESS;
+			logger.error(errorMessage);
+
+			throw new Exception(errorMessage);
 		}
+
+		return "Saved in XDS.b repository";
 	}
 }

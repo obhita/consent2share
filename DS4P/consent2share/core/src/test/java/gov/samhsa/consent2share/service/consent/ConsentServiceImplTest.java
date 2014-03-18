@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import echosign.api.clientv15.dto8.EmbeddedWidgetCreationResult;
 import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.ConsentPdfGenerator;
@@ -36,6 +37,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -96,6 +99,14 @@ public class ConsentServiceImplTest {
 	
 	@Mock
 	ConsentExportService consentExportService;
+	
+	byte[] DOCUMENT_BYTES="text".getBytes();
+	String DOCUMENT_FILE_NAME="documentFileName";
+	String DOCUMENT_NAME="documentName";
+	String SIGNED_DOCUMENT_URL="signedDocumentUrl";
+	String EMAIL="consent2shar@gmail.com";
+	String ECHOSIGN_API_KEY="echoSignApiKey";
+	String ECHOSIGN_SERVICE_URL="echoSignServiceUrl";
 	
 	/**
 	 * Sets the up.
@@ -395,16 +406,23 @@ public class ConsentServiceImplTest {
 	
 	/**
 	 * Test save consent.
-	 * @throws ConsentGenException 
+	 * @throws Exception 
 	 */
 	@Test
-	public void testSaveConsent() throws ConsentGenException{
+	public void testSaveConsent() throws Exception{
+		// Arrange
 		ConsentService cstSpy=spy(cst);
 		Consent consent=mock(Consent.class);
+		String xacmlMock = "xacmlMock";
 		when(cstSpy.makeConsent()).thenReturn(consent);
-		when(consentExportService.exportConsent2XACML(any(Consent.class))).thenReturn("mockXACML");
+		when(consentExportService.exportConsent2XACML(any(Consent.class))).thenReturn(xacmlMock);
+		
 		ConsentDto consentDto=mock(ConsentDto.class);
+		
+		// Act
 		cstSpy.saveConsent(consentDto);
+		
+		// Assert
 		verify(consentRepository).save(consent);
 	}
 	
@@ -534,6 +552,79 @@ public class ConsentServiceImplTest {
 		verify(consentRevokationPdfDto).setConsentName(anyString());
 		verify(consentRevokationPdfDto).setId(anyLong());
 		
+	}
+	
+	@Test
+	public void testCreateConsentEmbeddedWidget() {
+		Consent consent=mock(Consent.class);
+		Patient patient=mock(Patient.class);
+		when(consentRepository.findOne(anyLong())).thenReturn(consent);
+		
+		ConsentService spy=spy(cst);
+		ConsentPdfDto consentPdfDto=mock(ConsentPdfDto.class);
+		when(consentPdfDto.getContent()).thenReturn(DOCUMENT_BYTES);
+		when(consentPdfDto.getFilename()).thenReturn(DOCUMENT_FILE_NAME);
+		when(consentPdfDto.getConsentName()).thenReturn(DOCUMENT_NAME);
+		when(consentPdfDto.getId()).thenReturn((long)1);
+		SignedPDFConsent signedPdfConsent=mock(SignedPDFConsent.class);
+		when(spy.makeSignedPdfConsent()).thenReturn(signedPdfConsent);
+		when(consent.getPatient()).thenReturn(patient);
+		when(patient.getEmail()).thenReturn(EMAIL);
+		EmbeddedWidgetCreationResult result=mock(EmbeddedWidgetCreationResult.class);
+		when(echoSignSignatureService.createEmbeddedWidget(DOCUMENT_BYTES, DOCUMENT_FILE_NAME+".pdf", DOCUMENT_NAME, null,EMAIL)).thenReturn(result);
+		spy.createConsentEmbeddedWidget(consentPdfDto);
+		
+		verify(consentRepository).save(consent);
+	}
+	
+	@Test
+	public void testCreateRevocationEmbeddedWidget_when_revocation_type_is_emergency_only() {
+		Consent consent=mock(Consent.class);
+		Patient patient=mock(Patient.class);
+		when(consentRepository.findOne(anyLong())).thenReturn(consent);
+		
+		ConsentService spy=spy(cst);
+		ConsentRevokationPdfDto consentRevokationPdfDto=mock(ConsentRevokationPdfDto.class);
+		when(consentRevokationPdfDto.getContent()).thenReturn(DOCUMENT_BYTES);
+		when(consentRevokationPdfDto.getFilename()).thenReturn(DOCUMENT_FILE_NAME);
+		when(consentRevokationPdfDto.getConsentName()).thenReturn(DOCUMENT_NAME);
+		when(consentRevokationPdfDto.getId()).thenReturn((long)1);
+		when(consentRevokationPdfDto.getRevokationType()).thenReturn("EMERGENCY ONLY");
+		SignedPDFConsent signedPdfConsent=mock(SignedPDFConsent.class);
+		when(spy.makeSignedPdfConsent()).thenReturn(signedPdfConsent);
+		when(consent.getPatient()).thenReturn(patient);
+		when(patient.getEmail()).thenReturn(EMAIL);
+		EmbeddedWidgetCreationResult result=mock(EmbeddedWidgetCreationResult.class);
+		when(echoSignSignatureService.createEmbeddedWidget(DOCUMENT_BYTES, DOCUMENT_FILE_NAME+".pdf", DOCUMENT_NAME + " Revocation", null,EMAIL)).thenReturn(result);
+		spy.createRevocationEmbeddedWidget(consentRevokationPdfDto);
+		
+		verify(consentRepository).save(consent);
+		verify(consent).setConsentRevokationType("EMERGENCY ONLY");
+	}
+	
+	@Test
+	public void testCreateRevocationEmbeddedWidget_when_revocation_type_is_no_never() {
+		Consent consent=mock(Consent.class);
+		Patient patient=mock(Patient.class);
+		when(consentRepository.findOne(anyLong())).thenReturn(consent);
+		
+		ConsentService spy=spy(cst);
+		ConsentRevokationPdfDto consentRevokationPdfDto=mock(ConsentRevokationPdfDto.class);
+		when(consentRevokationPdfDto.getContent()).thenReturn(DOCUMENT_BYTES);
+		when(consentRevokationPdfDto.getFilename()).thenReturn(DOCUMENT_FILE_NAME);
+		when(consentRevokationPdfDto.getConsentName()).thenReturn(DOCUMENT_NAME);
+		when(consentRevokationPdfDto.getId()).thenReturn((long)1);
+		when(consentRevokationPdfDto.getRevokationType()).thenReturn("NO NEVER");
+		SignedPDFConsent signedPdfConsent=mock(SignedPDFConsent.class);
+		when(spy.makeSignedPdfConsent()).thenReturn(signedPdfConsent);
+		when(consent.getPatient()).thenReturn(patient);
+		when(patient.getEmail()).thenReturn(EMAIL);
+		EmbeddedWidgetCreationResult result=mock(EmbeddedWidgetCreationResult.class);
+		when(echoSignSignatureService.createEmbeddedWidget(DOCUMENT_BYTES, DOCUMENT_FILE_NAME+".pdf", DOCUMENT_NAME + " Revocation", null,EMAIL)).thenReturn(result);
+		spy.createRevocationEmbeddedWidget(consentRevokationPdfDto);
+		
+		verify(consentRepository).save(consent);
+		verify(consent).setConsentRevokationType("NO NEVER");
 	}
 	
 	

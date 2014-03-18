@@ -396,6 +396,27 @@ used more than once per page.
 	}
 
 
+/* ----------------------------------------------------------[ SysAdmin ] */
+
+	.sysAdmin-input {
+		width: 80%;
+	}
+		
+	.valueSetErrMsg {
+		color:red;
+		}	
+	
+	label.valueSetErrMsg {
+		margin-left: 10px;
+		margin-top: 5px;
+		}
+	
+	.valset_display_div.badge, #selected_valusets_name_display_holder div.badge {
+		margin-bottom: 10px;
+		margin-left: 4px;
+		}	
+	
+
 /* ----------------------------------------------------[ Administrator ] */
 
 	/* ---- TEMPORARY - Watermark hidden ---- */
@@ -1281,7 +1302,9 @@ since they may be used more than once.
 
 	}
 
-
+	.bold {
+		font-weight: bold;
+	}
 	
 /* ----------------------------------------------------[ Consent Modules] */
 	
@@ -1685,6 +1708,23 @@ since they may be used more than once.
 
 		
 /* ----------------------------------------------------[ Margins ] */	
+	
+	.top-margin0 {
+		margin-top: 0px !important;
+	}
+	
+	.bottom-margin0 {
+		margin-bottom: 0px !important;
+	}
+	
+	.top-margin5 {
+		margin-top: 5px;
+	}
+	
+	.bottom-margin5 {
+		margin-bottom: 5px;
+	}
+	
 	.top-margin10 {
 		margin-top: 10px;
 	}
@@ -1949,6 +1989,13 @@ Utility rules modify minor aspects of an element
 	@extend .no-pad;
 }
 
+.force-bold {
+	font-weight: bold !important;
+}
+
+.force-italic {
+	font-style: italic !important;
+}
 	 
 	 
 /* !STATE RULES */
@@ -2319,6 +2366,13 @@ Min Width 480px to Max Width 768px Wide - MOBILE - Landscape, Tablet Portrait (d
 ============================================================================*/
 
 @media only screen and (max-width: 479px) {
+
+/* ----------------------------------------------------------[ SysAdmin ] */
+
+	.sysAdmin-input {
+		width: 100%;
+	}
+
 
 /* ----------------------------------------------------[ Profile Section ] */
 	.hidden-479 {

@@ -30,7 +30,9 @@ public class ConsentGetterImplTest {
 	@Mock
 	private DataSource dataSourceMock;
 	@Mock
-	private SimpleConsentDtoRowMapper rowMapperMock;
+	private SimpleConsentDtoRowMapper simpleConsentDtoRowMapperMock;
+	@Mock
+	private PolicyIdDtoRowMapper policyIdDtoRowMapperMock;
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -43,19 +45,16 @@ public class ConsentGetterImplTest {
 	public void testGetConsent() throws SQLException {
 		// Arrange
 		long consentIdMock = 1;
-		String sql = "select consent.xacml_policy_file, consent.patient, consent.id, patient.enterprise_identifier "
-				+ "from consent "
-				+ "join patient on consent.patient=patient.id "
-				+ "where consent.id=?";
 		SimpleConsentDto simpleConsentDtoMock = mock(SimpleConsentDto.class);
 		LinkedList<SimpleConsentDto> simpleConsentDtoListMock = new LinkedList<SimpleConsentDto>();
 		simpleConsentDtoListMock.add(simpleConsentDtoMock);
-		when(rowMapperMock.mapRow(isA(ResultSet.class), anyInt())).thenReturn(
-				simpleConsentDtoMock);
+		when(
+				simpleConsentDtoRowMapperMock.mapRow(isA(ResultSet.class),
+						anyInt())).thenReturn(simpleConsentDtoMock);
 		when(sut.getJdbcTemplate()).thenReturn(jdbcTemplateMock);
 		when(
-				jdbcTemplateMock.query(eq(sql), isA(Object[].class),
-						eq(rowMapperMock)))
+				jdbcTemplateMock.query(eq(ConsentGetterImpl.SQL_GET_CONSENT),
+						isA(Object[].class), eq(simpleConsentDtoRowMapperMock)))
 				.thenReturn(simpleConsentDtoListMock);
 
 		// Act
@@ -63,5 +62,24 @@ public class ConsentGetterImplTest {
 
 		// Assert
 		assertEquals(simpleConsentDtoMock, response);
+	}
+
+	@Test
+	public void testGetPolicyId() throws SQLException {
+		long consentIdMock = 1;
+		LinkedList<PolicyIdDto> policyIdDtoListMock = new LinkedList<PolicyIdDto>();
+		PolicyIdDto policyIdDtoMock = mock(PolicyIdDto.class);
+		policyIdDtoListMock.add(policyIdDtoMock);
+		when(policyIdDtoRowMapperMock.mapRow(isA(ResultSet.class), anyInt()))
+				.thenReturn(policyIdDtoMock);
+		when(sut.getJdbcTemplate()).thenReturn(jdbcTemplateMock);
+		when(
+				jdbcTemplateMock.query(eq(ConsentGetterImpl.SQL_GET_POLICY_ID),
+						isA(Object[].class), eq(policyIdDtoRowMapperMock)))
+				.thenReturn(policyIdDtoListMock);
+
+		PolicyIdDto response = sut.getPolicyId(consentIdMock);
+
+		assertEquals(policyIdDtoMock, response);
 	}
 }

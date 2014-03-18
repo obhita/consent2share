@@ -52,16 +52,20 @@
 				
 				<li id="sidenav_codeSystems" role="menuitem"><a href="../sysadmin/home.html" th:href="@{/sysadmin/home.html}"><div class="fa fa-file"></div>
 						<span class="hidden-md" th:text="#{sidebar_codeSystems}"> Code Systems </span></a></li>
+
+ 				<li id="sidenav_codeSystemVersions" role="menuitem"><a href="../sysadmin/codeSystemVersionList.html" th:href="@{/sysadmin/codeSystemVersionList.html}"> <div class="fa fa-file"></div>
+						<span class="hidden-md" th:text="#{sidebar_codeSystemVersions}">Code System Versions</span></a></li>
 						
+				<li id="sidenav_valueSetCats" role="menuitem"><a href="../sysadmin/valueSetCategoryList.html" th:href="@{/sysadmin/valueSetCategoryList.html}"> <div class="fa fa-file"></div>
+						<span class="hidden-md" th:text="#{sidebar_valueSetCats}">Value Set Categories</span></a></li>
+
 				<li id="sidenav_valueSets" role="menuitem"><a href="../sysadmin/valueSetList.html" th:href="@{/sysadmin/valueSetList.html}"> <div class="fa fa-file"></div>
 						<span class="hidden-md" th:text="#{sidebar_valueSets}">Value Sets</span></a></li>
 	
 				<li id="sidenav_conceptCodes" role="menuitem"><a href="../sysadmin/conceptCodeList.html" th:href="@{/sysadmin/conceptCodeList.html}"> <div class="fa fa-file"></div>
 						<span class="hidden-md" th:text="#{sidebar_conceptCodes}"> Concept Codes </span></a></li>
-
-				<li id="sidenav_valueSetCats" role="menuitem"><a href="../sysadmin/valueSetCategoryList.html" th:href="@{/sysadmin/valueSetCategoryList.html}"> <div class="fa fa-file"></div>
-						<span class="hidden-md" th:text="#{sidebar_valueSetCats}">Value Set Categories</span></a></li>
-	
+				<li id="sidenav_lookup" role="menuitem"><a href="../sysadmin/lookup.html" th:href="@{/sysadmin/lookup.html}"> <div class="fa fa-file"></div>
+						<span class="hidden-md" th:text="#{sidebar_lookup}"> Lookup Service </span></a></li>		
 			</ul>
 		</div>
 					
@@ -86,6 +90,40 @@
 					<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
 				</div>
 			</span>
+			
+			<div th:substituteby="fragment/myaccount_menu :: sysAdminMyAccountMenuFragment"
+				class="btn-group pull-right">
+				<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE myaccountMenuFragment -->
+				<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
+
+				<a class="btn btn-default" href="#"> <span class="glyphicon glyphicon-envelope"></span><span
+					class="hidden-sm hidden-md"> Direct E-mail</span> <span
+					class="label label-warning hidden-sm">3</span>
+				</a>
+
+				<!-- COMPONENT: User Dropdown -->
+
+				<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+					<span class="glyphicon glyphicon-user">&nbsp;</span><span
+					class="hidden-sm hidden-md" th:text="#{header_my_account}">
+						My Account</span> <span class="caret"></span>
+				</a>
+
+				<ul role="menu" class="dropdown-menu">
+					<li role="menuitem"><a href="profile.html"
+						th:href="@{/patients/profile.html}"
+						th:text="#{header_my_profile}">My Profile</a></li>
+					<li role="menuitem"><a href="profile.html"
+						th:href="@{/patients/profile.html}"
+						th:text="#{header_change_password}">Change Password</a></li>
+					<li role="menuitem" aria-disabled="true" class="divider"></li>
+					<li role="menuitem"><a href="../index.html"
+						th:href="@{/resources/j_spring_security_logout}"
+						th:text="#{header_logout}">Logout</a></li>
+				</ul>
+
+				<!-- END OF SECTION REPLACED BY THYMELEAF -->
+			</div>
 	</div>
 	
 	<!-- END: Navbar Header Fragment -->

@@ -48,4 +48,12 @@ public interface EchoSignSignatureService extends SignatureService {
 	 * @return the latest document
 	 */
 	byte[] getLatestDocument(String documentKey);
+
+	/**
+	 * Gets the child document key.
+	 *
+	 * @param documentKey the document key
+	 * @return the child document key
+	 */
+	String getChildDocumentKey(String documentKey);
 }

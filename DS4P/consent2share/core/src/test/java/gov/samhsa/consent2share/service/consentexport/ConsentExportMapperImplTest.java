@@ -27,6 +27,7 @@ import gov.samhsa.consent2share.domain.reference.ClinicalDocumentSectionTypeCode
 import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCode;
 import gov.samhsa.consent2share.domain.reference.PurposeOfUseCode;
 import gov.samhsa.consent2share.domain.reference.SensitivityPolicyCode;
+import gov.samhsa.consent2share.domain.valueset.ValueSetCategory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -488,14 +489,12 @@ public class ConsentExportMapperImplTest {
 		// Set Do Not Shares
 
 	    Set<ConsentDoNotShareSensitivityPolicyCode> doNotShareSensitivityPolicyCodes = new HashSet<ConsentDoNotShareSensitivityPolicyCode>();
-		SensitivityPolicyCode sensitivityPolicyCode = new SensitivityPolicyCode();
-		sensitivityPolicyCode.setCode("code");
-		sensitivityPolicyCode.setDisplayName("display name");
-		sensitivityPolicyCode.setCodeSystem("code system");
-		sensitivityPolicyCode.setCodeSystemName("code system name");
+	    ValueSetCategory valueSetCategory = new ValueSetCategory();
+	    valueSetCategory.setCode("code");
+	    valueSetCategory.setName("display name");
 		
 		ConsentDoNotShareSensitivityPolicyCode consentDoNotShareSensitivityPolicyCode = new ConsentDoNotShareSensitivityPolicyCode(
-			sensitivityPolicyCode);
+				valueSetCategory);
 		doNotShareSensitivityPolicyCodes.add(consentDoNotShareSensitivityPolicyCode);
 
 		consent.setDoNotShareSensitivityPolicyCodes(doNotShareSensitivityPolicyCodes);

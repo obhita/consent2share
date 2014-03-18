@@ -25,13 +25,13 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.domain.consent;
 
+import gov.samhsa.consent2share.domain.valueset.ValueSetCategory;
+
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.util.Assert;
-
-import gov.samhsa.consent2share.domain.reference.SensitivityPolicyCode;
 
 /**
  * The Class ConsentDoNotShareSensitivityPolicyCode.
@@ -42,7 +42,7 @@ public class ConsentDoNotShareSensitivityPolicyCode {
 	/** The sensitivity policy code. */
 	@NotNull
 	@ManyToOne
-	private SensitivityPolicyCode sensitivityPolicyCode;
+	private ValueSetCategory valueSetCategory;
 	
 	/**
 	 * Instantiates a new consent do not share sensitivity policy code.
@@ -53,21 +53,21 @@ public class ConsentDoNotShareSensitivityPolicyCode {
 	/**
 	 * Instantiates a new consent do not share sensitivity policy code.
 	 *
-	 * @param sensitivityPolicyCode the sensitivity policy code
+	 * @param valueSetCategory the value set category
 	 */
 	public ConsentDoNotShareSensitivityPolicyCode(
-			SensitivityPolicyCode sensitivityPolicyCode) {
-		Assert.notNull(sensitivityPolicyCode,
+			ValueSetCategory valueSetCategory) {
+		Assert.notNull(valueSetCategory,
 				"SensitivityPolicyCode is required.");
-		this.sensitivityPolicyCode = sensitivityPolicyCode;
+		this.valueSetCategory = valueSetCategory;
 	}
 
 	/**
-	 * Gets the sensitivity policy code.
+	 * Gets the value set category.
 	 *
-	 * @return the sensitivity policy code
+	 * @return the value set category
 	 */
-	public SensitivityPolicyCode getSensitivityPolicyCode() {
-		return sensitivityPolicyCode;
+	public ValueSetCategory getValueSetCategory() {
+		return valueSetCategory;
 	}
 }

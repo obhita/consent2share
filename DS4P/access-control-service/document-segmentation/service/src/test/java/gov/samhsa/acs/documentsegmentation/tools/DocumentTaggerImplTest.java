@@ -2,25 +2,32 @@ package gov.samhsa.acs.documentsegmentation.tools;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import gov.samhsa.acs.brms.RuleExecutionServiceImpl;
+import gov.samhsa.acs.brms.domain.FactModel;
+import gov.samhsa.acs.brms.guvnor.GuvnorServiceImpl;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.namespace.PepNamespaceContext;
+import gov.samhsa.acs.common.tool.DocumentAccessorImpl;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
-import gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl;
+import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,16 +42,23 @@ public class DocumentTaggerImplTest {
 	private static final String N = "N";
 	private static final String R = "R";
 	private static final String V = "V";
-	
+
 	private static final String PROBLEMS_SECTION = "11450-4";
 	private static final String ALLERGIES_SECTION = "48765-2";
 	private static final String MEDICATIONS_SECTION = "10160-0";
 	private static final String RESULTS_SECTION = "30954-2";
 
 	private static final String REDACT = "REDACT";
-	private static final String NO_ACTION = "NO_ACTION";	 
+	private static final String NO_ACTION = "NO_ACTION";
 
 	private static FileReaderImpl fileReader;
+	private static SimpleMarshallerImpl marshaller;
+	private static DocumentFactModelExtractorImpl documentFactModelExtractor;
+	private static EmbeddedClinicalDocumentExtractor embeddedClinicalDocumentExtractor;
+	private static DocumentAccessorImpl documentAccessor;
+	private static RuleExecutionServiceImpl ruleExecutionService;
+	private static GuvnorServiceImpl guvnorServiceMock;
+
 	private static String c32;
 	private static String remC32;
 	private static String robustC32;
@@ -56,11 +70,23 @@ public class DocumentTaggerImplTest {
 
 	private static DocumentTaggerImpl documentTagger;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		// Arrange
 		fileReader = new FileReaderImpl();
-		c32 = fileReader.readFile("c32.xml");
+		documentAccessor = new DocumentAccessorImpl();
+		marshaller = new SimpleMarshallerImpl();
+		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
+		documentXmlConverter = new DocumentXmlConverterImpl();
+		embeddedClinicalDocumentExtractor = new EmbeddedClinicalDocumentExtractorImpl(
+				documentXmlConverter, documentAccessor);
+		guvnorServiceMock = mock(GuvnorServiceImpl.class);
+		String ruleSource = fileReader.readFile("testAnnotationRules.txt");
+		when(guvnorServiceMock.getVersionedRulesFromPackage()).thenReturn(
+				ruleSource);
+		ruleExecutionService = new RuleExecutionServiceImpl(guvnorServiceMock,
+				marshaller);
+		c32 = fileReader.readFile("sampleC32/c32.xml");
 		remC32 = fileReader.readFile("testRemC32.xml");
 		robustC32 = fileReader
 				.readFile("testMU_Rev3_HITSP_C32C83_4Sections_RobustEntries_NoErrors.xml");
@@ -101,15 +127,25 @@ public class DocumentTaggerImplTest {
 		assertTrue(!c32.contains("code=\"R\""));
 		assertTrue(!c32.contains("codeSystem=\"2.16.840.1.113883.5.25\""));
 	}
-	
+
 	@Test
 	public void testTagDocument_Entry_Level_Tagging() throws Exception {
 		// Arrange
 		logger.debug(c32);
+		String factModelXml = documentFactModelExtractor.extractFactModel(c32,
+				fileReader.readFile("testXacmlResultRedactHIV.xml"));
+		c32 = embeddedClinicalDocumentExtractor
+				.extractClinicalDocumentFromFactModel(factModelXml);
+		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
+		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+				factModelXml);
+		String executionResponseContainer = ruleExecutionService
+				.assertAndExecuteClinicalFacts(factModel)
+				.getRuleExecutionResponseContainer();
 
 		// Act
 		String taggedDocument = documentTagger.tagDocument(c32,
-				fileReader.readFile("ruleExecutionResponseContainer2.xml"), messageId);
+				executionResponseContainer, messageId);
 
 		// Assert
 		logger.debug(taggedDocument);
@@ -126,34 +162,48 @@ public class DocumentTaggerImplTest {
 				.contains("<confidentialityCode xmlns:ds4p=\"http://www.siframework.org/ds4p\""));
 		assertTrue(!c32.contains("code=\"R\""));
 		assertTrue(!c32.contains("codeSystem=\"2.16.840.1.113883.5.25\""));
-		
-		Document taggedDoc = documentXmlConverter.loadDocument(taggedDocument);			
-		verifyEntryLevelTags(taggedDoc, "e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7", Arrays.asList(new String[] {"V", "NORDSLCD", "ENCRYPT"}));
-		verifyEntryLevelTags(taggedDoc, "d11275e7-67ae-11db-bd13-0800200c9a66", Arrays.asList(new String[] {"R", "NORDSLCD"}));
-		verifyEntryLevelTags(taggedDoc, "a40027e1-67a5-11db-bd13-0800200c9a66", Arrays.asList(new String[] {"R", "NORDSLCD"}));
+
+		Document taggedDoc = documentXmlConverter.loadDocument(taggedDocument);
+		verifyEntryLevelTags(taggedDoc, "d1e259",
+				Arrays.asList(new String[] { "R", "NODSCLCD", "ENCRYPT" }));
+		verifyEntryLevelTags(taggedDoc, "d1e220",
+				Arrays.asList(new String[] { "V", "ENCRYPT", "NODSCLCD" }));
+		verifyEntryLevelTags(taggedDoc, "d1e1261",
+				Arrays.asList(new String[] { "R", "ENCRYPT", "NORDSCLCD" }));
 	}
-	
+
 	@Test
-	public void testTagDocument_Entry_Level_Tagging_Four_Sections() throws Exception {
+	public void testTagDocument_Entry_Level_Tagging_Four_Sections()
+			throws Exception {
 		// Arrange
 		logger.debug(c32);
-		
-		// Act		
+		String factModelXml = documentFactModelExtractor.extractFactModel(c32,
+				fileReader.readFile("testXacmlResultRedactHIV.xml"));
+		c32 = embeddedClinicalDocumentExtractor
+				.extractClinicalDocumentFromFactModel(factModelXml);
+		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
+		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+				factModelXml);
+		String executionResponseContainer = ruleExecutionService
+				.assertAndExecuteClinicalFacts(factModel)
+				.getRuleExecutionResponseContainer();
+
+		// Act
 		String taggedDocument = documentTagger.tagDocument(c32,
-				fileReader.readFile("ruleExecutionResponseContainer3.xml"), messageId);
-		
-		// Assert		
-		Document taggedDoc = documentXmlConverter.loadDocument(taggedDocument);			
-		verifyEntryLevelTags(taggedDoc, "107c2dc0-67a5-11db-bd13-0800200c9a66", Arrays.asList(new String[] {"ENCRYPT", "NODSCLCD", "R"}));
-		verifyEntryLevelTags(taggedDoc, "4adc1020-7b14-11db-9fe1-0800200c9a66", Arrays.asList(new String[] {"ENCRYPT", "NODSCLCD", "R"}));
-		verifyEntryLevelTags(taggedDoc, "8b3fa370-67a5-11db-bd13-0800200c9a66", Arrays.asList(new String[] {"ENCRYPT", "NODSCLCD", "V"}));
-		verifyEntryLevelTags(taggedDoc, "9d3d416d-45ab-4da1-912f-4583e0632000", Arrays.asList(new String[] {"ENCRYPT", "NODSCLCD", "V"}));
-		verifyEntryLevelTags(taggedDoc, "cdbd5b05-6cde-11db-9fe1-0800200c9a66", Arrays.asList(new String[] {"ENCRYPT", "NODSCLCD", "V"}));
-		verifyEntryLevelTags(taggedDoc, "cdbd5b05-6cde-11db-9fe1-08002tg964rfh8823ejba-00c9a66", Arrays.asList(new String[] {"ENCRYPT", "NODSCLCD", "V"}));
-		verifyEntryLevelTags(taggedDoc, "d11275e7-67ae-11db-bd13-0800200c9a66", Arrays.asList(new String[] {"ENCRYPT", "NODSCLCD", "V"}));
-		verifyEntryLevelTags(taggedDoc, "e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7", Arrays.asList(new String[] {"ENCRYPT", "NODSCLCD", "R"}));
-		verifyEntryLevelTags(taggedDoc, "eb936011-7b17-11db-9fe1-0800200c9a66", Arrays.asList(new String[] {"ENCRYPT", "NODSCLCD", "V"}));
-		verifyEntryLevelTags(taggedDoc, "2c09fea1-e931-477d-bef7-3611a10c6a99", Arrays.asList(new String[] {"ENCRYPT", "NORDSCLCD", "R"}));
+				executionResponseContainer, messageId);
+
+		// Assert
+		Document taggedDoc = documentXmlConverter.loadDocument(taggedDocument);
+		verifyEntryLevelTags(taggedDoc, "d1e1168", Arrays.asList(new String[] { "ENCRYPT", "NODSCLCD", "V" }));
+		verifyEntryLevelTags(taggedDoc, "d1e503", Arrays.asList(new String[] { "ENCRYPT", "NODSCLCD", "R" }));
+		verifyEntryLevelTags(taggedDoc, "d1e1168", Arrays.asList(new String[] { "ENCRYPT", "NODSCLCD", "V" }));
+		verifyEntryLevelTags(taggedDoc, "d1e341", Arrays.asList(new String[] { "ENCRYPT", "NODSCLCD", "V" }));
+		verifyEntryLevelTags(taggedDoc, "d1e849", Arrays.asList(new String[] { "ENCRYPT", "NODSCLCD", "V" }));
+		verifyEntryLevelTags(taggedDoc, "d1e798", Arrays.asList(new String[] { "ENCRYPT", "NODSCLCD", "V" }));
+		verifyEntryLevelTags(taggedDoc, "d1e220", Arrays.asList(new String[] { "ENCRYPT", "NODSCLCD", "V" }));
+		verifyEntryLevelTags(taggedDoc, "d1e259", Arrays.asList(new String[] { "ENCRYPT", "NODSCLCD", "R" }));
+		verifyEntryLevelTags(taggedDoc, "d1e564", Arrays.asList(new String[] { "ENCRYPT", "NODSCLCD", "V" }));
+		verifyEntryLevelTags(taggedDoc, "d1e1261", Arrays.asList(new String[] { "ENCRYPT", "NORDSCLCD", "R" }));
 	}
 
 	@Test
@@ -973,7 +1023,7 @@ public class DocumentTaggerImplTest {
 
 		return node;
 	}
-	
+
 	private NodeList getNodeList(Document xmlDocument, String xPathExpr)
 			throws XPathExpressionException {
 		// Create XPath instance
@@ -1026,36 +1076,44 @@ public class DocumentTaggerImplTest {
 		verifySectionLevelConfidentiality(doc, RESULTS_SECTION,
 				expectedResultsSectionLevelConfidentiality);
 	}
-	
-	private void verifyEntryLevelTags(Document taggedDoc, String obsId,
-			List<String> expectedList) throws XPathExpressionException,
-			XMLEncryptionException, Exception {
-		String xPathExprObservation = "//hl7:value/@code[ancestor::hl7:observation[child::hl7:id[@root='$obsId']]][ancestor::hl7:organizer[descendant::hl7:templateId[@root='2.16.840.1.113883.3.3251.1.4']]]";
-		String xPathExprSubstanceAdministration = "//hl7:substanceAdministration[hl7:id[@root='$obsId']]/hl7:entryRelationship[descendant::hl7:templateId[@root='2.16.840.1.113883.3.3251.1.4']]//hl7:value/@code";
-		String xPathExprProcedure = "//hl7:value/@code[ancestor::hl7:procedure[child::hl7:id[@root='$obsId']]][ancestor::hl7:organizer[descendant::hl7:templateId[@root='2.16.840.1.113883.3.3251.1.4']]]";
+
+	private void verifyEntryLevelTags(Document taggedDoc,
+			String generatedEntryId, List<String> expectedList)
+			throws XPathExpressionException, XMLEncryptionException, Exception {
+		String xPathExpr = "//hl7:entry[child::hl7:generatedEntryId='$generatedEntryId']//hl7:entryRelationship[descendant::hl7:templateId[@root='2.16.840.1.113883.3.3251.1.4']]//hl7:value/@code";
+		String xPathExprForOrganizer = "//hl7:entry[child::hl7:generatedEntryId='$generatedEntryId']//hl7:component[child::hl7:organizer[child::hl7:templateId[@root='2.16.840.1.113883.3.3251.1.4']]]//hl7:value/@code";
 		LinkedList<String> solutionList = new LinkedList<String>();
-		
-		// Add allergies, problems and some part of results (the ones embedded in observation)
-		NodeList nodeList = getNodeList(taggedDoc, xPathExprObservation.replace("$obsId", obsId));		
+
+		// Add everything except organizer
+		NodeList nodeList = getNodeList(taggedDoc,
+				xPathExpr.replace("$generatedEntryId", generatedEntryId));
 		addNodeListToSolutionList(solutionList, nodeList);
-		
-		// Add medications
-		nodeList = getNodeList(taggedDoc, xPathExprSubstanceAdministration.replace("$obsId", obsId));		
+
+		// Add organizer
+		nodeList = getNodeList(taggedDoc, xPathExprForOrganizer.replace(
+				"$generatedEntryId", generatedEntryId));
 		addNodeListToSolutionList(solutionList, nodeList);
-		
-		// Add the rest of results which are embedded in procedure
-		nodeList = getNodeList(taggedDoc, xPathExprProcedure.replace("$obsId", obsId));	
-		addNodeListToSolutionList(solutionList, nodeList);
-		
+
 		// Assert
 		assertTrue(solutionList.containsAll(expectedList));
 	}
 
 	private void addNodeListToSolutionList(List<String> solutionList,
 			NodeList nodeList) {
-		for(int i=0; i<nodeList.getLength(); i++){
+		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 			solutionList.add(node.getNodeValue());
 		}
+	}
+	
+	private String removeEmbeddedClinicalDocument(String factModelXml)
+			throws Exception, XPathExpressionException, IOException,
+			TransformerException {
+		Document fmDoc = documentXmlConverter.loadDocument(factModelXml);
+		Node ecd = documentAccessor.getNode(fmDoc,
+				"//hl7:EmbeddedClinicalDocument");
+		ecd.getParentNode().removeChild(ecd);
+		factModelXml = documentXmlConverter.convertXmlDocToString(fmDoc);
+		return factModelXml;
 	}
 }

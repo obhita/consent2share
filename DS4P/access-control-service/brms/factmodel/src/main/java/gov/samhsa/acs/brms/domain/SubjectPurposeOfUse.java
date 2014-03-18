@@ -54,8 +54,18 @@ public enum SubjectPurposeOfUse {
 	@XmlEnumValue("ETREAT")
 	emergencyTreatment("ETREAT"),
 	@XmlEnumValue("POPHLTH")
-	populationHealthTreatment("POPHLTH");	
-
+	populationHealthTreatment("POPHLTH"),	
+	@XmlEnumValue("CLINTRL")
+	clinicalTrialTreatment("CLINTRL"),		
+	@XmlEnumValue("CAREMGT")
+	careManagementTreatment("CAREMGT"),
+	@XmlEnumValue("FAMRQT")
+	familyRequested("FAMRQT"),
+	@XmlEnumValue("HLEGAL")
+	legal("HLEGAL"),
+	@XmlEnumValue("PWATRNY")
+	powerOfAttorney("PWATRNY");
+	
     private final String purpose;
 
     SubjectPurposeOfUse(String p) {purpose = p;}
@@ -64,4 +74,13 @@ public enum SubjectPurposeOfUse {
         return valueOf(v);
     }
     public String getPurpose() {return purpose;}
+    
+	public static SubjectPurposeOfUse fromAbbreviation(String purposeOfUse){
+		for(SubjectPurposeOfUse p: SubjectPurposeOfUse.values()){
+			if(p.getPurpose().equals(purposeOfUse)){
+				return p;
+			}
+		}
+		throw new IllegalArgumentException("The abbreviation '"+purposeOfUse+"' is not defined in this enum.");
+	}
 }

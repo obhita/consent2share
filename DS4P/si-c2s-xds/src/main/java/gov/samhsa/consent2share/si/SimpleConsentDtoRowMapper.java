@@ -68,7 +68,7 @@ public class SimpleConsentDtoRowMapper implements RowMapper<SimpleConsentDto> {
 	 */
 	@Override
 	public SimpleConsentDto mapRow(ResultSet rs, int i) throws SQLException {
-		long consentIdLong = rs.getLong("id");
+		long consentIdLong = rs.getLong("consent.id");
 		long patientId = rs.getLong("consent.patient");
 		String eId = rs.getString("patient.enterprise_identifier");
 		String consent = new String(lobHandler.getBlobAsBytes(rs,

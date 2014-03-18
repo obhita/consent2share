@@ -403,9 +403,9 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 * @see gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluatePolicyForTrying(java.lang.String)
 	 */
 	@Override
-	public PdpRequestResponse evaluatePolicyForTrying(String xacmlPolicy) {
+	public PdpRequestResponse evaluatePolicyForTrying(String xacmlPolicy, String purposeOfUse) {
 		Assert.hasText(xacmlPolicy, "Xaml policy is not set");
-
+		
 		Node resourceNode = null;
 		NodeList senderNodeList = null;
 		NodeList recipientNodeList = null;
@@ -432,11 +432,6 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 					.compile("//*[local-name() = 'SubjectAttributeDesignator'][@AttributeId='urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject']/../../*[local-name() = 'AttributeValue']");
 			recipientNodeList = (NodeList) xPathExpressionRecipient.evaluate(
 					xmlDoc, XPathConstants.NODESET);
-
-			XPathExpression xPathExpressionPurposeOfUse = xPath
-					.compile("//*[local-name() = 'SubjectAttributeDesignator'][@AttributeId='gov.samhsa.consent2share.purpose-of-use-code']/../../*[local-name() = 'AttributeValue']");
-			purposeOfUseNodeList = (NodeList) xPathExpressionPurposeOfUse
-					.evaluate(xmlDoc, XPathConstants.NODESET);
 
 			XPathExpression xPathExpressionCurrentDate = xPath
 					.compile("//*[local-name() = 'EnvironmentAttributeDesignator'][@AttributeId='urn:oasis:names:tc:xacml:1.0:environment:current-dateTime']/../..");
@@ -468,9 +463,8 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 		String recepientSubjectNPI = recipientNodeList.item(0).getTextContent();
 		xacmlRequest.setRecepientSubjectNPI(recepientSubjectNPI);
 
-		String purposeOfUse = purposeOfUseNodeList.item(0).getTextContent();
 		xacmlRequest.setPurposeOfUse(purposeOfUse);
-
+		
 		RequestType request = requestGenerator.generateRequest(
 				xacmlRequest.getRecepientSubjectNPI(),
 				xacmlRequest.getIntermediarySubjectNPI(),

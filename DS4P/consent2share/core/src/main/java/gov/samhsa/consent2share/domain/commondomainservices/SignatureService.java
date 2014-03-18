@@ -25,6 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.domain.commondomainservices;
 
+import echosign.api.clientv15.dto8.EmbeddedWidgetCreationResult;
+
 /**
  * The Interface SignatureService.
  */
@@ -58,4 +60,8 @@ public interface SignatureService {
 	String sendDocumentToSign(byte[] documentBytes, String documentFileName,
 			String documentName, String recipientEmail,
 			String messageToRecipient, String signedDocumentUrl);
+
+	EmbeddedWidgetCreationResult createEmbeddedWidget(byte[] documentBytes,
+			String documentFileName, String documentName,
+			String signedDocumentUrl, String email);
 }

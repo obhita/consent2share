@@ -109,6 +109,8 @@ public class HomeController {
 					return "redirect:/Administrator/adminHome.html"+notify;
 				else if (users.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER")))
 					return "redirect:/patients/home.html"+notify;
+				else if (users.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SYSADMIN")))
+					return "redirect:/sysadmin/valueSetList";
 			}
 		}
 		return "redirect:/index.html";

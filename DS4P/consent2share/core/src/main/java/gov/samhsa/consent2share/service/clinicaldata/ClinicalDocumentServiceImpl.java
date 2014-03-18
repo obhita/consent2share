@@ -34,6 +34,7 @@ import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCodeReposit
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.ClinicalDocumentDto;
+import gov.samhsa.consent2share.service.dto.LookupDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 
 import java.util.ArrayList;
@@ -130,7 +131,8 @@ public class ClinicalDocumentServiceImpl implements ClinicalDocumentService {
 
 		// required fields
 		ClinicalDocument clinicalDocument = new ClinicalDocument();
-		clinicalDocument.setId(clinicalDocumentDto.getId());
+		if(clinicalDocumentDto.getId()!=null)
+			clinicalDocument.setId(Long.parseLong(clinicalDocumentDto.getId()));
 		clinicalDocument.setName(clinicalDocumentDto.getName());
 		clinicalDocument.setFilename(clinicalDocumentDto.getFilename());
 		clinicalDocument.setContent(clinicalDocumentDto.getContent());
@@ -247,6 +249,13 @@ public class ClinicalDocumentServiceImpl implements ClinicalDocumentService {
 		Patient patient = patientRepository.findByUsername(patientDto
 				.getUsername());
 		List<ClinicalDocumentDto> dtos = findDtoByPatient(patient);
+		for(ClinicalDocumentDto dto : dtos) {
+        	if(dto.getClinicalDocumentTypeCode()==null) {
+        		LookupDto typeCode = new LookupDto();
+        		typeCode.setDisplayName("Not Specified");
+        		dto.setClinicalDocumentTypeCode(typeCode);
+        	}
+        }
 		return dtos;
 	}
 
@@ -261,7 +270,7 @@ public class ClinicalDocumentServiceImpl implements ClinicalDocumentService {
 		Patient patient = patientRepository.findByUsername(username);
 		List<ClinicalDocumentDto> clinicaldocumentDtos = findDtoByPatient(patient);
 		for (ClinicalDocumentDto documentDto : clinicaldocumentDtos) {
-			if (documentDto.getId() == clinicalDocumentDto.getId()) {
+			if (documentDto.getId().equals(clinicalDocumentDto.getId())) {
 				return true;
 			}
 		}

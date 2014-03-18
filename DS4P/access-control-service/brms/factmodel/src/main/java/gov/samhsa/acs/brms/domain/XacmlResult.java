@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.acs.brms.domain;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -51,6 +52,17 @@ public class XacmlResult {
 	
 	/** The home community id. */
 	private String homeCommunityId;
+	
+	/** The pdp obligations. */
+	@XmlElement(name="pdpObligation")
+	private List<String> pdpObligations;
+	
+	/**
+	 * Instantiates a new xacml result.
+	 */
+	public XacmlResult(){
+		pdpObligations = new LinkedList<String>();
+	}
 			
 	/**
 	 * Gets the home community id.
@@ -87,10 +99,6 @@ public class XacmlResult {
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
 	}
-	
-	/** The pdp obligations. */
-	@XmlElement(name="pdpObligation")
-	private List<String> pdpObligations;
 	
 	/**
 	 * Gets the pdp decision.
@@ -144,6 +152,5 @@ public class XacmlResult {
 	 */
 	public void setPdpObligations(List<String> pdpObligations) {
 		this.pdpObligations = pdpObligations;
-	}
-	
+	}	
 }

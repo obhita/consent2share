@@ -21,6 +21,7 @@ create unique index ix_auth_username on authorities
 
 # Section two: The following is generated from domain using JPA mapping and JSR303 validation annotations
     
+
     create table address_use_code (
         id bigint not null auto_increment,
         code varchar(250) not null,
@@ -193,90 +194,6 @@ create unique index ix_auth_username on authorities
     ) ENGINE=InnoDB
 ;
 
-    create table code_system (
-        code_system_id bigint not null auto_increment,
-        code varchar(255) not null,
-        creation_time datetime,
-        modification_time datetime,
-        name varchar(255) not null,
-        user_name varchar(255) not null,
-        code_system_oid varchar(255) not null unique,
-        display_name varchar(255),
-        primary key (code_system_id)
-    ) ENGINE=InnoDB
-;
-
-    create table code_system_aud (
-        code_system_id bigint not null,
-        rev bigint not null,
-        revtype tinyint,
-        code_system_oid varchar(255),
-        display_name varchar(255),
-        primary key (code_system_id, rev)
-    ) ENGINE=InnoDB
-;
-
-    create table concept_code (
-        concept_id bigint not null auto_increment,
-        code varchar(255) not null unique,
-        creation_time datetime,
-        modification_time datetime,
-        name varchar(255) not null,
-        user_name varchar(255) not null,
-        description varchar(255),
-        primary key (concept_id)
-    ) ENGINE=InnoDB
-;
-
-    create table concept_code_aud (
-        concept_id bigint not null,
-        rev bigint not null,
-        revtype tinyint,
-        description varchar(255),
-        primary key (concept_id, rev)
-    ) ENGINE=InnoDB
-;
-
-    create table concept_code_system_membership (
-        code_system_id bigint not null auto_increment,
-        concept_id bigint not null,
-        upload_effective_date datetime,
-        code_system bigint,
-        concept_code bigint,
-        primary key (code_system_id, concept_id)
-    ) ENGINE=InnoDB
-;
-
-    create table concept_code_system_membership_aud (
-        code_system_id bigint not null,
-        concept_id bigint not null,
-        rev bigint not null,
-        revtype tinyint,
-        upload_effective_date datetime,
-        primary key (code_system_id, concept_id, rev)
-    ) ENGINE=InnoDB
-;
-
-    create table concept_code_value_set_version_membership (
-        concept_id bigint not null auto_increment,
-        value_set_version_id bigint not null,
-        upload_effective_date datetime not null,
-        user_name varchar(255) not null,
-        concept_code bigint,
-        value_set_version bigint,
-        primary key (concept_id, value_set_version_id)
-    ) ENGINE=InnoDB
-;
-
-    create table concept_code_value_set_version_membership_aud (
-        concept_id bigint not null,
-        value_set_version_id bigint not null,
-        rev bigint not null,
-        revtype tinyint,
-        primary key (concept_id, value_set_version_id, rev)
-    ) ENGINE=InnoDB
-;
-
     create table confidentiality_code (
         id bigint not null auto_increment,
         code varchar(250) not null,
@@ -372,7 +289,7 @@ create unique index ix_auth_username on authorities
 
     create table consent_do_not_share_sensitivity_policy_code (
         consent_id bigint not null,
-        sensitivity_policy_code bigint
+        value_set_category bigint
     ) ENGINE=InnoDB
 ;
 
@@ -1275,14 +1192,91 @@ create unique index ix_auth_username on authorities
     ) ENGINE=InnoDB
 ;
 
-    create table value_set (
-        valueset_id bigint not null auto_increment,
-        code varchar(255) not null unique,
+    create table code_system (
+        code_system_id bigint not null auto_increment unique,
         creation_time datetime,
         modification_time datetime,
+        user_name varchar(255) not null,
+        code varchar(255) not null,
         name varchar(255) not null,
+        code_system_oid varchar(255) not null unique,
+        display_name varchar(255),
+        primary key (code_system_id)
+    ) ENGINE=InnoDB
+;
+
+    create table code_system_aud (
+        code_system_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        code_system_oid varchar(255),
+        display_name varchar(255),
+        primary key (code_system_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table code_system_version (
+        code_system_version_id bigint not null auto_increment unique,
+        creation_time datetime,
+        modification_time datetime,
         user_name varchar(255) not null,
         description varchar(255),
+        version_name varchar(255) not null,
+        fk_code_system_id bigint,
+        primary key (code_system_version_id)
+    ) ENGINE=InnoDB
+;
+
+    create table code_system_version_aud (
+        code_system_version_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        description varchar(255),
+        version_name varchar(255),
+        fk_code_system_id bigint,
+        primary key (code_system_version_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table concept_code (
+        concept_code_id bigint not null auto_increment unique,
+        creation_time datetime,
+        modification_time datetime,
+        user_name varchar(255) not null,
+        code varchar(255) not null,
+        name varchar(255) not null,
+        description varchar(255),
+        fk_code_system_version_id bigint,
+        primary key (concept_code_id),
+        unique (code, fk_code_system_version_id)
+    ) ENGINE=InnoDB
+;
+
+    create table concept_code_aud (
+        concept_code_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        description varchar(255),
+        fk_code_system_version_id bigint,
+        primary key (concept_code_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table conceptcode_valueset (
+        fk_concept_code_id bigint,
+        fk_valueset_id bigint,
+        primary key (fk_concept_code_id, fk_valueset_id)
+    ) ENGINE=InnoDB
+;
+    create table value_set (
+        valueset_id bigint not null auto_increment,
+        creation_time datetime,
+        modification_time datetime,
+        user_name varchar(255) not null,
+        code varchar(255) not null unique,
+        name varchar(255) not null,
+        description varchar(255),
+        fk_valueset_cat_id bigint,
         primary key (valueset_id)
     ) ENGINE=InnoDB
 ;
@@ -1292,37 +1286,29 @@ create unique index ix_auth_username on authorities
         rev bigint not null,
         revtype tinyint,
         description varchar(255),
+        fk_valueset_cat_id bigint,
         primary key (valueset_id, rev)
     ) ENGINE=InnoDB
 ;
 
     create table value_set_category (
-        vs_cat_id bigint not null auto_increment,
-        code varchar(255) not null unique,
+        valueset_cat_id bigint not null auto_increment,
         creation_time datetime,
         modification_time datetime,
-        name varchar(255) not null,
         user_name varchar(255) not null,
+        code varchar(255) not null unique,
+        name varchar(255) not null,
         description varchar(255),
-        primary key (vs_cat_id)
+        primary key (valueset_cat_id)
     ) ENGINE=InnoDB
 ;
 
     create table value_set_category_aud (
-        vs_cat_id bigint not null,
+        valueset_cat_id bigint not null,
         rev bigint not null,
         revtype tinyint,
         description varchar(255),
-        primary key (vs_cat_id, rev)
-    ) ENGINE=InnoDB
-;
-
-    create table value_set_version (
-        value_set_version_id bigint not null auto_increment,
-        upload_effective_date datetime not null,
-        user_name varchar(255) not null,
-        valueset_id bigint,
-        primary key (value_set_version_id)
+        primary key (valueset_cat_id, rev)
     ) ENGINE=InnoDB
 ;
 
@@ -1382,63 +1368,7 @@ create unique index ix_auth_username on authorities
         references revinfo (rev)
 ;
 
-    alter table code_system_aud 
-        add index FK4A7E0E32CDA971CE (rev), 
-        add constraint FK4A7E0E32CDA971CE 
-        foreign key (rev) 
-        references revinfo (rev)
-;
-
-    alter table concept_code_aud 
-        add index FK2B9D8555CDA971CE (rev), 
-        add constraint FK2B9D8555CDA971CE 
-        foreign key (rev) 
-        references revinfo (rev)
-;
-
-    alter table concept_code_system_membership 
-        add index FK8CF8DCB40102E48 (concept_code), 
-        add constraint FK8CF8DCB40102E48 
-        foreign key (concept_code) 
-        references concept_code (concept_id)
-;
-
-    alter table concept_code_system_membership 
-        add index FK8CF8DCB1C7CB0EE (code_system), 
-        add constraint FK8CF8DCB1C7CB0EE 
-        foreign key (code_system) 
-        references code_system (code_system_id)
-;
-
-    alter table concept_code_system_membership_aud 
-        add index FKD79A5A3CCDA971CE (rev), 
-        add constraint FKD79A5A3CCDA971CE 
-        foreign key (rev) 
-        references revinfo (rev)
-;
-
-    alter table concept_code_value_set_version_membership 
-        add index FKA3E9EC2340102E48 (concept_code), 
-        add constraint FKA3E9EC2340102E48 
-        foreign key (concept_code) 
-        references concept_code (concept_id)
-;
-
-    alter table concept_code_value_set_version_membership 
-        add index FKA3E9EC2347B40F83 (value_set_version), 
-        add constraint FKA3E9EC2347B40F83 
-        foreign key (value_set_version) 
-        references value_set_version (value_set_version_id)
-;
-
-    alter table concept_code_value_set_version_membership_aud 
-        add index FK872DCC94CDA971CE (rev), 
-        add constraint FK872DCC94CDA971CE 
-        foreign key (rev) 
-        references revinfo (rev)
-;
-
-    alter table consent 
+     alter table consent 
         add index FK38B6C01AB2036D5 (patient), 
         add constraint FK38B6C01AB2036D5 
         foreign key (patient) 
@@ -1516,17 +1446,17 @@ create unique index ix_auth_username on authorities
 ;
 
     alter table consent_do_not_share_sensitivity_policy_code 
+        add index FKC819CBFA1765E89 (value_set_category), 
+        add constraint FKC819CBFA1765E89 
+        foreign key (value_set_category) 
+        references value_set_category (valueset_cat_id)
+;
+
+    alter table consent_do_not_share_sensitivity_policy_code 
         add index FKC819CBFFCE8945A (consent_id), 
         add constraint FKC819CBFFCE8945A 
         foreign key (consent_id) 
         references consent (id)
-;
-
-    alter table consent_do_not_share_sensitivity_policy_code 
-        add index FKC819CBF81CE4DC9 (sensitivity_policy_code), 
-        add constraint FKC819CBF81CE4DC9 
-        foreign key (sensitivity_policy_code) 
-        references sensitivity_policy_code (id)
 ;
 
     alter table consent_individual_provider_disclosure_is_made_to 
@@ -1956,23 +1886,75 @@ create unique index ix_auth_username on authorities
         references organizational_provider (id)
 ;
 
+    alter table code_system_aud 
+        add index FK4A7E0E32DF74E053 (rev), 
+        add constraint FK4A7E0E32DF74E053 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table code_system_version 
+        add index FKE0181F5A7AE9A440 (fk_code_system_id), 
+        add constraint FKE0181F5A7AE9A440 
+        foreign key (fk_code_system_id) 
+        references code_system (code_system_id)
+;
+
+    alter table code_system_version_aud 
+        add index FKCE118C4BDF74E053 (rev), 
+        add constraint FKCE118C4BDF74E053 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table concept_code 
+        add index FKC2CE2D64243834C5 (fk_code_system_version_id), 
+        add constraint FKC2CE2D64243834C5 
+        foreign key (fk_code_system_version_id) 
+        references code_system_version (code_system_version_id)
+;
+
+    alter table concept_code_aud 
+        add index FK2B9D8555DF74E053 (rev), 
+        add constraint FK2B9D8555DF74E053 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table conceptcode_valueset 
+        add index FKDE3A75FBF298D340 (fk_concept_code_id), 
+        add constraint FKDE3A75FBF298D340 
+        foreign key (fk_concept_code_id) 
+        references concept_code (concept_code_id)
+;
+
+    alter table conceptcode_valueset 
+        add index FKDE3A75FB19232D71 (fk_valueset_id), 
+        add constraint FKDE3A75FB19232D71 
+        foreign key (fk_valueset_id) 
+        references value_set (valueset_id)
+;
+
+    alter table value_set 
+        add index FKD2615C94ED451F98 (fk_valueset_cat_id), 
+        add constraint FKD2615C94ED451F98 
+        foreign key (fk_valueset_cat_id) 
+        references value_set_category (valueset_cat_id)
+;
+
     alter table value_set_aud 
-        add index FKD2A59C85CDA971CE (rev), 
-        add constraint FKD2A59C85CDA971CE 
+        add index FKD2A59C85DF74E053 (rev), 
+        add constraint FKD2A59C85DF74E053 
         foreign key (rev) 
         references revinfo (rev)
 ;
 
     alter table value_set_category_aud 
-        add index FKB7F8D5BACDA971CE (rev), 
-        add constraint FKB7F8D5BACDA971CE 
+        add index FKB7F8D5BADF74E053 (rev), 
+        add constraint FKB7F8D5BADF74E053 
         foreign key (rev) 
         references revinfo (rev)
 ;
 
-    alter table value_set_version 
-        add index FKD25A4C2D8F14C1EB (valueset_id), 
-        add constraint FKD25A4C2D8F14C1EB 
-        foreign key (valueset_id) 
-        references value_set (valueset_id)
-;
+ 
+ 

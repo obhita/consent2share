@@ -225,12 +225,12 @@ public class PatientProfileDtoToPatientMapper implements
 			patient.setReligiousAffiliationCode(null);
 		}
 
-		if (patientDto.getIndividualProviders() != null
-				&& patientDto.getIndividualProviders().size() > 0) {
-			patient.setIndividualProviders(patientDto.getIndividualProviders());
-		} else {
-			patient.setIndividualProviders(null);
-		}
+//		if (patientDto.getIndividualProviders() != null
+//				&& patientDto.getIndividualProviders().size() > 0) {
+//			patient.setIndividualProviders(patientDto.getIndividualProviders());
+//		} else {
+//			patient.setIndividualProviders(null);
+//		}
 		
 
 		return patient;

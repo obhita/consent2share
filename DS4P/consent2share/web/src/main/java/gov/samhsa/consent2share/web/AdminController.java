@@ -25,17 +25,6 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.web;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import flexjson.JSONDeserializer;
 import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.dao.audit.JdbcAuditDao;
@@ -61,7 +50,6 @@ import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
-import gov.samhsa.consent2share.service.dto.StaffIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.PatientAdminDto;
@@ -69,6 +57,7 @@ import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.RecentAcctivityDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
+import gov.samhsa.consent2share.service.dto.StaffIndividualProviderDto;
 import gov.samhsa.consent2share.service.dto.StaffOrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.SystemNotificationDto;
 import gov.samhsa.consent2share.service.patient.PatientNotFoundException;
@@ -84,9 +73,20 @@ import gov.samhsa.consent2share.service.reference.MaritalStatusCodeService;
 import gov.samhsa.consent2share.service.reference.PurposeOfUseCodeService;
 import gov.samhsa.consent2share.service.reference.RaceCodeService;
 import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeService;
-import gov.samhsa.consent2share.service.reference.SensitivityPolicyCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
 import gov.samhsa.consent2share.service.systemnotification.SystemNotificationService;
+import gov.samhsa.consent2share.service.valueset.ValueSetCategoryService;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -187,10 +187,10 @@ public class AdminController extends AbstractController {
 	/** The purpose of use code service. */
 	@Autowired
 	private PurposeOfUseCodeService purposeOfUseCodeService;
-
-	/** The sensitivity policy code service. */
+	
+	/** The value set category service. */
 	@Autowired
-	private SensitivityPolicyCodeService sensitivityPolicyCodeService;
+	private ValueSetCategoryService valueSetCategoryService;
 
 	/** The field validator. */
 	@Autowired
@@ -440,8 +440,7 @@ public class AdminController extends AbstractController {
 			Calendar oneYearFromNow = Calendar.getInstance();
 			oneYearFromNow.add(Calendar.YEAR, 1);
 
-			List<AddConsentFieldsDto> sensitivityPolicyDto = sensitivityPolicyCodeService
-					.findAllSensitivityPolicyCodesAddConsentFieldsDto();
+			List<AddConsentFieldsDto> sensitivityPolicyDto = valueSetCategoryService.findAllValueSetCategoriesAddConsentFieldsDto();
 			List<AddConsentFieldsDto> purposeOfUseDto = purposeOfUseCodeService
 					.findAllPurposeOfUseCodesAddConsentFieldsDto();
 			List<AddConsentFieldsDto> clinicalDocumentSectionTypeDto = clinicalDocumentSectionTypeCodeService
@@ -633,8 +632,7 @@ public class AdminController extends AbstractController {
 			Calendar oneYearFromNow = Calendar.getInstance();
 			oneYearFromNow.add(Calendar.YEAR, 1);
 
-			List<AddConsentFieldsDto> sensitivityPolicyDto = sensitivityPolicyCodeService
-					.findAllSensitivityPolicyCodesAddConsentFieldsDto();
+			List<AddConsentFieldsDto> sensitivityPolicyDto = valueSetCategoryService.findAllValueSetCategoriesAddConsentFieldsDto();
 			List<AddConsentFieldsDto> purposeOfUseDto = purposeOfUseCodeService
 					.findAllPurposeOfUseCodesAddConsentFieldsDto();
 			List<AddConsentFieldsDto> clinicalDocumentSectionTypeDto = clinicalDocumentSectionTypeCodeService

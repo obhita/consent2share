@@ -186,7 +186,7 @@ public class CodeSystemController extends AbstractNodeController {
 	     * @return
 	     */
 	    @RequestMapping(value = "/codeSystem/edit/{id}", method = RequestMethod.POST)
-	    public String submitEditCodeSystemForm(@ModelAttribute(MODEL_ATTIRUTE_CODESYSTEMDTO) CodeSystemDto updated, @PathVariable("id") Long id) {
+	    public String submitEditCodeSystemForm(@ModelAttribute(MODEL_ATTIRUTE_CODESYSTEMDTO) CodeSystemDto updated, @PathVariable("id") Long id,RedirectAttributes redirectAttribute) {
 	        LOGGER.debug("Edit codeSystem form was submitted with information: " + updated + id);
 	        
 	        try {
@@ -195,14 +195,14 @@ public class CodeSystemController extends AbstractNodeController {
 		        updated.setId(id);
 	            updated = codeSystemService.update(updated);
 	            updated.setError(false);
-	            updated.setSuccessMessage("Code System  with code:" + updated.getCode() + " and oid: " + updated.getCodeSystemOId() + " is Edited Successfully");
+	            updated.setSuccessMessage("Code System  with Code: " + updated.getCode() + " and OID: " + updated.getCodeSystemOId() + " is Edited Successfully");
 
 	        } catch (CodeSystemNotFoundException e) {
 	            LOGGER.debug("No codeSystem was found with id: " + updated.getId());
 				updated.setError(true);
 				updated.setErrorMessage( "Edited Code System is not found");
 	        }
-	        
+			redirectAttribute.addFlashAttribute(MODEL_ATTIRUTE_CODESYSTEMDTO, updated);
 	        return createRedirectViewPath(REDIRECT_ID_MAPPING_LIST);
 	    }
 

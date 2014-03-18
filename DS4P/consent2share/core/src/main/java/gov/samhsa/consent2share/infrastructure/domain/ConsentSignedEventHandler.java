@@ -78,7 +78,7 @@ public class ConsentSignedEventHandler extends
 	public void handle(ConsentSignedEvent event) {
 		MessageProperties messageProperties = new MessageProperties();
 		messageProperties.setHeader("messageType", event.getClass().getName());
-		messageProperties.setContentType("text/plain");
+		messageProperties.setContentType(MessageProperties.CONTENT_TYPE_TEXT_PLAIN);
 		messageSender.send(event.getConsentId().toString(), messageProperties);
 		
 		Consent consent=consentRepository.findOne(event.getConsentId());

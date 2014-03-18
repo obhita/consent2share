@@ -38,4 +38,13 @@ public interface ConsentGetter {
 	 * @return the consent
 	 */
 	public abstract SimpleConsentDto getConsent(long consentId);
+
+	/**
+	 * Gets the policy id.
+	 * 
+	 * @param consentId
+	 *            the consent id
+	 * @return the policy id
+	 */
+	public abstract PolicyIdDto getPolicyId(long consentId);
 }

@@ -73,7 +73,7 @@ public class XdsbRepositoryAdapterTest {
 		// Arrange
 		when(
 				xdsbMetadataGeneratorMock.generateMetadataXml(
-						DOCUMENT_XML_STRING, HOME_COMMUNITY_ID)).thenReturn(
+						DOCUMENT_XML_STRING, HOME_COMMUNITY_ID, null, null)).thenReturn(
 				SUBMIT_OBJECTS_REQUEST_STRING);
 
 		SubmitObjectsRequest submitObjectRequest = new SubmitObjectsRequest();
@@ -105,7 +105,7 @@ public class XdsbRepositoryAdapterTest {
 		// Act
 		RegistryResponse actualResponse = xdsbRepositoryAdapterSpy
 				.provideAndRegisterDocumentSet(DOCUMENT_XML_STRING,
-						HOME_COMMUNITY_ID, XdsbDocumentType.CLINICAL_DOCUMENT);
+						HOME_COMMUNITY_ID, XdsbDocumentType.CLINICAL_DOCUMENT, null, null);
 
 		// Assert
 		assertEquals(response, actualResponse);

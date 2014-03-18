@@ -25,19 +25,31 @@
  ******************************************************************************/
 package gov.samhsa.acs.brms;
 
+import gov.samhsa.acs.brms.domain.FactModel;
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
 
 /**
  * The Interface RuleExecutionService.
  */
-public interface RuleExecutionService 
-{
-   
-   /**
-    * Assert and execute clinical facts.
-    *
-    * @param factModelXmlString the fact model xml string
-    * @return the assert and execute clinical facts response
-    */
-   public AssertAndExecuteClinicalFactsResponse assertAndExecuteClinicalFacts(String factModelXmlString);   
+public interface RuleExecutionService {
+
+	/**
+	 * Assert and execute clinical facts.
+	 * 
+	 * @param factModelXmlString
+	 *            the fact model xml string
+	 * @return the assert and execute clinical facts response
+	 */
+	public AssertAndExecuteClinicalFactsResponse assertAndExecuteClinicalFacts(
+			String factModelXmlString);
+
+	/**
+	 * Assert and execute clinical facts.
+	 * 
+	 * @param factModel
+	 *            the fact model
+	 * @return the assert and execute clinical facts response
+	 */
+	public AssertAndExecuteClinicalFactsResponse assertAndExecuteClinicalFacts(
+			FactModel factModel);
 }

@@ -1,6 +1,7 @@
 package gov.samhsa.acs.xdsb.registry.wsclient.adapter;
 
 import static org.junit.Assert.assertTrue;
+import gov.samhsa.acs.common.tool.DocumentAccessorImpl;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentReference;
@@ -59,7 +60,7 @@ public class XdsbRegistryAdapterIT {
 
 		xdsbRegistryAdapter = new XdsbRegistryAdapter(new XdsbRegistryWebServiceClient(
 				endpointAddress), new AdhocQueryResponseFilter(new SimpleMarshallerImpl(), new DocumentXmlConverterImpl()), new SimpleMarshallerImpl(),
-				new DocumentXmlConverterImpl());
+				new DocumentXmlConverterImpl(), new DocumentAccessorImpl());
 	}
 
 	// make sure you have a clinical document in your XDS.b endpoint with

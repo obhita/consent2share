@@ -12,7 +12,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
-import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.brms.domain.SubjectPurposeOfUse;
+import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
@@ -559,11 +560,13 @@ public class PolicyEnforcementPointImplTest {
 		// Arrange
 		String c32Xml = "c32Xml";
 		String xacmlPolicy = "xacmlPolicy";
+		String purposeOfUse = "TREAT";
 		PdpRequestResponse pdpRequestResponse = mock(PdpRequestResponse.class);
 		XacmlRequest xacmlRequest = mock(XacmlRequest.class);
 		XacmlResponse xacmlResponse = mock(XacmlResponse.class);
+		when(xacmlRequest.getPurposeOfUse()).thenReturn(SubjectPurposeOfUse.treatment.getPurpose());
 		when(xacmlResponse.getPdpObligation()).thenReturn(new ArrayList<String>());
-		when(contextHandler.makeDecisionForTryingPolicy(xacmlPolicy))
+		when(contextHandler.makeDecisionForTryingPolicy(xacmlPolicy, purposeOfUse))
 				.thenReturn(pdpRequestResponse);
 		when(pdpRequestResponse.getXacmlRequest()).thenReturn(xacmlRequest);
 		when(pdpRequestResponse.getXacmlResponse()).thenReturn(xacmlResponse);
@@ -585,7 +588,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn(segmentDocumentResponse);
 
 		// Act
-		String result = pep.tryPolicy(c32Xml, xacmlPolicy);
+		String result = pep.tryPolicy(c32Xml, xacmlPolicy, purposeOfUse);
 
 		// Assert
 		assertEquals("Not return expected result", segmentedC32, result);
@@ -607,8 +610,8 @@ public class PolicyEnforcementPointImplTest {
 			XacmlResult xacmlResult = (XacmlResult) argument;
 			if (xacmlResult.getHomeCommunityId() == xacmlRequest
 					.getHomeCommunityId()
-					&& xacmlResult.getSubjectPurposeOfUse() == xacmlRequest
-							.getPatientUniqueId()
+					&& xacmlResult.getSubjectPurposeOfUse().getPurpose() == xacmlRequest
+							.getPurposeOfUse()
 					&& xacmlResult.getPdpDecision() == xacmlResponse
 							.getPdpDecision()
 					&& xacmlResult.getPdpObligations() == xacmlResponse

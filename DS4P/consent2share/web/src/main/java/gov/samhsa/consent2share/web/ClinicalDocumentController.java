@@ -25,6 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.web;
 
+import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.clinicaldata.ClinicalDocumentService;
@@ -43,6 +44,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -75,6 +78,13 @@ public class ClinicalDocumentController {
 	@Autowired
 	UserContext userContext;
 	
+	/** The access reference mapper. */
+	@Autowired
+	AccessReferenceMapper accessReferenceMapper;
+	
+	/** The logger. */
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	/**
 	 * Document home.
 	 *
@@ -99,13 +109,7 @@ public class ClinicalDocumentController {
 		PatientProfileDto patientDto = patientService.findPatientProfileByUsername(username);
 		
         List<ClinicalDocumentDto> clinicaldocumentDtos = clinicalDocumentService.findDtoByPatientDto(patientDto);
-        for(ClinicalDocumentDto dto : clinicaldocumentDtos) {
-        	if(dto.getClinicalDocumentTypeCode()==null) {
-        		LookupDto typeCode = new LookupDto();
-        		typeCode.setDisplayName("Not Specified");
-        		dto.setClinicalDocumentTypeCode(typeCode);
-        	}
-        }
+        accessReferenceMapper.setupAccessReferenceMap(clinicaldocumentDtos);
         List<LookupDto> allDocumentTypeCodes = clinicalDocumentTypeCodeService.findAllClinicalDocumentTypeCodes();
         model.addAttribute("clinicaldocumentDtos", clinicaldocumentDtos);
         model.addAttribute("allDocumentTypeCodes", allDocumentTypeCodes);
@@ -166,11 +170,10 @@ public class ClinicalDocumentController {
      */
     @RequestMapping(value="/downloaddoc.html", method=RequestMethod.POST)
     public String download(HttpServletRequest request,
-    		HttpServletResponse response,
-    		@RequestParam("download_id") long documentId) {
+    		HttpServletResponse response,@RequestParam("download_id") String documentId) {
     	
-        ClinicalDocumentDto clinicalDocumentDto = clinicalDocumentService.findClinicalDocumentDto(documentId);
-		
+    	Long directDocumentId=accessReferenceMapper.getDirectReference(documentId);
+        ClinicalDocumentDto clinicalDocumentDto = clinicalDocumentService.findClinicalDocumentDto(directDocumentId);
     	if(clinicalDocumentService.isDocumentBelongsToThisUser(clinicalDocumentDto)) {
 	        try {
 	            response.setHeader("Content-Disposition", "attachment;filename=\"" +clinicalDocumentDto.getFilename()+ "\"");
@@ -196,9 +199,9 @@ public class ClinicalDocumentController {
      * @return the string
      */
     @RequestMapping(value="/deletedoc.html", method=RequestMethod.POST)
-    public String remove(@RequestParam("delete_id") long documentId) {
-    	
-        ClinicalDocumentDto clinicalDocumentDto = clinicalDocumentService.findClinicalDocumentDto(documentId);
+    public String remove(@RequestParam("delete_id") String documentId) {
+    	Long directDocumentId=accessReferenceMapper.getDirectReference(documentId);
+        ClinicalDocumentDto clinicalDocumentDto = clinicalDocumentService.findClinicalDocumentDto(directDocumentId);
 
 		if(clinicalDocumentService.isDocumentBelongsToThisUser(clinicalDocumentDto)) {
 	    	clinicalDocumentService.deleteClinicalDocument(clinicalDocumentDto);

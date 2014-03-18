@@ -4,13 +4,13 @@ import gov.samhsa.consent2share.domain.valueset.CodeSystem;
 import gov.samhsa.consent2share.domain.valueset.CodeSystemRepository;
 import gov.samhsa.consent2share.service.dto.CodeSystemDto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +22,9 @@ public class CodeSystemServiceImpl implements CodeSystemService {
 
 	@Resource
 	private CodeSystemRepository codeSystemRepository;
+	
+	@Autowired
+	ValueSetMgmtHelper valueSetMgmtHelper;
 
 	@Override
 	@Transactional
@@ -31,16 +34,9 @@ public class CodeSystemServiceImpl implements CodeSystemService {
 		CodeSystem codeSystem = CodeSystem.getBuilder(created.getCodeSystemOId(),
 				created.getCode(), created.getName(), created.getUserName()).displayName(displayName).build();
 		
-		// step:1 Insert concept code into conceptcode table
 		codeSystem = codeSystemRepository.save(codeSystem);
 		
-		// step:2  concept code with valueset mapping
-		
-		
-		
-		
-		
-		return createDtoFromEntity(codeSystem);
+		return valueSetMgmtHelper.createCodeSystemDtoFromEntity(codeSystem);
 	}
 
 
@@ -55,26 +51,21 @@ public class CodeSystemServiceImpl implements CodeSystemService {
 			throw new CodeSystemNotFoundException();			
 		}
 		codeSystemRepository.delete(deleted);
-		return createDtoFromEntity(deleted);
+		return valueSetMgmtHelper.createCodeSystemDtoFromEntity(deleted);
 	}
 
 	@Override
 	public List<CodeSystemDto> findAll() {
 		LOGGER.debug("Finding all codeSystems");
 		List<CodeSystem> codeSystems = codeSystemRepository.findAll();
-		List<CodeSystemDto> codeSystemDtos = new ArrayList<CodeSystemDto>();
-		for(CodeSystem codeSystem : codeSystems){
-			CodeSystemDto codeSystemDto = createDtoFromEntity(codeSystem);
-			codeSystemDtos.add(codeSystemDto);			
-		}		
-		return codeSystemDtos;
+		return valueSetMgmtHelper.convertCodeSystemEntitiesToDtos(codeSystems);
 	}
 
 	@Override
 	public CodeSystemDto findById(Long id) {
 		LOGGER.debug("Finding a CodeSystem with id: " + id);
 		CodeSystem codeSystem = codeSystemRepository.findOne(id);
-		return createDtoFromEntity(codeSystem);
+		return valueSetMgmtHelper.createCodeSystemDtoFromEntity(codeSystem);
 	}
 
 	@Override
@@ -91,7 +82,7 @@ public class CodeSystemServiceImpl implements CodeSystemService {
 		
 		codeSystem.update(updated.getCodeSystemOId(),
 				updated.getCode(), updated.getName(), updated.getDisplayName(),updated.getUserName());
-		return createDtoFromEntity(codeSystem);
+		return valueSetMgmtHelper.createCodeSystemDtoFromEntity(codeSystem);
 	}
 
     /**
@@ -101,19 +92,6 @@ public class CodeSystemServiceImpl implements CodeSystemService {
 	protected void setCodeSystemRepository(CodeSystemRepository codeSystemRepository) {
 		this.codeSystemRepository = codeSystemRepository;
 	}
-	
-	
-	private CodeSystemDto createDtoFromEntity(CodeSystem codeSystem){		
-		CodeSystemDto codeSystemDto = new CodeSystemDto();
-		codeSystemDto.setCode(codeSystem.getCode());
-		codeSystemDto.setCodeSystemOId(codeSystem.getCodeSystemOId());
-		codeSystemDto.setDisplayName(codeSystem.getDisplayName());
-		codeSystemDto.setName(codeSystem.getName());
-		codeSystemDto.setId(codeSystem.getId());		
-		return codeSystemDto;		
-	}
-	
-	
 	
 	
 	

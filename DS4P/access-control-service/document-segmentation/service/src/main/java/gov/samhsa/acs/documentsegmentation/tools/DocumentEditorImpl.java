@@ -25,7 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.tools;
 
-import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.common.namespace.PepNamespaceContext;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.common.tool.FileReader;

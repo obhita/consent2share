@@ -31,5 +31,13 @@ package gov.samhsa.consent2share.infrastructure;
  */
 public interface TryPolicyService {
 
-	String tryPolicy(String originalC32, Long consentId);
+	/**
+	 * Try policy.
+	 *
+	 * @param originalC32 the original c32
+	 * @param xacml the xacml
+	 * @param purposeOfUse the purpose of use
+	 * @return the string
+	 */
+	String tryPolicy(String originalC32, String xacml, String purposeOfUse);
 }

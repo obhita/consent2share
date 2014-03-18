@@ -36,13 +36,6 @@ public class CodeSystemDto extends AbstractNodeDto{
 		this.codeSystemOId = codeSystemOId;
 	}
 
-
-	@Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
-    }
-
-
 	public List<ValueSetDto> getValueSets() {
 		return valueSets;
 	}
@@ -52,5 +45,10 @@ public class CodeSystemDto extends AbstractNodeDto{
 		this.valueSets = valueSets;
 	}
 	
+
+	@Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 	
 }

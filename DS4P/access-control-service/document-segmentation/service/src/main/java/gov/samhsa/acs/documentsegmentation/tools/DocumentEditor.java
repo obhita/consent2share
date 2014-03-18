@@ -25,7 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.tools;
 
-import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.brms.domain.XacmlResult;
 
 import java.io.IOException;
 

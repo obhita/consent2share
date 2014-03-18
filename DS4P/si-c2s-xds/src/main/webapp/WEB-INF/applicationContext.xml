@@ -26,6 +26,12 @@
 		base-package="gov.samhsa.consent2share.si">
 	</context:component-scan>
 	
+	<!-- Consent Revoke Service -->
+	<bean id="consentRevokeServiceImpl"
+		class="gov.samhsa.consent2share.si.ConsentRevokeServiceImpl"
+		autowire="constructor">
+	</bean>	
+	
 	<!-- Consent Getter -->
 	<bean id="consentGetterImpl"
 		class="gov.samhsa.consent2share.si.ConsentGetterImpl"
@@ -46,6 +52,9 @@
 	<bean id="simpleConsentDtoRowMapper"
 		class="gov.samhsa.consent2share.si.SimpleConsentDtoRowMapper"
 		scope="singleton" autowire="constructor"/>
+	<bean id="policyIdDtoRowMapper"
+		class="gov.samhsa.consent2share.si.PolicyIdDtoRowMapper"
+		scope="singleton"/>		
 
 	<!-- Configures the annotation-driven Spring MVC Controller programming 
 		model. Note that, with Spring 3.0, this tag works in Servlet MVC only! -->
@@ -59,6 +68,10 @@
 	<bean id="documentXmlConverterImpl"
 		class="gov.samhsa.acs.common.tool.DocumentXmlConverterImpl"
 		scope="prototype"/>	
+	<bean id="documentAccessorImpl"
+		class="gov.samhsa.acs.common.tool.DocumentAccessorImpl"
+		scope="prototype"/>			
+	
 	<!-- XDS.b: common -->
 	<bean id="registryErrorListSetterImpl"
 		class="gov.samhsa.acs.xdsb.common.RegistryErrorListSetterImpl"
@@ -74,7 +87,20 @@
 		scope="prototype">
 		<constructor-arg value="${xdsbRepository}" />
 	</bean>
+	<bean id="xdsbRegistryWebServiceClient"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient"
+		scope="prototype">
+		<constructor-arg value="${xdsbRegistry}" />
+	</bean>	
 	<!-- XDS.b: adapters -->
+	<bean id="adhocQueryResponseFilter"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.adapter.AdhocQueryResponseFilter"
+		scope="prototype" autowire="constructor">
+	</bean>
+	<bean id="xdsbRegistryAdapter"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.adapter.XdsbRegistryAdapter"
+		scope="prototype" autowire="constructor">
+	</bean>	
 	<bean id="retrieveDocumentSetResponseFilter"
 		class="gov.samhsa.acs.xdsb.repository.wsclient.adapter.RetrieveDocumentSetResponseFilter"
 		scope="prototype" autowire="constructor">

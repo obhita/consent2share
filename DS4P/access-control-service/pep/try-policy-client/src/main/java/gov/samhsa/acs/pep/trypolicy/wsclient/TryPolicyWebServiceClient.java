@@ -58,9 +58,10 @@ public class TryPolicyWebServiceClient {
 	 *
 	 * @param c32Xml the c32 xml
 	 * @param xacmlPolicy the xacml policy
+	 * @param purposeOfUse the purpose of use
 	 * @return the string
 	 */
-	public String tryPolicy(String c32Xml, String xacmlPolicy) {
+	public String tryPolicy(String c32Xml, String xacmlPolicy, String purposeOfUse) {
 		TryPolicyPortType port;
 		if (StringUtils.hasText(this.endpointAddress))
 		{
@@ -72,7 +73,7 @@ public class TryPolicyWebServiceClient {
 			port = createPort();
 		}
 		
-		return tryPolicy(port, c32Xml, xacmlPolicy);
+		return tryPolicy(port, c32Xml, xacmlPolicy, purposeOfUse);
 	}
 
 
@@ -84,8 +85,8 @@ public class TryPolicyWebServiceClient {
 	 * @param xacmlPolicy the xacml policy
 	 * @return the string
 	 */
-	private String tryPolicy(TryPolicyPortType port, String c32Xml, String xacmlPolicy) {
-		return port.tryPolicy(c32Xml, xacmlPolicy);
+	private String tryPolicy(TryPolicyPortType port, String c32Xml, String xacmlPolicy, String purposeOfUse) {
+		return port.tryPolicy(c32Xml, xacmlPolicy, purposeOfUse);
 	}
 
 

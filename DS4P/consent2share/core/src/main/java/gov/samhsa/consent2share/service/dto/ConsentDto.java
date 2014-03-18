@@ -26,6 +26,7 @@
 package gov.samhsa.consent2share.service.dto;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -36,7 +37,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class ConsentDto {
 	
 	/** The id. */
-	private Long id;
+	private String id;
 	
 	/** The organizational providers permitted to disclose. */
 	private Set<String> organizationalProvidersPermittedToDisclose;
@@ -89,13 +90,16 @@ public class ConsentDto {
 	/** The do not share clinical concept codes. */
 	private Set<SpecificMedicalInfoDto> doNotShareClinicalConceptCodes;
 	
-	
+	/** The purpose of use codes and values. */
+	private HashMap<String, String> purposeOfUseCodesAndValues;
+
+
 	/**
 	 * Gets the id.
 	 * 
 	 * @return the id
 	 */
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -105,7 +109,7 @@ public class ConsentDto {
 	 * @param id
 	 *            the new id
 	 */
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -185,34 +189,74 @@ public class ConsentDto {
 		this.providersDisclosureIsMadeTo = providersDisclosureIsMadeTo;
 	}
 
+	/**
+	 * Gets the organizational providers permitted to disclose npi.
+	 *
+	 * @return the organizational providers permitted to disclose npi
+	 */
 	public Set<String> getOrganizationalProvidersPermittedToDiscloseNpi() {
 	    return organizationalProvidersPermittedToDiscloseNpi;
 	}
 
+	/**
+	 * Sets the organizational providers permitted to disclose npi.
+	 *
+	 * @param organizationalProvidersPermittedToDiscloseNpi the new organizational providers permitted to disclose npi
+	 */
 	public void setOrganizationalProvidersPermittedToDiscloseNpi(Set<String> organizationalProvidersPermittedToDiscloseNpi) {
 	    this.organizationalProvidersPermittedToDiscloseNpi = organizationalProvidersPermittedToDiscloseNpi;
 	}
 
+	/**
+	 * Gets the organizational providers disclosure is made to npi.
+	 *
+	 * @return the organizational providers disclosure is made to npi
+	 */
 	public Set<String> getOrganizationalProvidersDisclosureIsMadeToNpi() {
 	    return organizationalProvidersDisclosureIsMadeToNpi;
 	}
 
+	/**
+	 * Sets the organizational providers disclosure is made to npi.
+	 *
+	 * @param organizationalProvidersDisclosureIsMadeToNpi the new organizational providers disclosure is made to npi
+	 */
 	public void setOrganizationalProvidersDisclosureIsMadeToNpi(Set<String> organizationalProvidersDisclosureIsMadeToNpi) {
 	    this.organizationalProvidersDisclosureIsMadeToNpi = organizationalProvidersDisclosureIsMadeToNpi;
 	}
 
+	/**
+	 * Gets the providers permitted to disclose npi.
+	 *
+	 * @return the providers permitted to disclose npi
+	 */
 	public Set<String> getProvidersPermittedToDiscloseNpi() {
 	    return providersPermittedToDiscloseNpi;
 	}
 
+	/**
+	 * Sets the providers permitted to disclose npi.
+	 *
+	 * @param providersPermittedToDiscloseNpi the new providers permitted to disclose npi
+	 */
 	public void setProvidersPermittedToDiscloseNpi(Set<String> providersPermittedToDiscloseNpi) {
 	    this.providersPermittedToDiscloseNpi = providersPermittedToDiscloseNpi;
 	}
 
+	/**
+	 * Gets the providers disclosure is made to npi.
+	 *
+	 * @return the providers disclosure is made to npi
+	 */
 	public Set<String> getProvidersDisclosureIsMadeToNpi() {
 	    return providersDisclosureIsMadeToNpi;
 	}
 
+	/**
+	 * Sets the providers disclosure is made to npi.
+	 *
+	 * @param providersDisclosureIsMadeToNpi the new providers disclosure is made to npi
+	 */
 	public void setProvidersDisclosureIsMadeToNpi(Set<String> providersDisclosureIsMadeToNpi) {
 	    this.providersDisclosureIsMadeToNpi = providersDisclosureIsMadeToNpi;
 	}
@@ -340,7 +384,7 @@ public class ConsentDto {
 	/**
 	 * Sets the do not share for purpose of use codes.
 	 *
-	 * @param doNotShareForPurposeOfUseCodes the new do not share for purpose of use codes
+	 * @param shareForPurposeOfUseCodes the new share for purpose of use codes
 	 */
 	public void setShareForPurposeOfUseCodes(
 			Set<String> shareForPurposeOfUseCodes) {
@@ -365,7 +409,25 @@ public class ConsentDto {
 			Set<SpecificMedicalInfoDto> doNotShareClinicalConceptCodes) {
 		this.doNotShareClinicalConceptCodes = doNotShareClinicalConceptCodes;
 	}
+	
+	/**
+	 * Gets the purpose of use codes and values.
+	 *
+	 * @return the purpose of use codes and values
+	 */
+	public HashMap getPurposeOfUseCodesAndValues() {
+		return purposeOfUseCodesAndValues;
+	}
 
+	/**
+	 * Sets the purpose of use codes and values.
+	 *
+	 * @param purposeOfUseCodesAndValues the new purpose of use codes and values
+	 */
+	public void setPurposeOfUseCodesAndValues(HashMap purposeOfUseCodesAndValues) {
+		this.purposeOfUseCodesAndValues = purposeOfUseCodesAndValues;
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */

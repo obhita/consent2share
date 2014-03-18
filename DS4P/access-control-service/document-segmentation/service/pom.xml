@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>document-segmentation</artifactId>
-		<version>0.3.0-SNAPSHOT</version>
+		<version>0.4.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>document-segmentation-service</artifactId>
@@ -35,6 +35,11 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>		
 
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
@@ -47,13 +52,27 @@
 			<artifactId>cxf-rt-transports-http</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+		</dependency>
 
 		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-unit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
 		<!-- Web stack-specific dependencies that are internally needed by the 
 			Endpoint object as it exposes a web service -->
 		<dependency>
@@ -83,7 +102,7 @@
 
 		<finalName>DocumentSegmentation</finalName>
 
-		<plugins>
+		<plugins>				
 			<plugin>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
@@ -120,6 +139,9 @@
 							<exclude>gov/samhsa/consent2share/schema/documentsegmentation/*.class</exclude>
 							<exclude>gov/samhsa/consent2share/contract/documentsegmentation/*.class</exclude>
 							<exclude>gov/samhsa/acs/documentsegmentation/audit/*.class</exclude>
+							<exclude>gov/samhsa/acs/documentsegmentation/tools/dto/*.class</exclude>
+							<exclude>gov/samhsa/acs/documentsegmentation/valueset/dto/*.class</exclude>
+							<exclude>gov/samhsa/acs/documentsegmentation/valueset/SelfSignedSSLHelper.class</exclude>
 						</excludes>
 					</instrumentation>
 					<formats>

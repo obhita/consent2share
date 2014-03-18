@@ -25,6 +25,22 @@ function initSessionTimeoutChecker() {
 	window.setTimeout(runSessionTimeout, 60000*10);
 }
 
+function openSignConsentPage(id){
+	
+	
+	$.ajax({
+		  type: "POST",
+		  url: 'signConsent.html',
+		  consentId:id,
+		  success:function(data){
+			  if(data == 'OK') {
+			        window.open(url);
+			  }
+		  }
+		  
+		});
+}
+
 function initConsentPresignStatusChecker (sign_revoke_arys) {
 	if (sign_revoke_arys.consentPreSignList.length!=0||sign_revoke_arys.consentPreRevokeList!=0) {
 			valueInterval=0;
@@ -92,7 +108,6 @@ function initListConsent(sign_revoke_arys) {
 
 
 function loadTryMyPolicy(consentId) {
-	// TODO (AO): add spinner
 	var tryMyPocilyurl = "tryMyPolicyLookupC32Documents/"+consentId; 
 	$.ajax({
 		url: tryMyPocilyurl,
@@ -102,22 +117,31 @@ function loadTryMyPolicy(consentId) {
 		data: {consentId: consentId},
 		success: function (data) { 
 			$("#tryMyPolicy_c32Docs").empty();
+			$("#consentId").remove();
 			$("#applyMyPolicyForm").append("<input id='consentId' type='hidden' name='consentId' value='" + consentId + "' />");
-			$.each(data, function(index, element) {
+			
+			// populate c32 documents
+			$.each(data.c32Documents, function(index, element) {
 				$("#tryMyPolicy_c32Docs").append('<option value='+element.id+' name="c32Id">'+element.filename+'</option>');
 
 	        });
+			
+			$("#tryMyPolicy_purposeOfUse").empty();
+			
+			// populate share for purpose of use codes
+			$.each(data.shareForPurposeOfUseCodesAndValues, function(index, element){
+				$("#tryMyPolicy_purposeOfUse").append("<option value='"+index+"'>"+element+"</option>"); 
+			});
 		}
 	});
 }
 
 $('#tryMyPolicyApplyButton').click(function(){
-
     var consentId = $('#consentId').val();
-
     var c32Id = $("#tryMyPolicy_c32Docs").val();
-
-	var url = "tryMyPolicyApply/consentId/" + consentId + "/c32Id/" + c32Id;
+    var purposeOfUse = $("#tryMyPolicy_purposeOfUse").val();
+    
+	var url = "tryMyPolicyApply/consentId/" + consentId + "/c32Id/" + c32Id + "/purposeOfUse/" + purposeOfUse;
 	window.open(url);
 });
 

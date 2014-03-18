@@ -19,6 +19,7 @@
 					<xs:sequence>
 						<xs:element name="c32Xml" nillable="false" type="xs:string" />
 						<xs:element name="xacmlPolicy" nillable="false" type="xsd:string" />
+						<xs:element name="purposeOfUse" nillable="false" type="xsd:string" />						
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>

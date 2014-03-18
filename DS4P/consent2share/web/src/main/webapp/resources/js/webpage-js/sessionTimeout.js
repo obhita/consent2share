@@ -140,17 +140,17 @@ $(document).ready(function() {
 	//If it's login page then just keep session alive. Otherwise popup to let user decide.
 	
 	if (document.body.getAttribute("id")=="index-body") {
-		$.sessionTimeout({
-			warnAfter : 840000,	//14 minutes
-			redirAfter : 900000	//15 minutes
-		});
-	}
-	else{
 		setInterval(function() {
 			$.ajax({
 				type : 'GET',
 				url : "/consent2share/keep-alive"
 			});
 			}, 840000);	//14 minutes
+	}
+	else{
+		$.sessionTimeout({
+			warnAfter : 840000,	//14 minutes
+			redirAfter : 900000	//15 minutes
+		});
 	}
 });

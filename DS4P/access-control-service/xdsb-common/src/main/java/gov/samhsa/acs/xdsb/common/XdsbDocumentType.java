@@ -34,5 +34,7 @@ public enum XdsbDocumentType {
 	/** The clinical document. */
 	CLINICAL_DOCUMENT,
 	/** The privacy consent. */
-	PRIVACY_CONSENT;
+	PRIVACY_CONSENT,
+	/** The deprecate privacy consent. */
+	DEPRECATE_PRIVACY_CONSENT;
 }

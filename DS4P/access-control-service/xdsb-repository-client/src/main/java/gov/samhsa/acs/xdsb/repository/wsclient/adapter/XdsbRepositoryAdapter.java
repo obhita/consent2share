@@ -27,6 +27,8 @@ package gov.samhsa.acs.xdsb.repository.wsclient.adapter;
 
 import java.util.List;
 
+import org.springframework.util.Assert;
+
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.xdsb.common.UniqueOidProviderImpl;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
@@ -45,6 +47,9 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
  * The Class XdsbRepositoryAdapter.
  */
 public class XdsbRepositoryAdapter {
+
+	/** The Constant EMPTY_XML_DOCUMENT. */
+	public static final String EMPTY_XML_DOCUMENT = "<empty/>";
 
 	// Services
 	/** The xdsb repository. */
@@ -100,26 +105,52 @@ public class XdsbRepositoryAdapter {
 	 * repository service with a simplified interface).
 	 * 
 	 * @param documentXmlString
-	 *            the document xml string
+	 *            the document xml string (Pass
+	 *            XdsbRepositoryAdapter.EMPTY_XML_DOCUMENT if deprecating a
+	 *            document. Otherwise, pass the actual document to be provided.)
 	 * @param homeCommunityId
-	 *            the home community id
+	 *            the home community id (May pass null if deprecating a
+	 *            document.)
 	 * @param documentTypeForXdsbMetadata
 	 *            the document type for xdsb metadata
+	 * @param patientUniqueId
+	 *            the patient unique id (Pass this only if deprecating a
+	 *            document. Otherwise, pass null.)
+	 * @param entryUUID
+	 *            the entry uuid (Pass this only if deprecating a document.
+	 *            Otherwise, pass null.)
 	 * @return the registry response
 	 * @throws Throwable
 	 *             the throwable
 	 */
 	public RegistryResponse provideAndRegisterDocumentSet(
 			String documentXmlString, String homeCommunityId,
-			XdsbDocumentType documentTypeForXdsbMetadata) throws Throwable {
+			XdsbDocumentType documentTypeForXdsbMetadata,
+			String patientUniqueId, String entryUUID) throws Throwable {
+		switch (documentTypeForXdsbMetadata) {
+		case DEPRECATE_PRIVACY_CONSENT:
+			String messageDeprecate = "patientUniqueId and entryUUID must be injected to deprecate a document.";
+			Assert.notNull(patientUniqueId, messageDeprecate);
+			Assert.notNull(entryUUID, messageDeprecate);
+			break;
+		default:
+			String messageNotDeprecate = "patientUniqueId and entryUUID can only be injected to deprecate a document.";
+			Assert.isNull(patientUniqueId, messageNotDeprecate);
+			Assert.isNull(entryUUID, messageNotDeprecate);
+			break;
+		}
 
 		String submitObjectRequestXml = generateMetadata(documentXmlString,
-				homeCommunityId, documentTypeForXdsbMetadata);
-		SubmitObjectsRequest submitObjectRequest = new SubmitObjectsRequest();
-		submitObjectRequest = marshaller.unmarshallFromXml(
-				SubmitObjectsRequest.class, submitObjectRequestXml);
+				homeCommunityId, documentTypeForXdsbMetadata, patientUniqueId,
+				entryUUID);
+		SubmitObjectsRequest submitObjectRequest = marshaller
+				.unmarshallFromXml(SubmitObjectsRequest.class,
+						submitObjectRequestXml);
 
-		Document document = createDocument(documentXmlString);
+		Document document = null;
+		if (!documentXmlString.equals(EMPTY_XML_DOCUMENT)) {
+			document = createDocument(documentXmlString);
+		}
 
 		ProvideAndRegisterDocumentSetRequest request = createProvideAndRegisterDocumentSetRequest(
 				submitObjectRequest, document);
@@ -221,13 +252,18 @@ public class XdsbRepositoryAdapter {
 	 *            the home community id
 	 * @param documentTypeForXdsbMetadata
 	 *            the document type for xdsb metadata
+	 * @param patientUniqueId
+	 *            the patient unique id
+	 * @param entryUUID
+	 *            the entry uuid
 	 * @return the string
 	 */
 	String generateMetadata(String documentXmlString, String homeCommunityId,
-			XdsbDocumentType documentTypeForXdsbMetadata) {
+			XdsbDocumentType documentTypeForXdsbMetadata,
+			String patientUniqueId, String entryUUID) {
 		XdsbMetadataGenerator xdsbMetadataGenerator = createXdsbMetadataGenerator(documentTypeForXdsbMetadata);
 		String metadata = xdsbMetadataGenerator.generateMetadataXml(
-				documentXmlString, homeCommunityId);
+				documentXmlString, homeCommunityId, patientUniqueId, entryUUID);
 		return metadata;
 	}
 
@@ -257,7 +293,9 @@ public class XdsbRepositoryAdapter {
 			SubmitObjectsRequest submitObjectRequest, Document document) {
 		ProvideAndRegisterDocumentSetRequest request = new ProvideAndRegisterDocumentSetRequest();
 		request.setSubmitObjectsRequest(submitObjectRequest);
-		request.getDocument().add(document);
+		if (document != null) {
+			request.getDocument().add(document);
+		}
 		return request;
 	}
 

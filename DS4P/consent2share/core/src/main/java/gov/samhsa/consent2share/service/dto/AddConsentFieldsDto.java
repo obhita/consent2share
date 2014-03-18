@@ -43,6 +43,9 @@ public class AddConsentFieldsDto {
     @Size(max = 250)
     private String displayName;
     
+    /** The description. */
+    private String description;
+    
 	/**
 	 * Gets the code.
 	 *
@@ -79,4 +82,21 @@ public class AddConsentFieldsDto {
 		this.displayName = displayName;
 	}
 
+	/**
+	 * Gets the description.
+	 *
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * Sets the description.
+	 *
+	 * @param description the new description
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
 }

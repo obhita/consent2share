@@ -39,7 +39,7 @@ public class TryPolicyPortTypeImpl implements TryPolicyPortType {
     /* (non-Javadoc)
      * @see gov.samhsa.acs.pep.ws.contract.TryPolicyPortType#tryPolicy(java.lang.String  c32Xml ,)java.lang.String  xacmlPolicy )*
      */
-    public java.lang.String tryPolicy(java.lang.String c32Xml,java.lang.String xacmlPolicy) { 
+    public java.lang.String tryPolicy(java.lang.String c32Xml,java.lang.String xacmlPolicy, java.lang.String purposeOfUse) { 
         LOG.info("Executing operation tryPolicy");
 
         String returnedValue = returnedValueOfTryPolicy;

@@ -57,6 +57,8 @@
 					<!-- property name="hibernate.hbm2ddl.auto" value="create"/ -->
 					<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
 					<prop key="hibernate.connection.charSet">UTF-8</prop>
+<!-- 					<prop key="hibernate.show_sql">true</prop>
+					<prop key="hibernate.format_sql">true</prop>  -->
 
 					<!-- Uncomment the following two properties for JBoss only -->
 					<!-- property name="hibernate.validator.apply_to_ddl" value="false" 

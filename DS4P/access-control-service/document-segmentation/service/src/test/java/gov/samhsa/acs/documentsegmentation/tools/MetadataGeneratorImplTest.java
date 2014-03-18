@@ -27,7 +27,7 @@ public class MetadataGeneratorImplTest {
 	public static void setUp() throws Exception {
 		// Arrange
 		fileReader = new FileReaderImpl();
-		c32 = fileReader.readFile("c32.xml");
+		c32 = fileReader.readFile("sampleC32/c32.xml");
 		executionResponseContainer = fileReader
 				.readFile("ruleExecutionResponseContainer.xml");
 		homeCommunityId = "2.16.840.1.113883.3.467";

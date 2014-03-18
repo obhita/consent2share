@@ -25,6 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.acs.brms;
 
+import javax.xml.bind.JAXBException;
+
 import gov.samhsa.acs.brms.domain.ClinicalFact;
 import gov.samhsa.acs.brms.domain.FactModel;
 import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
@@ -84,25 +86,18 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * gov.samhsa.consent2share.accesscontrolservices.brms.RuleExecutionService
-	 * #assertAndExecuteClinicalFacts(java.lang.String)
+	 * gov.samhsa.acs.brms.RuleExecutionService#assertAndExecuteClinicalFacts
+	 * (gov.samhsa.acs.brms.domain.FactModel)
 	 */
 	@Override
 	public AssertAndExecuteClinicalFactsResponse assertAndExecuteClinicalFacts(
-			String factModelXmlString) {
+			FactModel factModel) {
 		RuleExecutionContainer executionResponseContainer = null;
-		FactModel factModel = new FactModel();
 		AssertAndExecuteClinicalFactsResponse assertAndExecuteResponse = new AssertAndExecuteClinicalFactsResponse();
-
 		String executionResponseContainerXMLString = null;
 
-		LOGGER.debug("factModelXmlString: " + factModelXmlString);
 		StatefulKnowledgeSession session = createStatefulKnowledgeSession();
 		try {
-			// unmarshall factmodel
-			factModel = marshaller.unmarshallFromXml(FactModel.class,
-					factModelXmlString);
-
 			session.insert(factModel.getXacmlResult());
 			for (ClinicalFact clinicalFact : factModel.getClinicalFactList()) {
 				session.insert(clinicalFact);
@@ -138,11 +133,29 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 				session.dispose();
 			}
 		}
-
 		assertAndExecuteResponse
 				.setRuleExecutionResponseContainer(executionResponseContainerXMLString);
-
 		return assertAndExecuteResponse;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.acs.brms.RuleExecutionService#assertAndExecuteClinicalFacts
+	 * (java.lang.String)
+	 */
+	@Override
+	public AssertAndExecuteClinicalFactsResponse assertAndExecuteClinicalFacts(
+			String factModelXmlString) {
+		FactModel factModel = null;
+		try {
+			factModel = marshaller.unmarshallFromXml(FactModel.class,
+					factModelXmlString);
+		} catch (JAXBException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		return assertAndExecuteClinicalFacts(factModel);
 	}
 
 	/**

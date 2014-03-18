@@ -25,13 +25,17 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.tools;
 
+import gov.samhsa.acs.brms.domain.FactModel;
 import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
-import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.brms.domain.XacmlResult;
 
+/**
+ * The Interface DocumentRedactor.
+ */
 public interface DocumentRedactor {
 
 	/**
-	 * Redact document
+	 * Redact document.
 	 * 
 	 * @param document
 	 *            the document
@@ -39,9 +43,20 @@ public interface DocumentRedactor {
 	 *            the rule execution container
 	 * @param xacmlResult
 	 *            the xacml result
+	 * @param factModel
+	 *            the fact model
 	 * @return the string
 	 */
 	public abstract String redactDocument(String document,
 			RuleExecutionContainer ruleExecutionContainer,
-			XacmlResult xacmlResult);
+			XacmlResult xacmlResult, FactModel factModel);
+
+	/**
+	 * Clean up generated entry ids.
+	 * 
+	 * @param document
+	 *            the document
+	 * @return the string
+	 */
+	public abstract String cleanUpGeneratedEntryIds(String document);
 }

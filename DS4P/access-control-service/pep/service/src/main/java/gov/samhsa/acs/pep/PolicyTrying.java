@@ -8,5 +8,5 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 
 public interface PolicyTrying {
-	String tryPolicy(String c32Xml, String xacmlPolicy) throws ParserConfigurationException, SAXException, IOException, TransformerException;
+	String tryPolicy(String c32Xml, String xacmlPolicy, String purposeOfUse) throws ParserConfigurationException, SAXException, IOException, TransformerException;
 }

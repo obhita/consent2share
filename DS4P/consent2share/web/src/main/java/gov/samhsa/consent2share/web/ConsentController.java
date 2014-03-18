@@ -28,6 +28,7 @@ package gov.samhsa.consent2share.web;
 import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.clinicaldata.ClinicalDocument;
 import gov.samhsa.consent2share.infrastructure.CodedConceptLookupService;
+import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.clinicaldata.ClinicalDocumentService;
@@ -44,6 +45,7 @@ import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
+import gov.samhsa.consent2share.service.dto.TryMyPolicyDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
 import gov.samhsa.consent2share.service.patient.PatientNotFoundException;
 import gov.samhsa.consent2share.service.patient.PatientService;
@@ -51,8 +53,8 @@ import gov.samhsa.consent2share.service.reference.AdministrativeGenderCodeServic
 import gov.samhsa.consent2share.service.reference.ClinicalDocumentSectionTypeCodeService;
 import gov.samhsa.consent2share.service.reference.ClinicalDocumentTypeCodeService;
 import gov.samhsa.consent2share.service.reference.PurposeOfUseCodeService;
-import gov.samhsa.consent2share.service.reference.SensitivityPolicyCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
+import gov.samhsa.consent2share.service.valueset.ValueSetCategoryService;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -124,10 +126,10 @@ public class ConsentController {
 
 	@Autowired
 	NotificationService notificationService;
-
-	/** The sensitivity policy code service. */
+	
+	/** The value set category service. */
 	@Autowired
-	private SensitivityPolicyCodeService sensitivityPolicyCodeService;
+	private ValueSetCategoryService valueSetCategoryService;
 	
 	/** The administrative gender code service. */
 	@Autowired
@@ -144,10 +146,14 @@ public class ConsentController {
 	/** The consent export service. */
 	@Autowired
 	private ConsentExportService consentExportService;
-
+	
+	@Autowired
+	private AccessReferenceMapper accessReferenceMapper;
+	
 	/** The logger. */
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
+	/** The C32_ do c_ code. */
 	public final String C32_DOC_CODE = "34133-9";
 	private Properties properties;
 
@@ -163,42 +169,43 @@ public class ConsentController {
 	 * @return the string
 	 */
 	@RequestMapping(value = "signConsent.html", method = RequestMethod.POST)
-	public String signConsent(HttpServletRequest request,
+	public String signConsent(Model model, HttpServletRequest request,
 			HttpServletResponse response,
-			@RequestParam("consentId") long consentId) {
-		AuthenticatedUser currentUser = userContext.getCurrentUser();
-		Long patientId = patientService.findIdByUsername(currentUser
-				.getUsername());
-		ConsentPdfDto consentPdfDto = consentService
-				.findConsentPdfDto(consentId);
-		if (consentService.isConsentBelongToThisUser(consentId, patientId)) {
-			if(consentService.signConsent(consentPdfDto)==true);
-				return "redirect:listConsents.html?emailsent=true";
+			@RequestParam("consentId") String consentId) {
+		AuthenticatedUser currentUser=userContext.getCurrentUser();
+		Long patientId = patientService.findIdByUsername(currentUser.getUsername());
+		Long directConsentId=accessReferenceMapper.getDirectReference(consentId);
+		if(consentService.isConsentBelongToThisUser(directConsentId, patientId)){
+			ConsentPdfDto consentPdfDto = consentService
+					.findConsentPdfDto(directConsentId);
+			String javascriptCode=consentService.createConsentEmbeddedWidget(consentPdfDto);
+			model.addAttribute("returned_javascript", javascriptCode);
+			return "views/consents/signConsent";
 		}
-		return "redirect:listConsents.html?emailsent=false";
+		return "redirect:listConsents.html";
 	}
 
 	@RequestMapping(value = "signConsentRevokation", method = RequestMethod.POST)
-	public String signConsentRevokation(HttpServletRequest request,
+	public String signConsentRevokation(Model model, HttpServletRequest request,
 			HttpServletResponse response,
-			@RequestParam("consentId") long consentId,
+			@RequestParam("consentId") String consentId,
 			@RequestParam("revokationType") String revokationType) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());
-
-		consentService.addUnsignedConsentRevokationPdf(consentId,
+		Long directConsentId=accessReferenceMapper.getDirectReference(consentId);
+		consentService.addUnsignedConsentRevokationPdf(directConsentId,
 				revokationType);
-		ConsentRevokationPdfDto consentRevokationPdfDto = consentService
-				.findConsentRevokationPdfDto(consentId);
-		consentRevokationPdfDto.setRevokationType(revokationType);
-
-		if (consentService.isConsentBelongToThisUser(consentId, patientId)) {
-			consentService.signConsentRevokation(consentRevokationPdfDto);
-			return "redirect:listConsents.html?emailsent=true";
+		if (consentService.isConsentBelongToThisUser(directConsentId, patientId)) {
+			ConsentRevokationPdfDto consentRevokationPdfDto = consentService
+					.findConsentRevokationPdfDto(directConsentId);
+			consentRevokationPdfDto.setRevokationType(revokationType);
+			String javascriptCode=consentService.createRevocationEmbeddedWidget(consentRevokationPdfDto);
+			model.addAttribute("returned_javascript", javascriptCode);
+			return "views/consents/signConsent";
 		}
 
-		return "redirect:listConsents.html?emailsent=false";
+		return "redirect:listConsents.html";
 	}
 
 	/**
@@ -238,12 +245,14 @@ public class ConsentController {
 		List<ConsentListDto> consentListDtos = consentService
 				.findAllConsentsDtoByPatient(patientService
 						.findIdByUsername(currentUser.getUsername()));
+		accessReferenceMapper.setupAccessReferenceMap(consentListDtos);
 		model.addAttribute("listConsentDtos", consentListDtos);
 		model.addAttribute("currentUser", currentUser);
 		model.addAttribute("emailSent", emailSent);
 		model.addAttribute("notification", notification);
 		return "views/consents/listConsents";
 	}
+	
 
 	@RequestMapping(value = "listConsents.html/checkConsentStatus", method = RequestMethod.GET)
 	public void ajaxCheckConsentStatus(Model model, HttpServletRequest request,
@@ -265,8 +274,7 @@ public class ConsentController {
 			for (String consentIdString : consentPreSignStringList) {
 				long consentId = Long.parseLong(consentIdString);
 				for (ConsentListDto consentListDto : consentListDtos) {
-					if (consentListDto.getId() == consentId
-							&& consentListDto.getConsentStage().equals("CONSENT_SIGNED"))
+					if (consentListDto.getId().equals(String.valueOf(consentId))&& consentListDto.getConsentStage().equals("CONSENT_SIGNED"))
 						isSigned = true;
 				}
 			}
@@ -274,9 +282,8 @@ public class ConsentController {
 		
 		if (consentPreRevokeStringList!= null) {
 			for (String consentIdString : consentPreRevokeStringList) {
-				long consentId = Long.parseLong(consentIdString);
 				for (ConsentListDto consentListDto : consentListDtos) {
-					if (consentListDto.getId() == consentId
+					if (consentListDto.getId().equals(consentIdString)
 							&& consentListDto.getRevokeStage().equals("REVOCATION_REVOKED"))
 						isSigned = true;
 				}
@@ -327,8 +334,7 @@ public class ConsentController {
 		
 		populateLookupCodes(model);
 
-		List<AddConsentFieldsDto> sensitivityPolicyDto = sensitivityPolicyCodeService
-				.findAllSensitivityPolicyCodesAddConsentFieldsDto();
+		List<AddConsentFieldsDto> sensitivityPolicyDto = valueSetCategoryService.findAllValueSetCategoriesAddConsentFieldsDto();
 		List<AddConsentFieldsDto> purposeOfUseDto = purposeOfUseCodeService
 				.findAllPurposeOfUseCodesAddConsentFieldsDto();
 		List<AddConsentFieldsDto> clinicalDocumentSectionTypeDto = clinicalDocumentSectionTypeCodeService
@@ -357,11 +363,11 @@ public class ConsentController {
 
 	@RequestMapping(value = "editConsent.html")
 	public String consetEdit(@RequestParam(value = "patientId", defaultValue = "-1") long in_patientId, Model model,
-			@RequestParam("consentId") long consentId) {
+			@RequestParam("consentId") String consentId) {
 
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		PatientProfileDto currentPatient = null;
-		
+		Long directConsentId=accessReferenceMapper.getDirectReference(consentId);
 		if (currentUser.getIsProviderAdmin() == true) {
 			try{
 				currentPatient = patientService.findPatient(in_patientId);
@@ -381,7 +387,8 @@ public class ConsentController {
 			}
 		}
 		
-		ConsentDto consentDto = consentService.findConsentById(consentId);
+		ConsentDto consentDto = consentService.findConsentById(directConsentId);
+		consentDto.setId(consentId);
 		
 		//Make sure current patient and patient listed in consentDto match
 		if(!consentDto.getUsername().equals(currentPatient.getUsername())){
@@ -402,8 +409,7 @@ public class ConsentController {
 			
 			populateLookupCodes(model);
 	
-			List<AddConsentFieldsDto> sensitivityPolicyDto = sensitivityPolicyCodeService
-					.findAllSensitivityPolicyCodesAddConsentFieldsDto();
+			List<AddConsentFieldsDto> sensitivityPolicyDto = valueSetCategoryService.findAllValueSetCategoriesAddConsentFieldsDto();
 			List<AddConsentFieldsDto> purposeOfUseDto = purposeOfUseCodeService
 					.findAllPurposeOfUseCodesAddConsentFieldsDto();
 			List<AddConsentFieldsDto> clinicalDocumentSectionTypeDto = clinicalDocumentSectionTypeCodeService
@@ -430,7 +436,7 @@ public class ConsentController {
 			model.addAttribute("purposeOfUse", purposeOfUseDto);
 			model.addAttribute("organizationalProvidersDto",
 					organizationalProvidersDto);
-	
+			model.addAttribute("isProviderAdminUser", false);
 			model.addAttribute("addConsent", false);
 	
 			return "views/consents/addConsent";
@@ -455,7 +461,10 @@ public class ConsentController {
 	public String consentAddPost(@Valid ConsentDto consentDto,
 			BindingResult bindingResult, Model model,
 			@RequestParam(value = "ICD9", required = false) HashSet<String> icd9) throws ConsentGenException {
-		
+		if (consentDto.getId()!=null) {
+			String directConsentId=String.valueOf(accessReferenceMapper.getDirectReference(consentDto.getId()));
+			consentDto.setId(directConsentId);
+		}
 		Set<String> isMadeTo = new HashSet<String>();
 		Set<String> isMadeFrom = new HashSet<String>();
 		if (consentDto.getOrganizationalProvidersDisclosureIsMadeTo() != null)
@@ -555,13 +564,14 @@ public class ConsentController {
 	@RequestMapping(value = "/downloadPdf.html", method = RequestMethod.POST)
 	public String downloadConsentPdfFile(HttpServletRequest request,
 			HttpServletResponse response,
-			@RequestParam("consentId") long consentId,
+			@RequestParam("consentId") String consentId,
 			@RequestParam("doctype") String docType) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());
-		AbstractPdfDto pdfDto = getPdfDto(docType, consentId);
-		if (consentService.isConsentBelongToThisUser(consentId, patientId)) {
+		Long directConsentId=accessReferenceMapper.getDirectReference(consentId);
+		AbstractPdfDto pdfDto = getPdfDto(docType, directConsentId);
+		if (consentService.isConsentBelongToThisUser(directConsentId, patientId)) {
 			try {
 				response.setHeader("Content-Disposition",
 						"attachment;filename=\"" + pdfDto.getFilename() + "\"");
@@ -593,16 +603,16 @@ public class ConsentController {
 	 * @return the string
 	 */
 	@RequestMapping(value="/deleteConsents", method = RequestMethod.POST)
-	public String deleteConsent(@RequestParam("consentId") Long consentId) {
+	public String deleteConsent(@RequestParam("consentId") String consentId) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());
 		
 		//TODO: Add code to display notice to user on delete failure
 		boolean isDeleteSuccess = false;
-		
-		if (consentService.isConsentBelongToThisUser(consentId, patientId)) {
-			isDeleteSuccess = consentService.deleteConsent(consentId);
+		Long directConsentId=accessReferenceMapper.getDirectReference(consentId);
+		if (consentService.isConsentBelongToThisUser(directConsentId, patientId)) {
+			isDeleteSuccess = consentService.deleteConsent(directConsentId);
 			return "redirect:/consents/listConsents.html";
 		}
 		return "redirect:/consents/listConsents.html";
@@ -623,13 +633,13 @@ public class ConsentController {
 	@RequestMapping("exportCDAR2Consents/{consentId}")
 	public String exportCDAR2Consents(HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable("consentId") Long consentId) throws ConsentGenException {
+			@PathVariable("consentId") String consentId) throws ConsentGenException {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());
-
-		if (consentService.isConsentBelongToThisUser(consentId, patientId)) {
-			String cdar2 = consentExportService.exportConsent2CDAR2(consentId);
+		Long directConsentId=accessReferenceMapper.getDirectReference(consentId);
+		if (consentService.isConsentBelongToThisUser(directConsentId, patientId)) {
+			String cdar2 = consentExportService.exportConsent2CDAR2(directConsentId);
 			response.setContentType("application/xml");
 			response.setHeader("Content-Disposition",
 					"attachment;filename=CDAR2consent" + consentId);
@@ -657,13 +667,14 @@ public class ConsentController {
 	@RequestMapping("exportXACMLConsents/{consentId}")
 	public String exportXACMLConsents(HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable("consentId") Long consentId) throws ConsentGenException {
+			@PathVariable("consentId") String consentId) throws ConsentGenException {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());
+		Long directConsentId=accessReferenceMapper.getDirectReference(consentId);
+		if (consentService.isConsentBelongToThisUser(directConsentId, patientId)) {
+			String xacmal = consentExportService.exportConsent2XACML(directConsentId);
 
-		if (consentService.isConsentBelongToThisUser(consentId, patientId)) {
-			String xacmal = consentExportService.exportConsent2XACML(consentId);
 			response.setContentType("application/xml");
 			response.setHeader("Content-Disposition",
 					"attachment;filename=XACMLconsent" + consentId);
@@ -699,13 +710,16 @@ public class ConsentController {
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "tryMyPolicyLookupC32Documents/{consentId}", method = RequestMethod.GET)
-	public @ResponseBody List<ClinicalDocumentDto> tryMyPolicyLookupC32Documents(Model model, HttpServletRequest request,
-			HttpServletResponse response, @PathVariable("consentId") Long consentId) throws IOException {
+	public @ResponseBody TryMyPolicyDto tryMyPolicyLookupC32Documents(Model model, HttpServletRequest request,
+			HttpServletResponse response, @PathVariable("consentId") String consentId) throws IOException {
+		
+		// TODO (AO): validate file
 		
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());
-		
+		TryMyPolicyDto tryMyPolicyDto = new TryMyPolicyDto();
+		Long directConsentId=accessReferenceMapper.getDirectReference(consentId);
 		List<ClinicalDocument> clinicalDocuments = clinicalDocumentService.findByPatientId(patientId);
 		List<ClinicalDocumentDto> c32Documents = new ArrayList<ClinicalDocumentDto>();
 		
@@ -714,14 +728,18 @@ public class ConsentController {
 			// return c32 documents only
 			if (clinicalDocuments.get(i).getClinicalDocumentTypeCode().getCode().equals(C32_DOC_CODE)) {
 				ClinicalDocumentDto dto = new ClinicalDocumentDto();
-				dto.setId(clinicalDocuments.get(i).getId());
+				dto.setId(String.valueOf(clinicalDocuments.get(i).getId()));
 				dto.setFilename(clinicalDocuments.get(i).getFilename());
 				
 				c32Documents.add(dto);
 			}
 		}
+		
+		// TODO: move dto to service 
+		tryMyPolicyDto.setC32Documents(c32Documents);
+		tryMyPolicyDto.setShareForPurposeOfUseCodesAndValues(consentService.findConsentById(directConsentId).getPurposeOfUseCodesAndValues());
 
-	    return c32Documents;
+	    return tryMyPolicyDto;
 	}
 	
 	/**
@@ -740,15 +758,18 @@ public class ConsentController {
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 */
-	@RequestMapping(value = "tryMyPolicyApply/consentId/{consentId}/c32Id/{c32Id}", method = RequestMethod.GET)
+	@RequestMapping(value = "tryMyPolicyApply/consentId/{consentId}/c32Id/{c32Id}/purposeOfUse/{purposeOfUse}", method = RequestMethod.GET)
 	public @ResponseBody String tryMyPolicyApply(Model model, HttpServletRequest request,
-			HttpServletResponse response, @PathVariable("consentId") Long consentId, @PathVariable("c32Id") Long c32Id) throws ConsentGenException, IOException, TransformerConfigurationException, TransformerException, ParserConfigurationException, SAXException {
+			HttpServletResponse response, @PathVariable("consentId") String consentId, @PathVariable("c32Id") Long c32Id, @PathVariable("purposeOfUse") String purposeOfUse) throws ConsentGenException, IOException, TransformerConfigurationException, TransformerException, ParserConfigurationException, SAXException {
 		
 		//String c32Id = request.getParameter("c32Id");
 		//Long consentId = Long.parseLong(request.getParameter("consentId"));
 		
-		System.out.println("Consent id: " + consentId);
-		System.out.println("C32 id: " + c32Id);
+		Long directConsentId=accessReferenceMapper.getDirectReference(consentId);
+		
+		logger.info("Consent id: " + consentId);
+		logger.info("C32 id: " + c32Id);
+		logger.info("Purpose of use: " + purposeOfUse);
 		
 		// move to service
 		ClinicalDocument document = clinicalDocumentService.findClinicalDocument(c32Id);
@@ -756,12 +777,12 @@ public class ConsentController {
 		String originalC32 = new String(document.getContent());
 		
 		// get tagged c32 
-		String taggedC32xml = consentService.getTaggedC32(originalC32, consentId);
+		String taggedC32xml = consentService.getTaggedC32(originalC32, directConsentId, purposeOfUse);
 		
 		//response.setContentType("text/xml");
 		response.setContentType("application/xml");
 		
-	    System.out.println("tagged c32: " + taggedC32xml);
+		logger.info("tagged c32: " + taggedC32xml);
 	    
 		return taggedC32xml;
 	}
@@ -776,6 +797,6 @@ public class ConsentController {
 		model.addAttribute("administrativeGenderCodes", administrativeGenderCodeService.findAllAdministrativeGenderCodes());
 		model.addAttribute("stateCodes", stateCodeService.findAllStateCodes());
 	}
-
+	
 
 }

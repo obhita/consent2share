@@ -74,9 +74,9 @@ public class ContextHandlerImpl implements ContextHandler {
 	 * @see gov.samhsa.acs.contexthandler.ContextHandler#makeDecisionForTryingPolicy(java.lang.String)
 	 */
 	@Override
-	public PdpRequestResponse makeDecisionForTryingPolicy(String xacmlPolicy) {
+	public PdpRequestResponse makeDecisionForTryingPolicy(String xacmlPolicy, String purposeOfUse) {
 		LOGGER.debug("makeDecisionForTryingPolicy(xacmlPolicy) is invoked");
 		Assert.hasText(xacmlPolicy, "Xaml policy is not set");
-		return policyDesicionPoint.evaluatePolicyForTrying(xacmlPolicy);
+		return policyDesicionPoint.evaluatePolicyForTrying(xacmlPolicy, purposeOfUse);
 	}
 }

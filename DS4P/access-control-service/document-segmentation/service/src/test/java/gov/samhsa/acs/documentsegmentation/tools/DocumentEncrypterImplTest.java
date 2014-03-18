@@ -52,7 +52,7 @@ public class DocumentEncrypterImplTest {
 
 		documentEncrypter = new DocumentEncrypterImpl(documentXmlConverter);
 
-		c32 = fileReader.readFile("c32.xml");
+		c32 = fileReader.readFile("sampleC32/c32.xml");
 		c32Document = documentXmlConverter.loadDocument(c32);
 
 		ruleExecutionContainer = setRuleExecutionContainer();

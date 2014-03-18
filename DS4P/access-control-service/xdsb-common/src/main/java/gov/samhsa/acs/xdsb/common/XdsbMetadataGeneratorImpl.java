@@ -63,14 +63,23 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 	/** The Constant XDSB_METADATA_XSL_FILE_NAME_FOR_PRIVACY_CONSENT. */
 	private static final String XDSB_METADATA_XSL_FILE_NAME_FOR_PRIVACY_CONSENT = "XdsbMetadataForXacmlPolicy.xsl";
 
+	/** The Constant XDSB_METADATA_XSL_FILE_NAME_FOR_PRIVACY_CONSENT_DEPRECATED. */
+	private static final String XDSB_METADATA_XSL_FILE_NAME_FOR_PRIVACY_CONSENT_DEPRECATED = "XdsbMetadataForXacmlPolicyDeprecated.xsl";
+
 	/** The Constant HomeCommunityId_Parameter_Name. */
 	private static final String HomeCommunityId_Parameter_Name = "homeCommunityId";
+
+	/** The Constant PatientUniqueId_Parameter_Name. */
+	private static final String PatientUniqueId_Parameter_Name = "patientUniqueId";
 
 	/** The Constant XdsDocumentEntry_UniqueId_Parameter_Name. */
 	private static final String XdsDocumentEntry_UniqueId_Parameter_Name = "XDSDocumentEntry_uniqueId";
 
 	/** The Constant XdsSubmissionSet_UniqueId_Parameter_Name. */
 	private static final String XdsSubmissionSet_UniqueId_Parameter_Name = "XDSSubmissionSet_uniqueId";
+
+	/** The Constant XdsDocumentEntry_EntryUUID_Parameter_Name. */
+	private static final String XdsDocumentEntry_EntryUUID_Parameter_Name = "XDSDocumentEntry_entryUUID";
 
 	/** The document type for xdsb metadata. */
 	private XdsbDocumentType documentTypeForXdsbMetadata;
@@ -99,11 +108,13 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see XdsbMetadataGenerator#generateMetadataXml (java.lang.String,
-	 * java.lang.String)
+	 * @see
+	 * gov.samhsa.acs.xdsb.common.XdsbMetadataGenerator#generateMetadataXml(
+	 * java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public String generateMetadataXml(String document, String homeCommunityId) {
+	public String generateMetadataXml(String document, String homeCommunityId,
+			String patientUniqueId, String entryUUID) {
 
 		StringWriter stringWriter = null;
 		InputStream inputStream = null;
@@ -134,6 +145,13 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 			transformer.setParameter(XdsSubmissionSet_UniqueId_Parameter_Name,
 					xdsSubmissionSetUniqueId);
 
+			setParameterIfDeprecateDocumentAction(transformer,
+					XdsDocumentEntry_EntryUUID_Parameter_Name, entryUUID,
+					"entryUUID can only be injected while deprecating a document.");
+			setParameterIfDeprecateDocumentAction(transformer,
+					PatientUniqueId_Parameter_Name, patientUniqueId,
+					"patientUniqueId can only be injected while deprecating a document.");
+
 			stringWriter = new StringWriter();
 			transformer.transform(new StreamSource(new StringReader(document)),
 					new StreamResult(stringWriter));
@@ -156,14 +174,16 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see XdsbMetadataGenerator#generateMetadata (java.lang.String,
-	 * java.lang.String)
+	 * @see
+	 * gov.samhsa.acs.xdsb.common.XdsbMetadataGenerator#generateMetadata(java
+	 * .lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public SubmitObjectsRequest generateMetadata(String document,
-			String homeCommunityId) {
+			String homeCommunityId, String patientUniqueId, String entryUUID) {
 
-		String metadataXml = generateMetadataXml(document, homeCommunityId);
+		String metadataXml = generateMetadataXml(document, homeCommunityId,
+				patientUniqueId, entryUUID);
 		SubmitObjectsRequest submitObjectsRequest = null;
 		try {
 			submitObjectsRequest = marshaller.unmarshallFromXml(
@@ -184,16 +204,42 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 	 */
 	private String resolveXslFileName(
 			XdsbDocumentType documentTypeForXdsbMetadata) {
-		if (XdsbDocumentType.CLINICAL_DOCUMENT
-				.equals(documentTypeForXdsbMetadata)) {
+
+		switch (documentTypeForXdsbMetadata) {
+		case CLINICAL_DOCUMENT:
 			return XDSB_METADATA_XSL_FILE_NAME_FOR_CLINICAL_DOCUMENT;
-		} else if (XdsbDocumentType.PRIVACY_CONSENT
-				.equals(documentTypeForXdsbMetadata)) {
+		case PRIVACY_CONSENT:
 			return XDSB_METADATA_XSL_FILE_NAME_FOR_PRIVACY_CONSENT;
-		} else {
-			logger.error("Invalid document type for XdsbMetadataGenerator.");
+		case DEPRECATE_PRIVACY_CONSENT:
+			return XDSB_METADATA_XSL_FILE_NAME_FOR_PRIVACY_CONSENT_DEPRECATED;
+		default:
 			throw new DS4PException(
-					"Invalid document type for XdsbMetadataGenerator.");
+					"Unsupported document type for XdsbMetadataGenerator.");
+		}
+	}
+
+	/**
+	 * Sets the parameter if deprecate document action.
+	 * 
+	 * @param transformer
+	 *            the transformer
+	 * @param parameterName
+	 *            the parameter name
+	 * @param parameterValue
+	 *            the parameter value
+	 * @param errorMessage
+	 *            the error message
+	 */
+	private void setParameterIfDeprecateDocumentAction(Transformer transformer,
+			String parameterName, String parameterValue, String errorMessage) {
+		if (parameterValue != null) {
+			if (!documentTypeForXdsbMetadata
+					.equals(XdsbDocumentType.DEPRECATE_PRIVACY_CONSENT)) {
+				logger.error(errorMessage);
+				throw new DS4PException(errorMessage);
+			} else {
+				transformer.setParameter(parameterName, parameterValue.replace("'", ""));
+			}
 		}
 	}
 }

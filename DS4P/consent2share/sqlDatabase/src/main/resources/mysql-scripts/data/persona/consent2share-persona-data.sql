@@ -7,7 +7,8 @@ insert into users (username,password,enabled,failed_attempts)
 values ('consent2share.admin','9465493d519b7fd926a3b2b69887c41222018215880b9a014382624a4369e1cff57c494b8ac46b5b',1,0);
 insert into users (username,password,enabled,failed_attempts)
 values ('disabled1','46ce538975b7f0826c44dfd5dada4c2eac8ab47b717a596aae311cd31695fe612523b7e644cd21e8',0,0);
-
+insert into users (username,password,enabled,failed_attempts)
+values ('consent2share.sysadmin','eb0b0f45263cb8239fdcc45d57e6ee9a7fabf5996d6b64d3cbd2e2b7e18a49183179fe4831d86ac3',1,0);
 
 insert into authorities(username,authority)
 values ('albert.smith','ROLE_USER');
@@ -17,6 +18,8 @@ insert into authorities(username,authority)
 values ('consent2share.admin','ROLE_ADMIN');
 insert into authorities(username,authority)
 values ('disabled1','ROLE_USER');
+insert into authorities(username,authority)
+values ('consent2share.sysadmin','ROLE_SYSADMIN');
 
 
 insert into patient(username, first_name, last_name, birth_day, administrative_gender_code, email, version,telephone, street_address_line,city, state_code,postal_code,country_code)
@@ -111,14 +114,14 @@ INSERT INTO consent_share_for_purpose_of_use_code(consent_id, purpose_of_use_cod
 INSERT INTO consent_share_for_purpose_of_use_code(consent_id, purpose_of_use_code) VALUES(2,9);
 INSERT INTO consent_share_for_purpose_of_use_code(consent_id, purpose_of_use_code) VALUES(2,7);
 
-INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, sensitivity_policy_code) VALUES(1,2);
-INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, sensitivity_policy_code) VALUES(1,6);
-INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, sensitivity_policy_code) VALUES(1,1);
-INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, sensitivity_policy_code) VALUES(1,4);
-INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, sensitivity_policy_code) VALUES(2,2);
-INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, sensitivity_policy_code) VALUES(2,6);
-INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, sensitivity_policy_code) VALUES(2,1);
-INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, sensitivity_policy_code) VALUES(2,4);
+INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, value_set_category) VALUES(1,2);
+INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, value_set_category) VALUES(1,6);
+INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, value_set_category) VALUES(1,1);
+INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, value_set_category) VALUES(1,4);
+INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, value_set_category) VALUES(2,2);
+INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, value_set_category) VALUES(2,6);
+INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, value_set_category) VALUES(2,1);
+INSERT INTO consent_do_not_share_sensitivity_policy_code(consent_id, value_set_category) VALUES(2,4);
 
 INSERT INTO consent_individual_provider_disclosure_is_made_to(consent_id, individual_provider) VALUES(1,1);
 INSERT INTO consent_individual_provider_disclosure_is_made_to(consent_id, individual_provider) VALUES(1,2);

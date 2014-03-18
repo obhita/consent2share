@@ -87,7 +87,7 @@ public class XdsbRepositoryServiceImpl implements XdsbRepositoryService {
 		RegistryResponse response = null;
 		try {
 			response = xdsbRepository.provideAndRegisterDocumentSet(
-					documentXmlString, domainId, xdsbDocumentType);
+					documentXmlString, domainId, xdsbDocumentType, null, null);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 			throw new AcsShowCaseException(

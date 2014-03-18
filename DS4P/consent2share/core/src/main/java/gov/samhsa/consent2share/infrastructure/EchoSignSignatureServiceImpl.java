@@ -31,6 +31,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
+
 import echosign.api.clientv15.dto.ArrayOfDocumentKey;
 import echosign.api.clientv15.dto.ArrayOfFileInfo;
 import echosign.api.clientv15.dto.CallbackInfo;
@@ -40,9 +42,15 @@ import echosign.api.clientv15.dto.Pong;
 import echosign.api.clientv15.dto.SignatureFlow;
 import echosign.api.clientv15.dto.SignatureType;
 import echosign.api.clientv15.dto14.ArrayOfRecipientInfo;
+import echosign.api.clientv15.dto14.GetDocumentsOptions;
+import echosign.api.clientv15.dto14.GetDocumentsResult;
 import echosign.api.clientv15.dto14.RecipientInfo;
 import echosign.api.clientv15.dto14.RecipientRole;
 import echosign.api.clientv15.dto15.DocumentInfo;
+import echosign.api.clientv15.dto8.EmbeddedWidgetCreationResult;
+import echosign.api.clientv15.dto8.GetFormDataResult;
+import echosign.api.clientv15.dto8.WidgetCreationInfo;
+import echosign.api.clientv15.dto8.WidgetPersonalizationInfo;
 import echosign.api.clientv15.service.EchoSignDocumentService15Client;
 import echosign.api.clientv15.service.EchoSignDocumentService15PortType;
 
@@ -82,7 +90,7 @@ public class EchoSignSignatureServiceImpl implements EchoSignSignatureService {
 	 *
 	 * @return the cached service
 	 */
-	private EchoSignDocumentService15PortType getCachedService() {
+	EchoSignDocumentService15PortType getCachedService() {
 		if (cachedService == null) {
 			EchoSignDocumentService15Client client = new EchoSignDocumentService15Client();
 			cachedService = client
@@ -90,6 +98,8 @@ public class EchoSignSignatureServiceImpl implements EchoSignSignatureService {
 		}
 		return cachedService;
 	}
+	
+	
 
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.domain.commondomainservices.SignatureService#sendDocumentToSign(byte[], java.lang.String, java.lang.String, java.lang.String, java.lang.String)
@@ -156,6 +166,8 @@ public class EchoSignSignatureServiceImpl implements EchoSignSignatureService {
 			// is being sent and/or why their signature is required.
 			documentInfo.setMessage(messageToRecipient);
 		}
+		
+		
 
 		// Optional parameter which sets how often you'd like the recipient(s)
 		// to be reminded to sign this document.
@@ -218,10 +230,23 @@ public class EchoSignSignatureServiceImpl implements EchoSignSignatureService {
 	@Override
 	public byte[] getLatestDocument(String documentKey){
 		Assert.hasText(documentKey, "Document key must not be null or empty.");
-		byte[] data = getCachedService().getLatestDocument(echoSignApiKey,
-				documentKey);
-		
-		return data;
+			GetDocumentsOptions documentOptions=new GetDocumentsOptions();
+			GetDocumentsResult documentResult
+				= getCachedService().getDocuments(echoSignApiKey, documentKey, documentOptions);
+			return documentResult.getDocuments().getDocumentContent().get(0).getBytes();
+	}
+	
+	@Override
+	public String getChildDocumentKey(String documentKey) {
+		GetFormDataResult getFormDataResult=getCachedService().getFormData(echoSignApiKey, documentKey);
+		String formDataCsv=getFormDataResult.getFormDataCsv();
+		if (formDataCsv!=null) {
+			String[] splittedFormDataCsv=formDataCsv.split(",");
+			String childApiKey=splittedFormDataCsv[splittedFormDataCsv.length-1];
+			childApiKey=childApiKey.replace("\"", "");
+			return childApiKey;
+		}
+		return null;
 	}
 	
 	/**
@@ -243,5 +268,70 @@ public class EchoSignSignatureServiceImpl implements EchoSignSignatureService {
 	public byte[] testEchoFile(byte[] input){
 		byte[] output = getCachedService().testEchoFile(echoSignApiKey, input);
 		return output;
+	}
+
+	@Override
+	public EmbeddedWidgetCreationResult createEmbeddedWidget(byte[] documentBytes,
+			String documentFileName, String documentName, String signedDocumentUrl, String email) {
+		Assert.notNull(documentBytes, "Document bytes must not be null.");
+		Assert.hasText(documentFileName,
+				"Document file name must not be null or empty.");
+
+		FileInfo fileInfo = new FileInfo();
+		// fileName is required
+		fileInfo.setFileName(documentFileName);
+		// The raw file content, encoded using base64.
+		fileInfo.setFile(documentBytes);
+
+		ArrayOfFileInfo fileInfos = new ArrayOfFileInfo();
+		fileInfos.getFileInfo().add(fileInfo);
+		WidgetCreationInfo widgetInfo=new WidgetCreationInfo();
+
+		if (!StringUtils.hasText(documentName)) {
+			documentName = documentFileName;
+		}
+
+		// The name of the agreement, which will be used to identify it in the
+		// emails and on the website.
+		// name is required
+		widgetInfo.setName(documentName);
+
+		// Optional parameter which sets how often you'd like the recipient(s)
+		// to be reminded to sign this document.
+		// reminderFrequency is not required
+		// documentInfo.setReminderFrequency(value);
+
+		if (StringUtils.hasText(signedDocumentUrl)) {
+			// Sets the callback properties that allows EchoSign to notify you
+			// when the agreement has been signed and avoid polling.
+			// callbackInfo is not required
+			CallbackInfo callbackInfo = new CallbackInfo();
+			widgetInfo.setCallbackInfo(callbackInfo);
+		}
+
+		// The locale associated with this agreement - specifies the language
+		// for the signing page and emails, for example en_US or fr_FR. If none
+		// specified, defaults to the language configured for the widget's
+		// sender.
+		// locale is not required
+		// documentInfo.setLocale(value);
+
+		// Optional default values for fields to merge into the document. The
+		// values will be presented to the signers for editable fields; for
+		// read-only fields the provided values will not be editable during the
+		// signing process.
+		// mergeFieldInfo is not required
+		// documentInfo.setMergeFieldInfo(value);
+		
+		widgetInfo.setFileInfos(fileInfos);
+		widgetInfo
+				.setSignatureFlow(SignatureFlow.SENDER_SIGNATURE_NOT_REQUIRED);
+
+		WidgetPersonalizationInfo personalizationInfo=new WidgetPersonalizationInfo();
+		personalizationInfo.setReusable(false);
+		personalizationInfo.setEmail(email);
+		EmbeddedWidgetCreationResult embeddedWidgetCreationResult=
+				getCachedService().createPersonalEmbeddedWidget(echoSignApiKey, null, widgetInfo, personalizationInfo);
+		return embeddedWidgetCreationResult;
 	}
 }

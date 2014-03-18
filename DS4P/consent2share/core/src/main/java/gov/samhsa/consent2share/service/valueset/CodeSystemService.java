@@ -11,9 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional(readOnly = true)
 public interface CodeSystemService {
-	   /**
-     * Creates a new person.
-     * @param created   The information of the created person.
+	 
+	/**
+     * Creates a new CodeSystem.
+     * @param created The information of the created person.
      * @return  The created person.
      */
     public CodeSystemDto create(CodeSystemDto created);

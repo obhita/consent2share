@@ -38,6 +38,7 @@
 		<context:exclude-filter type="assignable" expression="gov.samhsa.consent2share.infrastructure.eventlistener.LoginFailureEventListener"/>
 		<context:exclude-filter type="assignable" expression="gov.samhsa.consent2share.infrastructure.PixQueryServiceImpl"/>
 		<context:exclude-filter type="assignable" expression="gov.samhsa.consent2share.infrastructure.TryPolicyServiceImpl"/>
+		<context:exclude-filter type="assignable" expression="gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper"/>
 	</context:component-scan>
 
 	<bean class="org.springframework.mail.javamail.JavaMailSenderImpl"

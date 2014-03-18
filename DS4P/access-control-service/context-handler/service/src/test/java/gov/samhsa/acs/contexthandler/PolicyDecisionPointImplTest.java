@@ -238,7 +238,7 @@ public class PolicyDecisionPointImplTest {
 				.getStringFromResourceFile(policyFileUri);
 		
 		// Act
-		XacmlResponse xacmlResponse =  thePdp.evaluatePolicyForTrying(xacmlPolicy).getXacmlResponse();
+		XacmlResponse xacmlResponse =  thePdp.evaluatePolicyForTrying(xacmlPolicy, "TREAT").getXacmlResponse();
 		
 		// Assert
 		assertEquals(xacmlResponse.getPdpDecision().toLowerCase(), "permit");
@@ -251,7 +251,7 @@ public class PolicyDecisionPointImplTest {
 		String xacmlPolicy = null;
 		
 		// Act
-		pdp.evaluatePolicyForTrying(xacmlPolicy);
+		pdp.evaluatePolicyForTrying(xacmlPolicy, null);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
@@ -260,7 +260,7 @@ public class PolicyDecisionPointImplTest {
 		String xacmlPolicy = " ";
 		
 		// Act
-		pdp.evaluatePolicyForTrying(xacmlPolicy);
+		pdp.evaluatePolicyForTrying(xacmlPolicy, null);
 	}
 
 }

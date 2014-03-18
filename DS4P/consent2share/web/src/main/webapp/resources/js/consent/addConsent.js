@@ -227,119 +227,162 @@ function setupPage(addConsent_tmp, isProviderAdminUser_tmp, specMedSetObj_tmp) {
 	$("div.sidebar-container").addClass("guide-pulldown-tab");
 	$("div.sidebar-inject.top > span").addClass("sidebar-label");
 	
-	$('#tourtest').joyride({
-	    tipContainer: '#consent-add-main',
-	    heightPadding: $('footer').outerHeight() + 10,
-	    mode: 'focus',
-	    autoStart: true,
-	    'preStepCallback': function() {
-		    var int_next_index = 0;
-		    try{
-		    	int_next_index = $('#tourtest').joyride('get_next_index');
-		    }catch(e){
-			    int_next_index = 0;
+	if(!isProviderAdminUser){
+		$('#tourtest').joyride({
+		    tipContainer: '#consent-add-main',
+		    heightPadding: $('footer').outerHeight() + 10,
+		    mode: 'focus',
+		    autoStart: true,
+		    'preStepCallback': function() {
+			    var int_next_index = 0;
+			    try{
+			    	int_next_index = $('#tourtest').joyride('get_next_index');
+			    }catch(e){
+				    int_next_index = 0;
+				}
+			    
+			    var li_field_id = $('#tourtest li').get(int_next_index);
+			    var isShowDelayedNext = $(li_field_id).hasClass('show-delayed-next');
+			    var str_field_id = $(li_field_id).data("id");
+			    var tempVarIconUser = $('div#' + str_field_id).find('.fa-user');
+			    var tempVarBadge = $('div#' + str_field_id).find('.badge');
+			    var isDataPopulated = false;
+	
+			    if(tempVarIconUser.length > 0 || tempVarBadge.length > 0){
+				    isDataPopulated = true;
+			    }else{
+			    	isDataPopulated = false;
+				}
+	
+			    var obj_next_tip = $('#tourtest').joyride('get_next_tip');
+			    var btn_next_button = $(obj_next_tip).find('.joyride-next-tip');
+	
+			    $(btn_next_button).addClass('hidden');
+			    
+			    if(isDataPopulated || isShowDelayedNext){					    	
+			    	setTimeout(function(){
+				    	$(btn_next_button).removeClass('hidden');
+					}, 500);
+			    }
+			},
+			'postRideCallback': function() {
+				setGuideButtonStateOff();
 			}
-		    
-		    var li_field_id = $('#tourtest li').get(int_next_index);
-		    var isShowDelayedNext = $(li_field_id).hasClass('show-delayed-next');
-		    var str_field_id = $(li_field_id).data("id");
-		    var tempVarIconUser = $('div#' + str_field_id).find('.fa-user');
-		    var tempVarBadge = $('div#' + str_field_id).find('.badge');
-		    var isDataPopulated = false;
-
-		    if(tempVarIconUser.length > 0 || tempVarBadge.length > 0){
-			    isDataPopulated = true;
-		    }else{
-		    	isDataPopulated = false;
+		});
+	
+		if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'on'){
+			turnGuideOn();
+		}else if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'off'){
+			turnGuideOff();
+		}else{
+			if($('#btn_guide_OnOff').hasClass('guide-off-flag') === false){
+				turnGuideOn();
+			}else{
+				turnGuideOff();
 			}
-
-		    var obj_next_tip = $('#tourtest').joyride('get_next_tip');
-		    var btn_next_button = $(obj_next_tip).find('.joyride-next-tip');
-
-		    $(btn_next_button).addClass('hidden');
-		    
-		    if(isDataPopulated || isShowDelayedNext){					    	
-		    	setTimeout(function(){
-			    	$(btn_next_button).removeClass('hidden');
-				}, 500);
-		    }
-		},
-		'postRideCallback': function() {
-			setGuideButtonStateOff();
 		}
-	});
-	
-	
-
-	if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'on'){
-		turnGuideOn();
-	}else if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'off'){
-		turnGuideOff();
-	}else{
-		if($('#btn_guide_OnOff').hasClass('guide-off-flag') === false){
-			turnGuideOn();
-		}else{
-			turnGuideOff();
-		}
-	}
-	
-	
-	$('#btn_guide_OnOff').click(function() {
-		if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
-			turnGuideOn();
-		}else{
-			turnGuideOff();
-		}
-    });
-    
-	$('#saveauthorizer').click(function() {
-		ifGuideOnGoNext();
-    });
-
-	$('#saveconsentmadeto').click(function() {
-		ifGuideOnGoNext();
-    });
-
-    $('#btn_close_share_settings').click(function() {
-    	ifGuideOnGoNext();
-	});
-
-    $('#btn_save_selected_purposes').click(function() {
-    	ifGuideOnGoNext();
-	});
-
-	$('#selectInfo').change(function() {				    
-	    if($('#selectInfo').prop('checked') == true){
-	    	ifGuideOnGoNext();
-		}
-	});
-
-    $('#selectPurposesToggle').change(function() {				    
-	    if($('#selectPurposesToggle').prop('checked') == true){
-	    	ifGuideOnGoNext();
-		}
-	});
-    
-	$("a[id*=i-icon]").bind('click', function() {
-		var id = $(this).attr("id").split('_')[1];
-		$("#message-block_"+id).css("display","block");
-
-	});
-	
-	$("body").on("closeJoyrideClick", function(e){
-		e.stopImmediatePropagation();
 		
-		$('#tourtest').joyride('end');
-		turnGuideOff();
-	});
+		
+		$('#btn_guide_OnOff').click(function() {
+			if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
+				turnGuideOn();
+			}else{
+				turnGuideOff();
+			}
+	    });
+	    
+		$('#saveauthorizer').click(function() {
+			ifGuideOnGoNext();
+	    });
 	
+		$('#saveconsentmadeto').click(function() {
+			ifGuideOnGoNext();
+	    });
 	
+	    $('#btn_close_share_settings').click(function() {
+	    	ifGuideOnGoNext();
+		});
+	
+	    $('#btn_save_selected_purposes').click(function() {
+	    	ifGuideOnGoNext();
+		});
+	
+		$('#selectInfo').change(function() {
+		    if($('#selectInfo').prop('checked') == true){
+		    	ifGuideOnGoNext();
+			}
+		});
+	
+	    $('#selectPurposesToggle').change(function() {
+		    if($('#selectPurposesToggle').prop('checked') == true){
+		    	ifGuideOnGoNext();
+			}
+		});
+	    
+		$("a[id*=i-icon]").bind('click', function() {
+			var id = $(this).attr("id").split('_')[1];
+			$("#message-block_"+id).css("display","block");
+	
+		});
+		
+		$("body").on("closeJoyrideClick", function(e){
+			e.stopImmediatePropagation();
+			
+			$('#tourtest').joyride('end');
+			turnGuideOff();
+		});
+	
+	}
 	
 	function ifGuideOnGoNext(){
-		if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'on'){
-			$('#tourtest').joyride("go_next");
+		if(!isProviderAdminUser){
+			if(jQuery.storage.getItem('guideStatus', 'sessionStorage') == 'on'){
+				$('#tourtest').joyride("go_next");
+			}
 		}
 	}
+	
+	//Turn Joyride Guide Off
+	function turnGuideOff(){
+		if(!isProviderAdminUser){
+			$('#tourtest').joyride('end');
+			setGuideButtonStateOff();
+		}
+	}
+
+	//Set Joyride Guide Button State Off
+	function setGuideButtonStateOff(){
+		if(!isProviderAdminUser){
+			$('#btn_guide_OnOff').addClass('guide-off-flag');
+			
+			jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
+			
+			$('#btn_guide_OnOff').text("Guide On");
+		}
+	}
+
+	//Turn Joyride Guide On
+	function turnGuideOn(){
+		if(!isProviderAdminUser){
+			$('#tourtest').joyride('end');
+			$('#tourtest').joyride();
+			setGuideButtonStateOn();
+		}
+	}
+
+	//Set Joyride Guide Button State On
+	function setGuideButtonStateOn(){
+		if(!isProviderAdminUser){
+			if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
+				$('#btn_guide_OnOff').removeClass('guide-off-flag');
+			}
+			
+			jQuery.storage.setItem('guideStatus', 'on', 'sessionStorage');
+			
+			$('#btn_guide_OnOff').text("Guide Off");
+		}
+	}
+	
 	
 }
 /**********************************************************************************
@@ -1185,39 +1228,6 @@ function showShareSettingsModal(){
 		  keyboard: false,
 		  backdrop: 'static'
 	});
-}
-
-//Turn Joyride Guide Off
-function turnGuideOff(){
-	$('#tourtest').joyride('end');
-	setGuideButtonStateOff();
-}
-
-//Set Joyride Guide Button State Off
-function setGuideButtonStateOff(){
-	$('#btn_guide_OnOff').addClass('guide-off-flag');
-	
-	jQuery.storage.setItem('guideStatus', 'off', 'sessionStorage');
-
-	$('#btn_guide_OnOff').text("Guide On");
-}
-
-//Turn Joyride Guide On
-function turnGuideOn(){
-	$('#tourtest').joyride('end');
-	$('#tourtest').joyride();
-	setGuideButtonStateOn();
-}
-
-//Set Joyride Guide Button State On
-function setGuideButtonStateOn(){
-	if($('#btn_guide_OnOff').hasClass('guide-off-flag') === true){
-		$('#btn_guide_OnOff').removeClass('guide-off-flag');
-	}
-
-	jQuery.storage.setItem('guideStatus', 'on', 'sessionStorage');
-	
-	$('#btn_guide_OnOff').text("Guide Off");
 }
 
 

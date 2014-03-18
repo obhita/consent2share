@@ -797,7 +797,7 @@
 																						</span> <span> <label for="Substance-Abuse"
 																								th:for="${SensitivityPolicyCode.code}"
 																								class="checkbox checkedCheckbox1"
-																								th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}">Substance
+																								th:text="${SensitivityPolicyCode.displayName}">Substance
 																									Abuse</label>
 																						</span>
 																						</span> <span th:if="${!addConsent}"> <span>
@@ -811,7 +811,7 @@
 																						</span> <span> <label for="Substance-Abuse"
 																								th:for="${SensitivityPolicyCode.code}"
 																								class="checkbox checkedCheckbox1"
-																								th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}">Substance
+																								th:text="${SensitivityPolicyCode.displayName}">Substance
 																									Abuse</label>
 																						</span> <span
 																							th:if="${consentDto.doNotShareSensitivityPolicyCodes.contains(SensitivityPolicyCode.displayName)}">
@@ -827,11 +827,11 @@
 																							<span style="margin-left: 5px;"
 																							class="fa fa-info-circle"></span>
 																						</a> <input
-																							th:attr="data-linkid=${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')},data-intitle=#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}"
+																							th:attr="data-linkid=${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')},data-intitle=${SensitivityPolicyCode.displayName}"
 																							class="input_i-text"
 																							th:id="${'i-text_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}"
 																							type="hidden"
-																							th:value="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')+'_text'}}" />
+																							th:value="${SensitivityPolicyCode.description}" />
 																					</div>
 																				</form>
 																			</div>
@@ -1384,7 +1384,7 @@
 	</div>
 	<!-- end first row -->
 
-	<ol id="tourtest" class="hidden">
+	<ol th:if="${!isProviderAdminUser}" id="tourtest" class="hidden">
 
 		<li data-id="consent-from" class="user-guide"
 			data-options="tipLocation:bottom; tipTopOffset:0;tipLeftOffset:0;nubPhonePosition:top"><img
@@ -1447,7 +1447,7 @@
 
 	</ol>
 
-	<ul id="pulldown_menu">
+	<ul th:if="${!isProviderAdminUser}" id="pulldown_menu">
 		<li>
 			<div style="z-index: 101;">
 				<button id="btn_guide_OnOff" type="button" class="btn btn-default">Guide

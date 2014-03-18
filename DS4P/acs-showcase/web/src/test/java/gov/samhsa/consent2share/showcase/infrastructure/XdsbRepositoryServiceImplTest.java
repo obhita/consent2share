@@ -45,7 +45,7 @@ public class XdsbRepositoryServiceImplTest {
 		when(
 				xdsbRepositoryAdapterMock.provideAndRegisterDocumentSet(
 						documentXmlStringMock, domainIdMock,
-						xdsbDocumentTypeMock)).thenReturn(registryResponseMock);
+						xdsbDocumentTypeMock, null, null)).thenReturn(registryResponseMock);
 
 		// Act
 		RegistryResponse actualResponse = sut.provideAndRegisterDocumentSet(
@@ -68,7 +68,7 @@ public class XdsbRepositoryServiceImplTest {
 		when(
 				xdsbRepositoryAdapterMock.provideAndRegisterDocumentSet(
 						documentXmlStringMock, domainIdMock,
-						xdsbDocumentTypeMock)).thenThrow(Throwable.class);
+						xdsbDocumentTypeMock, null, null)).thenThrow(Throwable.class);
 		thrown.expect(AcsShowCaseException.class);
 
 		// Act

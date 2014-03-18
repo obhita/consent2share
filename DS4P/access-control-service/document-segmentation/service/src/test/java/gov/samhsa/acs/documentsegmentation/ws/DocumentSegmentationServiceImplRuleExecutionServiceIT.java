@@ -3,6 +3,7 @@ package gov.samhsa.acs.documentsegmentation.ws;
 import static org.junit.Assert.assertTrue;
 import gov.samhsa.acs.brms.RuleExecutionServiceImpl;
 import gov.samhsa.acs.brms.guvnor.GuvnorServiceImpl;
+import gov.samhsa.acs.common.tool.DocumentAccessorImpl;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
@@ -13,9 +14,12 @@ import gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypterImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentFactModelExtractorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentMaskerImpl;
+import gov.samhsa.acs.documentsegmentation.tools.DocumentRedactor;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl;
+import gov.samhsa.acs.documentsegmentation.tools.EmbeddedClinicalDocumentExtractorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl;
+import gov.samhsa.acs.documentsegmentation.valueset.ValueSetServiceImplMock;
 import gov.samhsa.acs.documentsegmentation.ws.DocumentSegmentationServiceImpl;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationService;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationServicePortType;
@@ -54,12 +58,15 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 	private static DocumentEditorImpl documentEditor;
 	private static SimpleMarshallerImpl marshaller;
 	private static DocumentEncrypterImpl documentEncrypter;
-	private static DocumentRedactorImpl documentRedactor;
+	private static DocumentRedactor documentRedactor;
 	private static DocumentMaskerImpl documentMasker;
 	private static DocumentTaggerImpl documentTagger;
 	private static MetadataGeneratorImpl metadataGenerator;
 	private static FileReaderImpl fileReader;
 	private static DocumentFactModelExtractorImpl documentFactModelExtractor;
+	private static DocumentXmlConverterImpl documentXmlConverter;
+	private static DocumentAccessorImpl documentAccessor;
+	private static EmbeddedClinicalDocumentExtractorImpl embeddedClinicalDocumentExtractor;
 	private static AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl additionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
 
 	static {
@@ -86,16 +93,18 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 				new DocumentXmlConverterImpl());
 		marshaller = new SimpleMarshallerImpl();
 		documentEncrypter = new DocumentEncrypterImpl();
-		documentRedactor = new DocumentRedactorImpl(documentEditor,
-				new DocumentXmlConverterImpl());
+		documentRedactor = new DocumentRedactorImpl(new DocumentXmlConverterImpl(), null);
 		documentMasker = new DocumentMaskerImpl();
 		documentTagger = new DocumentTaggerImpl();
 		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
 		additionalMetadataGeneratorForSegmentedClinicalDocumentImpl = new AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl();
+		documentXmlConverter = new DocumentXmlConverterImpl();
+		documentAccessor = new DocumentAccessorImpl();
+		embeddedClinicalDocumentExtractor = new EmbeddedClinicalDocumentExtractorImpl(documentXmlConverter, documentAccessor);
 
 		address = "http://localhost:9000/services/processDocumentservice";
 		wsdlURL = new URL(address + "?wsdl");
-		c32Document = fileReader.readFile("c32.xml");
+		c32Document = fileReader.readFile("sampleC32/c32.xml");
 
 		endpointAddressGuvnorService = "http://localhost:7070/guvnor-5.5.0.Final-tomcat-6.0/rest/packages/AnnotationRules/source";
 
@@ -114,7 +123,7 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 										documentEncrypter, documentRedactor,
 										documentMasker, documentTagger,
 										documentFactModelExtractor,
-										additionalMetadataGeneratorForSegmentedClinicalDocumentImpl)));
+										embeddedClinicalDocumentExtractor, new ValueSetServiceImplMock(fileReader), additionalMetadataGeneratorForSegmentedClinicalDocumentImpl)));
 	}
 
 	@After

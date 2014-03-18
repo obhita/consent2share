@@ -110,6 +110,9 @@
 	<bean id="simpleMarshallerImpl"
 		class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl"
 		scope="prototype" />
+	<bean id="documentAccessorImpl"
+		class="gov.samhsa.acs.common.tool.DocumentAccessorImpl"
+		scope="prototype" />		
 		
 	<!-- XDS.b -->
 	<!-- XDS.b: common -->
@@ -236,6 +239,20 @@
 	<bean id="additionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
 		class="gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
 		scope="prototype"/>
+	<bean id="embeddedClinicalDocumentExtractorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.EmbeddedClinicalDocumentExtractorImpl"
+		scope="prototype" autowire="constructor"/>
+	<!-- TODO: This bean should be removed in production environment. 
+		It enables trusting self signed SSL certificate for development purposes. -->
+	<bean id="selfSignedSSLHelper"
+		class="gov.samhsa.acs.documentsegmentation.valueset.SelfSignedSSLHelper"
+		scope="singleton"/>	
+	<!-- Value Set Lookup Service-->
+	<bean id="valueSetServiceImpl"
+		class="gov.samhsa.acs.documentsegmentation.valueset.ValueSetServiceImpl"
+		scope="prototype" autowire="constructor">
+		<constructor-arg index="0" value="#{endpointAddressProperties.valueSetCategoryLookupService}"  />
+	</bean>		
 	<!-- DocumentSegmentation: document segmentation -->		
 	<bean id="documentSegmentationImpl"
 		class="gov.samhsa.acs.documentsegmentation.DocumentSegmentationImpl"

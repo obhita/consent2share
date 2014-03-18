@@ -6,10 +6,8 @@ import java.util.LinkedList;
 
 import javax.xml.bind.JAXBException;
 
-import gov.samhsa.acs.common.bean.RuleExecutionContainer;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
-import gov.va.ds4p.cas.RuleExecutionResponse;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,8 +21,8 @@ public class SimpleMarshallerImplTest {
 	private static RuleExecutionContainer ruleExecutionContainer;
 	private static String ruleExecutionContainerString;
 	
-	private static final String EXPECTED_RESPONSE_1 = "11450-4:Problems:66214007:SNOMED CT:Substance Abuse Disorder:ENCRYPT:NORDSLCD:REDACT:e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7:ETH:42CFRPart2:";
-	private static final String EXPECTED_RESPONSE_2 = "11450-4:Problems:111880001:SNOMED CT:Acute HIV:ENCRYPT:NORDSLCD:MASK:d11275e7-67ae-11db-bd13-0800200c9a66:HIV:42CFRPart2:";
+	private static final String EXPECTED_RESPONSE_1 = "11450-4:Problems:66214007:SNOMED CT:Substance Abuse Disorder:ENCRYPT:NORDSCLCD:REDACT:e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7:ETH:42CFRPart2:";
+	private static final String EXPECTED_RESPONSE_2 = "11450-4:Problems:111880001:SNOMED CT:Acute HIV:ENCRYPT:NORDSCLCD:MASK:d11275e7-67ae-11db-bd13-0800200c9a66:HIV:42CFRPart2:";
 	private static final String EXPECTED_MARSHALL_RESPONSE = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ruleExecutionContainer><executionResponseList/></ruleExecutionContainer>";
 	
 	private static SimpleMarshallerImpl marshaller;
@@ -84,13 +82,13 @@ public class SimpleMarshallerImplTest {
 		ruleExecutionResponseToStringAppender(builder, r.getCodeSystemName());
 		ruleExecutionResponseToStringAppender(builder, r.getDisplayName());
 		ruleExecutionResponseToStringAppender(builder,
-				r.getDocumentObligationPolicy());
+				r.getDocumentObligationPolicy().toString());
 		ruleExecutionResponseToStringAppender(builder,
-				r.getDocumentRefrainPolicy());
+				r.getDocumentRefrainPolicy().toString());
 		ruleExecutionResponseToStringAppender(builder, r.getItemAction());
 		ruleExecutionResponseToStringAppender(builder, r.getObservationId());
-		ruleExecutionResponseToStringAppender(builder, r.getSensitivity());
-		ruleExecutionResponseToStringAppender(builder, r.getUSPrivacyLaw());
+		ruleExecutionResponseToStringAppender(builder, r.getSensitivity().toString());
+		ruleExecutionResponseToStringAppender(builder, r.getUSPrivacyLaw().getPrivacy());
 		return builder.toString();
 	}
 

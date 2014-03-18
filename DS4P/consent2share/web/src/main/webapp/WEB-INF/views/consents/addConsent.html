@@ -628,7 +628,7 @@
 																						</span> <span> <label for="Substance-Abuse"
 																								th:for="${SensitivityPolicyCode.code}"
 																								class="checkbox checkedCheckbox1"
-																								th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}">Substance
+																								th:text="${SensitivityPolicyCode.displayName}">Substance
 																									Abuse</label>
 																						</span>
 																						</span> <span th:if="${!addConsent}"> <span>
@@ -642,7 +642,7 @@
 																						</span> <span> <label for="Substance-Abuse"
 																								th:for="${SensitivityPolicyCode.code}"
 																								class="checkbox checkedCheckbox1"
-																								th:text="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}">Substance
+																								th:text="${SensitivityPolicyCode.displayName}">Substance
 																									Abuse</label>
 																						</span> <span
 																							th:if="${consentDto.doNotShareSensitivityPolicyCodes.contains(SensitivityPolicyCode.displayName)}">
@@ -658,11 +658,11 @@
 																							<span style="margin-left: 5px;"
 																							class="fa fa-info-circle"></span>
 																						</a> <input
-																							th:attr="data-linkid=${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')},data-intitle=#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')}}"
+																							th:attr="data-linkid=${'i-icon_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')},data-intitle=${SensitivityPolicyCode.displayName}"
 																							class="input_i-text"
 																							th:id="${'i-text_' + #strings.replace(SensitivityPolicyCode.displayName, ' ', '-')}"
 																							type="hidden"
-																							th:value="#{${#strings.replace(SensitivityPolicyCode.displayName, ' ', '_')+'_text'}}" />
+																							th:value="${SensitivityPolicyCode.description}" />
 																					</div>
 																				</form>
 																			</div>

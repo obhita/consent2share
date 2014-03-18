@@ -8,17 +8,21 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 import gov.samhsa.acs.brms.RuleExecutionService;
 import gov.samhsa.acs.brms.domain.Confidentiality;
+import gov.samhsa.acs.brms.domain.FactModel;
 import gov.samhsa.acs.brms.domain.ObligationPolicyDocument;
 import gov.samhsa.acs.brms.domain.RefrainPolicy;
 import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.brms.domain.RuleExecutionResponse;
 import gov.samhsa.acs.brms.domain.Sensitivity;
+import gov.samhsa.acs.brms.domain.SubjectPurposeOfUse;
 import gov.samhsa.acs.brms.domain.UsPrivacyLaw;
-import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReader;
@@ -33,9 +37,12 @@ import gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypterImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentFactModelExtractorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentMaskerImpl;
+import gov.samhsa.acs.documentsegmentation.tools.DocumentRedactor;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl;
+import gov.samhsa.acs.documentsegmentation.tools.EmbeddedClinicalDocumentExtractorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl;
+import gov.samhsa.acs.documentsegmentation.valueset.ValueSetServiceImplMock;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
 
@@ -69,7 +76,9 @@ public class DocumentSegmentationImplTest {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private static String xacmlResult;
+	private static String factModel;
 	private static XacmlResult xacmlResultObj;
+	private static FactModel factModelObj;
 	private static RuleExecutionContainer ruleExecutionContainerObj;
 
 	private static String senderEmailAddress;
@@ -77,16 +86,18 @@ public class DocumentSegmentationImplTest {
 
 	private static FileReader fileReader;
 	private static DocumentXmlConverterImpl documentXmlConverter;
+	private static SimpleMarshallerImpl marshaller;
 
 	private static RuleExecutionService ruleExecutionServiceClientMock;
 	private static AuditServiceImpl auditServiceMock;
 	private static DocumentEditorImpl documentEditorMock;
 	private static DocumentFactModelExtractorImpl documentFactModelExtractorMock;
 	private static SimpleMarshallerImpl marshallerMock;
-	private static DocumentRedactorImpl documentRedactorMock;
+	private static DocumentRedactor documentRedactorMock;
 	private static DocumentTaggerImpl documentTaggerMock;
 	private static DocumentMaskerImpl documentMaskerMock;
 	private static DocumentEncrypterImpl documentEncrypterMock;
+	private static EmbeddedClinicalDocumentExtractorImpl embeddedClinicalDocumentExtractorMock;
 	private static AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl additionalMetadataGeneratorForSegmentedClinicalDocumentImplMock;
 
 	private static String testOriginal_C32_xml;
@@ -107,6 +118,8 @@ public class DocumentSegmentationImplTest {
 
 		// File reader
 		fileReader = new FileReaderImpl();
+		// Marshaller
+		marshaller = new SimpleMarshallerImpl();
 		// Document-Xml converter
 		documentXmlConverter = new DocumentXmlConverterImpl();
 
@@ -125,6 +138,9 @@ public class DocumentSegmentationImplTest {
 		xacmlResult = "<xacmlResult><pdpDecision>PERMIT</pdpDecision><purposeOfUse>TREAT</purposeOfUse><messageId>cf8cace6-6331-4a45-8e79-5bf503925be4</messageId><homeCommunityId>2.16.840.1.113883.3.467</homeCommunityId><pdpObligation>51848-0</pdpObligation><pdpObligation>121181</pdpObligation><pdpObligation>47420-5</pdpObligation><pdpObligation>46240-8</pdpObligation><pdpObligation>ETH</pdpObligation><pdpObligation>GDIS</pdpObligation><pdpObligation>PSY</pdpObligation><pdpObligation>SEX</pdpObligation><pdpObligation>18748-4</pdpObligation><pdpObligation>11504-8</pdpObligation><pdpObligation>34117-2</pdpObligation></xacmlResult>";
 		xacmlResultObj = setXacmlResult();
 
+		// FactModel
+		factModel = "<FactModel><xacmlResult><pdpDecision>PERMIT</pdpDecision><purposeOfUse>TREAT</purposeOfUse><messageId>cf8cace6-6331-4a45-8e79-5bf503925be4</messageId><homeCommunityId>2.16.840.1.113883.3.467</homeCommunityId><pdpObligation>51848-0</pdpObligation><pdpObligation>121181</pdpObligation><pdpObligation>47420-5</pdpObligation><pdpObligation>46240-8</pdpObligation><pdpObligation>ETH</pdpObligation><pdpObligation>GDIS</pdpObligation><pdpObligation>PSY</pdpObligation><pdpObligation>SEX</pdpObligation><pdpObligation>18748-4</pdpObligation><pdpObligation>11504-8</pdpObligation><pdpObligation>34117-2</pdpObligation></xacmlResult><ClinicalFacts><ClinicalFact><code>111880001</code><displayName>Acute HIV</displayName><codeSystem>2.16.840.1.113883.6.96</codeSystem><codeSystemName/><c32SectionTitle>Problems</c32SectionTitle><c32SectionLoincCode>11450-4</c32SectionLoincCode><observationId>d11275e7-67ae-11db-bd13-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>66214007</code><displayName>Substance Abuse Disorder</displayName><codeSystem>2.16.840.1.113883.6.96</codeSystem><codeSystemName/><c32SectionTitle>Problems</c32SectionTitle><c32SectionLoincCode>11450-4</c32SectionLoincCode><observationId>e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7</observationId></ClinicalFact><ClinicalFact><code>234391009</code><displayName>Sickle Cell Anemia</displayName><codeSystem>2.16.840.1.113883.6.96</codeSystem><codeSystemName>SNOMED</codeSystemName><c32SectionTitle>Problems</c32SectionTitle><c32SectionLoincCode>11450-4</c32SectionLoincCode><observationId>ab1791b0-5c71-11db-b0de-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>233604007</code><displayName>Pneumonia</displayName><codeSystem>2.16.840.1.113883.6.96</codeSystem><codeSystemName>SNOMED</codeSystemName><c32SectionTitle>Problems</c32SectionTitle><c32SectionLoincCode>11450-4</c32SectionLoincCode><observationId>9d3d416d-45ab-4da1-912f-4583e0632000</observationId></ClinicalFact><ClinicalFact><code>22298006</code><displayName>Myocardial infarction</displayName><codeSystem>2.16.840.1.113883.6.96</codeSystem><codeSystemName>SNOMED</codeSystemName><c32SectionTitle>Problems</c32SectionTitle><c32SectionLoincCode>11450-4</c32SectionLoincCode><observationId/></ClinicalFact><ClinicalFact><code>77386006</code><displayName>Patient currently pregnant</displayName><codeSystem>2.16.840.1.113883.6.96</codeSystem><codeSystemName>SNOMED</codeSystemName><c32SectionTitle>Problems</c32SectionTitle><c32SectionLoincCode>11450-4</c32SectionLoincCode><observationId/></ClinicalFact><ClinicalFact><code>70618</code><displayName>Penicillin</displayName><codeSystem>2.16.840.1.113883.6.88</codeSystem><codeSystemName>RxNorm</codeSystemName><c32SectionTitle>Allergies and Adverse Reactions</c32SectionTitle><c32SectionLoincCode>48765-2</c32SectionLoincCode><observationId>4adc1020-7b14-11db-9fe1-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>1191</code><displayName>Aspirin</displayName><codeSystem>2.16.840.1.113883.6.88</codeSystem><codeSystemName>RxNorm</codeSystemName><c32SectionTitle>Allergies and Adverse Reactions</c32SectionTitle><c32SectionLoincCode>48765-2</c32SectionLoincCode><observationId>eb936011-7b17-11db-9fe1-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>2670</code><displayName>Codeine</displayName><codeSystem>2.16.840.1.113883.6.88</codeSystem><codeSystemName>RxNorm</codeSystemName><c32SectionTitle>Allergies and Adverse Reactions</c32SectionTitle><c32SectionLoincCode>48765-2</c32SectionLoincCode><observationId>c3df3b60-7b18-11db-9fe1-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>6736007</code><displayName>moderate</displayName><codeSystem>2.16.840.1.113883.6.96</codeSystem><codeSystemName>SNOMED</codeSystemName><c32SectionTitle>Allergies and Adverse Reactions</c32SectionTitle><c32SectionLoincCode>48765-2</c32SectionLoincCode><observationId/></ClinicalFact><ClinicalFact><code>993536</code><displayName>Bupropion Hydrochloride 200 MG Extended Release Tablet</displayName><codeSystem>2.16.840.1.113883.6.88</codeSystem><codeSystemName>RxNorm</codeSystemName><c32SectionTitle>Medications</c32SectionTitle><c32SectionLoincCode>10160-0</c32SectionLoincCode><observationId>cdbd5b05-6cde-11db-9fe1-08002tg964rfh8823ejba-00c9a66</observationId></ClinicalFact><ClinicalFact><code>309362</code><displayName>Clopidogrel 75 MG oral tablet</displayName><codeSystem>2.16.840.1.113883.6.88</codeSystem><codeSystemName>RxNorm</codeSystemName><c32SectionTitle>Medications</c32SectionTitle><c32SectionLoincCode>10160-0</c32SectionLoincCode><observationId>cdbd5b05-6cde-11db-9fe1-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>430618</code><displayName>Metoprolol 25 MG oral tablet</displayName><codeSystem>2.16.840.1.113883.6.88</codeSystem><codeSystemName>RxNorm</codeSystemName><c32SectionTitle>Medications</c32SectionTitle><c32SectionLoincCode>10160-0</c32SectionLoincCode><observationId>cdbd5b01-6cde-11db-9fe1-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>312615</code><displayName>Prednisone 20 MG oral tablet</displayName><codeSystem>2.16.840.1.113883.6.88</codeSystem><codeSystemName>RxNorm</codeSystemName><c32SectionTitle>Medications</c32SectionTitle><c32SectionLoincCode>10160-0</c32SectionLoincCode><observationId>cdbd5b03-6cde-11db-9fe1-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>197454</code><displayName>Cephalexin 500 MG oral tablet</displayName><codeSystem>2.16.840.1.113883.6.88</codeSystem><codeSystemName>RxNorm</codeSystemName><c32SectionTitle>Medications</c32SectionTitle><c32SectionLoincCode>10160-0</c32SectionLoincCode><observationId>cdbd5b07-6cde-11db-9fe1-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>30313-1</code><displayName>HGB</displayName><codeSystem>2.16.840.1.113883.6.1</codeSystem><codeSystemName/><c32SectionTitle>Diagnostic Results</c32SectionTitle><c32SectionLoincCode>30954-2</c32SectionLoincCode><observationId>107c2dc0-67a5-11db-bd13-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>33765-9</code><displayName>WBC</displayName><codeSystem>2.16.840.1.113883.6.1</codeSystem><codeSystemName/><c32SectionTitle>Diagnostic Results</c32SectionTitle><c32SectionLoincCode>30954-2</c32SectionLoincCode><observationId>8b3fa370-67a5-11db-bd13-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>26515-7</code><displayName>PLT</displayName><codeSystem>2.16.840.1.113883.6.1</codeSystem><codeSystemName/><c32SectionTitle>Diagnostic Results</c32SectionTitle><c32SectionLoincCode>30954-2</c32SectionLoincCode><observationId>80a6c740-67a5-11db-bd13-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>2951-2</code><displayName>NA</displayName><codeSystem>2.16.840.1.113883.6.1</codeSystem><codeSystemName/><c32SectionTitle>Diagnostic Results</c32SectionTitle><c32SectionLoincCode>30954-2</c32SectionLoincCode><observationId>a40027e1-67a5-11db-bd13-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>2823-3</code><displayName>K</displayName><codeSystem>2.16.840.1.113883.6.1</codeSystem><codeSystemName/><c32SectionTitle>Diagnostic Results</c32SectionTitle><c32SectionLoincCode>30954-2</c32SectionLoincCode><observationId>a40027e2-67a5-11db-bd13-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>2075-0</code><displayName>CL</displayName><codeSystem>2.16.840.1.113883.6.1</codeSystem><codeSystemName/><c32SectionTitle>Diagnostic Results</c32SectionTitle><c32SectionLoincCode>30954-2</c32SectionLoincCode><observationId>a40027e3-67a5-11db-bd13-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>1963-8</code><displayName>HCO3</displayName><codeSystem>2.16.840.1.113883.6.1</codeSystem><codeSystemName/><c32SectionTitle>Diagnostic Results</c32SectionTitle><c32SectionLoincCode>30954-2</c32SectionLoincCode><observationId>a40027e4-67a5-11db-bd13-0800200c9a66</observationId></ClinicalFact><ClinicalFact><code>43789009</code><displayName>CBC WO DIFFERENTIAL</displayName><codeSystem>2.16.840.1.113883.6.96</codeSystem><codeSystemName/><c32SectionTitle>Diagnostic Results</c32SectionTitle><c32SectionLoincCode>30954-2</c32SectionLoincCode><observationId/></ClinicalFact><ClinicalFact><code>20109005</code><displayName>LYTES</displayName><codeSystem>2.16.840.1.113883.6.96</codeSystem><codeSystemName>SNOMED CT</codeSystemName><c32SectionTitle>Diagnostic Results</c32SectionTitle><c32SectionLoincCode>30954-2</c32SectionLoincCode><observationId/></ClinicalFact></ClinicalFacts></FactModel>";
+		factModelObj = marshaller.unmarshallFromXml(FactModel.class, factModel);
 		// Document editor mock
 		documentEditorMock = mock(DocumentEditorImpl.class);
 		when(documentEditorMock.setDocumentCreationDate(testOriginal_C32_xml))
@@ -153,6 +169,9 @@ public class DocumentSegmentationImplTest {
 				ruleExecutionServiceClientMock.assertAndExecuteClinicalFacts(
 						testFactModel_xml).getRuleExecutionResponseContainer())
 				.thenReturn(testExecutionResponseContainer_xml);
+		AssertAndExecuteClinicalFactsResponse cfr = mock(AssertAndExecuteClinicalFactsResponse.class);
+		when(cfr.getRuleExecutionResponseContainer()).thenReturn(testExecutionResponseContainer_xml);
+		doReturn(cfr).when(ruleExecutionServiceClientMock).assertAndExecuteClinicalFacts(factModelObj);
 
 		// Marshaller mock
 		marshallerMock = mock(SimpleMarshallerImpl.class);
@@ -164,6 +183,8 @@ public class DocumentSegmentationImplTest {
 		when(
 				marshallerMock.unmarshallFromXml(eq(XacmlResult.class),
 						anyString())).thenReturn(xacmlResultObj);
+		when(marshallerMock.unmarshallFromXml(eq(FactModel.class), anyString()))
+				.thenReturn(factModelObj);
 		when(marshallerMock.marshall(ruleExecutionContainerObj)).thenReturn(
 				testExecutionResponseContainer_xml);
 
@@ -171,8 +192,8 @@ public class DocumentSegmentationImplTest {
 		documentRedactorMock = mock(DocumentRedactorImpl.class);
 		when(
 				documentRedactorMock.redactDocument(eq(testOriginal_C32_xml),
-						eq(ruleExecutionContainerObj), eq(xacmlResultObj)))
-				.thenReturn(testRedacted_C32_xml);
+						eq(ruleExecutionContainerObj), eq(xacmlResultObj),
+						isA(FactModel.class))).thenReturn(testRedacted_C32_xml);
 
 		// Document tagger
 		documentTaggerMock = mock(DocumentTaggerImpl.class);
@@ -181,6 +202,7 @@ public class DocumentSegmentationImplTest {
 						testExecutionResponseContainer_xml,
 						xacmlResultObj.getMessageId())).thenReturn(
 				testTagged_C32_xml);
+		when(documentRedactorMock.cleanUpGeneratedEntryIds(testTagged_C32_xml)).thenReturn(testTagged_C32_xml);
 
 		// Audit service mock
 		auditServiceMock = mock(AuditServiceImpl.class);
@@ -213,12 +235,19 @@ public class DocumentSegmentationImplTest {
 								senderEmailAddress, recipientEmailAddress,
 								"TREAT", "123")).thenReturn(
 				testAdditionalMetadata_xml);
+		embeddedClinicalDocumentExtractorMock = mock(EmbeddedClinicalDocumentExtractorImpl.class);
+		when(
+				embeddedClinicalDocumentExtractorMock
+						.extractClinicalDocumentFromFactModel(testFactModel_xml))
+				.thenReturn(testOriginal_C32_xml);
 
 		documentSegmentation = new DocumentSegmentationImpl(
 				ruleExecutionServiceClientMock, auditServiceMock,
 				documentEditorMock, marshallerMock, documentEncrypterMock,
 				documentRedactorMock, documentMaskerMock, documentTaggerMock,
 				documentFactModelExtractorMock,
+				embeddedClinicalDocumentExtractorMock,
+				new ValueSetServiceImplMock(fileReader),
 				additionalMetadataGeneratorForSegmentedClinicalDocumentImplMock);
 	}
 
@@ -234,6 +263,8 @@ public class DocumentSegmentationImplTest {
 				documentEncrypterMock, documentRedactorMock,
 				documentMaskerMock, documentTaggerMock,
 				documentFactModelExtractorMock,
+				embeddedClinicalDocumentExtractorMock,
+				new ValueSetServiceImplMock(fileReader),
 				additionalMetadataGeneratorForSegmentedClinicalDocumentImplMock);
 
 		// Act
@@ -260,6 +291,8 @@ public class DocumentSegmentationImplTest {
 				realDocumentEditorImpl, marshallerMock, documentEncrypterMock,
 				documentRedactorMock, documentMaskerMock, documentTaggerMock,
 				documentFactModelExtractorMock,
+				embeddedClinicalDocumentExtractorMock,
+				new ValueSetServiceImplMock(fileReader),
 				additionalMetadataGeneratorForSegmentedClinicalDocumentImplMock);
 
 		// Act
@@ -477,7 +510,7 @@ public class DocumentSegmentationImplTest {
 	private static XacmlResult setXacmlResult() {
 		XacmlResult xacmlResultObject = new XacmlResult();
 		xacmlResultObject.setPdpDecision("PERMIT");
-		xacmlResultObject.setSubjectPurposeOfUse("TREAT");
+		xacmlResultObject.setSubjectPurposeOfUse(SubjectPurposeOfUse.treatment);
 		xacmlResultObject.setMessageId("cf8cace6-6331-4a45-8e79-5bf503925be4");
 		xacmlResultObject.setHomeCommunityId("2.16.840.1.113883.3.467");
 		String[] o = { "51848-0", "121181", "47420-5", "46240-8", "ETH",
@@ -495,7 +528,7 @@ public class DocumentSegmentationImplTest {
 		r1.setCode("66214007");
 		r1.setCodeSystemName("SNOMED CT");
 		r1.setDisplayName("Substance Abuse Disorder");
-		r1.setDocumentObligationPolicy(ObligationPolicyDocument.ENCRYPT);		
+		r1.setDocumentObligationPolicy(ObligationPolicyDocument.ENCRYPT);
 		r1.setDocumentRefrainPolicy(RefrainPolicy.NODSCLCD);
 		r1.setImpliedConfSection(Confidentiality.R);
 		r1.setItemAction("REDACT");

@@ -11,6 +11,9 @@ import javax.xml.transform.TransformerException;
 
 import org.xml.sax.SAXException;
 
+/**
+ * The Class PolicyTryingServiceImpl.
+ */
 @javax.jws.WebService(
                       serviceName = "TryPolicyService",
                       portName = "TryPolicyServicePort",
@@ -20,20 +23,30 @@ import org.xml.sax.SAXException;
                       
 public class PolicyTryingServiceImpl implements TryPolicyPortType {
 
+    /** The Constant LOG. */
     private static final Logger LOG = Logger.getLogger(PolicyTryingServiceImpl.class.getName());
     
+    /** The policy trying. */
     private PolicyTrying policyTrying;
     
+    /**
+     * Instantiates a new policy trying service impl.
+     *
+     * @param tryPolicy the try policy
+     */
     public PolicyTryingServiceImpl(PolicyTrying tryPolicy ) {
 		this.policyTrying = tryPolicy;
 	}
 
-    public String tryPolicy(String c32Xml, String xacmlPolicy) { 
+    /* (non-Javadoc)
+     * @see gov.samhsa.acs.pep.ws.contract.TryPolicyPortType#tryPolicy(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public String tryPolicy(String c32Xml, String xacmlPolicy, String purposeOfUse) { 
         LOG.info("Executing operation tryPolicy");
         
         String segmentedC32 = null;
 		try {
-			segmentedC32 = policyTrying.tryPolicy(c32Xml, xacmlPolicy);
+			segmentedC32 = policyTrying.tryPolicy(c32Xml, xacmlPolicy, purposeOfUse);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {

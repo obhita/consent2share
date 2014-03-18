@@ -132,21 +132,21 @@
 				<span th:case="'notification_add_consent_successed'">
 				   <div class="alert alert-success rounded">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
-		  		    	<strong>Congratulations!</strong> You've successfully added a new Consent. You may now click on the <strong>'Submit'</strong> button to review and sign your consent.
+		  		    	<strong>Congratulations!</strong> You've successfully added a new Consent. You may now click on the <strong>'Sign'</strong> button to review and sign your consent.
 					</div>
 			    </span>
 				
 				<span th:case="'notification_review_sign_consent'">
 					<div class="alert alert-info rounded">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
-		  		    	You may now click the <strong>'Submit'</strong> button to review and sign your Consent.
+		  		    	You may now click the <strong>'Sign'</strong> button to review and sign your Consent.
 					</div>
 				 </span>
 				
 				<span th:case="'notification_sign_consent'">
 			    <div class="alert alert-info rounded">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
-						You have an unsigned consent. To sign your consent, Please check your <a href="../inbox/inboxMain.html"><strong>Message Center</strong></a> or the e-sign email sent to your email account.
+						You have an unsigned consent. To sign your consent, Please go to <a href="../consents/listConsents.html"><strong>My Consents</strong></a> to review and sign your consent.
 				</div>
 				</span>
 		</div>
@@ -365,7 +365,7 @@
 									</form>
 
 									<form th:name="@{'consent_sign_' + ${consentEntry.id}}"
-										th:action="@{/consents/signConsent.html}" method="post">
+										th:action="@{/consents/signConsent.html}" method="post" target="_blank">
 										<input type="hidden" name="consentId"
 											th:value="${consentEntry.id}" />
 									</form>
@@ -408,15 +408,10 @@
 												<li th:switch="${consentEntry.consentStage}"
 												class="help-inline" role="listitem">
 												
-												<span th:case="CONSENT_SUBMITTED">
-												<a href="#" class="btn btn-sm btn-warning"
-												onclick="window.open('toEmail.html')" th:text="#{list_consent_go_mailbox}">Go to Your Mailbox</a>
-												</span>
-												
 												<span th:case="CONSENT_SAVED">
 												<a href="#"
 												th:href="@{'javascript:document.' + 'consent_sign_' + ${consentEntry.id} + '.submit()'}"
-												class="btn btn-sm btn-success submit_buttons" th:text="#{list_consent_submit}">Submit</a> 
+												class="btn btn-sm btn-success submit_buttons" th:text="#{list_consent_sign}">Sign</a> 
 												</span> 
 												</li>
 
@@ -440,13 +435,6 @@
 														role="button" data-edit-button="#content1"
 														data-toggle="modal" th:text="#{list_consent_withdrawal}">Withdrawal</a> 
 												</span>	
-												
-												<span th:case="REVOCATION_SUBMITTED">	
-													<a class="btn btn-default btn-sm btn-inactive" role="button">
-														<div style="margin-right: 4px; margin-left: -4px" class="fa fa-refresh fa-spin"></div>
-														<span th:text="#{list_consent_withdrawal_in_progress}">Withdrawal In Progress</span>
-													</a>
-												</span>
 												
 												<span th:case="REVOCATION_REVOKED">			
 													<a  href="#" class="btn btn-sm btn-primary"
@@ -518,7 +506,7 @@
 									</div>
 								</div>
 		
-								<form class="row col-sm-11 col-sm-offset-1" id="consentRevokationForm" th:action="@{/consents/signConsentRevokation}" method="post" style="z-index:1;">
+								<form class="row col-sm-11 col-sm-offset-1" id="consentRevokationForm" th:action="@{/consents/signConsentRevokation}" method="post" target="_blank" style="z-index:1;">
 									<ul>
 										<li>
 											<div class="col-sm-12 top-margin10">
@@ -623,12 +611,22 @@
 
 								<div class="form-group">
 									<div>
-										<label class="control-label col-lg-4" for="c32Docs">Select C32 Document: </label>
+										<label class="control-label col-lg-4" for="tryMyPolicy_c32Docs">C32 Document: </label>
 										<div class="controls col-lg-4">
 											<select name="c32Id" id="tryMyPolicy_c32Docs" class="form-control">
 											</select>
 										</div>
 									</div>
+								</div>									
+							
+								<div class="form-group">
+									<div>
+										<label class="control-label col-lg-4" for="tryMyPolicy_purposeOfUse">Purpose of Use: </label>
+										<div class="controls col-lg-6">
+											<select name="purposeOfUse" id="tryMyPolicy_purposeOfUse" class="form-control">
+											</select>
+										</div>
+									</div>									
 								</div>
 
 							</div>

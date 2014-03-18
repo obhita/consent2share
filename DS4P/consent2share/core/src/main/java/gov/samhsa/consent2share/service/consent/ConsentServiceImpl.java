@@ -25,12 +25,15 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.consent;
 
+import echosign.api.clientv15.dto8.EmbeddedWidgetCreationResult;
 import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.consent.ConsentBuilder;
 import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.ConsentDoNotShareClinicalDocumentSectionTypeCode;
 import gov.samhsa.consent2share.domain.consent.ConsentDoNotShareClinicalDocumentTypeCode;
 import gov.samhsa.consent2share.domain.consent.ConsentDoNotShareSensitivityPolicyCode;
+import gov.samhsa.consent2share.domain.consent.ConsentFactory;
 import gov.samhsa.consent2share.domain.consent.ConsentIndividualProviderDisclosureIsMadeTo;
 import gov.samhsa.consent2share.domain.consent.ConsentIndividualProviderPermittedToDisclose;
 import gov.samhsa.consent2share.domain.consent.ConsentOrganizationalProviderDisclosureIsMadeTo;
@@ -54,8 +57,8 @@ import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCode;
 import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCodeRepository;
 import gov.samhsa.consent2share.domain.reference.PurposeOfUseCode;
 import gov.samhsa.consent2share.domain.reference.PurposeOfUseCodeRepository;
-import gov.samhsa.consent2share.domain.reference.SensitivityPolicyCode;
-import gov.samhsa.consent2share.domain.reference.SensitivityPolicyCodeRepository;
+import gov.samhsa.consent2share.domain.valueset.ValueSetCategory;
+import gov.samhsa.consent2share.domain.valueset.ValueSetCategoryRepository;
 import gov.samhsa.consent2share.infrastructure.ConsentRevokationPdfGenerator;
 import gov.samhsa.consent2share.infrastructure.EchoSignSignatureService;
 import gov.samhsa.consent2share.infrastructure.TryPolicyService;
@@ -70,12 +73,10 @@ import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -91,8 +92,6 @@ import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -118,7 +117,7 @@ import org.w3c.dom.ProcessingInstruction;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class ConsentServiceImpl.
  */
@@ -154,9 +153,9 @@ public class ConsentServiceImpl implements ConsentService {
 	@Autowired
 	private ClinicalDocumentSectionTypeCodeRepository clinicalDocumentSectionTypeCodeRepository;
 	
-	/** The sensitivity policy code repository. */
+	/** The value set category repository. */
 	@Autowired
-	private SensitivityPolicyCodeRepository sensitivityPolicyCodeRepository;
+	private ValueSetCategoryRepository valueSetCategoryRepository;
 	
 	/** The purpose of use code repository. */
 	@Autowired
@@ -178,9 +177,16 @@ public class ConsentServiceImpl implements ConsentService {
 	@Autowired
 	private ConsentExportService consentExportService;
 	
-	/**	Try policy service */
+	/** 	Try policy service. */
 	@Autowired
 	private TryPolicyService tryPolicyService;
+	
+	/** The consent builder. */
+	@Autowired
+	private ConsentBuilder consentBuilder;
+	
+	@Autowired
+	private	ConsentFactory consentFactory;
 	
 	/** The logger. */
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -208,6 +214,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 * Delete consent.
 	 *
 	 * @param consentId the consent id
+	 * @return true, if successful
 	 */
 	public boolean deleteConsent(Long consentId) {
 		Consent consent = null;
@@ -265,6 +272,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 * Sign consent.
 	 *
 	 * @param consentPdfDto the consent pdf dto
+	 * @return true, if successful
 	 */
 	@Override
 	public boolean signConsent(ConsentPdfDto consentPdfDto){
@@ -426,6 +434,9 @@ public class ConsentServiceImpl implements ConsentService {
 		return consentListDtos;
 	}
 	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.consent.ConsentService#findAllConsentsDtoByUserName(java.lang.String)
+	 */
 	@Override
 	public List<ConsentListDto> findAllConsentsDtoByUserName(String userName){
 		Patient patient=patientRepository.findByUsername(userName);
@@ -482,7 +493,7 @@ public class ConsentServiceImpl implements ConsentService {
 
 			Set<String> consentDoNotShareSensitivityPolicyCode=new HashSet<String>();
 			for (ConsentDoNotShareSensitivityPolicyCode item:consent.getDoNotShareSensitivityPolicyCodes()){
-				consentDoNotShareSensitivityPolicyCode.add(item.getSensitivityPolicyCode().getDisplayName());
+				consentDoNotShareSensitivityPolicyCode.add(item.getValueSetCategory().getName());
 			}
 
 			Set<String> consentShareForPurposeOfUseCode=new HashSet<String>();
@@ -494,28 +505,25 @@ public class ConsentServiceImpl implements ConsentService {
 			for (ClinicalConceptCode item:consent.getDoNotShareClinicalConceptCodes()){
 				consentDoNotShareClinicalConceptCodes.add(item.getDisplayName());
 			}
-
+			
 			if (consent.getSignedPdfConsent()!=null){
-				if (consent.getSignedPdfConsent().getSignedPdfConsentContent()!=null){
+				if(consent.getSignedPdfConsent().getDocumentSignedStatus().equals("SIGNED"))
 					consentListDto.setConsentStage("CONSENT_SIGNED");
-				}
-				else{
-					consentListDto.setConsentStage("CONSENT_SUBMITTED");
-				}
+				else 
+					consentListDto.setConsentStage("CONSENT_SAVED");
 			}
-			else{
+			else
 				consentListDto.setConsentStage("CONSENT_SAVED");
-			}
 
 			if (!consentListDto.getConsentStage().equals("CONSENT_SIGNED")){
 				consentListDto.setRevokeStage("NA");
 			}
 			else{
 				if (consent.getSignedPdfConsentRevoke()!=null)
-					if(consent.getSignedPdfConsentRevoke().getSignedPdfConsentRevocationContent()!=null)
+					if(consent.getSignedPdfConsentRevoke().getDocumentSignedStatus().equals("SIGNED"))
 						consentListDto.setRevokeStage("REVOCATION_REVOKED");
 					else
-						consentListDto.setRevokeStage("REVOCATION_SUBMITTED");
+						consentListDto.setRevokeStage("REVOCATION_NOT_SUBMITTED");
 				else
 					consentListDto.setRevokeStage("REVOCATION_NOT_SUBMITTED");
 			}
@@ -525,7 +533,7 @@ public class ConsentServiceImpl implements ConsentService {
 			isMadeToName.addAll(isMadeToOrgName);
 			toDiscloseName.addAll(toDiscloseOrgName);
 			consentListDto.setDoNotShareClinicalConceptCodes(consentDoNotShareClinicalConceptCodes);
-			consentListDto.setId(consent.getId());
+			consentListDto.setId(Long.toString(consent.getId()));
 			consentListDto.setIsMadeToName(isMadeToName);
 			consentListDto.setToDiscloseName(toDiscloseName);
 			consentListDto.setDoNotShareClinicalDocumentSectionTypeCodes(consentDoNotShareClinicalDocumentSectionTypeCode);
@@ -599,8 +607,8 @@ public class ConsentServiceImpl implements ConsentService {
 		providerMap.put(o.getNpi(),o);
 	for (OrganizationalProvider o:patient.getOrganizationalProviders())
 		providerMap.put(o.getNpi(), o);
-	if (consentDto.getId() != null && consentDto.getId().longValue() > 0)
-	    consent = consentRepository.findOne(consentDto.getId());
+	if (consentDto.getId() != null && Long.parseLong(consentDto.getId()) > 0)
+	    consent = consentRepository.findOne(Long.parseLong(consentDto.getId()));
 
 	// Set Providers
 	if (consentDto.getProvidersDisclosureIsMadeTo() != null) {
@@ -685,9 +693,9 @@ public class ConsentServiceImpl implements ConsentService {
 	if (consentDto.getDoNotShareSensitivityPolicyCodes() != null) {
 	    Set<ConsentDoNotShareSensitivityPolicyCode> doNotShareSensitivityPolicyCodes = new HashSet<ConsentDoNotShareSensitivityPolicyCode>();
 	    for (String item : consentDto.getDoNotShareSensitivityPolicyCodes()) {
-		SensitivityPolicyCode sensitivityPolicyCode = sensitivityPolicyCodeRepository.findByCode(item);
+		ValueSetCategory valueSetCategory = valueSetCategoryRepository.findByCode(item);
 		ConsentDoNotShareSensitivityPolicyCode consentDoNotShareSensitivityPolicyCode = new ConsentDoNotShareSensitivityPolicyCode(
-			sensitivityPolicyCode);
+				valueSetCategory);
 		doNotShareSensitivityPolicyCodes.add(consentDoNotShareSensitivityPolicyCode);
 	    }
 	    consent.setDoNotShareSensitivityPolicyCodes(doNotShareSensitivityPolicyCodes);
@@ -737,7 +745,10 @@ public class ConsentServiceImpl implements ConsentService {
 		logger.error("Error in saving consent in xacml format",e);
 		throw new ConsentGenException(e.getMessage());
 	}
+	
+	if(consent.getId()!=null)
 	consentRepository.save(consent);
+	else consentFactory.createNewConsent(consent);
 
     }
 	
@@ -856,7 +867,7 @@ public class ConsentServiceImpl implements ConsentService {
 			
 			Set<String> consentDoNotShareSensitivityPolicyCode=new HashSet<String>();
 			for (ConsentDoNotShareSensitivityPolicyCode item:consent.getDoNotShareSensitivityPolicyCodes()){
-				consentDoNotShareSensitivityPolicyCode.add(item.getSensitivityPolicyCode().getDisplayName()); 
+				consentDoNotShareSensitivityPolicyCode.add(item.getValueSetCategory().getName()); 
 			}
 			
 			Set<String> consentShareForPurposeOfUseCode=new HashSet<String>();
@@ -878,7 +889,7 @@ public class ConsentServiceImpl implements ConsentService {
 //			isMadeToName.addAll(isMadeToOrgName);
 //			toDiscloseName.addAll(toDiscloseOrgName);
 			consentDto.setDoNotShareClinicalConceptCodes(consentDoNotShareClinicalConceptCodes);
-			consentDto.setId(consent.getId());
+			consentDto.setId(String.valueOf(consent.getId()));
 			consentDto.setUsername(consent.getPatient().getUsername());
 
 			//
@@ -921,7 +932,12 @@ public class ConsentServiceImpl implements ConsentService {
 			consentDto.setShareForPurposeOfUseCodes(consentShareForPurposeOfUseCode);
 			consentDto.setDoNotShareSensitivityPolicyCodes(consentDoNotShareSensitivityPolicyCode);
 
-
+			HashMap<String, String> purposeOfUseMap = new HashMap<String, String>();
+			for (ConsentShareForPurposeOfUseCode purposeOfUseCode : consent.getShareForPurposeOfUseCodes()) {
+				purposeOfUseMap.put(purposeOfUseCode.getPurposeOfUseCode().getCode(), purposeOfUseCode.getPurposeOfUseCode().getDisplayName());
+			}
+			consentDto.setPurposeOfUseCodesAndValues(purposeOfUseMap);
+			
 		}
 		return consentDto;
 	}
@@ -978,16 +994,20 @@ public class ConsentServiceImpl implements ConsentService {
 
 	/**
 	 * Return tagged c32. Entry tags that have been removed in segmented c32 were tagged and returned 
-	 * 
-	 * @param originalC32
-	 * @param segmentedC32
-	 * @return
+	 *
+	 * @param originalC32 the original c32
+	 * @param consentId the consent id
+	 * @param purposeOfUse the purpose of use
+	 * @return the tagged c32
+	 * @throws ConsentGenException the consent gen exception
 	 */
 	public String getTaggedC32(String originalC32,
-			Long consentId) {
+			Long consentId, String purposeOfUse) throws ConsentGenException {
+		
+		String xacml = consentBuilder.buildConsent2Xacml(consentId);
 		
 		// get segmented doc
-		String segmentedC32 = tryPolicyService.tryPolicy(originalC32, consentId);
+		String segmentedC32 = tryPolicyService.tryPolicy(originalC32, xacml, purposeOfUse);
 		
 		List<String> originalC32Ids = new ArrayList<String>();
 		List<String> segmentedC32Ids = new ArrayList<String>();
@@ -1062,9 +1082,9 @@ public class ConsentServiceImpl implements ConsentService {
 	
 	
 	/**
-	 * Changes xsl path to local xsl
-	 * 
-	 * @param taggedC32Doc
+	 * Changes xsl path to local xsl.
+	 *
+	 * @param taggedC32Doc the tagged c32 doc
 	 */
 	private void changeXslPath(Document taggedC32Doc) {
 		
@@ -1101,6 +1121,12 @@ public class ConsentServiceImpl implements ConsentService {
 		
 	}
 
+	/**
+	 * Gets the ids.
+	 *
+	 * @param c32List the c32 list
+	 * @return the ids
+	 */
 	public List<String> getIds(NodeList c32List) {
 		List<String> listOfIdsInC32 = new ArrayList<String>();
 		
@@ -1129,6 +1155,13 @@ public class ConsentServiceImpl implements ConsentService {
 		return listOfIdsInC32;
 	}
 	
+	/**
+	 * Gets the ids to tag.
+	 *
+	 * @param originalC32Ids the original c32 ids
+	 * @param segmentedC32Ids the segmented c32 ids
+	 * @return the ids to tag
+	 */
 	public List<String> getIdsToTag(List<String> originalC32Ids,
 			List<String> segmentedC32Ids) {
 		List<String> idsToTag = new ArrayList<String>();
@@ -1142,6 +1175,12 @@ public class ConsentServiceImpl implements ConsentService {
 		return idsToTag;
 	}
 	
+	/**
+	 * Tag c32 document.
+	 *
+	 * @param taggedC32List the tagged c32 list
+	 * @param taggedC32Ids the tagged c32 ids
+	 */
 	public void tagC32Document(NodeList taggedC32List, List<String> taggedC32Ids) {
 		
 		for (int i = 0; i < taggedC32List.getLength(); i++) {
@@ -1170,6 +1209,53 @@ public class ConsentServiceImpl implements ConsentService {
 		        }
 		    }
 		}
+	}
+	
+	@Override
+	public String createConsentEmbeddedWidget(ConsentPdfDto consentPdfDto){
+		Consent consent=consentRepository.findOne(consentPdfDto.getId());
+		// SignConsent
+		SignedPDFConsent signedPdfConsent = makeSignedPdfConsent();
+		Patient patient=consent.getPatient();
+		String patientEmail=patient.getEmail();
+		
+		EmbeddedWidgetCreationResult result=echoSignSignatureService.createEmbeddedWidget(consentPdfDto.getContent(), consentPdfDto.getFilename()+".pdf",  consentPdfDto.getConsentName(), null,patientEmail);
+		signedPdfConsent.setDocumentId(result.getDocumentKey());
+		signedPdfConsent.setDocumentNameBySender(consentPdfDto.getConsentName());
+		signedPdfConsent.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");
+		signedPdfConsent.setSignerEmail(patientEmail);
+		signedPdfConsent.setDocumentSignedStatus("Unsigned");
+		consent.setSignedPdfConsent(signedPdfConsent);
+		consentRepository.save(consent);
+		return result.getJavascript();
+	}
+	
+	@Override
+	public String createRevocationEmbeddedWidget(ConsentRevokationPdfDto consentRevokationPdfDto) {
+		Consent consent=consentRepository.findOne(consentRevokationPdfDto.getId());
+		// SignConsentRevokation
+		SignedPDFConsentRevocation signedPDFConsentRevocation=makeSignedPDFConsentRevocation();
+		Patient patient=consent.getPatient();
+		String patientEmail=patient.getEmail();
+		
+		EmbeddedWidgetCreationResult result=echoSignSignatureService.createEmbeddedWidget(consentRevokationPdfDto.getContent(), consentRevokationPdfDto.getFilename()+".pdf",  consentRevokationPdfDto.getConsentName() + " Revocation", null,patientEmail);
+		signedPDFConsentRevocation.setDocumentId(result.getDocumentKey());
+		signedPDFConsentRevocation.setDocumentNameBySender(consentRevokationPdfDto.getConsentName());
+		signedPDFConsentRevocation.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");
+		signedPDFConsentRevocation.setSignerEmail("consent2share@gmail.com");
+		signedPDFConsentRevocation.setDocumentSignedStatus("Unsigned");
+		signedPDFConsentRevocation.setDocumentCreatedBy(consent.getPatient().getLastName()+", "+consent.getPatient().getFirstName());
+		signedPDFConsentRevocation.setDocumentSentOutForSignatureDateTime(new Date());
+		consent.setConsentRevoked(true);
+		consent.setSignedPdfConsentRevoke(signedPDFConsentRevocation);
+		
+		if(consentRevokationPdfDto.getRevokationType().equals("EMERGENCY ONLY"))
+			consent.setConsentRevokationType("EMERGENCY ONLY");
+		if(consentRevokationPdfDto.getRevokationType().equals("NO NEVER"))
+			consent.setConsentRevokationType("NO NEVER");
+		
+		consentRepository.save(consent);
+		return result.getJavascript();
 	}
 
 

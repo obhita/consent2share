@@ -42,5 +42,5 @@ public interface ContextHandler {
 	 */
 	public XacmlResponse enforcePolicy(XacmlRequest xacmlRequest);
 	
-	public PdpRequestResponse makeDecisionForTryingPolicy(String xacmlPolicy);
+	public PdpRequestResponse makeDecisionForTryingPolicy(String xacmlPolicy, String purposeOfUse);
 }

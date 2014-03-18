@@ -25,39 +25,51 @@
  ******************************************************************************/
 package gov.samhsa.acs.brms.domain;
 
+import java.util.Set;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
  * The Class ClinicalFact.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ClinicalFact {
-	
+
 	/** The code. */
 	private String code;
-	
+
 	/** The code system. */
 	private String codeSystem;
-	
+
 	/** The code system name. */
 	private String codeSystemName;
-	
+
 	/** The display name. */
 	private String displayName;
-	
+
 	/** The c32 section title. */
 	private String c32SectionTitle;
-	
+
 	/** The c32 section loinc code. */
 	private String c32SectionLoincCode;
-	
+
 	/** The observation id. */
 	private String observationId;
-		
+
+	/** The entry. */
+	private String entry;
+
+	/** The value set categories. */
+	@XmlElementWrapper(name = "valueSetCategories")
+	@XmlElement(name = "valueSetCategory")
+	private Set<String> valueSetCategories;
+
 	/**
 	 * Gets the code.
-	 *
+	 * 
 	 * @return the code
 	 */
 	public String getCode() {
@@ -66,8 +78,9 @@ public class ClinicalFact {
 
 	/**
 	 * Sets the code.
-	 *
-	 * @param code the new code
+	 * 
+	 * @param code
+	 *            the new code
 	 */
 	public void setCode(String code) {
 		this.code = code;
@@ -75,7 +88,7 @@ public class ClinicalFact {
 
 	/**
 	 * Gets the code system.
-	 *
+	 * 
 	 * @return the code system
 	 */
 	public String getCodeSystem() {
@@ -84,8 +97,9 @@ public class ClinicalFact {
 
 	/**
 	 * Sets the code system.
-	 *
-	 * @param codeSystem the new code system
+	 * 
+	 * @param codeSystem
+	 *            the new code system
 	 */
 	public void setCodeSystem(String codeSystem) {
 		this.codeSystem = codeSystem;
@@ -93,7 +107,7 @@ public class ClinicalFact {
 
 	/**
 	 * Gets the code system name.
-	 *
+	 * 
 	 * @return the code system name
 	 */
 	public String getCodeSystemName() {
@@ -102,8 +116,9 @@ public class ClinicalFact {
 
 	/**
 	 * Sets the code system name.
-	 *
-	 * @param codeSystemName the new code system name
+	 * 
+	 * @param codeSystemName
+	 *            the new code system name
 	 */
 	public void setCodeSystemName(String codeSystemName) {
 		this.codeSystemName = codeSystemName;
@@ -111,7 +126,7 @@ public class ClinicalFact {
 
 	/**
 	 * Gets the display name.
-	 *
+	 * 
 	 * @return the display name
 	 */
 	public String getDisplayName() {
@@ -120,8 +135,9 @@ public class ClinicalFact {
 
 	/**
 	 * Sets the display name.
-	 *
-	 * @param displayName the new display name
+	 * 
+	 * @param displayName
+	 *            the new display name
 	 */
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
@@ -129,7 +145,7 @@ public class ClinicalFact {
 
 	/**
 	 * Gets the c32 section title.
-	 *
+	 * 
 	 * @return the c32 section title
 	 */
 	public String getC32SectionTitle() {
@@ -138,8 +154,9 @@ public class ClinicalFact {
 
 	/**
 	 * Sets the c32 section title.
-	 *
-	 * @param c32SectionTitle the new c32 section title
+	 * 
+	 * @param c32SectionTitle
+	 *            the new c32 section title
 	 */
 	public void setC32SectionTitle(String c32SectionTitle) {
 		this.c32SectionTitle = c32SectionTitle;
@@ -147,7 +164,7 @@ public class ClinicalFact {
 
 	/**
 	 * Gets the c32 section loinc code.
-	 *
+	 * 
 	 * @return the c32 section loinc code
 	 */
 	public String getC32SectionLoincCode() {
@@ -156,8 +173,9 @@ public class ClinicalFact {
 
 	/**
 	 * Sets the c32 section loinc code.
-	 *
-	 * @param c32SectionLoincCode the new c32 section loinc code
+	 * 
+	 * @param c32SectionLoincCode
+	 *            the new c32 section loinc code
 	 */
 	public void setC32SectionLoincCode(String c32SectionLoincCode) {
 		this.c32SectionLoincCode = c32SectionLoincCode;
@@ -165,7 +183,7 @@ public class ClinicalFact {
 
 	/**
 	 * Gets the observation id.
-	 *
+	 * 
 	 * @return the observation id
 	 */
 	public String getObservationId() {
@@ -174,10 +192,49 @@ public class ClinicalFact {
 
 	/**
 	 * Sets the observation id.
-	 *
-	 * @param observationId the new observation id
+	 * 
+	 * @param observationId
+	 *            the new observation id
 	 */
 	public void setObservationId(String observationId) {
 		this.observationId = observationId;
+	}
+
+	/**
+	 * Gets the entry.
+	 * 
+	 * @return the entry
+	 */
+	public String getEntry() {
+		return entry;
+	}
+
+	/**
+	 * Sets the entry.
+	 * 
+	 * @param entry
+	 *            the new entry
+	 */
+	public void setEntry(String entry) {
+		this.entry = entry;
+	}
+
+	/**
+	 * Gets the value set categories.
+	 * 
+	 * @return the value set categories
+	 */
+	public Set<String> getValueSetCategories() {
+		return valueSetCategories;
+	}
+
+	/**
+	 * Sets the value set categories.
+	 * 
+	 * @param valueSetCategories
+	 *            the new value set categories
+	 */
+	public void setValueSetCategories(Set<String> valueSetCategories) {
+		this.valueSetCategories = valueSetCategories;
 	}
 }

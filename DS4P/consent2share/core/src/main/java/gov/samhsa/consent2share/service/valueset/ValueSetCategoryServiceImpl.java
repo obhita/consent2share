@@ -2,6 +2,7 @@ package gov.samhsa.consent2share.service.valueset;
 
 import gov.samhsa.consent2share.domain.valueset.ValueSetCategory;
 import gov.samhsa.consent2share.domain.valueset.ValueSetCategoryRepository;
+import gov.samhsa.consent2share.service.dto.AddConsentFieldsDto;
 import gov.samhsa.consent2share.service.dto.ValueSetCategoryDto;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,9 @@ public class ValueSetCategoryServiceImpl implements ValueSetCategoryService {
 
 	@Resource
 	private ValueSetCategoryRepository valueSetCategoryRepository;
+	
+	@Autowired
+	ValueSetMgmtHelper valueSetMgmtHelper;
 
 	@Override
 	@Transactional
@@ -30,11 +35,11 @@ public class ValueSetCategoryServiceImpl implements ValueSetCategoryService {
 		String description = (created.getDescription() != null) ? created.getDescription() : "";
 		ValueSetCategory valueSetCategory = ValueSetCategory.getBuilder(created.getCode(), created.getName(), created.getUserName()).description(description).build();
 		valueSetCategory = valueSetCategoryRepository.save(valueSetCategory);
-		return createDtoFromEntity(valueSetCategory);
+		return valueSetMgmtHelper.createValuesetCategoryDtoFromEntity(valueSetCategory);
 	}
 
-	@Transactional(rollbackFor = ValueSetCategoryNotFoundException.class)
 	@Override
+	@Transactional(rollbackFor = ValueSetCategoryNotFoundException.class)
 	public ValueSetCategoryDto delete(Long valueSetCategoryId)
 			throws ValueSetCategoryNotFoundException {
 		LOGGER.debug("Deleting ValueSetCategory with id: " + valueSetCategoryId);
@@ -44,26 +49,21 @@ public class ValueSetCategoryServiceImpl implements ValueSetCategoryService {
 			throw new ValueSetCategoryNotFoundException();			
 		}
 		valueSetCategoryRepository.delete(deleted);
-		return createDtoFromEntity(deleted);
+		return valueSetMgmtHelper.createValuesetCategoryDtoFromEntity(deleted);
 	}
 
 	@Override
 	public List<ValueSetCategoryDto> findAll() {
 		LOGGER.debug("Finding all valueSetCategories");
 		List<ValueSetCategory> valueSetCategories = valueSetCategoryRepository.findAll();
-		List<ValueSetCategoryDto> valueSetCategoryDtos = new ArrayList<ValueSetCategoryDto>();
-		for(ValueSetCategory valueSetCategory : valueSetCategories){
-			ValueSetCategoryDto valueSetCategoryDto = createDtoFromEntity(valueSetCategory);
-			valueSetCategoryDtos.add(valueSetCategoryDto);			
-		}		
-		return valueSetCategoryDtos;
+		return valueSetMgmtHelper.convertValueSetCategoryEntitiesToDtos(valueSetCategories);
 	}
 
 	@Override
 	public ValueSetCategoryDto findById(Long id) {
 		LOGGER.debug("Finding a ValueSetCategory with id: " + id);
 		ValueSetCategory valueSetCategory = valueSetCategoryRepository.findOne(id);
-		return createDtoFromEntity(valueSetCategory);
+		return valueSetMgmtHelper.createValuesetCategoryDtoFromEntity(valueSetCategory);
 	}
 
 	@Override
@@ -79,7 +79,21 @@ public class ValueSetCategoryServiceImpl implements ValueSetCategoryService {
 		}
 		
 		valueSetCategory.update(updated.getCode(), updated.getName(), updated.getDescription(),updated.getUserName());
-		return createDtoFromEntity(valueSetCategory);
+		return valueSetMgmtHelper.createValuesetCategoryDtoFromEntity(valueSetCategory);
+	}
+	
+	@Override
+	public List<AddConsentFieldsDto> findAllValueSetCategoriesAddConsentFieldsDto() {
+		List<ValueSetCategory> valueSetCategoryList = valueSetCategoryRepository.findAll();
+		List<AddConsentFieldsDto> sensitivityPolicyDto = new ArrayList<AddConsentFieldsDto>();
+		for (ValueSetCategory valueSetCategory : valueSetCategoryList) {
+			AddConsentFieldsDto sensitivityPolicyDtoItem = new AddConsentFieldsDto();
+			sensitivityPolicyDtoItem.setCode(valueSetCategory.getCode());
+			sensitivityPolicyDtoItem.setDisplayName(valueSetCategory.getName());
+			sensitivityPolicyDtoItem.setDescription(valueSetCategory.getDescription());
+			sensitivityPolicyDto.add(sensitivityPolicyDtoItem);
+		}
+		return sensitivityPolicyDto;
 	}
 
     /**
@@ -90,12 +104,4 @@ public class ValueSetCategoryServiceImpl implements ValueSetCategoryService {
 		this.valueSetCategoryRepository = valueSetCategoryRepository;
 	}
 	
-	private ValueSetCategoryDto createDtoFromEntity(ValueSetCategory valueSetCategory){		
-		ValueSetCategoryDto valueSetCategoryDto = new ValueSetCategoryDto();
-		valueSetCategoryDto.setCode(valueSetCategory.getCode());
-		valueSetCategoryDto.setDescription(valueSetCategory.getDescription());
-		valueSetCategoryDto.setName(valueSetCategory.getName());
-		valueSetCategoryDto.setId(valueSetCategory.getId());		
-		return valueSetCategoryDto;		
-	}
 }

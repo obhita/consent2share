@@ -269,7 +269,26 @@ public interface ConsentService {
 	 * 
 	 * @param originalC32
 	 * @param consentId
+	 * @param purposeOfUse 
 	 * @return
+	 * @throws ConsentGenException 
 	 */
-	public String getTaggedC32(String originalC32, Long consentId);
+	public String getTaggedC32(String originalC32, Long consentId, String purposeOfUse) throws ConsentGenException;
+
+	/**
+	 * Creates the embedded widget.
+	 *
+	 * @param consentPdfDto the consent pdf dto
+	 * @return the string
+	 */
+	String createConsentEmbeddedWidget(ConsentPdfDto consentPdfDto);
+
+	/**
+	 * Creates the revocation embedded widget.
+	 *
+	 * @param consentRevokationPdfDto the consent revokation pdf dto
+	 * @return the string
+	 */
+	String createRevocationEmbeddedWidget(
+			ConsentRevokationPdfDto consentRevokationPdfDto);
 }

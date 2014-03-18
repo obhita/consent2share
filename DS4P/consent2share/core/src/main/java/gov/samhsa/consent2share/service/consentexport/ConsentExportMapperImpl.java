@@ -141,12 +141,10 @@ public class ConsentExportMapperImpl implements ConsentExportMapper {
 				.getDoNotShareSensitivityPolicyCodes()) {
 
 			TypeCodesDto tcd2 = new TypeCodesDto();
-			tcd2.setDisplayName(item.getSensitivityPolicyCode()
-					.getDisplayName());
-			tcd2.setCode(item.getSensitivityPolicyCode().getCode());
-			tcd2.setCodeSystem(item.getSensitivityPolicyCode().getCodeSystem());
-			tcd2.setCodeSystemName(item.getSensitivityPolicyCode()
-					.getCodeSystemName());
+			tcd2.setDisplayName(item.getValueSetCategory().getName());
+			tcd2.setCode(item.getValueSetCategory().getCode());
+			tcd2.setCodeSystem(null);
+			tcd2.setCodeSystemName(null);
 			consentDoNotShareSensitivityPolicyCode.add(tcd2);
 
 		}

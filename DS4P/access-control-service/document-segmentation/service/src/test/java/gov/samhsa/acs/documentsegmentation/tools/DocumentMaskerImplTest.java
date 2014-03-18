@@ -10,7 +10,7 @@ import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.brms.domain.RuleExecutionResponse;
 import gov.samhsa.acs.brms.domain.Sensitivity;
 import gov.samhsa.acs.brms.domain.UsPrivacyLaw;
-import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
@@ -45,7 +45,7 @@ public class DocumentMaskerImplTest {
 
 		documentMasker = new DocumentMaskerImpl(documentXmlConverter);
 
-		c32 = fileReader.readFile("c32.xml");
+		c32 = fileReader.readFile("sampleC32/c32.xml");
 		ruleExecutionContainer = setRuleExecutionContainer();
 		xacmlResultMock = setMockXacmlResult();
 	}

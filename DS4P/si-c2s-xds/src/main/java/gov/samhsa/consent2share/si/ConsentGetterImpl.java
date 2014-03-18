@@ -33,12 +33,10 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 /**
  * The Class ConsentGetterImpl.
  */
-@Component
 public class ConsentGetterImpl implements ConsentGetter {
 
 	/** The logger. */
@@ -53,6 +51,23 @@ public class ConsentGetterImpl implements ConsentGetter {
 	/** The simple consent dto row mapper. */
 	private SimpleConsentDtoRowMapper simpleConsentDtoRowMapper;
 
+	/** The policy id dto row mapper. */
+	private PolicyIdDtoRowMapper policyIdDtoRowMapper;
+	
+	/** The Constant SQL_GET_CONSENT. */
+	public static final String SQL_GET_CONSENT = 
+			"select consent.xacml_policy_file, consent.patient, consent.id, patient.enterprise_identifier "
+			+ "from consent "
+			+ "join patient on consent.patient=patient.id "
+			+ "where consent.id=?";
+	
+	/** The Constant SQL_GET_POLICY_ID. */
+	public static final String SQL_GET_POLICY_ID = 
+			"select consent.id, consent.consent_reference_id, patient.enterprise_identifier "
+			+ "from consent "
+			+ "join patient on consent.patient=patient.id "
+			+ "where consent.id=?";
+	
 	/**
 	 * Instantiates a new consent getter impl.
 	 */
@@ -66,11 +81,15 @@ public class ConsentGetterImpl implements ConsentGetter {
 	 *            the data source
 	 * @param simpleConsentDtoRowMapper
 	 *            the simple consent dto row mapper
+	 * @param policyIdDtoRowMapper
+	 *            the policy id dto row mapper
 	 */
 	public ConsentGetterImpl(DataSource dataSource,
-			SimpleConsentDtoRowMapper simpleConsentDtoRowMapper) {
+			SimpleConsentDtoRowMapper simpleConsentDtoRowMapper,
+			PolicyIdDtoRowMapper policyIdDtoRowMapper) {
 		this.dataSource = dataSource;
 		this.simpleConsentDtoRowMapper = simpleConsentDtoRowMapper;
+		this.policyIdDtoRowMapper = policyIdDtoRowMapper;
 	}
 
 	/*
@@ -80,20 +99,29 @@ public class ConsentGetterImpl implements ConsentGetter {
 	 */
 	@Override
 	public SimpleConsentDto getConsent(long consentId) {
-
-		String sql = "select consent.xacml_policy_file, consent.patient, consent.id, patient.enterprise_identifier "
-				+ "from consent "
-				+ "join patient on consent.patient=patient.id "
-				+ "where consent.id=?";
-
 		jdbcTemplate = getJdbcTemplate();
 
-		List<SimpleConsentDto> consents = this.jdbcTemplate.query(sql,
+		List<SimpleConsentDto> consents = this.jdbcTemplate.query(SQL_GET_CONSENT,
 				new Object[] { consentId }, simpleConsentDtoRowMapper);
 		logger.info("Consent is queried.");
 		consents.removeAll(Collections.singleton(null));
 
 		return consents.get(0);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see gov.samhsa.consent2share.si.ConsentGetter#getPolicyId(long)
+	 */
+	@Override
+	public PolicyIdDto getPolicyId(long consentId) {
+		jdbcTemplate = getJdbcTemplate();
+
+		List<PolicyIdDto> policyId = this.jdbcTemplate.query(SQL_GET_POLICY_ID,
+				new Object[] { consentId }, policyIdDtoRowMapper);
+		policyId.removeAll(Collections.singleton(null));
+		return policyId.get(0);
 	}
 
 	/**

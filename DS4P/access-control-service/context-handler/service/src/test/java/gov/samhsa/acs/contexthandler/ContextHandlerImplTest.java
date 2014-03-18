@@ -206,13 +206,13 @@ public class ContextHandlerImplTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testMakeDecisionForTryingPolicy_Given_Null_XacmlPolicy_Throws_Exception(){
 		ContextHandlerImpl sut = new ContextHandlerImpl(policyDesicionPointMock);
-		sut.makeDecisionForTryingPolicy(null);
+		sut.makeDecisionForTryingPolicy(null, null);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testMakeDecisionForTryingPolicy_Given_Empty_XacmlPolicy_Throws_Exception(){
 		ContextHandlerImpl sut = new ContextHandlerImpl(policyDesicionPointMock);
-		sut.makeDecisionForTryingPolicy(" ");
+		sut.makeDecisionForTryingPolicy(" ", null);
 	}
 	
 	public void testMakeDecisionForTryingPolicy_XacmlResponse_Returned_By_PdpDecisionPoint(){
@@ -220,11 +220,11 @@ public class ContextHandlerImplTest {
 		String xacmlPolicy = "Whatever Policy";
 		PolicyDecisionPoint policyDecisionPoint = mock(PolicyDecisionPoint.class);
 		PdpRequestResponse pdpRequestResponse = mock(PdpRequestResponse.class);
-		when(policyDecisionPoint.evaluatePolicyForTrying(xacmlPolicy)).thenReturn(pdpRequestResponse);
+		when(policyDecisionPoint.evaluatePolicyForTrying(xacmlPolicy, null)).thenReturn(pdpRequestResponse);
 		ContextHandlerImpl sut = new ContextHandlerImpl(policyDesicionPointMock);
 		
 		// Act
-		PdpRequestResponse returned = sut.makeDecisionForTryingPolicy(xacmlPolicy);
+		PdpRequestResponse returned = sut.makeDecisionForTryingPolicy(xacmlPolicy, null);
 		
 		// Assert
 		Assert.assertEquals(pdpRequestResponse, returned);

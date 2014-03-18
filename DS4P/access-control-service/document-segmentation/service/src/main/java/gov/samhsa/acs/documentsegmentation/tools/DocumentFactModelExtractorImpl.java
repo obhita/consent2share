@@ -26,6 +26,7 @@
 package gov.samhsa.acs.documentsegmentation.tools;
 
 import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.acs.common.util.StringURIResolver;
 
 import java.io.InputStream;
 import java.io.StringReader;
@@ -76,21 +77,20 @@ public class DocumentFactModelExtractorImpl implements
 			StreamSource source = new StreamSource(new StringReader(document));
 			StreamSource style = new StreamSource(in);
 
-			String xacmlResult = enforcementPolicies;
+			String xacmlResult = enforcementPolicies.replace("<xacmlReslt>", "<xacmlReslt xmlns:\"urn:hl7-org:v3\">");
 
 			TransformerFactory factory = TransformerFactory.newInstance();
 			Transformer t = factory.newTransformer(style);
 
-			t.setParameter(PARAM_XACML_RESULT, xacmlResult);
+			t.setURIResolver(new StringURIResolver().put(
+					PARAM_XACML_RESULT,
+					xacmlResult));
 
 			t.setOutputProperty(OutputKeys.INDENT, "no");
 			t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 			t.transform(source, new StreamResult(writer));
 
 			factModel = writer.toString();
-
-			factModel = factModel.replaceAll("&lt;", "<");
-			factModel = factModel.replaceAll("&gt;", ">");
 
 			in.close();
 			writer.close();

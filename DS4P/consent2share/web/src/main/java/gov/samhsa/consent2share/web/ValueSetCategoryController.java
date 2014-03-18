@@ -195,7 +195,7 @@ public class ValueSetCategoryController extends AbstractNodeController {
 	        updated.setId(id);
             updated = valueSetCategoryService.update(updated);
             updated.setError(false);
-            updated.setSuccessMessage("Value Set Category  with code:" + updated.getCode() + " and Name: " + updated.getName() + " is Edited Successfully");
+            updated.setSuccessMessage("Value Set Category  with Code: " + updated.getCode() + " and Name: " + updated.getName() + " is Edited Successfully");
 
         } catch (ValueSetCategoryNotFoundException e) {
             LOGGER.debug("No valueSetCategory was found with id: " + updated.getId());

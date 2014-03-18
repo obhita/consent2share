@@ -4,17 +4,35 @@
 	xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
 	xmlns:int-ws="http://www.springframework.org/schema/integration/ws"
 	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:groovy="http://www.springframework.org/schema/integration/groovy"
+	xmlns:mail="http://www.springframework.org/schema/integration/mail"
 	xsi:schemaLocation="http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd
 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
-		http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd 
+		http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd
 		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration/groovy http://www.springframework.org/schema/integration/groovy/spring-integration-groovy.xsd
+		http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd">
 
-	<bean id="ampqHandler" class="gov.samhsa.consent2share.si.ConsentSignedMessageHandler" />
+	<!-- ********** Control Bus integration ********** -->
 
-	<int-amqp:inbound-channel-adapter
+	<!-- Configurations for control bus must before its control target inboundChannelAdapter -->
+
+	<groovy:control-bus input-channel="controlChannel" />
+
+	<int:gateway id="controlBusGateway" service-interface="gov.samhsa.consent2share.si.BusController"
+		default-request-channel="controlChannel" />
+
+	<!-- ********** AMPQ integration ********** -->
+
+	<bean id="ampqHandlerSigned" class="gov.samhsa.consent2share.si.ConsentSignedMessageHandler" />
+	<bean id="ampqHandlerRevoked"
+		class="gov.samhsa.consent2share.si.ConsentRevokedMessageHandler" />
+
+	<int-amqp:inbound-channel-adapter id="inboundChannelAdapter"
 		channel="amqpInboundChannel" queue-names="${rabbitMQ.queueName}"
-		connection-factory="rabbitConnectionFactory" mapped-request-headers="*" />
+		connection-factory="rabbitConnectionFactory" mapped-request-headers="*"
+		error-channel="errorChannel" />
 
 	<int:channel id="amqpInboundChannel">
 		<int:interceptors>
@@ -22,17 +40,22 @@
 		</int:interceptors>
 	</int:channel>
 
-	<int:header-value-router header-name="messageType" input-channel="amqpInboundChannel" default-output-channel="rejectedMessagesChannel" >
-		<int:mapping value="gov.samhsa.consent2share.domain.consent.event.ConsentSignedEvent" channel="consentSignedEventChannel" />
-		<int:mapping value="gov.samhsa.consent2share.domain.consent.event.ConsentRevokedEvent" channel="consentRevokedEventChannel" />
+	<int:header-value-router header-name="messageType"
+		input-channel="amqpInboundChannel" default-output-channel="rejectedMessagesChannel">
+		<int:mapping
+			value="gov.samhsa.consent2share.domain.consent.event.ConsentSignedEvent"
+			channel="consentSignedEventChannel" />
+		<int:mapping
+			value="gov.samhsa.consent2share.domain.consent.event.ConsentRevokedEvent"
+			channel="consentRevokedEventChannel" />
 	</int:header-value-router>
-	
+
 	<int:channel id="consentSignedEventChannel">
 		<int:interceptors>
 			<int:wire-tap channel="logger" />
 		</int:interceptors>
 	</int:channel>
-	
+
 	<int:channel id="consentRevokedEventChannel">
 		<int:interceptors>
 			<int:wire-tap channel="logger" />
@@ -40,14 +63,17 @@
 	</int:channel>
 
 	<int:service-activator input-channel="consentSignedEventChannel"
-		ref="ampqHandler" method="handleMessage" output-channel="messageChannel" />
+		ref="ampqHandlerSigned" method="handleMessage" output-channel="messageChannel" />
+
+	<int:service-activator input-channel="consentRevokedEventChannel"
+		ref="ampqHandlerRevoked" method="handleMessage" output-channel="messageChannel" />
 
 	<int:channel id="messageChannel">
 		<int:interceptors>
 			<int:wire-tap channel="logger" />
 		</int:interceptors>
 	</int:channel>
-	
+
 	<int:publish-subscribe-channel id="rejectedMessagesChannel" />
 
 	<int:logging-channel-adapter id="logger"
@@ -55,4 +81,70 @@
 
 	<int-stream:stdout-channel-adapter
 		id="consoleOut" channel="messageChannel" append-newline="true" />
+
+	<!-- ********** Error handling integration ********** -->
+
+	<!-- Because we are using amqp:inbound-channel-adapter auto-ack, we cannot 
+		use PollableChannel -->
+	<int:publish-subscribe-channel id="errorChannel" />
+
+	<!-- If there is only one public method in the service-activator bean, do 
+		not need specify method -->
+	<int:service-activator input-channel="errorChannel"
+		ref="inboundChannelAdapterEndpointStopper" method="tryToStop"
+		output-channel="nullChannel" />
+
+	<bean id="inboundChannelAdapterEndpointStopper" class="gov.samhsa.consent2share.si.EndpointStopper">
+		<property name="endpointNeedToStop" value="inboundChannelAdapter" />
+		<property name="numberOfTryingTimes" value="3" />
+		<property name="intervalIncrementalInMillisBetweenTrying"
+			value="1000" />
+		<!-- <property name="exceptionWhenNeedToStop" value="si.ShutdownException"/> -->
+	</bean>
+
+	<int:service-activator input-channel="errorChannel"
+		ref="notificationExceptionHandler" output-channel="nullChannel" />
+
+	<int:service-activator input-channel="errorChannel"
+		ref="unackExceptionHandler" method="handError" output-channel="nullChannel" />
+
+	<bean id="inboundChannelAdapterEndpointStarter" class="gov.samhsa.consent2share.si.EndpointStarter">
+		<property name="endpointStopperCounterpart" ref="inboundChannelAdapterEndpointStopper" />
+	</bean>
+
+	<!-- ********** Notification integration ********** -->
+
+	<int:gateway id="notificationGateway"
+		service-interface="gov.samhsa.consent2share.si.NotificationPublisher"
+		default-request-channel="notificationChannel" />
+
+	<int:publish-subscribe-channel id="notificationChannel" />
+
+	<int:chain id="notificationEmailChain" input-channel="notificationChannel">
+		<mail:header-enricher>
+			<mail:subject expression="payload?.subject" />
+			<mail:to value="consent2share@outlook.com" />
+			<mail:from value="consent2share@gmail.com" />
+		</mail:header-enricher>
+		<int:transformer ref="notificationEmailGenerator"
+			method="generateEmail" />
+		<mail:outbound-channel-adapter
+			mail-sender="mailSender" />
+	</int:chain>
+
+	<bean class="org.springframework.mail.javamail.JavaMailSenderImpl"
+		id="mailSender">
+		<property name="host" value="${email.host}" />
+		<property name="protocol" value="${email.protocol}" />
+		<property name="port" value="${email.port}" />
+		<property name="username" value="${email.username}" />
+		<property name="password" value="${email.password}" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+			</props>
+		</property>
+	</bean>
+
 </beans>

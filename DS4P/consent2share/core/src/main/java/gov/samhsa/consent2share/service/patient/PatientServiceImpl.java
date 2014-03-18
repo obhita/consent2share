@@ -261,7 +261,7 @@ public class PatientServiceImpl implements PatientService {
 				individualProviderDto.setDeletable(true);
 				for(IndividualProvider individualProvider: consentIndividualProviders)
 				{
-					if(individualProviderDto.getId()==individualProvider.getId()&&individualProviderDto.getNpi().equals(individualProvider.getNpi()))
+					if(Long.parseLong(individualProviderDto.getId())==individualProvider.getId()&&individualProviderDto.getNpi().equals(individualProvider.getNpi()))
 						individualProviderDto.setDeletable(false);
 				}
 			}
@@ -273,7 +273,7 @@ public class PatientServiceImpl implements PatientService {
 				organizationalProviderDto.setDeletable(true);
 				for(OrganizationalProvider organizationalProvider: consentOrganizationalProviders)
 				{
-					if(organizationalProviderDto.getId()==organizationalProvider.getId()&&organizationalProviderDto.getNpi().equals(organizationalProvider.getNpi()))
+					if(Long.parseLong(organizationalProviderDto.getId())==organizationalProvider.getId()&&organizationalProviderDto.getNpi().equals(organizationalProvider.getNpi()))
 						organizationalProviderDto.setDeletable(false);
 				}
 			}

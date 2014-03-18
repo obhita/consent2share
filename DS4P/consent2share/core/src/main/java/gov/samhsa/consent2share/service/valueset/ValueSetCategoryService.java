@@ -1,5 +1,6 @@
 package gov.samhsa.consent2share.service.valueset;
 
+import gov.samhsa.consent2share.service.dto.AddConsentFieldsDto;
 import gov.samhsa.consent2share.service.dto.ValueSetCategoryDto;
 
 import java.util.List;
@@ -44,5 +45,11 @@ public interface ValueSetCategoryService {
 	  * @throws ValueSetCategoryNotFoundException  if no ValueSetCategory is found with given id.
 	  */
 	 public ValueSetCategoryDto update(ValueSetCategoryDto updated) throws ValueSetCategoryNotFoundException;
-	
+	 
+ 	/**
+	  * Find all value set categories add consent fields dto.
+	  *
+	  * @return the list
+	  */
+	 public List<AddConsentFieldsDto> findAllValueSetCategoriesAddConsentFieldsDto();	
 }

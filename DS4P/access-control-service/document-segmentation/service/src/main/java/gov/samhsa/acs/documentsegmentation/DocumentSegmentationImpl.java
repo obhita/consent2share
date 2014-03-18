@@ -26,12 +26,13 @@
 package gov.samhsa.acs.documentsegmentation;
 
 import gov.samhsa.acs.brms.RuleExecutionService;
+import gov.samhsa.acs.brms.domain.ClinicalFact;
+import gov.samhsa.acs.brms.domain.FactModel;
 import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
-import gov.samhsa.acs.common.bean.XacmlResult;
+import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.common.util.EncryptTool;
-import gov.samhsa.acs.common.util.FileHelper;
 import gov.samhsa.acs.documentsegmentation.audit.AuditService;
 import gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocument;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEditor;
@@ -40,9 +41,12 @@ import gov.samhsa.acs.documentsegmentation.tools.DocumentFactModelExtractor;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentMasker;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentRedactor;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentTagger;
+import gov.samhsa.acs.documentsegmentation.tools.EmbeddedClinicalDocumentExtractor;
+import gov.samhsa.acs.documentsegmentation.valueset.ValueSetService;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 
 import java.security.Key;
+import java.util.Set;
 
 import javax.activation.DataHandler;
 
@@ -92,14 +96,20 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 	/** The document fact model extractor. */
 	private final DocumentFactModelExtractor documentFactModelExtractor;
 
+	/** The embedded clinical document extractor. */
+	private final EmbeddedClinicalDocumentExtractor embeddedClinicalDocumentExtractor;
+
+	/** The value set service. */
+	private final ValueSetService valueSetService;
+
 	/** The additional metadata generator for segmented clinical document. */
 	private final AdditionalMetadataGeneratorForSegmentedClinicalDocument additionalMetadataGeneratorForSegmentedClinicalDocument;
 
 	/**
 	 * Instantiates a new document processor impl.
 	 * 
-	 * @param ruleExecutionWebServiceClient
-	 *            the rule execution web service client
+	 * @param ruleExecutionService
+	 *            the rule execution service
 	 * @param auditService
 	 *            the audit service
 	 * @param documentEditor
@@ -114,6 +124,15 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 	 *            the document masker
 	 * @param documentTagger
 	 *            the document tagger
+	 * @param documentFactModelExtractor
+	 *            the document fact model extractor
+	 * @param embeddedClinicalDocumentExtractor
+	 *            the embedded clinical document extractor
+	 * @param valueSetService
+	 *            the value set service
+	 * @param additionalMetadataGeneratorForSegmentedClinicalDocument
+	 *            the additional metadata generator for segmented clinical
+	 *            document
 	 */
 	public DocumentSegmentationImpl(
 			RuleExecutionService ruleExecutionService,
@@ -125,6 +144,8 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 			DocumentMasker documentMasker,
 			DocumentTagger documentTagger,
 			DocumentFactModelExtractor documentFactModelExtractor,
+			EmbeddedClinicalDocumentExtractor embeddedClinicalDocumentExtractor,
+			ValueSetService valueSetService,
 			AdditionalMetadataGeneratorForSegmentedClinicalDocument additionalMetadataGeneratorForSegmentedClinicalDocument) {
 
 		this.ruleExecutionService = ruleExecutionService;
@@ -136,12 +157,13 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 		this.documentMasker = documentMasker;
 		this.documentTagger = documentTagger;
 		this.documentFactModelExtractor = documentFactModelExtractor;
+		this.embeddedClinicalDocumentExtractor = embeddedClinicalDocumentExtractor;
+		this.valueSetService = valueSetService;
 		this.additionalMetadataGeneratorForSegmentedClinicalDocument = additionalMetadataGeneratorForSegmentedClinicalDocument;
 	}
 
 	/**
-	 * ***************************************** Process document based on
-	 * drools directives ******************************************.
+	 * Segment document.
 	 * 
 	 * @param document
 	 *            the document
@@ -182,8 +204,22 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 			// FileHelper.writeStringToFile(document, "Original_C32.xml");
 
 			// extract factModel
-			String factModel = documentFactModelExtractor.extractFactModel(
+			String factModelXml = documentFactModelExtractor.extractFactModel(
 					document, enforcementPolicies);
+			// get clinical document with generatedEntryId elements
+			document = embeddedClinicalDocumentExtractor
+					.extractClinicalDocumentFromFactModel(factModelXml);
+			FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+					factModelXml);
+			// Get and set value set categories to clinical facts
+			for (ClinicalFact fact : factModel.getClinicalFactList()) {
+				// Get value set categories
+				Set<String> valueSetCategories = valueSetService
+						.lookupValueSetCategories(fact.getCode(),
+								fact.getCodeSystem());
+				// Set retrieved value set categories to the clinical fact
+				fact.setValueSetCategories(valueSetCategories);
+			}
 			// FileHelper.writeStringToFile(factModel, "FactModel.xml");
 
 			// get execution response container
@@ -202,21 +238,29 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 			xacmlResult = marshaller.unmarshallFromXml(XacmlResult.class,
 					enforcementPolicies);
 
+			logger.info("Fact model: " + factModelXml);
+			logger.info("Rule Execution Container size: "
+					+ ruleExecutionContainer.getExecutionResponseList().size());
+
 			// redact document
 			document = documentRedactor.redactDocument(document,
-					ruleExecutionContainer, xacmlResult);
+					ruleExecutionContainer, xacmlResult, factModel);
 			// to get the itemActions from documentRedactor
-			executionResponseContainer = marshaller.marshall(ruleExecutionContainer);
+			executionResponseContainer = marshaller
+					.marshall(ruleExecutionContainer);
 
 			// tag document
 			document = documentTagger.tagDocument(document,
 					executionResponseContainer, xacmlResult.getMessageId());
 
+			// clean up generatedEntryId elements from document
+			document = documentRedactor.cleanUpGeneratedEntryIds(document);
+
 			String additionalMetadataForSegmentedClinicalDocument = additionalMetadataGeneratorForSegmentedClinicalDocument
 					.generateMetadataXml(xacmlResult.getMessageId(), document,
 							executionResponseContainer, senderEmailAddress,
-							recipientEmailAddress,
-							xacmlResult.getSubjectPurposeOfUse(),
+							recipientEmailAddress, xacmlResult
+									.getSubjectPurposeOfUse().getPurpose(),
 							xdsDocumentEntryUniqueId);
 			// FileHelper.writeStringToFile(additionalMetadataForSegmentedClinicalDocument,"additional_metadata.xml");
 

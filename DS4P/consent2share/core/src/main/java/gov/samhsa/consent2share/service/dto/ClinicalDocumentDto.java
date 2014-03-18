@@ -38,7 +38,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 /**
  * The Class ClinicalDocumentDto.
  */
-public class ClinicalDocumentDto {
+public class ClinicalDocumentDto implements HasId{
 
 	/** The name. */
 	@NotEmpty
@@ -239,14 +239,9 @@ public class ClinicalDocumentDto {
 	}
 
 	/** The id. */
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
-	private Long id;
+	private String id;
 
 	/** The version. */
-	@Version
-	@Column(name = "version")
 	private Integer version;
 
 	/**
@@ -254,7 +249,7 @@ public class ClinicalDocumentDto {
 	 *
 	 * @return the id
 	 */
-	public Long getId() {
+	public String getId() {
 		return this.id;
 	}
 
@@ -263,7 +258,7 @@ public class ClinicalDocumentDto {
 	 *
 	 * @param id the new id
 	 */
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

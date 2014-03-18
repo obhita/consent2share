@@ -33,6 +33,11 @@ $(document).ready(function() {
 		case "codeSystemEdit":
 			document.getElementById("sidenav_codeSystems").className += " active";
 			break;			
+		case "codeSystemVersionList":
+		case "codeSystemVersionAdd":
+		case "codeSystemVersionEdit":
+			document.getElementById("sidenav_codeSystemVersions").className += " active";
+			break;
 		case "valueSetList":
 		case "valueSetAdd":
 		case "valueSetEdit":
@@ -47,6 +52,9 @@ $(document).ready(function() {
 		case "valueSetCategoryAdd":
 		case "valueSetCategoryEdit":
 			document.getElementById("sidenav_valueSetCats").className += " active";
+			break;
+		case "lookup":
+			document.getElementById("sidenav_lookup").className += " active";
 			break;
 		default:
 			break;	

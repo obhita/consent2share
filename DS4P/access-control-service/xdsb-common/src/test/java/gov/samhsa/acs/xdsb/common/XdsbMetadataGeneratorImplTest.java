@@ -77,7 +77,7 @@ public class XdsbMetadataGeneratorImplTest {
 		String expectedMetadata = fileReader.readFile(expectedMetadataFileName);
 
 		// Act
-		String meta = sut.generateMetadataXml(file, "1.1.1.1.1");
+		String meta = sut.generateMetadataXml(file, "1.1.1.1.1", null, null);
 
 		// Assert
 		DetailedDiff diff = XmlComparator.compareXMLs(expectedMetadata, meta,
@@ -93,12 +93,12 @@ public class XdsbMetadataGeneratorImplTest {
 		String homeCommunityIdMock = "homeCommunityIdMock";
 		sut = spy(sut);
 		doReturn(metadata).when(sut).generateMetadataXml(documentMock,
-				homeCommunityIdMock);
+				homeCommunityIdMock, null, null);
 		XMLUnit.setIgnoreWhitespace(true);
 
 		// Act
 		SubmitObjectsRequest submitObjectsRequest = sut.generateMetadata(
-				documentMock, homeCommunityIdMock);
+				documentMock, homeCommunityIdMock, null, null);
 		String xml = marshaller.marshall(submitObjectsRequest);
 
 		// Assert
