@@ -25,27 +25,39 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.admin;
 
+import java.util.Date;
+import java.util.UUID;
+
 import javax.mail.MessagingException;
 
+import gov.samhsa.consent2share.domain.account.EmailToken;
+import gov.samhsa.consent2share.domain.account.EmailTokenRepository;
+import gov.samhsa.consent2share.domain.account.TokenGenerator;
+import gov.samhsa.consent2share.domain.account.TokenType;
 import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.domain.account.UsersRepository;
 import gov.samhsa.consent2share.domain.commondomainservices.EmailSender;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
+import gov.samhsa.consent2share.domain.reference.AdministrativeGenderCode;
+import gov.samhsa.consent2share.domain.reference.AdministrativeGenderCodeRepository;
 import gov.samhsa.consent2share.domain.staff.Staff;
 import gov.samhsa.consent2share.domain.staff.StaffRepository;
 import gov.samhsa.consent2share.infrastructure.DtoToDomainEntityMapper;
 import gov.samhsa.consent2share.infrastructure.EmailType;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
+import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.AdminProfileDto;
+import gov.samhsa.consent2share.service.dto.BasicPatientAccountDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,9 +104,23 @@ public class AdminServiceImpl implements AdminService {
 	@Autowired
 	private EmailSender emailSender;
 	
+	/** The token generator. */
+	@Autowired
+	private TokenGenerator tokenGenerator;
+	
+	/** The email token repository. */
+	@Autowired
+	private EmailTokenRepository emailTokenRepository;
+	
 		/** The users repository. */
 	@Autowired
 	private UsersRepository usersRepository;
+	
+	@Autowired
+	private AdministrativeGenderCodeRepository administrativeGenderCodeRepository;
+	
+	@Value("${accountVerificationTokenExpireInHours}")
+	private Integer accountVerificationTokenExpireInHours;
 	
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.patient.PatientService#findPatientProfileByUsername(java.lang.String)
@@ -138,6 +164,57 @@ public class AdminServiceImpl implements AdminService {
 		Patient patient = patientProfileDtoToPatientMapper.map(patientDto);
 		patientRepository.save(patient);
 		}
+
+	@Override
+	public long createPatientAccount(
+			BasicPatientAccountDto basicPatientAccountDto) {
+		Patient patient = new Patient();
+		patient.setBirthDay(basicPatientAccountDto.getBirthDate());
+		patient.setFirstName(basicPatientAccountDto.getFirstName());
+		patient.setLastName(basicPatientAccountDto.getLastName());
+		patient.setEmail(basicPatientAccountDto.getEmail());
+		AdministrativeGenderCode administrativeGenderCode = administrativeGenderCodeRepository
+				.findByCode(basicPatientAccountDto.getAdministrativeGenderCode());
+		patient.setAdministrativeGenderCode(administrativeGenderCode);
+		patient.setVerificationCode(UUID.randomUUID().toString().substring(0, 7));
+		
+		patientRepository.save(patient);
+		
+		return patient.getId();
+	}
+	
+	@Override
+	public Boolean sendLoginInformationEmail(
+			long patientId, String linkUrl) throws EmailAddressNotExistException, MessagingException {
+		
+		Patient patient =patientRepository.findOne(patientId);
+		//create emailToken 
+		if (patient.getEmail()==null) {
+			String message = String.format(
+					"Email address %s doesn't exist for username %s.");
+			
+			logger.info("message");
+			throw new EmailAddressNotExistException(message);
+		}
+		
+		EmailToken accountLoginInfoToken = new EmailToken();
+		accountLoginInfoToken.setExpireInHours(accountVerificationTokenExpireInHours);
+		accountLoginInfoToken.setRequestDateTime(new Date());
+		String token = tokenGenerator.generateToken();
+		accountLoginInfoToken.setToken(token);
+		accountLoginInfoToken.setIsTokenUsed(false);
+		accountLoginInfoToken.setPatientId(patientId);
+		accountLoginInfoToken.setTokenType(TokenType.NEW_LOGIN_ACCOUNT);
+		emailTokenRepository.save(accountLoginInfoToken);
+
+		String emailLinkPlaceHolder = "?token=%s";
+		String link = String.format(emailLinkPlaceHolder, token);
+
+		emailSender.sendMessage(
+				patient.getFirstName() + " " + patient.getLastName(),
+				patient.getEmail(), EmailType.NEW_LOGIN_ACCOUNT, linkUrl, token);
+		return true;
+	}
 	
 
 	

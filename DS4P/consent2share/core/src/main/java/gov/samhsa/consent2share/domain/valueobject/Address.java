@@ -33,6 +33,8 @@ import gov.samhsa.consent2share.domain.reference.StateCode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
@@ -51,7 +53,7 @@ import org.hibernate.envers.RelationTargetAuditMode;
 public class Address {
 
     /** The address use code. */
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private AddressUseCode addressUseCode;
 
@@ -67,7 +69,7 @@ public class Address {
 
     /** The state code. */
     @NotNull
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private StateCode stateCode;
 
@@ -78,7 +80,7 @@ public class Address {
 
     /** The country code. */
     @NotNull
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private CountryCode countryCode;
 

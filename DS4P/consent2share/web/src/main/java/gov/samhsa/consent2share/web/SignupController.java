@@ -28,6 +28,7 @@ package gov.samhsa.consent2share.web;
 import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
+import gov.samhsa.consent2share.infrastructure.security.RecaptchaService;
 import gov.samhsa.consent2share.infrastructure.security.TokenExpiredException;
 import gov.samhsa.consent2share.infrastructure.security.TokenNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
@@ -78,6 +79,10 @@ public class SignupController extends AbstractController {
 	/** The user context. */
 	@Autowired
 	UserContext userContext;
+	
+	/** The recaptcha util. */
+	@Autowired
+	RecaptchaService recaptchaUtil;
 
 	/**
 	 * Instantiates a new signup controller.
@@ -91,7 +96,8 @@ public class SignupController extends AbstractController {
 	public SignupController(AccountService accountService,
 			AdministrativeGenderCodeService administrativeGenderCodeService,
 			FieldValidator fieldValidator,
-			AccountVerificationService accountVerificationService) {
+			AccountVerificationService accountVerificationService,
+			RecaptchaService recaptchaUtil) {
 		if (accountService == null) {
 			throw new IllegalArgumentException("accountService cannot be null");
 		}
@@ -103,6 +109,7 @@ public class SignupController extends AbstractController {
 		this.administrativeGenderCodeService = administrativeGenderCodeService;
 		this.fieldValidator = fieldValidator;
 		this.accountVerificationService = accountVerificationService;
+		this.recaptchaUtil=recaptchaUtil;
 	}
 
 	/**
@@ -112,11 +119,14 @@ public class SignupController extends AbstractController {
 	 * @return the string
 	 */
 	@RequestMapping(value = "registration.html")
-	public String signup(Model model) {
+	public String signup(Model model,@RequestParam(value = "notify", required = false) String notification) {
 		SignupDto signupDto = new SignupDto();
 		model.addAttribute("signupDto", signupDto);
 		List<LookupDto> genderCodes = administrativeGenderCodeService.findAllAdministrativeGenderCodes();
+		String captchaString=recaptchaUtil.createSecureRecaptchaHtml();
 		model.addAttribute("genderCodes", genderCodes);
+		model.addAttribute("captcha", captchaString);
+		model.addAttribute("notification", notification);
 		return "views/registration";
 	}
 
@@ -139,6 +149,13 @@ public class SignupController extends AbstractController {
 			HttpServletRequest request, RedirectAttributes redirectAttributes,
 			Model model) throws MessagingException, ParseException,
 			UsernameNotExistException, EmailAddressNotExistException {
+		
+		if(recaptchaUtil.checkAnswer(request.getRemoteAddr(), 
+				request.getParameter("recaptcha_challenge_field"), 
+				request.getParameter("recaptcha_response_field"))==false) {
+			return "redirect:/registration.html?notify=wrong_captcha";
+		}
+			
 
 		fieldValidator.validate(signupDto, result);
 

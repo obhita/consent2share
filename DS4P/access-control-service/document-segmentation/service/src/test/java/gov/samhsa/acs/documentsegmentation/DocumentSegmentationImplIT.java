@@ -10,8 +10,11 @@ import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.acs.common.util.EncryptTool;
 import gov.samhsa.acs.common.util.FileHelper;
+import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentationImpl;
 import gov.samhsa.acs.documentsegmentation.audit.AuditServiceImpl;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidSegmentedClinicalDocumentException;
 import gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypterImpl;
@@ -118,7 +121,7 @@ public class DocumentSegmentationImplIT {
 
 	// Integration test
 	@Test
-	public void testSegmentDocument_Segment_Document() {
+	public void testSegmentDocument_Segment_Document() throws InvalidOriginalClinicalDocumentException, InvalidSegmentedClinicalDocumentException, XmlDocumentReadFailureException {
 
 		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
 				ruleExecutionService, new AuditServiceImpl(

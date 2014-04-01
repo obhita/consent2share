@@ -24,3 +24,12 @@ function initPopovers(){
 	});
 	
 }
+
+//Append an option to a select element
+function appendOptionToSelect(in_select_id, in_value, in_text){
+	if(in_value == ""){
+		$('select#' + in_select_id).append("<option selected='selected' value=''>- Please Select -</option>");
+	}else{
+		$('select#' + in_select_id).append("<option value='" + in_value + "'>" + in_text + "</option>");
+	}
+}

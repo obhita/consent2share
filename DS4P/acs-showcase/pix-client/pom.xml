@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>acs-showcase</artifactId>
-		<version>0.4.0-SNAPSHOT</version>
+		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>pix-client</artifactId>
 
@@ -20,16 +20,10 @@
 			<artifactId>common-library</artifactId>
 		</dependency>
 
-		<!-- Spring dependencies Start -->
-		<!-- <dependency>
-			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-ws-core</artifactId>
-		</dependency> -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 		</dependency>
-		<!-- Spring dependencies End -->
 
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -77,12 +71,12 @@
 									<wsdlLocation>classpath:PIXPDQManager.wsdl</wsdlLocation>
 									<extraargs>
 										<extraarg>-client</extraarg>
-										<!-- This argument resolves the max enum member issue while generating 
+										<!-- This argument resolves the max enum member issue while generating
 											the classes. -->
 										<extraarg>-xjc-b,${basedir}/src/main/resources/bindings/bindings.xjb</extraarg>
-										<!-- TODO: The namespace of the generated classes are manually 
-											mapped as below, because some classes were interfering with XDS.b generated 
-											classes. The org.hl7.v3 classes can be moved to a shared artifact in the 
+										<!-- TODO: The namespace of the generated classes are manually
+											mapped as below, because some classes were interfering with XDS.b generated
+											classes. The org.hl7.v3 classes can be moved to a shared artifact in the
 											future. -->
 										<extraarg>-p</extraarg>
 										<extraarg>urn:hl7-org:v3=org.hl7.v3.types</extraarg>
@@ -98,7 +92,7 @@
 				</executions>
 			</plugin>
 
-			<!-- Add generated sources - avoids having to copy generated sources to 
+			<!-- Add generated sources - avoids having to copy generated sources to
 				build location -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -140,15 +134,4 @@
 		</plugins>
 
 	</build>
-
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-			</plugin>
-
-		</plugins>
-
-	</reporting>
 </project>

@@ -5,6 +5,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -37,6 +38,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -180,7 +182,7 @@ public class ConceptCodeControllerTest {
 						.param("name","name")
 						.param("code","code"))
 			.andExpect(status().isFound())
-			.andExpect(view().name("redirect:../conceptCodeList"));
+			.andExpect(view().name("redirect:../conceptCodeList?panelState=addnew"));
 	}
 	
 	@Test
@@ -199,7 +201,7 @@ public class ConceptCodeControllerTest {
 						.param("name","ConceptCodeCatName")
 						.param("code","ConceptCodeCatCode"))
 			.andExpect(status().isFound())
-			.andExpect(view().name("redirect:../conceptCodeAdd.html"));
+			.andExpect(view().name("redirect:../conceptCodeAdd.html?panelState=addnew"));
 	}
 	
 	@Test
@@ -218,7 +220,7 @@ public class ConceptCodeControllerTest {
 						.param("name","ConceptCodeCatName")
 						.param("code","ConceptCodeCatCode"))
 			.andExpect(status().isFound())
-			.andExpect(view().name("redirect:../conceptCodeAdd.html"));
+			.andExpect(view().name("redirect:../conceptCodeAdd.html?panelState=addnew"));
 	}
 	
 	@Test
@@ -237,7 +239,7 @@ public class ConceptCodeControllerTest {
 						.param("name","ConceptCodeCatName")
 						.param("code","ConceptCodeCatCode"))
 			.andExpect(status().isFound())
-			.andExpect(view().name("redirect:../conceptCodeAdd.html"));
+			.andExpect(view().name("redirect:../conceptCodeAdd.html?panelState=addnew"));
 		
 	}
 	
@@ -340,7 +342,40 @@ public class ConceptCodeControllerTest {
 			.andExpect(view().name("redirect:../../conceptCodeList"));
 	}
 	
-	
+	@Test
+	public void testValueSetBatchUpload() throws Exception{
+//		List<ConceptCodeDto> conceptCodeDtos=(List<ConceptCodeDto>) mock(List.class);
+//		List<CodeSystemDto> codeSystems = (List<CodeSystemDto>) mock(List.class);
+//		List<ValueSetDto> valueSets = (List<ValueSetDto>) mock(List.class);
+//		
+//		when(conceptCodeService.findAll()).thenReturn(conceptCodeDtos);
+//		when(codeSystemService.findAll()).thenReturn(codeSystems);
+//		when(valueSetService.findAll()).thenReturn(valueSets);
+//		
+//		mockMvc.perform(post("/sysadmin/conceptCode/batchUpload"))
+//			.andExpect(status().isOk())
+//			.andExpect(model().attribute("conceptCodeDtos",conceptCodeDtos))
+//			.andExpect(view().name("views/sysadmin/conceptCodeList"));
+//		
+//		
+		
+//		MockMultipartFile file = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+//		mockMvc.perform(fileUpload("/sysadmin/conceptCode/batchUpload").file(file)
+//				.param("name", "mocked_name")
+//				.param("description", "mocked_description")
+//				.param("documentType", "mocked_type"))
+//			.andExpect(view().name("redirect:../conceptCodeList"));
+		
+		
+//		 mockMvc.perform(post("/form"))
+//		   .andExpect(status.isOk())
+//		   .andExpect(redirectedUrl("/person/1"))
+//		   .andExpect(model().size(1))
+//		   .andExpect(model().attributeExists("person"))
+//		   .andExpect(flash().attributeCount(1))
+//		   .andExpect(flash().attribute("message", "success!"));
+
+	}
 
 
 }

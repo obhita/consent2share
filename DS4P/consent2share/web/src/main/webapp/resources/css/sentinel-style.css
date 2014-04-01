@@ -85,7 +85,7 @@ body {
   padding-right: 0;
   padding-left: 0;
   height: auto;
-  margin-bottom: 40px;
+  /*	margin-bottom:40px;  */
   color: #646464;
   height: 100%;
   min-width: 310px;
@@ -350,6 +350,14 @@ label.valueSetErrMsg {
   margin-left: 4px;
 }
 
+.sysAdmin_pagination {
+  text-align: center;
+}
+.sysAdmin_pagination .pagination {
+  margin: 0;
+  font-size: 1em;
+}
+
 /* ----------------------------------------------------[ Administrator ] */
 /* ---- TEMPORARY - Watermark hidden ---- */
 #watermark {
@@ -378,6 +386,7 @@ label.valueSetErrMsg {
 }
 .admin-pages div#createPatient.modal form > div {
   padding-left: 15px !important;
+  padding-right: 15px !important;
 }
 .admin-pages div#createPatient.modal .modal-footer {
   margin-top: 0 !important;
@@ -1044,6 +1053,31 @@ these modules live within major layout components of the page
 such as headers or footers. Modules should use class selectors
 since they may be used more than once.
 ============================================================*/
+/* ----------------------------------------------------[ Validation Modal ] */
+.status-copy {
+  font-weight: bold;
+}
+
+.modal .consentValidationForm .panel {
+  padding-left: 0px;
+}
+.modal .consentValidationForm .panel ul {
+  margin: 0px 0px 5px 25px !important;
+}
+.modal .consentValidationForm .panel ul li {
+  list-style-type: disc;
+}
+
+.panel-body div label {
+  margin: 4;
+  font-size: small;
+  font-weight: 700;
+}
+.panel-body div span {
+  margin: 4;
+  font-size: small;
+}
+
 /* ----------------------------------------------------[ Buttons ] */
 .btn-round {
   border-radius: 24px;
@@ -1226,10 +1260,11 @@ td.contacts-td {
 }
 
 /* ----------------------------------------------------[ Accordion Panel Styles ] */
-.panel-title {
-  color: #428bca;
-}
-
+/*
+	.panel-title {
+		color: #428bca;
+	}
+*/
 .edit {
   margin-left: 15px;
   vertical-align: middle;
@@ -1467,6 +1502,10 @@ td.contacts-td {
   background-color: #e4eaf1;
 }
 .admin-pages .summary-border #patient-Account-btn {
+  width: auto;
+}
+.admin-pages .summary-border #consent-main-plus-btn {
+  border-radius: 3px;
   margin-left: 10px;
 }
 .admin-pages div#createPatient.modal form > div {
@@ -1572,6 +1611,9 @@ a:hover.footer-link {
 #sidenavMenu.navbar-collapse {
   padding-left: 0;
 }
+#sidenavMenu.navbar-collapse.in {
+  overflow-y: visible;
+}
 #sidenavMenu ul {
   margin: 0;
 }
@@ -1596,6 +1638,11 @@ a:hover.footer-link {
   overflow: auto !important;
   white-space: normal !important;
   height: auto;
+}
+
+.consent-current-active div.summary-border.duplicate-consent {
+  border-color: red !important;
+  border-width: medium !important;
 }
 
 #add-legal-modal .summary-container div.datepicker:after {
@@ -1981,10 +2028,11 @@ Media Query - defines how things should be styles under defined criteria
     display: none;
   }
 
-  .row {
-    width: 100%;
-  }
-
+  /*
+  	.row {
+  	width: 100%;
+  	}
+  */
   /* !MODULE RULES - JOYRIDE STYLING 
   768px Wide - MOBILE - Landscape, Tablet Portrait (devices and browsers) 
   (min-width: 480px) and (max-width: 767px)*/
@@ -2361,10 +2409,11 @@ Min Width 480px to Max Width 768px Wide - MOBILE - Landscape, Tablet Portrait (d
     border-bottom: 1px solid  #e5e5e5;
   }
 
-  .row {
-    width: 100%;
-  }
-
+  /*
+  	.row {
+  	width: 100%;
+  	}
+  */
   /* !MODULE RULES - JOYRIDE STYLING 
   479px wide - MOBILE - Portrait, Mobile Landscape Size (devices and browsers) */
   /*

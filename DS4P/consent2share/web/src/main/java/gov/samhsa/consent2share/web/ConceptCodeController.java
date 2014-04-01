@@ -94,7 +94,8 @@ public class ConceptCodeController extends AbstractNodeController {
      * @return  The name of the create conceptCode form view.
      */
     @RequestMapping(value = REQUEST_MAPPING_LIST, method = RequestMethod.GET)
-    public String showCreateConceptCodeForm(Model model, HttpServletRequest request){
+    public String showCreateConceptCodeForm(Model model,
+    			@RequestParam(value = "panelState", required = false, defaultValue = "") String panelState){
     	
     	List<ConceptCodeDto> conceptCodes = null;
     	ConceptCodeVSCSDto conceptCodeVSCSDto = null;
@@ -114,7 +115,14 @@ public class ConceptCodeController extends AbstractNodeController {
 	           LOGGER.debug("No code systems found in the system");
 		} catch (CodeSystemVersionNotFoundException e) {
 	           LOGGER.debug("No code system versions found in the system");
-		}       
+		}
+        
+        if(panelState.equals("resetoptions")){
+			model.addAttribute("panelState", "resetoptions");
+		}else if(panelState.equals("addnew")){
+			model.addAttribute("panelState", "addnew");
+		}
+        
         model.addAttribute(MODEL_ATTRIBUTE_CONCEPTCODEDTOS, conceptCodes);
         model.addAttribute(MODEL_ATTIRUTE_CONCEPTCODEVSCSDTO, conceptCodeVSCSDto);
 		//model.addAttribute(MODEL_ATTIRUTE_CONCEPTCODEDTO, conceptCodeDto);
@@ -212,7 +220,10 @@ public class ConceptCodeController extends AbstractNodeController {
 		} 
 		model.addAttribute(MODEL_ATTIRUTE_CONCEPTCODEDTO, created);
 		redirectAttribute.addFlashAttribute(MODEL_ATTIRUTE_CONCEPTCODEDTO, created);
-        return  createRedirectViewPath(path);
+		
+		String panelState = "?panelState=addnew";
+
+		return createRedirectViewPath(path) + panelState;
     }	    
     
 	/**

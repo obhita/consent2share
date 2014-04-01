@@ -23,7 +23,7 @@ public class C32WebServiceClientTest {
 
 	@BeforeClass
 	public static void setUp() {
-		address = "http://localhost:9000/services/C32Service";
+		address = "http://localhost:12345/services/C32Service";
 		ep = Endpoint.publish(address, new IC32ServiceImpl());
 		IC32ServiceImpl.returnedValueOfGetC32 = returnedValueOfGetC32;
 	}

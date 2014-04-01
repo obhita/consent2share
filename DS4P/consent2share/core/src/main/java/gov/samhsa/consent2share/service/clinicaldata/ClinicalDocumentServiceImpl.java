@@ -29,7 +29,6 @@ import gov.samhsa.consent2share.domain.clinicaldata.ClinicalDocument;
 import gov.samhsa.consent2share.domain.clinicaldata.ClinicalDocumentRepository;
 import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
-import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCode;
 import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCodeRepository;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
@@ -38,20 +37,33 @@ import gov.samhsa.consent2share.service.dto.LookupDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 
 /**
  * The Class ClinicalDocumentServiceImpl.
  */
 @Service
 @Transactional
-public class ClinicalDocumentServiceImpl implements ClinicalDocumentService {
+public class ClinicalDocumentServiceImpl implements ClinicalDocumentService, InitializingBean{
 
 	/** The clinical document repository. */
 	@Autowired
@@ -72,7 +84,49 @@ public class ClinicalDocumentServiceImpl implements ClinicalDocumentService {
 	/** The user context. */
 	@Autowired
 	UserContext userContext;
+	
+	@Autowired
+	Validator validator;
+	
+	@Value("${maximum_upload_file_size}")
+    private Long maxFileSize;
+	
+	@Value("${extensions_permitted_to_upload}")
+	private String permittedExtensions;
+	
+	private String[] permittedExtensionsArray;
 
+	
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	
+	
+	public ClinicalDocumentServiceImpl(
+			ClinicalDocumentRepository clinicalDocumentRepository,
+			ClinicalDocumentTypeCodeRepository clinicalDocumentTypeCodeRepository,
+			ModelMapper modelMapper, PatientRepository patientRepository,
+			UserContext userContext, Validator validator, Long maxFileSize,
+			String permittedExtensions, String[] permittedExtensionsArray) {
+		super();
+		this.clinicalDocumentRepository = clinicalDocumentRepository;
+		this.clinicalDocumentTypeCodeRepository = clinicalDocumentTypeCodeRepository;
+		this.modelMapper = modelMapper;
+		this.patientRepository = patientRepository;
+		this.userContext = userContext;
+		this.validator = validator;
+		this.maxFileSize = maxFileSize;
+		this.permittedExtensions = permittedExtensions;
+		this.permittedExtensionsArray = permittedExtensionsArray;
+	}
+	
+	@SuppressWarnings("unused")
+	private ClinicalDocumentServiceImpl() {}
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		permittedExtensionsArray=permittedExtensions.split(",");
+		
+	}
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.clinicaldata.ClinicalDocumentService#countAllClinicalDocuments()
 	 */
@@ -116,8 +170,17 @@ public class ClinicalDocumentServiceImpl implements ClinicalDocumentService {
 	 * @see gov.samhsa.consent2share.service.clinicaldata.ClinicalDocumentService#saveClinicalDocument(gov.samhsa.consent2share.service.dto.ClinicalDocumentDto)
 	 */
 	public void saveClinicalDocument(ClinicalDocumentDto clinicalDocumentDto) {
-		ClinicalDocument clinicalDocument = getClinicalDocumenFromDto(clinicalDocumentDto);
-		clinicalDocumentRepository.save(clinicalDocument);
+			if (validateClinicalDocumentDtoFields(clinicalDocumentDto)==true) {
+				ClinicalDocument clinicalDocument = getClinicalDocumenFromDto(clinicalDocumentDto);
+				clinicalDocumentRepository.save(clinicalDocument);
+			}
+	}
+	
+	boolean validateClinicalDocumentDtoFields(ClinicalDocumentDto clinicalDocumentDto) {
+		Set<ConstraintViolation<ClinicalDocumentDto>> violations = validator.validate(clinicalDocumentDto);
+		if(violations.isEmpty()==true)
+			return true;
+		throw new ConstraintViolationException("Field validation error.", new HashSet<ConstraintViolation<?>>(violations));
 	}
 
 	/**
@@ -223,7 +286,7 @@ public class ClinicalDocumentServiceImpl implements ClinicalDocumentService {
 	 * @param patient the patient
 	 * @return the list
 	 */
-	private List<ClinicalDocumentDto> findDtoByPatient(Patient patient) {
+	List<ClinicalDocumentDto> findDtoByPatient(Patient patient) {
 		List<ClinicalDocument> documents = clinicalDocumentRepository
 				.findByPatientId(patient.getId());
 		List<ClinicalDocumentDto> dtos = new ArrayList<ClinicalDocumentDto>();
@@ -275,5 +338,30 @@ public class ClinicalDocumentServiceImpl implements ClinicalDocumentService {
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public boolean isDocumentOversized(MultipartFile file) {
+		if (file.getSize()>maxFileSize)
+			return true;
+		return false;
+	}
+	
+	@Override
+	public boolean isDocumentExtensionPermitted(MultipartFile file) {
+		boolean result=false;
+		int indexOfDot=file.getOriginalFilename().indexOf(".");
+		if(indexOfDot>=0) {
+			String extension=file.getOriginalFilename().substring(indexOfDot+1);
+			for(String permittedExtension:permittedExtensionsArray) {
+				if(extension.equals(permittedExtension)) {
+					result=true;
+					break;
+				}
+					
+			}
+
+		}
+		return result;
 	}
 }

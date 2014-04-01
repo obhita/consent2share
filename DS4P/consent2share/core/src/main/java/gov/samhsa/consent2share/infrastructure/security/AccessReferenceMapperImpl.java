@@ -45,7 +45,7 @@ public class AccessReferenceMapperImpl implements AccessReferenceMapper{
 	 * @see gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper#getIndirectReference(long)
 	 */
 	@Override
-	public String getIndirectReference(long directReference) {
+	public String getIndirectReference(String directReference) {
 		HttpSession session=getSession();
 		AccessReferenceMap<String> map=getMap();
 		String indirectReference=map.addDirectReference(directReference);

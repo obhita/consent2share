@@ -17,18 +17,18 @@ public interface AccessReferenceMapper {
 	public long getDirectReference(String indirectReference);
 	
 	/**
-	 * Gets the indirect reference.
-	 *
-	 * @param directReference the direct reference
-	 * @return the indirect reference
-	 */
-	public String getIndirectReference(long directReference);
-	
-	/**
 	 * Sets the up access reference map.
 	 *
 	 * @param objects the new up access reference map
 	 */
 	public void setupAccessReferenceMap(Iterable<? extends HasId> objects);
+
+	/**
+	 * Gets the indirect reference.
+	 *
+	 * @param directReference the direct reference
+	 * @return the indirect reference
+	 */
+	String getIndirectReference(String directReference);
 	
 }

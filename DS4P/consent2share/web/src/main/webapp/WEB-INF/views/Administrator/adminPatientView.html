@@ -224,8 +224,11 @@
 									<span class="fa fa-pencil"></span> Edit Profile
 								</button>
 							</div>
+					
 						</div>
 						
+						
+				
 <!-- EDIT PATIENT MODAL -->
 						<div  id="editPatient" class="modal fade"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 							  <div class="modal-dialog">
@@ -239,12 +242,45 @@
 							      </div>
 							      <div class="modal-body">
 							      	
+							      	<section th:if="*{username==null}">
+											<div class="panel-group" id="accordion">
+										  <div class="panel panel-default">
+										    <div class="panel-heading">
+										      <h4 class="panel-title">
+										        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+										          Verification Code
+										        </a>
+										      </h4>
+										    </div>
+										    <div id="collapseOne" class="panel-collapse collapse">
+										      <div class="panel-body">
+												
+												<div class="col-sm-7">
+													<label style="font-size:large">Code:</label>
+													<span id="verificationCode" style="font-size:large" th:text="${patientProfileDto.verificationCode}">000 000 0000000</span>
+												</div>
+											
+												<div>
+													<button type="button" id="send_login_information" class="btn btn-primary" th:value="${patientProfileDto.id}">Send Verification Email</button>
+												</div>
+												
+												<div class="top-margin10">
+													<p style="font-size:small;">The Patient is required to use this Verification Code when setting up their account login information for the first time.</p>
+												</div>
+										      </div>
+										    </div>
+										  </div>
+										 </div> 
+							
+									</section>
+							      	
 							      	<section class="row">
 							        	<fieldset class="form-group col-sm-12">
 							      			<legend>Edit Required Account Information</legend>
 							      		</fieldset>
 							      	</section>
 							      	<input id="id" name="patientId" type="text" aria-required="true" th:field="*{id}"  class="form-control inline-block" style="display: none;" />
+							      								      	
 							      	<section class="row">
 										<div class="form-group col-sm-6">
 											<div>
@@ -272,7 +308,7 @@
 									
 									<section class="row">
 									
-										<div class="form-group col-sm-5">
+										<div class="form-group col-sm-5 col-xs-8">
 											<div>
 												<label for="gender">Gender</label>
 											</div>
@@ -287,7 +323,7 @@
 											</div>
 										</div>
 
-										<div class="form-group col-sm-7">
+										<div class="form-group col-sm-7 col-xs-12">
 											<div>
 												<label class="control-label">Date of Birth</label>
 											</div>
@@ -569,8 +605,7 @@
 											</div>
 										</div>
 										
-									</section>
-											
+									</section>															
 								</div>
 										<!-- COMPONENT: Connections -->
 							    <div class="modal-footer">
@@ -1150,11 +1185,10 @@
 						</div>
 						<div class="modal-body">
 
-							<div id="page-subcontent-holder" role="main"
-								class="col-md-10 col-sm-9">
+							<div id="page-subcontent-holder" role="main">
 								<div class="row">
 									<!-- !SECTION: Provider Lookup -->
-									<div>
+									
 										<section class="">
 											<fieldset>
 												<div class="required-info-group">
@@ -1171,8 +1205,7 @@
 																		</a>
 																	</div>
 																</div>
-																<div id="accord3_collapseOne"
-																	class="panel-collapse collapse">
+																<div id="accord3_collapseOne" class="panel-collapse collapse">
 
 																	<div class="panel-body">
 																		<div>
@@ -1182,20 +1215,24 @@
 																				<span>Enter the provider State, City or Zip
 																					Code to search</span>
 																			</div>
-																			<form>
-																				<div class="control-group">
+																			<section>
+																				<div class="row">
 
-																					<div
-																						style="margin-left: 0px; padding: 10px 15px;"
-																						class="username-container">
-																						<label for="search_state_name">State</label> <select
+																					<div class="username-container col-sm-8 col-xs-12">
+																						<div class="form-group">
+																							<label for="search_state_name">State</label> 
+																							<select
 																							id="search_state_name" class="form-control">
 																							<option selected="selected" value="">---
 																								Please Select ---</option>
 																							<option th:each="addressState : ${stateCodes}"
 																								th:value="${addressState.code}"
 																								th:text="${addressState.displayName}">Alabama</option>
-																						</select> <label for="search_city_name">City <span
+																							</select> 
+																						</div>
+																						<div class="form-group">
+																							
+																							<label for="search_city_name">City <span
 																							style="font-size: small; color: #8a8a8a;"><em>(not
 																									required)</em></span></label> <input id="search_city_name"
 																							name="cityname" type="text"
@@ -1203,24 +1240,31 @@
 																							id="search_city_client_error_text"
 																							class="required-text" style="display: none;">The
 																							length of city name cannot be less than 3.</span>
+																						</div>
 
 																					</div>
-
-
-
-																					<p style="font-weight: 600; margin: 5px 0 8px 20px;">OR</p>
-																					<label for="search_zip_code">Zip Code</label>
-																						<input id="search_zip_code" name="zipcode" type="text"
-																						class="form-control" />
-																						<span id="search_zip_client_error_text" class="required-text"
-																						style="display: none;">Please provide a
-																						valid zip code.</span>
 																				</div>
-																				<button type="button" class="btn btn-default "
-																					style="margin: 10px 10px 0 0;"
-																					onclick="clearLocation()">Clear</button>
+																				</section>
 
-																			</form>
+																				<section>
+																					<div class="row">
+																						<p style="font-weight: 600; color: #428bca; margin: 5px 0 8px 20px;">OR</p>
+																						<div class="form-group col-sm-7">
+																							<label for="search_zip_code">Zip Code</label>
+																							<input id="search_zip_code" name="zipcode" type="text"
+																							class="form-control" />
+																							<span id="search_zip_client_error_text" class="required-text"
+																							style="display: none;">Please provide a
+																							valid zip code.</span>
+																						</div>
+																					</div>
+																					<button type="button" class="btn btn-default "
+																						style="margin: 10px 10px 0 0;"
+																						onclick="clearLocation()">Clear
+																					</button>
+																				</section>
+
+																			
 																		</div>
 																	</div>
 																</div>
@@ -1317,8 +1361,7 @@
 
 											</fieldset>
 										</section>
-									</div>
-									<!-- end box col-md-9 -->
+									
 								</div>
 								<!-- end row -->
 							</div>

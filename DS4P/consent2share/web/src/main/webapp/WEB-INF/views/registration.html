@@ -52,6 +52,14 @@
 		</div>
 	</header>
 	<div id="under-header"></div>
+	        <div id="notification_bar" th:switch="${notification}">
+				<span th:case="'wrong_captcha'">
+					<div class="alert alert-warning rounded">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    			The CAPTCHA you entered is wrong. Please try again.
+					</div>
+				</span>
+		</div>
 	<!-- END : Page Header -->
 	
 	<div class="row main-content-wrapper">					
@@ -79,7 +87,7 @@
 			<div class="col-sm-9">
 				
 				 <section class="top-margin10">
-					<form id="signupForm" onsubmit="return validateSignupForm()" action="signupVerification.html" th:action="@{/registration.html}" th:object="${signupDto}" method="post">
+					<form id="signupForm" onsubmit="return validateSignupForm()" action="signupVerification.html" th:action="@{/registration.html}" th:object="${signupDto}" th:inline="text" method="post">
 							<fieldset id="login-thirdparty" class="row">
 			                    
 			                    	<legend>Required Account Information</legend>									
@@ -217,7 +225,7 @@
 												</div> <!-- end username-container -->
 											</div>
 										</div><!-- end required-info-group -->
-         
+         									[[${captcha}]]
 		                               	<div class="submit-cancel-btn-group row top-margin15">
 		                               		<button type="button" class="btn btn-default" onClick="window.location.href='index.html'" style="margin: 0 10px 0 0;">Cancel</button>
 		                               		<button type="submit" value="Save" class="btn btn-primary">Save</button>

@@ -36,7 +36,9 @@ $(document).ready(function(){
 	});
 });
 
-/*  Clear create patient account modal input field values & error messages. */
+/**
+ * Clear create patient account modal input field values & error messages
+ */
 function clearCreatePatientAccountModal(){
 	$('input#first_name').val("");
 	$('#fname_client_error_text').text("");

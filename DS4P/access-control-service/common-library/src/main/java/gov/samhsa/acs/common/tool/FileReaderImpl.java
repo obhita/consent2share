@@ -50,14 +50,27 @@ public class FileReaderImpl implements FileReader {
 	 */
 	@Override
 	public String readFile(String filename) throws IOException {
-		BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
 		InputStream is = getClass().getClassLoader().getResourceAsStream(
 				filename);
 
+		return readInputStreamAsString(is);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.acs.common.tool.FileReader#readInputStreamAsString(java.io
+	 * .InputStream)
+	 */
+	@Override
+	public String readInputStreamAsString(InputStream inputStream) {
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+
 		String line;
 		try {
-			br = new BufferedReader(new InputStreamReader(is));
+			br = new BufferedReader(new InputStreamReader(inputStream));
 			while ((line = br.readLine()) != null) {
 				if (sb.length() > 0) {
 					sb.append("\n");
@@ -65,7 +78,7 @@ public class FileReaderImpl implements FileReader {
 				sb.append(line);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		} finally {
 			if (br != null) {
 				try {
@@ -74,9 +87,9 @@ public class FileReaderImpl implements FileReader {
 					logger.error(e.getMessage(), e);
 				}
 			}
-			if (is != null) {
+			if (inputStream != null) {
 				try {
-					is.close();
+					inputStream.close();
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 				}

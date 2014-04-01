@@ -25,6 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,6 +68,10 @@ public class ConceptCodeServiceImpl implements ConceptCodeService {
 	@Autowired
 	ValueSetMgmtHelper valueSetMgmtHelper;
 
+	/** The Constant CONCEPT_CODE_PAGE_SIZE. */
+	// TODO (AO): move to properties file
+	public static final int CONCEPT_CODE_PAGE_SIZE = 20;
+	
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.valueset.ConceptCodeService#delete(java.lang.Long)
 	 */
@@ -156,7 +165,6 @@ public class ConceptCodeServiceImpl implements ConceptCodeService {
 		if(null != cValueSets && cValueSets.size()>0)
 			conceptCodeValueSetRepository.delete(cValueSets);
 		
-		
 		//add the new associations
 		List<ConceptCodeValueSet> cVSets = new ArrayList<ConceptCodeValueSet>(); 
 		for(Long id: selVsIds){
@@ -196,9 +204,28 @@ public class ConceptCodeServiceImpl implements ConceptCodeService {
 	@Override
 	public List<ConceptCodeDto> findAll() {
 		LOGGER.debug("Finding all conceptCodes");
+		
 		List<ConceptCode> conceptCodes = conceptCodeRepository.findAll();
+		
 		return valueSetMgmtHelper
 				.convertConceptCodeEntitiesToDtos(conceptCodes);
+	}
+	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.valueset.ConceptCodeService#findAll()
+	 */
+	@Override
+	public List<ConceptCodeDto> findAll(int pageNumber) {
+		LOGGER.debug("Finding all conceptCodes with paging");
+		Sort sort = new Sort(new Order(Direction.ASC, "code"));
+		PageRequest pageRequest = new PageRequest(pageNumber, CONCEPT_CODE_PAGE_SIZE, sort);
+		
+		Page<ConceptCode> conceptCodes = conceptCodeRepository.findAll(pageRequest);
+		LOGGER.debug("Total Concept Codes: " + conceptCodes.getTotalElements());
+		LOGGER.debug("Total Pages: " + conceptCodes.getTotalPages());
+		
+		return valueSetMgmtHelper
+				.convertConceptCodeEntitiesToDtos(conceptCodes.getContent());
 	}
 	
 	/* (non-Javadoc)

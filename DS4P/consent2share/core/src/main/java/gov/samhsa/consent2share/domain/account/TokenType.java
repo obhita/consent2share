@@ -34,6 +34,9 @@ public enum TokenType {
 		ACCOUNT_VERIFICATION, 
 		
 		/** The password reset. */
-		PASSWORD_RESET
+		PASSWORD_RESET,
 		/*add new enum types to the end of the list*/
+		
+		/** The account verification. */
+		NEW_LOGIN_ACCOUNT
 }

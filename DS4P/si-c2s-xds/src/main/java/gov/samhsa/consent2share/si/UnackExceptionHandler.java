@@ -8,7 +8,7 @@ import org.springframework.util.Assert;
 @Component
 public class UnackExceptionHandler {
 
-	public void handError(Message<?> errorMessage) throws Throwable {
+	public void handleError(Message<?> errorMessage) throws Throwable {
 		Assert.notNull(errorMessage);
 		
 		Throwable e = ((MessagingException) errorMessage.getPayload()).getCause();

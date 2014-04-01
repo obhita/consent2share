@@ -75,6 +75,19 @@ tr {
 	margin-right: 0 !important;
 } */
 
+body {
+	padding-top: 70px !important;
+}
+
+.navbar-inverse {
+	background-color: #6f6f6f;
+	border-color: white;
+}
+
+.navbar-fixed-top {
+	border-radius: 0;
+}
+
 div.div-entry {
 	padding-left: 0;
 	padding-right: 0;
@@ -156,15 +169,16 @@ h2 a:hover, h3 a:hover {
 .education-text {
 		/* text-align: center; */
 		/* color: #A30505; */
-		color: #c30000;
+		/* color: #c30000; */
+		color: white;
 		margin: 10px 30px 15px;
 	}
 
 div.education-text > div:first-child {
 	float: left;
-	margin: 0 10px 20px 0;
-	/* color: #d11f1f; */
-	color: #c30000;
+	margin: 0 10px 41px 0;
+	color: red; 
+	/* color: #c30000; */
 }
 
 .narr_header {
@@ -251,10 +265,21 @@ div.education-text > div:first-child {
 }
 
 /*---------------------------------------------------------------*/
+@media only screen and (min-width: 769px) and (max-width: 1020px) {
+	body {
+	padding-top: 90px !important;
+	}
+}
+
+/*---------------------------------------------------------------*/
 @media only screen and (max-width: 768px) {
 	/* .border_box {
 		margin:0 0 10px 0;
 	} */
+	
+	body {
+	padding-top: 80px !important;
+	}
 	
 	h2, h3 {
 		font-size: 12pt;
@@ -271,7 +296,7 @@ div.education-text > div:first-child {
 	
 	div.education-text > div:first-child {
 
-		margin: 0 10px 0px 0;
+		margin: 0 10px -1px 0;
 	}
 	
 }

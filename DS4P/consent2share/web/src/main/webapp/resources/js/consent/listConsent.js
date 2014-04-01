@@ -15,6 +15,12 @@ $(document).ready(function() {
 			};
 
 			initListConsent(sign_revoke_arys);
+			
+			var duplicate_consent_id = $('input#duplicate_consent_id').val();
+			
+			if((typeof duplicate_consent_id != 'undefined') && (typeof duplicate_consent_id != 'null')){
+				$("section.consent-current-active#consent_current_active_" + duplicate_consent_id).children("div.summary-border").first().addClass("duplicate-consent");
+			}
 });
 
 function initSessionTimeoutChecker() {

@@ -22,7 +22,7 @@ public class TryPolicyWebServiceClientTest {
 
 	@BeforeClass
 	public static void setUp() {
-		address = "http://localhost:9000/services/TryPolicyService";
+		address = "http://localhost:12345/services/TryPolicyService";
 		ep = Endpoint.publish(address, new TryPolicyPortTypeImpl());
 		TryPolicyPortTypeImpl.returnedValueOfTryPolicy = returnedValueOfTryPolicy;
 	}

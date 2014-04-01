@@ -2,7 +2,10 @@ package gov.samhsa.acs.documentsegmentation.ws;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentation;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidSegmentedClinicalDocumentException;
 import gov.samhsa.acs.documentsegmentation.ws.DocumentSegmentationServiceImpl;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationService;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationServicePortType;
@@ -42,7 +45,7 @@ public class DocumentSegmentationImplEndpointTest {
 
 	@Before
 	public void setUp() throws Exception {
-		address = "http://localhost:9000/services/DocumentSegmentationService";
+		address = "http://localhost:12345/services/DocumentSegmentationService";
 		wsdlURL = new URL(address + "?wsdl");
 		segmentDocumentResponse = new SegmentDocumentResponse();
 
@@ -65,7 +68,7 @@ public class DocumentSegmentationImplEndpointTest {
 
 	@Test
 	public void processDocumentWorksWithGeneratedServiceAndSei()
-			throws MalformedURLException {
+			throws MalformedURLException, InvalidOriginalClinicalDocumentException, InvalidSegmentedClinicalDocumentException, XmlDocumentReadFailureException {
 		DocumentSegmentationService service = new DocumentSegmentationService(
 				wsdlURL, serviceName);
 		DocumentSegmentationServicePortType port = service

@@ -103,7 +103,7 @@ the page. Do not use class or ID selectors with Base Rules.
 		padding-right:0;
 		padding-left:0;
 		height:auto;
-		margin-bottom:40px;
+	/*	margin-bottom:40px;  */
 		color:#646464;
 		height: 100%;
 		min-width: 310px;
@@ -415,6 +415,14 @@ used more than once per page.
 		margin-bottom: 10px;
 		margin-left: 4px;
 		}	
+
+	.sysAdmin_pagination {
+		text-align: center;
+		.pagination {
+			margin: 0;
+			font-size: 1em;
+			}
+		}
 	
 
 /* ----------------------------------------------------[ Administrator ] */
@@ -450,6 +458,7 @@ used more than once per page.
 		div#createPatient.modal { 
 			form > div {
 				padding-left: 15px !important;
+				padding-right: 15px !important;
 			}
 			.modal-footer {
 				margin-top: 0 !important;
@@ -1159,7 +1168,7 @@ used more than once per page.
 		
 		.inputform, form { 
 		    > div{
-		    	padding-left: 25px;
+                padding-left: 25px;
 		    }
 			label {
 				display: inline-block;
@@ -1214,7 +1223,48 @@ such as navigation bars, carousels, and widgets etc. Usually
 these modules live within major layout components of the page
 such as headers or footers. Modules should use class selectors
 since they may be used more than once.
-============================================================*/	
+============================================================*/
+
+
+/* ----------------------------------------------------[ Validation Modal ] */
+
+
+.status-copy {
+  font-weight: bold;
+}
+
+.modal {
+        .consentValidationForm {
+          .panel {
+            padding-left: 0px;
+            
+            ul {
+            	margin: 0px 0px 5px 25px !important;
+            	
+            	li {
+            		list-style-type: disc;
+            	}
+            }
+            
+          }
+        }
+ }
+
+    .panel-body{
+		div{
+			label{
+				margin: 4;
+				font-size: small;
+				font-weight: 700;
+			}
+			span{
+				margin: 4;
+				font-size: small;			
+			}
+		}
+		
+	}
+
 	
 /* ----------------------------------------------------[ Buttons ] */
 	
@@ -1424,9 +1474,11 @@ since they may be used more than once.
 
 /* ----------------------------------------------------[ Accordion Panel Styles ] */
 	
+/*
 	.panel-title {
 		color: #428bca;
 	}
+*/
 	
 	.edit {
 		margin-left: 15px;
@@ -1691,6 +1743,10 @@ since they may be used more than once.
 		.summary-border {
 			background-color: #e4eaf1;
 			#patient-Account-btn {
+				width: auto;
+			}
+			#consent-main-plus-btn{
+				border-radius: 3px;
 				margin-left: 10px;
 			}
 		}
@@ -1818,7 +1874,11 @@ since they may be used more than once.
 	#sidenavMenu {
 		&.navbar-collapse {
 			padding-left:0;
+			&.in {
+				overflow-y: visible;
+			}
 		}
+		
 		ul {
 			margin: 0;
 			.hidden-md {
@@ -1847,6 +1907,15 @@ since they may be used more than once.
 				overflow: auto !important;
 				white-space: normal !important;
 				height: auto;
+			}
+		}
+	}
+	
+	.consent-current-active {
+		div.summary-border {
+			&.duplicate-consent {
+				border-color: red !important;
+				border-width: medium !important;
 			}
 		}
 	}
@@ -2324,10 +2393,11 @@ Media Query - defines how things should be styles under defined criteria
 		display:none;
 	}
 	
+/*
 	.row {
 	width: 100%;
 	}
-	
+*/	
 	
 	/* !MODULE RULES - JOYRIDE STYLING 
 	768px Wide - MOBILE - Landscape, Tablet Portrait (devices and browsers) 
@@ -2777,9 +2847,11 @@ Min Width 480px to Max Width 768px Wide - MOBILE - Landscape, Tablet Portrait (d
 	#e5e5e5;
 	}
 
+/*
 	.row {
 	width: 100%;
 	}
+*/
 	
 	/* !MODULE RULES - JOYRIDE STYLING 
 	479px wide - MOBILE - Portrait, Mobile Landscape Size (devices and browsers) */ 

@@ -25,8 +25,12 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.admin;
 
+import javax.mail.MessagingException;
+
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
+import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.service.dto.AdminProfileDto;
+import gov.samhsa.consent2share.service.dto.BasicPatientAccountDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 
 import org.springframework.security.access.annotation.Secured;
@@ -50,6 +54,11 @@ public interface AdminService {
 	void updateAdministrator(AdminProfileDto adminProfileDto) throws AuthenticationFailedException;
 	
 	void updatePatient(PatientProfileDto patientDto);
+
+	long createPatientAccount(BasicPatientAccountDto basicPatientAccountDto);
+	
+	public Boolean sendLoginInformationEmail(
+			long patientId,String linkUrl) throws EmailAddressNotExistException,MessagingException;
 
 	
 

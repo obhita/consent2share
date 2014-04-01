@@ -1,11 +1,13 @@
 package gov.samhsa.consent2share.service.valueset;
 
+import gov.samhsa.consent2share.domain.valueset.ConceptCode;
 import gov.samhsa.consent2share.domain.valueset.ConceptCodeValueSet;
 import gov.samhsa.consent2share.domain.valueset.ConceptCodeValueSetRepository;
 import gov.samhsa.consent2share.domain.valueset.ValueSet;
 import gov.samhsa.consent2share.domain.valueset.ValueSetCategory;
 import gov.samhsa.consent2share.domain.valueset.ValueSetCategoryRepository;
 import gov.samhsa.consent2share.domain.valueset.ValueSetRepository;
+import gov.samhsa.consent2share.service.dto.ConceptCodeDto;
 import gov.samhsa.consent2share.service.dto.ValueSetDto;
 import gov.samhsa.consent2share.service.dto.ValueSetVSCDto;
 
@@ -19,6 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +56,9 @@ public class ValueSetServiceImpl implements ValueSetService {
 	@Autowired
 	ValueSetMgmtHelper valueSetMgmtHelper;
 
+	/** The Constant VALUE_SET_PAGE_SIZE. */
+	private static final int VALUE_SET_PAGE_SIZE = 20;
+	
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.valueset.ValueSetService#create(gov.samhsa.consent2share.service.dto.ValueSetDto)
 	 */
@@ -90,29 +100,20 @@ public class ValueSetServiceImpl implements ValueSetService {
 		ValueSet deleted = valueSetRepository.findOne(valueSetId);
 		if(deleted == null){
 			LOGGER.debug("No ValueSet found with an id: " + valueSetId);
-			throw new ValueSetNotFoundException();			
+			throw new ValueSetNotFoundException("No ValueSet found with an id: " + valueSetId);			
 		}
+		
+		// is it eligible to delete
+		// check if any concept codes associated to this version
+		List<ConceptCodeValueSet> conceptCodeValueSets = deleted.getConceptCodes();	
+		if(null != conceptCodeValueSets && conceptCodeValueSets.size() > 0) {
+			LOGGER.debug("You can not delete a Value Set attached to an active Concept Code. " + valueSetId);
+			throw new ValueSetNotFoundException("You can not delete a Value Set attached to an active Concept Code. " + valueSetId);			
+		}		
 		valueSetRepository.delete(deleted);
 		return valueSetMgmtHelper.createValuesetDtoFromEntity(deleted);
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.service.valueset.ValueSetService#findAll()
-	 */
-	@Override
-	public List<ValueSetDto> findAll() {
-		LOGGER.debug("Finding all valueSets");
-		List<ValueSet> valueSets = valueSetRepository.findAll();
-		List<ValueSetDto> valueSetDtos = valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSets);
-		// setting deletable flag to each dto
-		for(ValueSetDto valueSetDto : valueSetDtos){
-			List<ConceptCodeValueSet> cValueSets = conceptCodeValueSetRepository.findAllByPkValueSetId(valueSetDto.getId());
-			if(null != cValueSets && cValueSets.size() > 0){
-				valueSetDto.setDeletable(false);
-			}			
-		}
-		return valueSetDtos;
-	}
 
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.valueset.ValueSetService#findById(java.lang.Long)
@@ -200,6 +201,32 @@ public class ValueSetServiceImpl implements ValueSetService {
 				.convertValueSetCategoryEntitiesToMap(valueSetCategories));
 		return valueSetVSCDto;
 		}
+
+
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.valueset.ValueSetService#findAll()
+	 */
+	@Override
+	public List<ValueSetDto> findAll() {		
+		LOGGER.debug("Finding all valueSets");
+		List<ValueSet> valueSets = valueSetRepository.findAll();
+		return setDeletableToValueSetDto(valueSets);
+	}	
+	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.valueset.ConceptCodeService#findAll()
+	 */
+	@Override
+	public List<ValueSetDto> findAll(int pageNumber) {
+		LOGGER.debug("Finding all valueSets with paging");
+		Sort sort = new Sort(new Order(Direction.ASC, "code"));
+		PageRequest pageRequest = new PageRequest(pageNumber, VALUE_SET_PAGE_SIZE, sort);
+		
+		Page<ValueSet> valueSets = valueSetRepository.findAll(pageRequest);
+		
+		return setDeletableToValueSetDto(valueSets.getContent());
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.valueset.ValueSetService#findAllByName(java.lang.String)
@@ -207,8 +234,21 @@ public class ValueSetServiceImpl implements ValueSetService {
 	@Override
 	public List<ValueSetDto> findAllByName(String searchTerm){
 		List<ValueSet> valueSets = valueSetRepository.findAllByNameLike("%"+searchTerm+"%");
-		return valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSets);
+		return setDeletableToValueSetDto(valueSets);
 		
+	}
+
+
+	protected List<ValueSetDto>  setDeletableToValueSetDto(List<ValueSet> valueSets) {
+		List<ValueSetDto> valueSetDtos = valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSets);
+		// setting deletable flag to each dto
+		for(ValueSetDto valueSetDto : valueSetDtos){
+			List<ConceptCodeValueSet> cValueSets = conceptCodeValueSetRepository.findAllByPkValueSetId(valueSetDto.getId());
+			if(null != cValueSets && cValueSets.size() > 0){
+				valueSetDto.setDeletable(false);
+			}			
+		}
+		return valueSetDtos;
 	}
 	
 	/* (non-Javadoc)
@@ -217,7 +257,8 @@ public class ValueSetServiceImpl implements ValueSetService {
 	@Override
 	public List<ValueSetDto> findAllByCode(String searchTerm){
 		List<ValueSet> valueSets = valueSetRepository.findAllByCodeLike("%"+searchTerm+"%");
-		return valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSets);
+		
+		return setDeletableToValueSetDto(valueSets);
 		
 	}
 
@@ -264,9 +305,9 @@ public class ValueSetServiceImpl implements ValueSetService {
 
 			valueSetDto.setRowsUpdated(rowsUpdated);
 		} catch (DataIntegrityViolationException ex) {
-			LOGGER.debug("Duplicate value set while doing batch upload: " + ex.getMessage());
+			LOGGER.debug("Cannot add value set. There is an error with file at row: " + ex.getMessage());
 			valueSetDto.setError(true);
-			valueSetDto.setErrorMessage("Duplicate code for row: " + (rowNum + 1));
+			valueSetDto.setErrorMessage("Cannot add value set. There is an error with file at row: " + (rowNum + 1));
 			throw ex;
 		} catch (ValueSetNotFoundException ex) {
 			LOGGER.debug("Missing required field while doing batch upload: " + ex.getMessage());

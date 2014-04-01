@@ -88,4 +88,7 @@ public interface ConsentRepository extends JpaSpecificationExecutor<Consent>,
 	 */
 	List<Consent> findBySignedPdfConsentDocumentSignedStatusNot(
 			String signStatus);
+
+	
+	List<Consent> findAllByPatientUsername(String username);
 }

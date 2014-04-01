@@ -11,6 +11,7 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -78,9 +79,21 @@ public class WSClient {
 
 			Scanner scan = new Scanner(System.in);
 			System.out.println("Please enter documentUniqueId:");
-			String documentUniqueId = scan.nextLine();
+			LinkedList<String> documentIds = new LinkedList<String>();
+			boolean go = false;
+			while(!go && scan.hasNextLine()){
+				String command = scan.nextLine();
+				if("go".equalsIgnoreCase(command)){
+					go = true;
+				}
+				else{
+					documentIds.add(command);
+				}
+			}
+			scan.close();
+			//String documentUniqueId = scan.nextLine();
 			RetrieveDocumentSetResponse retrieveDocResp = port
-					.retrieveDocumentSet(constructRetrieveDocumentRequest(documentUniqueId));
+					.retrieveDocumentSet(constructRetrieveDocumentRequest(documentIds));
 
 			// FileHelper.writeBytesToFile(retrieveDocResp.getDocumentResponse()
 			// .get(0).getDocument(), "retrievedDocumentForTest.xml");
@@ -204,6 +217,24 @@ public class WSClient {
 		String retrieveDocumentSetString = "<urn:RetrieveDocumentSetRequest xmlns:urn=\"urn:ihe:iti:xds-b:2007\"><urn:DocumentRequest><urn:RepositoryUniqueId>1.3.6.1.4.1.21367.2010.1.2.1040</urn:RepositoryUniqueId><urn:DocumentUniqueId>"+documentUniqueId+"</urn:DocumentUniqueId></urn:DocumentRequest></urn:RetrieveDocumentSetRequest>";
 		RetrieveDocumentSetRequest request = marshaller.unmarshallFromXml(
 				RetrieveDocumentSetRequest.class, retrieveDocumentSetString);
+
+		return request;
+	}
+	
+	private static RetrieveDocumentSetRequest constructRetrieveDocumentRequest(LinkedList<String> documentIds)
+			throws Exception {
+		SimpleMarshallerImpl marshaller = new SimpleMarshallerImpl();
+		StringBuilder builder = new StringBuilder();
+		builder.append("<urn:RetrieveDocumentSetRequest xmlns:urn=\"urn:ihe:iti:xds-b:2007\">");
+		for(String documentId : documentIds){
+			builder.append("<urn:DocumentRequest><urn:RepositoryUniqueId>1.3.6.1.4.1.21367.2010.1.2.1040</urn:RepositoryUniqueId><urn:DocumentUniqueId>");
+			builder.append(documentId);
+			builder.append("</urn:DocumentUniqueId></urn:DocumentRequest>");
+		}
+		builder.append("</urn:RetrieveDocumentSetRequest>");
+
+		RetrieveDocumentSetRequest request = marshaller.unmarshallFromXml(
+				RetrieveDocumentSetRequest.class, builder.toString());
 
 		return request;
 	}

@@ -34,7 +34,7 @@ public class PolicyTryingServiceImplTest {
 	public void setUp() throws Exception {
 		serviceName = new QName("http://acs.samhsa.gov/pep/ws/contract", "TryPolicyService");
 
-		address = "http://localhost:9000/services/TryPolicyService";
+		address = "http://localhost:12345/services/TryPolicyService";
 		wsdlURL = new URL(address + "?wsdl");
 		
 		policyTrying = mock(PolicyTrying.class);

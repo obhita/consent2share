@@ -259,9 +259,11 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 			try {
 				nodeToBeRedacted.getParentNode().removeChild(nodeToBeRedacted);
 			} catch (NullPointerException e) {
-				logger.warn("The text value '"
-						+ nodeToBeRedacted.getNodeValue()
-						+ "' must have been removed already, it cannot be removed again. This might happen if one of the search text contains the other.");
+				StringBuilder builder = new StringBuilder();
+				builder.append("The text value '");
+				builder.append(nodeToBeRedacted.getNodeValue());
+				builder.append("' must have been removed already, it cannot be removed again. This might happen if one of the search text contains the other.");
+				logger.warn(builder.toString());
 			}
 		}
 	}

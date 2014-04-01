@@ -82,10 +82,10 @@ INSERT INTO patient_organizational_providers(patient,organizational_providers) V
 INSERT INTO signedpdfconsent(document_id,document_message_by_sender,document_name_by_sender,document_signed_status,signer_email,signed_pdf_consent_content,version)VALUES('UF8J5S7X3H4525','This is a hard-coded greeting to be replaced.','Consent','SIGNED','consent2share@outlook.com','signed_pdf_consent_content',1);
 
 INSERT INTO consent (description, end_date, name, start_date, unsigned_pdf_consent, version, signed_pdf_consent,patient,id, consent_reference_id) 
-VALUES ( 'This is a consent made by Albert Smith', '2013-07-18 00:00:00', 'Consent', '2013-06-12 00:00:00', 'unsigned_pdf_consent', '1',1, 1,1, 'a07478e8-3642-42ff-980e-911e26ec3f47');
+VALUES ( 'This is a consent made by Albert Smith', '2013-07-18 23:59:59', 'Consent', '2013-06-12 00:00:00', 'unsigned_pdf_consent', '1',1, 1,1, 'a07478e8-3642-42ff-980e-911e26ec3f47');
 
 INSERT INTO consent (description, end_date, name, start_date, unsigned_pdf_consent, version, signed_pdf_consent,patient,id, consent_reference_id) 
-VALUES ( 'This is a consent made by Adam Smith', '2013-07-18 00:00:00', 'Consent', '2013-06-12 00:00:00', 'unsigned_pdf_consent', '1',1, 2,2, 'a07478e8-3642-42ff-980e-911e26ec3f48');
+VALUES ( 'This is a consent made by Adam Smith', '2013-07-18 23:59:59', 'Consent', '2013-06-12 00:00:00', 'unsigned_pdf_consent', '1',1, 2,2, 'a07478e8-3642-42ff-980e-911e26ec3f48');
 
 
 INSERT INTO consent_do_not_share_clinical_document_section_type_code (consent_id, clinical_document_section_type_code) VALUES(1,10);

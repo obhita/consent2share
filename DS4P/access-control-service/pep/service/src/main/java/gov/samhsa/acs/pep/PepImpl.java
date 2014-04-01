@@ -35,6 +35,8 @@ import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.contexthandler.ContextHandler;
 import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentation;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidSegmentedClinicalDocumentException;
 import gov.samhsa.acs.pep.c32getter.C32Getter;
 import gov.samhsa.acs.pep.saml.SamlTokenParser;
 import gov.samhsa.acs.pep.xdsbregistry.XdsbRegistry;
@@ -261,6 +263,10 @@ public class PepImpl implements Pep {
 				throw new DS4PException(e.toString(), e);
 			} catch (IOException e) {
 				throw new DS4PException(e.toString(), e);
+			} catch (InvalidOriginalClinicalDocumentException e) {
+				throw new DS4PException(e.toString(), e);
+			} catch (InvalidSegmentedClinicalDocumentException e) {
+				throw new DS4PException(e.toString(), e);
 			}
 		}
 
@@ -379,6 +385,10 @@ public class PepImpl implements Pep {
 			} catch (JAXBException e) {
 				throw new DS4PException(e.toString(), e);
 			} catch (IOException e) {
+				throw new DS4PException(e.toString(), e);
+			} catch (InvalidOriginalClinicalDocumentException e) {
+				throw new DS4PException(e.toString(), e);
+			} catch (InvalidSegmentedClinicalDocumentException e) {
 				throw new DS4PException(e.toString(), e);
 			}
 		}

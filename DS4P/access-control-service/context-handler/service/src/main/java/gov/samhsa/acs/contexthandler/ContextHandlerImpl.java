@@ -31,7 +31,6 @@ import gov.samhsa.acs.common.dto.XacmlResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 /**
@@ -40,7 +39,6 @@ import org.springframework.util.Assert;
 public class ContextHandlerImpl implements ContextHandler {
 
 	/** The policy desicion point. */
-	@Autowired
 	private PolicyDecisionPoint policyDesicionPoint;
 
 	/** The Constant LOGGER. */

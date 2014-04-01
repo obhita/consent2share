@@ -26,8 +26,10 @@
 package gov.samhsa.consent2share.web;
 
 import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
 import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.dao.audit.JdbcAuditDao;
+import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.domain.reference.EntityType;
 import gov.samhsa.consent2share.infrastructure.CodedConceptLookupService;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
@@ -35,11 +37,14 @@ import gov.samhsa.consent2share.infrastructure.HashMapResultToProviderDtoConvert
 import gov.samhsa.consent2share.infrastructure.PixQueryService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
+import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.admin.AdminService;
 import gov.samhsa.consent2share.service.audit.AdminAuditService;
+import gov.samhsa.consent2share.service.consent.ConsentHelper;
 import gov.samhsa.consent2share.service.consent.ConsentNotFoundException;
 import gov.samhsa.consent2share.service.consent.ConsentService;
+import gov.samhsa.consent2share.service.consent.DuplicateConsentException;
 import gov.samhsa.consent2share.service.dto.AbstractPdfDto;
 import gov.samhsa.consent2share.service.dto.AddConsentFieldsDto;
 import gov.samhsa.consent2share.service.dto.AddConsentIndividualProviderDto;
@@ -50,7 +55,9 @@ import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
+import gov.samhsa.consent2share.service.dto.ConsentValidationDto;
 import gov.samhsa.consent2share.service.dto.IndividualProviderDto;
+import gov.samhsa.consent2share.service.dto.LookupDto;
 import gov.samhsa.consent2share.service.dto.OrganizationalProviderDto;
 import gov.samhsa.consent2share.service.dto.PatientAdminDto;
 import gov.samhsa.consent2share.service.dto.PatientConnectionDto;
@@ -88,23 +95,32 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * The Class AdminController.
@@ -199,6 +215,10 @@ public class AdminController extends AbstractController {
 	/** The provider search lookup service. */
 	@Autowired
 	private ProviderSearchLookupService providerSearchLookupService;
+	
+	/** The consent helper. */
+	@Autowired
+	private ConsentHelper consentHelper;
 
 	// @Autowired
 	// StaffIndividualProviderRepository staffIndividualProviderRepository;
@@ -228,19 +248,20 @@ public class AdminController extends AbstractController {
 	 * @return the string
 	 */
 	@RequestMapping(value = "adminHome.html")
-	public String adminHome(Model model, HttpServletRequest request) {
+	public String adminHome(Model model, HttpServletRequest request, BasicPatientAccountDto basicPatientAccountDto) {
 		AuthenticatedUser currentUser = adminUserContext.getCurrentUser();
 		String notify = request.getParameter("notify");
-		BasicPatientAccountDto basicPatientAccountDto = new BasicPatientAccountDto();
 
 		List<RecentAcctivityDto> recentActivityDtos = adminAuditService
 				.findAdminHistoryByUsername(currentUser.getUsername());
 		AdminProfileDto adminProfileDto = adminService
 				.findAdminProfileByUsername(currentUser.getUsername());
 		model.addAttribute("adminProfileDto", adminProfileDto);
+		model.addAttribute("administrativeGenderCodes",
+				administrativeGenderCodeService
+						.findAllAdministrativeGenderCodes());
 
 		model.addAttribute("notifyevent", notify);
-		model.addAttribute(basicPatientAccountDto);
 		model.addAttribute("recentActivityDtos", recentActivityDtos);
 
 		return "views/Administrator/adminHome";
@@ -276,6 +297,7 @@ public class AdminController extends AbstractController {
 					.findAllConsentsDtoByPatient(patientId);
 			patientConnectionDto=patientService.findPatientConnectionById(patientId);
 			systemNotificationDtos=systemNotificationService.findAllSystemNotificationDtosByPatient(patientId);
+			
 		} else if (userName != null) {
 			patientProfileDto = patientService.findByUsername(userName);
 			consentListDto = consentService
@@ -420,13 +442,14 @@ public class AdminController extends AbstractController {
 			if (currentPatient == null) {
 				throw new PatientNotFoundException("Patient not found by id");
 			}
-
+			
 			List<AddConsentIndividualProviderDto> individualProvidersDto = patientService
-					.findAddConsentIndividualProviderDtoByUsername(currentPatient
-							.getUsername());
+						.findAddConsentIndividualProviderDtoByPatientId(patientId);
+			
 			List<AddConsentOrganizationalProviderDto> organizationalProvidersDto = patientService
-					.findAddConsentOrganizationalProviderDtoByUsername(currentPatient
-							.getUsername());
+						.findAddConsentOrganizationalProviderDtoByPatientId(patientId);
+				
+			
 			
 			List<StaffIndividualProviderDto> favoriteIndividualProviders = individualProviderService.findAllStaffIndividualProvidersDto();
 			List<StaffOrganizationalProviderDto> favoriteOrganizationalProviders = organizationalProviderService.findAllStaffOrganizationalProvidersDto();
@@ -479,6 +502,7 @@ public class AdminController extends AbstractController {
 	}
 
 	/**
+	 * @throws JSONException 
 	 * Admin Patient View Create Consent Form Submit.
 	 * 
 	 * @param consentDto
@@ -487,18 +511,25 @@ public class AdminController extends AbstractController {
 	 * @param icd9
 	 * @return the string
 	 * @throws ConsentGenException
+	 * @throws JSONException 
+	 * @throws IOException 
+	 * @throws JsonMappingException 
+	 * @throws  
 	 */
 	@RequestMapping(value = "adminPatientViewCreateConsent.html", method = RequestMethod.POST)
-	public String adminPatientViewCreateConsent(
+	public @ResponseBody String adminPatientViewCreateConsent(
 			@Valid ConsentDto consentDto,
+			@RequestParam("patientId") long patientId,
 			BindingResult bindingResult,
 			Model model,
 			@RequestParam(value = "ICD9", required = false) HashSet<String> icd9,
 			@RequestParam(value = "isAddConsent") boolean isAddConsent)
-			throws ConsentGenException {
+			throws ConsentGenException, IOException, JSONException {
 
 		Set<String> isMadeTo = new HashSet<String>();
 		Set<String> isMadeFrom = new HashSet<String>();
+		consentDto.setConsentEnd(consentHelper.setDateAsEndOfDay(consentDto.getConsentEnd()));
+		
 		if (consentDto.getOrganizationalProvidersDisclosureIsMadeTo() != null)
 			isMadeTo.addAll(consentDto
 					.getOrganizationalProvidersDisclosureIsMadeTo());
@@ -514,47 +545,33 @@ public class AdminController extends AbstractController {
 				&& consentService.areThereDuplicatesInTwoSets(isMadeTo,
 						isMadeFrom) == false) {
 
-			long patientId = -1;
-
-			try {
-				patientId = patientService.findIdByUsername(consentDto
-						.getUsername());
-			} catch (NullPointerException e) {
-				patientId = -1;
-				logger.warn("patientService.findIdByUsername method unable to find patient record...");
-				logger.warn("...username from consentDto does not match any valid patient usernames");
-				logger.warn("The exception stack trace is: " + e);
-				return "redirect:/Administrator/adminHome.html?notify=unknownerror";
-			}
-
 			Set<SpecificMedicalInfoDto> doNotShareClinicalConceptCodes = new HashSet<SpecificMedicalInfoDto>();
 			if (icd9 != null)
-				for (String item : icd9) {
-					String icd9Item = item.replace("^^^", ",");
-					SpecificMedicalInfoDto specificMedicalInfoDto = new SpecificMedicalInfoDto();
-					specificMedicalInfoDto.setCodeSystem("ICD9");
-
-					specificMedicalInfoDto.setCode(icd9Item.substring(0,
-							icd9Item.indexOf(";")));
-					specificMedicalInfoDto.setDisplayName(icd9Item
-							.substring(icd9Item.indexOf(";") + 1));
-					doNotShareClinicalConceptCodes.add(specificMedicalInfoDto);
-				}
+				doNotShareClinicalConceptCodes = consentHelper.getDoNotShareClinicalConceptCodes(icd9);
 			consentDto
 					.setDoNotShareClinicalConceptCodes(doNotShareClinicalConceptCodes);
 
-			consentService.saveConsent(consentDto);
-
-			if (isAddConsent == false) {
-				return "redirect:/Administrator/adminPatientView.html?notify=editpatientconsent&status=success&id="
-						+ patientId;
-			} else {
-				return "redirect:/Administrator/adminPatientView.html?notify=createpatientconsent&status=success&id="
-						+ patientId;
+			Object obj = consentService.saveConsent(consentDto, patientId);
+			if (null != obj && obj instanceof ConsentValidationDto) {
+				// duplicate policy found
+				ObjectMapper mapper = new ObjectMapper();
+				throw new AjaxException(HttpStatus.CONFLICT, mapper.writeValueAsString(obj));
 			}
+			JSONObject succObj = new JSONObject();
+			succObj.put("isSuccess", true);
+			succObj.put("isAdmin", true);
+			succObj.put("patientId", patientId);
+			if (isAddConsent == false) {
+				succObj.put("isAdd", false);
+			} else {
+				succObj.put("isAdd", true);
+			}
+			return succObj.toString();
+		} else {
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "Resource Not Found");
 		}
 
-		return "views/resourceNotFound";
+		
 	}
 
 	/**
@@ -601,6 +618,7 @@ public class AdminController extends AbstractController {
 	@RequestMapping(value = "adminPatientViewEditConsent.html")
 	public String adminPatientViewEditConsent(
 			@RequestParam(value = "consentId", defaultValue = "-1") long consentId,
+			@RequestParam("patientId") long patientId,
 			Model model) {
 		if (consentId <= -1) {
 			throw new IllegalArgumentException(
@@ -613,7 +631,7 @@ public class AdminController extends AbstractController {
 			}
 
 			PatientProfileDto currentPatient = patientService
-					.findByUsername(consentDto.getUsername());
+					.findPatient(patientId);
 
 			if (currentPatient == null) {
 				throw new PatientNotFoundException(
@@ -621,11 +639,10 @@ public class AdminController extends AbstractController {
 			}
 
 			List<AddConsentIndividualProviderDto> individualProvidersDto = patientService
-					.findAddConsentIndividualProviderDtoByUsername(consentDto
-							.getUsername());
+					.findAddConsentIndividualProviderDtoByPatientId(patientId);
+		
 			List<AddConsentOrganizationalProviderDto> organizationalProvidersDto = patientService
-					.findAddConsentOrganizationalProviderDtoByUsername(consentDto
-							.getUsername());
+					.findAddConsentOrganizationalProviderDtoByPatientId(patientId);
 
 			DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 			Calendar today = Calendar.getInstance();
@@ -774,9 +791,55 @@ public class AdminController extends AbstractController {
 	 */
 	@RequestMapping(value = "adminCreatePatientAccount.html", method = RequestMethod.POST)
 	public String adminCreatePatientAccount(
-			BasicPatientAccountDto basicPatientAccountDto, Model model) {
-		System.out.println("FUNCTION NOT YET CREATED TO PROCESS THIS FORM");
-		return "redirect:/Administrator/adminHome.html";
+			@Valid BasicPatientAccountDto basicPatientAccountDto, BindingResult result, RedirectAttributes redirectAttributes, Model model) {
+
+		fieldValidator.validate(basicPatientAccountDto, result);
+
+		if (result.hasErrors()) {
+			redirectAttributes
+			.addFlashAttribute("basicPatientAccountDto", basicPatientAccountDto);
+			redirectAttributes
+			.addFlashAttribute("notify", "createPatientFailed");
+			return "redirect:/Administrator/adminHome.html";
+		}
+        long patientId=adminService.createPatientAccount(basicPatientAccountDto);
+		return "redirect:/Administrator/adminPatientView.html?id="+patientId;
+	}
+	
+	
+	@RequestMapping(value = "sendLoginInformation.html", method = RequestMethod.GET)
+	public @ResponseBody String adminSendLoginInfoEmail(
+			@RequestParam("patientId") long patientId,
+			HttpServletRequest request) {
+		try{
+		String linkUrl = getServletUrl(request);
+		adminService.sendLoginInformationEmail(patientId,linkUrl);
+		return "Login information has been sent to email.";
+		}catch (EmailAddressNotExistException e) {
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "Email Address is not exist.");
+			
+		}
+		catch (MessagingException e) {
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "Message is not available, please click later");
+			
+		}
+	}
+	
+	
+	private String getServletUrl(HttpServletRequest request) {
+		String scheme = request.getScheme();
+		String serverName = request.getServerName();
+		int serverPort = request.getServerPort();
+		String contextPath = request.getContextPath();
+		StringBuffer hostName = new StringBuffer();
+		hostName.append(scheme).append("://").append(serverName);
+
+		if ((serverPort != 80) && (serverPort != 443)) {
+			hostName.append(":").append(serverPort);
+		}
+
+		hostName.append(contextPath);
+		return hostName.toString();
 	}
 
 	/**
@@ -845,6 +908,7 @@ public class AdminController extends AbstractController {
 			providerDto.setAuthorizedOfficialTelephoneNumber(Result
 					.get("authorizedOfficialTelephoneNumber"));
 			providerDto.setUsername(patientUserName);
+			providerDto.setPatientId(patientId);
 			
 			isSuccess = organizationalProviderService.addNewOrganizationalProvider(providerDto);
 		} else {
@@ -858,6 +922,7 @@ public class AdminController extends AbstractController {
 			providerDto.setNameSuffix(Result.get("providerNameSuffixText"));
 			providerDto.setCredential(Result.get("providerCredentialText"));
 			providerDto.setUsername(patientUserName);
+			providerDto.setPatientId(patientId);
 			
 			isSuccess = individualProviderService.addNewIndividualProvider(providerDto);
 		}

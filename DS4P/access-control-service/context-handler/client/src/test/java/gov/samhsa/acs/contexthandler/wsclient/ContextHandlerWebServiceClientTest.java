@@ -42,7 +42,7 @@ public class ContextHandlerWebServiceClientTest {
 	@BeforeClass
 	public static void setUp() {
 		try {
-			address = "http://localhost:9000/services/DS4PContextHandler";
+			address = "http://localhost:12345/services/DS4PContextHandler";
 			ep = Endpoint.publish(address, new DS4PContextHandlerImpl());
 			
 			returnedValueOfEnforcePolicy = new Return ();

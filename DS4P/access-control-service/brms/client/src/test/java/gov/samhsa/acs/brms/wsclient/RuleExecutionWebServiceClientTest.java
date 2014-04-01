@@ -40,7 +40,7 @@ public class RuleExecutionWebServiceClientTest {
 
 	@BeforeClass
 	public static void setUp() {
-		address = "http://localhost:9000/services/RuleExecutionService";
+		address = "http://localhost:12345/services/RuleExecutionService";
 		ep = Endpoint.publish(address,
 				new RuleExecutionServicePortTypeImpl());
 

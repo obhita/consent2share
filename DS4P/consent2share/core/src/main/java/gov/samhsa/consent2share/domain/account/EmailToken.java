@@ -39,6 +39,7 @@ import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class EmailToken.
  */
@@ -57,9 +58,11 @@ public class EmailToken {
     private Integer version;
 	
 	/** The username. */
-	@NotNull
     @Size(min = 3, max = 30)
     private String username;
+	
+	/** The patientId. */
+    private long patientId;
 	
 	/** The token. */
 	@NotNull
@@ -239,5 +242,44 @@ public class EmailToken {
 	 */
 	public void setIsTokenUsed(Boolean isTokenUsed) {
 		this.isTokenUsed = isTokenUsed;
+	}
+
+	/**
+	 * Gets the patient id.
+	 *
+	 * @return the patient id
+	 */
+	public long getPatientId() {
+		return patientId;
+	}
+
+	/**
+	 * Sets the patient id.
+	 *
+	 * @param patientId the new patient id
+	 */
+	public void setPatientId(long patientId) {
+		this.patientId = patientId;
+	}
+
+	/**
+	 * Sets the id.
+	 *
+	 * @param id the new id
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * Sets the version.
+	 *
+	 * @param version the new version
+	 */
+	public void setVersion(Integer version) {
+		this.version = version;
 	}	
+	
+	
+	
 }

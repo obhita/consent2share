@@ -3,11 +3,11 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd                 
-	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd                 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
 	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
 
-	<!-- The controllers are autodetected POJOs labeled with the @Controller 
+	<!-- The controllers are autodetected POJOs labeled with the @Controller
 		annotation. -->
 	<context:component-scan base-package="gov.samhsa.consent2share"
 		use-default-filters="false">
@@ -15,22 +15,18 @@
 			type="annotation" />
 	</context:component-scan>
 
-	<!-- Turns on support for mapping requests to Spring MVC @Controller methods 
+	<!-- Turns on support for mapping requests to Spring MVC @Controller methods
 		Also registers default Formatters and Validators for use across all @Controllers -->
-	<mvc:annotation-driven conversion-service="applicationConversionService" />
+	<mvc:annotation-driven />
 
-	<bean
-		class="gov.samhsa.consent2share.web.ApplicationConversionServiceFactoryBean"
-		id="applicationConversionService" />
-
-	<!-- Allows for mapping the DispatcherServlet to "/" by forwarding static 
+	<!-- Allows for mapping the DispatcherServlet to "/" by forwarding static
 		resource requests to the container's default Servlet -->
 	<mvc:default-servlet-handler />
 
-	<!-- Resolves localized messages*.properties and application.properties 
-		files in the application to allow for internationalization. The messages*.properties 
-		files translate Roo generated messages which are part of the admin interface, 
-		the application.properties resource bundle localizes all application specific 
+	<!-- Resolves localized messages*.properties and application.properties
+		files in the application to allow for internationalization. The messages*.properties
+		files translate Roo generated messages which are part of the admin interface,
+		the application.properties resource bundle localizes all application specific
 		messages such as entity names and menu items. -->
 
 	<!-- Store preferred language configuration in a cookie -->
@@ -39,9 +35,9 @@
 		<property name="defaultLocale" value="en"/>
 	</bean>
 
-	<!-- This bean resolves specific types of exceptions to corresponding logical 
-		- view names for error views. The default behaviour of DispatcherServlet 
-		- is to propagate all exceptions to the servlet container: this will happen 
+	<!-- This bean resolves specific types of exceptions to corresponding logical
+		- view names for error views. The default behaviour of DispatcherServlet
+		- is to propagate all exceptions to the servlet container: this will happen
 		- here with all other types of exceptions. -->
 	<!-- TODO: convert logical views to tyhmeleaf html -->
 	<bean
@@ -56,34 +52,34 @@
 			</props>
 		</property>
 	</bean>
-	
-	
+
+
 	<bean id="multipartResolver"
 	    class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 	     <!-- one of the properties available; the maximum file size in bytes -->
-	    <property name="maxUploadSize" value="10000000"/>
+<!-- 	    <property name="maxUploadSize" value="10000000"/> -->
 	</bean>
-	
+
 
 	<!-- Enable this for integration of file upload functionality -->
-	<!-- <bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" 
-		id="multipartResolver" /> <bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" 
-		id="tilesViewResolver"> <property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView" 
-		/> </bean> <bean class="org.springframework.web.servlet.view.tiles2.TilesConfigurer" 
-		id="tilesConfigurer"> <property name="definitions"> <list> <value>/WEB-INF/layouts/layouts.xml</value> 
-		Scan views directory for Tiles configurations <value>/WEB-INF/views/**/views.xml</value> 
+	<!-- <bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+		id="multipartResolver" /> <bean class="org.springframework.web.servlet.view.UrlBasedViewResolver"
+		id="tilesViewResolver"> <property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView"
+		/> </bean> <bean class="org.springframework.web.servlet.view.tiles2.TilesConfigurer"
+		id="tilesConfigurer"> <property name="definitions"> <list> <value>/WEB-INF/layouts/layouts.xml</value>
+		Scan views directory for Tiles configurations <value>/WEB-INF/views/**/views.xml</value>
 		</list> </property> </bean> <import resource="webflow-config.xml" /> -->
 
-	<!-- Handles HTTP GET requests for /resources/** by efficiently serving 
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving
 		up static resources -->
-	<!-- <mvc:resources location="/, classpath:/META-INF/web-resources/" mapping="/resources/**" 
+	<!-- <mvc:resources location="/, classpath:/META-INF/web-resources/" mapping="/resources/**"
 		/> -->
 
-	<!-- Selects a static view for rendering without the need for an explicit 
+	<!-- Selects a static view for rendering without the need for an explicit
 		controller -->
-	<!-- <mvc:view-controller path="/login" /> <mvc:view-controller path="///embed/privacy_on_twitter" 
-		/> <mvc:view-controller path="///embed/privacy_video_game_part_2" /> <mvc:view-controller 
-		path="///embed/privacy_video_game_part_1" /> <mvc:view-controller path="/" 
+	<!-- <mvc:view-controller path="/login" /> <mvc:view-controller path="///embed/privacy_on_twitter"
+		/> <mvc:view-controller path="///embed/privacy_video_game_part_2" /> <mvc:view-controller
+		path="///embed/privacy_video_game_part_1" /> <mvc:view-controller path="/"
 		view-name="index" /> -->
 	<mvc:view-controller path="views/uncaughtException.html" />
 	<mvc:view-controller path="views/resourceNotFound.html" />
@@ -92,17 +88,17 @@
 	<mvc:view-controller path="views/error404.html" />
 
 	<!-- Register "global" interceptor beans to apply to all registered HandlerMappings -->
-	<mvc:interceptors> <bean class="org.springframework.web.servlet.theme.ThemeChangeInterceptor" 
-		/> <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" 
+	<mvc:interceptors> <bean class="org.springframework.web.servlet.theme.ThemeChangeInterceptor"
+		/> <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"
 		p:paramName="lang" /> </mvc:interceptors>
 
-	<!-- Resolves localized <theme_name>.properties files in the classpath to 
+	<!-- Resolves localized <theme_name>.properties files in the classpath to
 		allow for theme support -->
-	<!-- <bean class="org.springframework.ui.context.support.ResourceBundleThemeSource" 
+	<!-- <bean class="org.springframework.ui.context.support.ResourceBundleThemeSource"
 		id="themeSource" /> -->
 
 	<!-- Store preferred theme configuration in a cookie -->
-	<!-- <bean class="org.springframework.web.servlet.theme.CookieThemeResolver" 
+	<!-- <bean class="org.springframework.web.servlet.theme.CookieThemeResolver"
 		id="themeResolver" p:cookieName="theme" p:defaultThemeName="standard" /> -->
 </beans>
 

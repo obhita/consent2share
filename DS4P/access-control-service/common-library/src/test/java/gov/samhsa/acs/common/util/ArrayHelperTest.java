@@ -1,8 +1,8 @@
 package gov.samhsa.acs.common.util;
 
 import gov.samhsa.acs.common.util.ArrayHelper;
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ArrayHelperTest {

@@ -78,7 +78,7 @@
 					class="btn btn-info"> <span class="fa fa-chevron-left"></span>
 				</a> <a class="btn btn-info btn-mainmenu" data-toggle="collapse"
 					data-target=".top-nav.navbar-collapse,.sidebar-nav.navbar-collapse">
-					<span class="fa fa-reorder"></span>
+					<span class="fa fa-bars"></span>
 				</a>
 				<h1>
 					<span class="nav-title">Add Consent</span>
@@ -1102,6 +1102,7 @@
 												class="btn btn-primary" data-dismiss="modal"
 												aria-hidden="true">Save changes</button>
 										</div>
+										
 									</div>
 								</div>
 							</div>
@@ -1188,6 +1189,59 @@
 									</button>
 								</span>
 							</div>
+							
+							<!-- Consent Validation Modal Start-->
+							
+							<div class="modal fade" id="consent_validation_modal" tabindex="-1" role="dialog" aria-labelledby="consentValidationLabel" aria-hidden="true">
+							  <div class="modal-dialog">
+							    <div class="modal-content">
+							      <div class="modal-header">
+							        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							        <h4 class="modal-title" id="consentValidationLabel">Please review results below.</h4>
+							      </div>
+							      <div class="modal-body">
+							      	<div class="alert alert-danger">
+							      	<h4>Whoops!</h4>
+							      	<p>An existing consent record matching the settings of the consent you are currently editing already exists. Duplicate consents are not permitted, please change your current settings and try submitting again.</p></div>
+							        
+							        <div class="panel panel-danger">
+										<div class="panel-heading">
+											<h3 class="panel-title">Currently Editing</h3>      
+										</div>
+										<div class="panel-body">
+											<div><label>Authorized Provider:</label><span>Benjamin Franklin</span></div>
+											<div><label>Disclose To:</label><span>George Washington</span></div>
+											<div><label>Purpose of Use:</label><span>Treatment</span></div>
+											<div><label>Start Date:</label><span>4/10/2014</span></div>
+											<div><label>End Date:</label><span>4/10/2015</span></div>
+										</div>
+									</div>	
+									
+									<div class="panel panel-info">
+										<div class="panel-heading">
+											<h3 class="panel-title">Existing Consent</h3>
+										</div>
+										<div class="panel-body">
+											<div><label>Authorized Provider:</label><span>Benjamin Franklin, Thomas Jefferson</span></div>
+											<div><label>Disclose To:</label><span>George Washington</span></div>
+											<div><label>Purpose of Use:</label><span>Treatment, Research</span></div>
+											<div><label>Start Date:</label><span>4/10/2014</span></div>
+											<div><label>End Date:</label><span>2/10/2015</span></div>
+											<div class="pull-right"><button class="btn btn-primary">View Existing Consent</button></div>				
+										</div>
+									</div>
+									
+							      </div>
+							      <div class="modal-footer">
+							        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+							        <button type="button" class="btn btn-success">Continue Editing</button>
+							      </div>
+							    </div>
+							  </div>
+							</div>
+							
+							<!-- Consent Validation Modal End-->								
+							
 						</section>
 
 
@@ -1201,6 +1255,7 @@
 		<!-- end content line 96-->
 
 
+		
 
 		<!-- END: Content Region -->
 
@@ -1305,6 +1360,7 @@
 						th:value="${DoNotShareClinicalConceptCode.code} + ';' + ${DoNotShareClinicalConceptCode.displayName}" />
 				</div>
 			</div>
+			
 		</form>
 	</div>
 	

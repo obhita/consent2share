@@ -200,7 +200,10 @@ public class IndividualProviderServiceImpl implements IndividualProviderService 
     }
 	
 	public boolean addNewIndividualProvider(IndividualProviderDto individualProviderDto) {
-		Patient patient=patientRepository.findByUsername(individualProviderDto.getUsername());
+		Patient patient;
+		if(individualProviderDto.getUsername()==null&&individualProviderDto.getPatientId()!=null)
+		patient=patientRepository.findOne(Long.valueOf(individualProviderDto.getPatientId()).longValue());
+		else patient=patientRepository.findByUsername(individualProviderDto.getUsername());
 		Set<IndividualProvider> individualProviders=patient.getIndividualProviders();
 		IndividualProvider in_individualProvider=null;
 		for (IndividualProvider o:individualProviders){

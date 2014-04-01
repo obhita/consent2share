@@ -38,7 +38,7 @@ public class XdsbRegistryWebServiceClientTest {
 	public static void setUp() {
 		fileReader = new FileReaderImpl();
 		try {
-			address = "http://localhost:9000/services/xdsregistryb";
+			address = "http://localhost:12345/services/xdsregistryb";
 			ep = Endpoint.publish(address, new XdsbRegistryServiceImpl());
 
 			XdsbRegistryServiceImpl.returnedValueOfRegistryStoredQuery = returnedValueOfRegistryStoredQuery;

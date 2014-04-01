@@ -90,6 +90,11 @@ public class HomeController {
 			model.addAttribute("expired", true);
 
 		}
+		
+		if (request.getSession().getAttribute("tokenErrorMessage") != null) {
+			model.addAttribute("tokenErrorMessage", request.getSession().getAttribute("tokenErrorMessage"));
+
+		}
 
 		return "views/index";
 	}

@@ -25,15 +25,20 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.dto;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class ConsentListDto.
  */
-public class ConsentListDto implements HasId{
+public class ConsentListDto implements HasId,Serializable{
+
+	private static final long serialVersionUID = 1964409499117296161L;
 
 	/** The id. */
 	private String id;
@@ -66,12 +71,38 @@ public class ConsentListDto implements HasId{
 	
 	// Consent Sharing date
 	/** The consent start. */
+	@DateTimeFormat(pattern = "MM/dd/yyyy")
 	private Date consentStart;
 
 	
 	/** The consent end. */
+	@DateTimeFormat(pattern = "MM/dd/yyyy")
 	private Date consentEnd;
+
+	// Consent Sharing date
+	/** The consent start. */
+	private String consentStartString;
+
 	
+	/** The consent end. */
+	private String consentEndString;	
+	
+	public String getConsentStartString() {
+		return consentStartString;
+	}
+
+	public void setConsentStartString(String consentStartString) {
+		this.consentStartString = consentStartString;
+	}
+
+	public String getConsentEndString() {
+		return consentEndString;
+	}
+
+	public void setConsentEndString(String consentEndString) {
+		this.consentEndString = consentEndString;
+	}
+
 	/**
 	 * Gets the consent start.
 	 *
@@ -303,5 +334,7 @@ public class ConsentListDto implements HasId{
 	public void setRevokeStage(String revokeStage) {
 		this.revokeStage = revokeStage;
 	}
+	
+	
 
 }

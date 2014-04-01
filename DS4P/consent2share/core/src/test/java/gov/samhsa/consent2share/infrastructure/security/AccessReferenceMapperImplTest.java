@@ -58,7 +58,8 @@ public class AccessReferenceMapperImplTest {
 	AccessReferenceMapperImpl sut;
 	HttpSession session;
 	final String INDIRECT_REFERENCE="ScrambledText";
-	final Long DIRECT_REFERENCE=(long) 1;
+	final Long DIRECT_REFERENCE_LONG=(long) 1;
+	final String DIRECT_REFERENCE_STRING="1";
 	final String MAP_NAME="AccessReferenceMap";
 	
 	@Before
@@ -68,7 +69,7 @@ public class AccessReferenceMapperImplTest {
 		session=mock(HttpSession.class);
 		@SuppressWarnings("unchecked")
 		AccessReferenceMap<String> map=(AccessReferenceMap<String>)mock(AccessReferenceMap.class);
-		Object directReference=String.valueOf(DIRECT_REFERENCE);
+		Object directReference=String.valueOf(DIRECT_REFERENCE_STRING);
 		
 		doReturn(map).when(sut).getMap();
 		doReturn(INDIRECT_REFERENCE).when(map).addDirectReference(anyString());
@@ -79,12 +80,12 @@ public class AccessReferenceMapperImplTest {
 	
 	@Test
 	public void testGetDirectReference() {
-		assertEquals(DIRECT_REFERENCE, Long.valueOf(sut.getDirectReference(INDIRECT_REFERENCE)));
+		assertEquals(DIRECT_REFERENCE_LONG, Long.valueOf(sut.getDirectReference(INDIRECT_REFERENCE)));
 	}
 	
 	@Test
 	public void testGetIndirectReference() {
-		assertEquals(INDIRECT_REFERENCE, sut.getIndirectReference(DIRECT_REFERENCE));
+		assertEquals(INDIRECT_REFERENCE, sut.getIndirectReference(DIRECT_REFERENCE_STRING));
 	}
 	
 	@Test

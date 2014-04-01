@@ -34,6 +34,7 @@ import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import java.util.List;
 
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * The Interface ClinicalDocumentService.
@@ -88,6 +89,7 @@ public interface ClinicalDocumentService {
 	 * Save clinical document.
 	 *
 	 * @param clinicalDocumentDto the clinical document dto
+	 * @return 
 	 */
 	public abstract void saveClinicalDocument(ClinicalDocumentDto clinicalDocumentDto);
 	
@@ -143,5 +145,11 @@ public interface ClinicalDocumentService {
 	 * @return true, if is document belongs to this user
 	 */
 	public abstract boolean isDocumentBelongsToThisUser(ClinicalDocumentDto clinicalDocumentDto);
+
+
+	boolean isDocumentOversized(MultipartFile file);
+
+
+	boolean isDocumentExtensionPermitted(MultipartFile file);
 
 }

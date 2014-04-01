@@ -27,12 +27,12 @@ public class NotificationExceptionHandlerTest {
 	private NotificationExceptionHandler sut;
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testHandError_Throws_Exception_Given_Null_Message() {
-		sut.handError(null);
+	public void testHandleError_Throws_Exception_Given_Null_Message() {
+		sut.handleError(null);
 	}
 
 	@Test
-	public void testHandError_Notification_Is_Published() {
+	public void testHandleError_Notification_Is_Published() {
 		Message<MessagingException> errorMessageMock = (Message<MessagingException>) mock(Message.class);
 		MessagingException messagingExceptionMock = mock(MessagingException.class);
 		when(errorMessageMock.getPayload()).thenReturn(messagingExceptionMock);
@@ -47,7 +47,7 @@ public class NotificationExceptionHandlerTest {
 		String expectedDetails = "bla";
 		String expectedSubject = "Consent signed/revoked message hanlding error";
 
-		sut.handError(errorMessageMock);
+		sut.handleError(errorMessageMock);
 
 		verify(notificationPublisher, times(1)).publish(
 				argThat(new IsNotificationAsExpected(expectedSubject,

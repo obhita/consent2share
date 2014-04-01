@@ -26,7 +26,9 @@
 package gov.samhsa.consent2share.web;
 
 import gov.samhsa.consent2share.domain.account.TroubleType;
+import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.infrastructure.FieldValidatorChangePassword;
+import gov.samhsa.consent2share.infrastructure.FieldValidatorCreateNewAccountOnPatient;
 import gov.samhsa.consent2share.infrastructure.FieldValidatorLoginTroubleCreateNewPassword;
 import gov.samhsa.consent2share.infrastructure.FieldValidatorLoginTroublePassword;
 import gov.samhsa.consent2share.infrastructure.FieldValidatorLoginTroubleSelection;
@@ -36,25 +38,31 @@ import gov.samhsa.consent2share.infrastructure.security.TokenExpiredException;
 import gov.samhsa.consent2share.infrastructure.security.TokenNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
+import gov.samhsa.consent2share.service.account.AccountLinkToPatientService;
+import gov.samhsa.consent2share.service.account.AccountService;
 import gov.samhsa.consent2share.service.account.PasswordResetService;
 import gov.samhsa.consent2share.service.dto.LoginTroubleDto;
 import gov.samhsa.consent2share.service.dto.PasswordChangeDto;
 import gov.samhsa.consent2share.service.dto.PasswordResetDto;
+import gov.samhsa.consent2share.service.dto.SignupLinkToPatientDto;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * The Class AccountController.
@@ -70,13 +78,25 @@ public class AccountController extends AbstractController {
 
 	/** The field validator login trouble create new password. */
 	private FieldValidatorLoginTroubleCreateNewPassword fieldValidatorLoginTroubleCreateNewPassword;
-	
+
 	/** The field validator change password. */
 	private FieldValidatorChangePassword fieldValidatorChangePassword;
 
+	/** The field validator create new account on patient. */
+	@Autowired
+	private FieldValidatorCreateNewAccountOnPatient fieldValidatorCreateNewAccountOnPatient;
+
 	/** The password reset service. */
 	private PasswordResetService passwordResetService;
-	
+
+	/** The account link to patient service. */
+	@Autowired
+	private AccountLinkToPatientService accountLinkToPatientService;
+
+	/** The account service. */
+	@Autowired
+	private AccountService accountService;
+
 	/** The user context. */
 	@Autowired
 	UserContext userContext;
@@ -90,8 +110,8 @@ public class AccountController extends AbstractController {
 	 *            the field validator login trouble create new password
 	 * @param fieldValidatorTroubleSelection
 	 *            the field validator trouble selection
-	 * @param fieldValidatorChangePassword            
-	 * 			  the field validator change password
+	 * @param fieldValidatorChangePassword
+	 *            the field validator change password
 	 * @param passwordResetService
 	 *            the password reset service
 	 */
@@ -146,23 +166,27 @@ public class AccountController extends AbstractController {
 		}
 
 		String handleTroublePage = null;
-		
-		if (loginTroubleDto.getTroubleTypeId() == TroubleType.UNKNOWN_PASSWORD.getValue()){
+
+		if (loginTroubleDto.getTroubleTypeId() == TroubleType.UNKNOWN_PASSWORD
+				.getValue()) {
 			handleTroublePage = "redirect:/loginTroublePassword.html";
-		}else if (loginTroubleDto.getTroubleTypeId() == TroubleType.UNKNOWN_USERNAME.getValue()){
+		} else if (loginTroubleDto.getTroubleTypeId() == TroubleType.UNKNOWN_USERNAME
+				.getValue()) {
 			handleTroublePage = "redirect:/loginTroubleUsername.html";
-		}else if (loginTroubleDto.getTroubleTypeId() == TroubleType.DIFFICULTY_SIGNING_IN.getValue()){
+		} else if (loginTroubleDto.getTroubleTypeId() == TroubleType.DIFFICULTY_SIGNING_IN
+				.getValue()) {
 			handleTroublePage = "redirect:/loginTroubleOther.html";
-		}else{
+		} else {
 			handleTroublePage = null;
 		}
 
-		if (handleTroublePage ==  null){
-			result.addError(new ObjectError(StringUtils.uncapitalize(LoginTroubleDto.class
-					.getSimpleName()), "Please select from one of the options below."));
+		if (handleTroublePage == null) {
+			result.addError(new ObjectError(StringUtils
+					.uncapitalize(LoginTroubleDto.class.getSimpleName()),
+					"Please select from one of the options below."));
 			handleTroublePage = "views/loginTrouble";
 		}
-		
+
 		return handleTroublePage;
 	}
 
@@ -176,7 +200,8 @@ public class AccountController extends AbstractController {
 	@RequestMapping(value = "loginTroublePassword.html")
 	public String loginTroublePassword(Model model) {
 		LoginTroubleDto loginTroubleDto = new LoginTroubleDto();
-		loginTroubleDto.setTroubleTypeId(TroubleType.UNKNOWN_PASSWORD.getValue());
+		loginTroubleDto.setTroubleTypeId(TroubleType.UNKNOWN_PASSWORD
+				.getValue());
 		model.addAttribute(loginTroubleDto);
 		return "views/loginTroublePassword";
 	}
@@ -212,16 +237,21 @@ public class AccountController extends AbstractController {
 		}
 
 		String linkUrl = getServletUrl(request);
-		String loginTroubleDtoObjectName = StringUtils.uncapitalize(LoginTroubleDto.class.getSimpleName());
+		String loginTroubleDtoObjectName = StringUtils
+				.uncapitalize(LoginTroubleDto.class.getSimpleName());
 
 		try {
-			passwordResetService.createPasswordResetToken(loginTroubleDto.getUsername(), loginTroubleDto.getEmail(), linkUrl);
+			passwordResetService.createPasswordResetToken(
+					loginTroubleDto.getUsername(), loginTroubleDto.getEmail(),
+					linkUrl);
 		} catch (UsernameNotExistException ex) {
-			FieldError error = new FieldError(loginTroubleDtoObjectName, "username", "Username does not exist");
+			FieldError error = new FieldError(loginTroubleDtoObjectName,
+					"username", "Username does not exist");
 			result.addError(error);
 			return "views/loginTroublePassword";
 		} catch (EmailAddressNotExistException ex) {
-			FieldError error = new FieldError(loginTroubleDtoObjectName, "email", "Email address does not exist");
+			FieldError error = new FieldError(loginTroubleDtoObjectName,
+					"email", "Email address does not exist");
 			result.addError(error);
 			return "views/loginTroublePassword";
 		}
@@ -229,9 +259,7 @@ public class AccountController extends AbstractController {
 
 		return "redirect:/newPasswordRequested.html";
 	}
-	
-	
-	
+
 	/**
 	 * Login trouble username.
 	 * 
@@ -242,13 +270,12 @@ public class AccountController extends AbstractController {
 	@RequestMapping(value = "loginTroubleUsername.html")
 	public String loginTroubleUsername(Model model) {
 		LoginTroubleDto loginTroubleDto = new LoginTroubleDto();
-		loginTroubleDto.setTroubleTypeId(TroubleType.UNKNOWN_USERNAME.getValue());
+		loginTroubleDto.setTroubleTypeId(TroubleType.UNKNOWN_USERNAME
+				.getValue());
 		model.addAttribute(loginTroubleDto);
 		return "views/loginTroubleUsername";
 	}
-	
-	
-	
+
 	/**
 	 * Login trouble other.
 	 * 
@@ -259,13 +286,11 @@ public class AccountController extends AbstractController {
 	@RequestMapping(value = "loginTroubleOther.html")
 	public String loginTroubleOther(Model model) {
 		LoginTroubleDto loginTroubleDto = new LoginTroubleDto();
-		loginTroubleDto.setTroubleTypeId(TroubleType.DIFFICULTY_SIGNING_IN.getValue());
+		loginTroubleDto.setTroubleTypeId(TroubleType.DIFFICULTY_SIGNING_IN
+				.getValue());
 		model.addAttribute(loginTroubleDto);
 		return "views/loginTroubleOther";
 	}
-	
-	
-	
 
 	/**
 	 * New password requested.
@@ -312,19 +337,207 @@ public class AccountController extends AbstractController {
 
 		try {
 			if (passwordResetService.isPasswordResetTokenExpired(token)) {
-				//TODO: It is better not to use session
+				// TODO: It is better not to use session
 				request.getSession().setAttribute("tokenMessage",
 						"tokenExpired");
 				return "redirect:/newPasswordRequested.html";
 			}
 		} catch (TokenNotExistException ex) {
-			//TODO: It is better not to use session
+			// TODO: It is better not to use session
 			request.getSession().setAttribute("tokenMessage", "tokenNotExist");
 			return "redirect:/newPasswordRequested.html";
 		}
 
 		request.getSession().setAttribute("token", token);
 		return "redirect:/createPassword.html";
+	}
+
+	/**
+	 * Verify new account link.
+	 * 
+	 * @param token
+	 *            the token
+	 * @param model
+	 *            the model
+	 * @param request
+	 *            the request
+	 * @return the string
+	 */
+	@RequestMapping(value = "verifyNewAccountLink.html")
+	public String verifyNewAccountLink(
+			@RequestParam(value = "token", required = true) String token,
+			Model model, HttpServletRequest request) {
+
+		try {
+			if (accountLinkToPatientService.isTokenExpired(token)) {
+				// TODO: It is better not to use session
+				request.getSession().setAttribute("tokenMessage",
+						"tokenExpiredForPatientAccount");
+				return "redirect:/newPasswordRequested.html";
+			}
+		} catch (TokenNotExistException ex) {
+			request.getSession().setAttribute("tokenMessage",
+					"tokenNotExistForPatientAccount");
+			return "redirect:/newPasswordRequested.html";
+		}
+
+		request.getSession().setAttribute("token", token);
+		return "redirect:/registrationLinkToPatient.html";
+	}
+
+	/**
+	 * Registration link to patient.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param request
+	 *            the request
+	 * @return the string
+	 */
+	@RequestMapping(value = "registrationLinkToPatient.html")
+	public String registrationLinkToPatient(Model model,
+			HttpServletRequest request) {
+		String token = (String) request.getSession().getAttribute("token");
+		SignupLinkToPatientDto signupLinkToPatientDto = new SignupLinkToPatientDto();
+		signupLinkToPatientDto.setToken(token);
+		model.addAttribute(signupLinkToPatientDto);
+		return "views/registrationLinkToPatient";
+	}
+
+	/**
+	 * Registration link to patient.
+	 * 
+	 * @param signupLinkToPatientDto
+	 *            the signup link to patient dto
+	 * @param request
+	 *            the request
+	 * @param result
+	 *            the result
+	 * @param model
+	 *            the model
+	 * @param redirectAttribute
+	 *            the redirect attribute
+	 * @return the string
+	 * @throws TokenNotExistException
+	 *             the token not exist exception
+	 * @throws UsernameNotExistException
+	 *             the username not exist exception
+	 * @throws MessagingException
+	 *             the messaging exception
+	 * @throws TokenExpiredException
+	 *             the token expired exception
+	 */
+	@RequestMapping(value = "registrationLinkToPatient.html", method = RequestMethod.POST)
+	public String registrationLinkToPatient(
+			@Valid SignupLinkToPatientDto signupLinkToPatientDto,
+			HttpServletRequest request, BindingResult result, Model model,
+			RedirectAttributes redirectAttribute) {
+
+		if (signupLinkToPatientDto.getBirthDate() == null) {
+			FieldError error = new FieldError("signupLinkToPatientDto",
+					"birthDate", "BirthDate can Not Null.");
+			result.addError(error);
+			return "redirect:/registrationLinkToPatient.html";
+		}
+
+		if (signupLinkToPatientDto.getVerificationCode() == null) {
+			FieldError error = new FieldError("signupLinkToPatientDto",
+					"verificationCode", "VerificationCode can Not Null.");
+			result.addError(error);
+			return "redirect:/registrationLinkToPatient.html";
+		}
+
+		if (accountLinkToPatientService.checkUpAccount(signupLinkToPatientDto) == false) {
+			model.addAttribute("notification", "wrong_verification_info");
+			model.addAttribute("signupLinkToPatientDto", signupLinkToPatientDto);
+			return "views/registrationLinkToPatient";
+		}
+
+		redirectAttribute.addFlashAttribute("signupLinkToPatientDto",
+				signupLinkToPatientDto);
+		return "redirect:/registrationLinkToPatient_createUsername.html";
+	}
+
+	/**
+	 * Registration link to patient create username.
+	 * 
+	 * @param signupLinkToPatientDto
+	 *            the signup link to patient dto
+	 * @param request
+	 *            the request
+	 * @param result
+	 *            the result
+	 * @param model
+	 *            the model
+	 * @return the string
+	 */
+	@RequestMapping(value = "registrationLinkToPatient_createUsername.html")
+	public String registrationLinkToPatientCreateUsername(
+			@Valid @ModelAttribute SignupLinkToPatientDto signupLinkToPatientDto,
+			HttpServletRequest request, BindingResult result, Model model) {
+
+		return "views/registrationLinkToPatient_createUsername";
+	}
+
+	/**
+	 * Registration link to patient create usernam.
+	 * 
+	 * @param signupLinkToPatientDto
+	 *            the signup link to patient dto
+	 * @param request
+	 *            the request
+	 * @param result
+	 *            the result
+	 * @param model
+	 *            the model
+	 * @return the string
+	 * @throws TokenNotExistException
+	 *             the token not exist exception
+	 * @throws UsernameNotExistException
+	 *             the username not exist exception
+	 * @throws TokenExpiredException
+	 *             the token expired exception
+	 */
+	@RequestMapping(value = "registrationLinkToPatient_createUsername.html", method = RequestMethod.POST)
+	public String registrationLinkToPatientCreateUsernam(
+			@Valid SignupLinkToPatientDto signupLinkToPatientDto,
+			HttpServletRequest request, BindingResult result, Model model) {
+
+		fieldValidatorCreateNewAccountOnPatient.validate(
+				signupLinkToPatientDto, result);
+
+		if (result.hasErrors()) {
+			return "views/registrationLinkToPatient_createUsername";
+		}
+
+		String username = signupLinkToPatientDto.getUsername();
+
+		Users user = accountService.findUserByUsername(username);
+
+		if (user != null) {
+			FieldError error = new FieldError("signupLinkToPatientDto",
+					"username", "Username is already in use.");
+			result.addError(error);
+
+			return "views/registrationLinkToPatient_createUsername";
+		}
+
+		String linkUrl = getServletUrl(request);
+		try {
+			accountLinkToPatientService.setupAccount(signupLinkToPatientDto,
+					linkUrl.toString());
+		} catch (MessagingException e) {
+			model.addAttribute("notification", "wrong_verification_info");
+			model.addAttribute("signupLinkToPatientDto", signupLinkToPatientDto);
+			return "views/registrationLinkToPatient";
+		} catch (TokenExpiredException e) {
+			request.getSession().setAttribute("tokenMessage",
+					"tokenExpiredForPatientAccount");
+			return "redirect:/newPasswordRequested.html";
+		} 
+		SecurityContextHolder.clearContext();
+
+		return "views/registrationLinkToPatient_Successful";
 	}
 
 	/**
@@ -381,7 +594,7 @@ public class AccountController extends AbstractController {
 		try {
 			passwordResetService.resetPassword(passwordResetDto, linkUrl);
 		} catch (TokenExpiredException ex) {
-			//TODO: Better not to use Session
+			// TODO: Better not to use Session
 			request.getSession().setAttribute("tokenMessage", "tokenExpired");
 			return "redirect:/newPasswordRequested.html";
 		}
@@ -423,67 +636,76 @@ public class AccountController extends AbstractController {
 		hostName.append(contextPath);
 		return hostName.toString();
 	}
-	
-	
-	
+
 	/**
 	 * Change Password.
-	 *
-	 * @param model the model
+	 * 
+	 * @param model
+	 *            the model
 	 * @return the string
 	 */
 	@RequestMapping(value = "changePassword.html")
 	public String changePassword(Model model) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
-		String username=currentUser.getUsername();
-		
+		String username = currentUser.getUsername();
+
 		PasswordChangeDto passwordChangeDto = new PasswordChangeDto();
 		passwordChangeDto.setUsername(username);
-		
-		
+
 		model.addAttribute(passwordChangeDto);
 		return "views/changePassword";
 	}
-	
-	
+
 	/**
 	 * Change Password.
-	 *
-	 * @param model the model
+	 * 
+	 * @param passwordChangeDto
+	 *            the password change dto
+	 * @param result
+	 *            the result
+	 * @param model
+	 *            the model
 	 * @return the string
-	 * @throws MessagingException 
-	 * @throws UsernameNotExistException 
+	 * @throws UsernameNotExistException
+	 *             the username not exist exception
+	 * @throws MessagingException
+	 *             the messaging exception
 	 */
 	@RequestMapping(value = "changePassword.html", method = RequestMethod.POST)
 	public String changePassword(PasswordChangeDto passwordChangeDto,
-			BindingResult result, Model model) throws UsernameNotExistException, MessagingException {
+			BindingResult result, Model model)
+			throws UsernameNotExistException, MessagingException {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
-		String username=currentUser.getUsername();
+		String username = currentUser.getUsername();
 		passwordChangeDto.setUsername(username);
-		
+
 		fieldValidatorChangePassword.validate(passwordChangeDto, result);
-		
-		if(result.hasErrors()){
+
+		if (result.hasErrors()) {
 			return "views/changePassword";
 		}
-		
-		String passwordChangeDtoObjectName = StringUtils.uncapitalize(PasswordChangeDto.class.getSimpleName());
+
+		String passwordChangeDtoObjectName = StringUtils
+				.uncapitalize(PasswordChangeDto.class.getSimpleName());
 		boolean isChangeSuccess = false;
-		
-		try{
-			isChangeSuccess = passwordResetService.changePassword(passwordChangeDto);
-		}catch(UsernameNotExistException ex){
-			FieldError error = new FieldError(passwordChangeDtoObjectName, "username", "Username does not exist");
+
+		try {
+			isChangeSuccess = passwordResetService
+					.changePassword(passwordChangeDto);
+		} catch (UsernameNotExistException ex) {
+			FieldError error = new FieldError(passwordChangeDtoObjectName,
+					"username", "Username does not exist");
 			result.addError(error);
-			model.addAttribute("generalErrorMessage", "An unknown error has occurred");
+			model.addAttribute("generalErrorMessage",
+					"An unknown error has occurred");
 			return "views/changePassword";
 		}
-		
-		
-		if(isChangeSuccess == true){
+
+		if (isChangeSuccess == true) {
 			return "redirect:defaultLoginPage.html?notify=passChangeSuccess";
-		}else{
-			FieldError error = new FieldError(passwordChangeDtoObjectName, "oldPassword", "Wrong password");
+		} else {
+			FieldError error = new FieldError(passwordChangeDtoObjectName,
+					"oldPassword", "Wrong password");
 			result.addError(error);
 			return "views/changePassword";
 		}

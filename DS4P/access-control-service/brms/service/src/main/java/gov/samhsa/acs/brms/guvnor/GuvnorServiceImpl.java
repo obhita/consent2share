@@ -83,12 +83,17 @@ public class GuvnorServiceImpl implements GuvnorService {
 
 		connection.setRequestMethod("GET");
 		connection.setRequestProperty("Accept", MediaType.TEXT_PLAIN);
-		String passwordString = guvnorServiceUsername + ":" + guvnorServicePassword;
-		connection.setRequestProperty(
-				"Authorization",
-				"Basic "
-						+ new Base64().encodeToString((passwordString
-								.getBytes())));
+		StringBuilder passwordStringBuilder = new StringBuilder();
+		passwordStringBuilder.append(guvnorServiceUsername);
+		passwordStringBuilder.append(":");
+		passwordStringBuilder.append(guvnorServicePassword);
+		String passwordString = passwordStringBuilder.toString();
+		StringBuilder propertyStringBuilder = new StringBuilder();
+		propertyStringBuilder.append("Basic ");
+		propertyStringBuilder.append(new Base64()
+				.encodeToString((passwordString.getBytes())));
+		connection.setRequestProperty("Authorization",
+				propertyStringBuilder.toString());
 		connection.connect();
 
 		source = readAsString(connection.getInputStream());
@@ -112,7 +117,10 @@ public class GuvnorServiceImpl implements GuvnorService {
 				inputStream));
 		String line;
 		while ((line = reader.readLine()) != null) {
-			ret.append(line + "\n");
+			StringBuilder builder = new StringBuilder();
+			builder.append(line);
+			builder.append("\n");
+			ret.append(builder.toString());
 		}
 		return ret.toString();
 	}

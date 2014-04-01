@@ -31,21 +31,16 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * A factory for creating XdsbError objects.
  */
 public class XdsbErrorFactory {
-
-	/** The logger. */
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/** The registry error list setter. */
 	private RegistryErrorListSetter registryErrorListSetter;
@@ -84,10 +79,14 @@ public class XdsbErrorFactory {
 	public RetrieveDocumentSetResponse setRetrieveDocumentSetResponseRegistryErrorListFilteredByPatientAndAuthor(
 			RetrieveDocumentSetResponse response, int numRemoved,
 			String patientId, String authorNPI) {
-		String codeContext = numRemoved
-				+ " document(s) is/are not authored by " + authorNPI
-				+ " or does/do not belong to the patient " + patientId
-				+ " and removed from the response.";
+		StringBuilder builder = new StringBuilder();
+		builder.append(numRemoved);
+		builder.append(" document(s) is/are not authored by ");
+		builder.append(authorNPI);
+		builder.append(" or does/do not belong to the patient ");
+		builder.append(patientId);
+		builder.append(" and removed from the response.");
+		String codeContext = builder.toString();
 		String errorCode = "XDSRepositoryError";
 		boolean isPartial = response.getDocumentResponse().size() > 0;
 		setErrorRegistryResponse(codeContext, errorCode, isPartial, response);
@@ -109,6 +108,30 @@ public class XdsbErrorFactory {
 	}
 
 	/**
+	 * Error retrieve document set response schema validation.
+	 * 
+	 * @param response
+	 *            the response
+	 * @param errorMap
+	 *            the error map
+	 * @return the retrieve document set response
+	 */
+	public RetrieveDocumentSetResponse errorRetrieveDocumentSetResponseSchemaValidation(
+			RetrieveDocumentSetResponse response, Map<String, String> errorMap) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Document validation error(s) occurred in Policy Enforcement Point for document(s): ");
+		builder.append(errorMap.keySet());
+		builder.append(". Please contact to system administrator if this error persists.");
+		String codeContext = builder.toString();
+		String errorCode = "XDSRepositoryError";
+		boolean isPartial = response.getDocumentResponse().size() > 0;
+
+		setErrorRegistryResponse(codeContext, errorCode, isPartial, response);
+
+		return response;
+	}
+
+	/**
 	 * Error retrieve document set response not exists or accessible.
 	 * 
 	 * @param input
@@ -119,12 +142,17 @@ public class XdsbErrorFactory {
 			RetrieveDocumentSetRequest input) {
 		List<String> list = new LinkedList<String>();
 		for (DocumentRequest req : input.getDocumentRequest()) {
-			list.add(req.getDocumentUniqueId() + ":"
-					+ req.getRepositoryUniqueId());
+			StringBuilder builder = new StringBuilder();
+			builder.append(req.getDocumentUniqueId());
+			builder.append(":");
+			builder.append(req.getRepositoryUniqueId());
+			list.add(builder.toString());
 		}
-		String codeContext = "The document(s) "
-				+ list.toString()
-				+ " does/do not exist or access denied by Policy Enforcement Point.";
+		StringBuilder builder = new StringBuilder();
+		builder.append("The document(s) ");
+		builder.append(list.toString());
+		builder.append(" does/do not exist or access denied by Policy Enforcement Point.");
+		String codeContext = builder.toString();
 		String errorCode = "XDSRepositoryError";
 		boolean isPartial = false;
 
@@ -173,10 +201,21 @@ public class XdsbErrorFactory {
 		return createRetrieveDocumentSetResponseError(codeContext, errorCode,
 				isPartial);
 	}
-	
-	public RetrieveDocumentSetResponse errorRetrieveDocumentSetResponseNoConsentsFound(String patientUniqueId) {
-		String codeContext = "No consents found for patient "
-				+ patientUniqueId + ".";
+
+	/**
+	 * Error retrieve document set response no consents found.
+	 * 
+	 * @param patientUniqueId
+	 *            the patient unique id
+	 * @return the retrieve document set response
+	 */
+	public RetrieveDocumentSetResponse errorRetrieveDocumentSetResponseNoConsentsFound(
+			String patientUniqueId) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("No consents found for patient ");
+		builder.append(patientUniqueId);
+		builder.append(".");
+		String codeContext = builder.toString();
 		String errorCode = "XDSRepositoryError";
 		boolean isPartial = false;
 
@@ -195,10 +234,13 @@ public class XdsbErrorFactory {
 	 */
 	public AdhocQueryResponse errorAdhocQueryResponseInconsistentPatientUniqueId(
 			String patientUniqueIdFromRequest, String patientUniqueIdFromSAML) {
-		String codeContext = "The document entry patient id in $XDSDocumentEntryPatientId ("
-				+ patientUniqueIdFromRequest
-				+ ") does not match the patient unique id ("
-				+ patientUniqueIdFromSAML + ") generated from SAML header.";
+		StringBuilder builder = new StringBuilder();
+		builder.append("The document entry patient id in $XDSDocumentEntryPatientId (");
+		builder.append(patientUniqueIdFromRequest);
+		builder.append(") does not match the patient unique id (");
+		builder.append(patientUniqueIdFromSAML);
+		builder.append(") generated from SAML header.");
+		String codeContext = builder.toString();
 		String errorCode = "XDSRegistryError";
 
 		return createAdhocQueryResponseError(codeContext, errorCode);
@@ -239,18 +281,32 @@ public class XdsbErrorFactory {
 	 */
 	public AdhocQueryResponse errorAdhocQueryResponseNoDocumentsFound(
 			String patientUniqueId, String intermediarySubjectNPI) {
-		String codeContext = "No documents found for patient "
-				+ patientUniqueId + " authored by " + intermediarySubjectNPI
-				+ ".";
+		StringBuilder builder = new StringBuilder();
+		builder.append("No documents found for patient ");
+		builder.append(patientUniqueId);
+		builder.append(" authored by ");
+		builder.append(intermediarySubjectNPI);
+		builder.append(".");
+		String codeContext = builder.toString();
 		String errorCode = "XDSRegistryError";
 
 		return createAdhocQueryResponseError(codeContext, errorCode);
 	}
-	
+
+	/**
+	 * Error adhoc query response no consents found.
+	 * 
+	 * @param patientUniqueId
+	 *            the patient unique id
+	 * @return the adhoc query response
+	 */
 	public AdhocQueryResponse errorAdhocQueryResponseNoConsentsFound(
 			String patientUniqueId) {
-		String codeContext = "No consents found for patient "
-				+ patientUniqueId + ".";
+		StringBuilder builder = new StringBuilder();
+		builder.append("No consents found for patient ");
+		builder.append(patientUniqueId);
+		builder.append(".");
+		String codeContext = builder.toString();
 		String errorCode = "XDSRegistryError";
 
 		return createAdhocQueryResponseError(codeContext, errorCode);
@@ -265,9 +321,11 @@ public class XdsbErrorFactory {
 	 */
 	public AdhocQueryResponse errorAdhocQueryResponseUnsupportedFormatCode(
 			String unsupportedFormatCode) {
-		String codeContext = unsupportedFormatCode
-				+ " format code is not supported by Policy Enforcement Point."
-				+ " The only supported format code is '2.16.840.1.113883.10.20.1^^HITSP'.";
+		StringBuilder builder = new StringBuilder();
+		builder.append(unsupportedFormatCode);
+		builder.append(" format code is not supported by Policy Enforcement Point.");
+		builder.append(" The only supported format code is '2.16.840.1.113883.10.20.1^^HITSP'.");
+		String codeContext = builder.toString();
 		String errorCode = "XDSRegistryError";
 
 		return createAdhocQueryResponseError(codeContext, errorCode);
@@ -282,9 +340,11 @@ public class XdsbErrorFactory {
 	 */
 	public AdhocQueryResponse errorAdhocQueryResponseUnsupportedResponseOptionType(
 			String supportedResponseOptionType) {
-		String codeContext = "Policy Enforcement Point only supports '"
-				+ supportedResponseOptionType
-				+ "' response option return type.";
+		StringBuilder builder = new StringBuilder();
+		builder.append("Policy Enforcement Point only supports '");
+		builder.append(supportedResponseOptionType);
+		builder.append("' response option return type.");
+		String codeContext = builder.toString();
 		String errorCode = "XDSRegistryError";
 
 		return createAdhocQueryResponseError(codeContext, errorCode);

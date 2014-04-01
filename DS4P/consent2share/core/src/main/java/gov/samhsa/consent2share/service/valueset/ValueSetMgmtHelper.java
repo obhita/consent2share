@@ -25,13 +25,17 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ValueSetMgmtHelper.
  */
@@ -68,6 +72,12 @@ public class ValueSetMgmtHelper {
 	
 	/** The Constant VALUE_SET_CATEGORY_NAME_CELL_NUM. */
 	private static final int VALUE_SET_DESC_CELL_NUM = 3;
+	
+	@Value("${concept_code_list_page_size}")
+	private static int conceptCodeListPageSize;
+	
+	/** The logger. */
+	final static Logger logger = LoggerFactory.getLogger(ValueSetMgmtHelper.class);
 	
 	// Code System
 	/**
@@ -446,9 +456,9 @@ public class ValueSetMgmtHelper {
 						|| headerRow.getCell(CONCEPTCODES_DESC_CELL_NUM, Row.RETURN_BLANK_AS_NULL) == null) {
 					throw new InvalidCSVException("Header row values in file should be in the following format: Code, Name, Description");
 					
-				} else if(!headerRow.getCell(CONCEPTCODES_CODE_CELL_NUM, Row.RETURN_BLANK_AS_NULL).getStringCellValue().trim().equalsIgnoreCase(CODE_FIELD) ||
-						!headerRow.getCell(CONCEPTCODES_NAME_CELL_NUM, Row.RETURN_BLANK_AS_NULL).getStringCellValue().trim().equalsIgnoreCase(NAME_FIELD) ||
-						!headerRow.getCell(CONCEPTCODES_DESC_CELL_NUM, Row.RETURN_BLANK_AS_NULL).getStringCellValue().trim().equalsIgnoreCase(DESC_FIELD)) {
+				} else if(!getCellValueAsString(headerRow.getCell(CONCEPTCODES_CODE_CELL_NUM, Row.RETURN_BLANK_AS_NULL)).equalsIgnoreCase(CODE_FIELD) ||
+						!getCellValueAsString(headerRow.getCell(CONCEPTCODES_NAME_CELL_NUM, Row.RETURN_BLANK_AS_NULL)).equalsIgnoreCase(NAME_FIELD) ||
+						!getCellValueAsString(headerRow.getCell(CONCEPTCODES_DESC_CELL_NUM, Row.RETURN_BLANK_AS_NULL)).equalsIgnoreCase(DESC_FIELD)) {
 					throw new InvalidCSVException("Header row values in excel file should be in the following format: Code, Name, Description");
 				}
 			}
@@ -469,16 +479,16 @@ public class ValueSetMgmtHelper {
 				if (codeCell == null || nameCell == null) {
 
 					if (codeCell != null || nameCell != null) {
-						throw new InvalidCSVException("Required field(s) empty for row: " + (row.getRowNum() + 1));
+						throw new InvalidCSVException("Cannot add value set. Required field(s) empty for row: " + (row.getRowNum() + 1));
 					}
 				} else {
 					conceptCodeDto.setCodeSystemName(codeSystemId);
 					conceptCodeDto.setCodeSystemVersionId(codeSystemVersionId);
 					conceptCodeDto.setValueSetIds(valueSetIds);
 					conceptCodeDto.setUserName(userName);
-					conceptCodeDto.setCode(codeCell.getStringCellValue().trim());
-					conceptCodeDto.setName(nameCell.getStringCellValue().trim());
-					conceptCodeDto.setDescription(descriptionCell.getStringCellValue().trim());
+					conceptCodeDto.setCode(getCellValueAsString(codeCell));
+					conceptCodeDto.setName(getCellValueAsString(nameCell));
+					conceptCodeDto.setDescription(getCellValueAsString(descriptionCell));
 
 					listOfConceptCodesDtos.add(conceptCodeDto);
 				}
@@ -487,6 +497,7 @@ public class ValueSetMgmtHelper {
 
 		return listOfConceptCodesDtos;
 	}
+
 
 	/**
 	 * Read value sets from file.
@@ -520,10 +531,10 @@ public class ValueSetMgmtHelper {
 						|| headerRow.getCell(VALUE_SET_DESC_CELL_NUM, Row.RETURN_BLANK_AS_NULL) == null) {
 					throw new InvalidCSVException("Header row values in file should be in the following format: Code, Name, Category Name, Description");
 					
-				} else if(!headerRow.getCell(VALUE_SET_CODE_CELL_NUM, Row.RETURN_BLANK_AS_NULL).getStringCellValue().trim().equalsIgnoreCase(CODE_FIELD) ||
-						!headerRow.getCell(VALUE_SET_NAME_CELL_NUM, Row.RETURN_BLANK_AS_NULL).getStringCellValue().trim().equalsIgnoreCase(NAME_FIELD) ||
-						!headerRow.getCell(VALUE_SET_CATEGORY_NAME_CELL_NUM, Row.RETURN_BLANK_AS_NULL).getStringCellValue().trim().equalsIgnoreCase(CATEGORY_NAME_FIELD) ||
-						!headerRow.getCell(VALUE_SET_DESC_CELL_NUM, Row.RETURN_BLANK_AS_NULL).getStringCellValue().trim().equalsIgnoreCase(DESC_FIELD)) {
+				} else if(!getCellValueAsString(headerRow.getCell(VALUE_SET_CODE_CELL_NUM, Row.RETURN_BLANK_AS_NULL)).equalsIgnoreCase(CODE_FIELD) ||
+						!getCellValueAsString(headerRow.getCell(VALUE_SET_NAME_CELL_NUM, Row.RETURN_BLANK_AS_NULL)).equalsIgnoreCase(NAME_FIELD) ||
+						!getCellValueAsString(headerRow.getCell(VALUE_SET_CATEGORY_NAME_CELL_NUM, Row.RETURN_BLANK_AS_NULL)).equalsIgnoreCase(CATEGORY_NAME_FIELD) ||
+						!getCellValueAsString(headerRow.getCell(VALUE_SET_DESC_CELL_NUM, Row.RETURN_BLANK_AS_NULL)).equalsIgnoreCase(DESC_FIELD)) {
 					throw new InvalidCSVException("Header row values in excel file should be in the following format: Code, Name, Category Name, Description");
 				}
 			}
@@ -549,11 +560,10 @@ public class ValueSetMgmtHelper {
 					}
 				} else {
 					valueSetDto.setUserName(userName);
-					valueSetDto.setCode(codeCell.getStringCellValue().trim());
-					valueSetDto.setName(nameCell.getStringCellValue().trim());
-					valueSetDto.setDescription(descriptionCell.getStringCellValue().trim());
-					valueSetDto.setValueSetCatName(categoryNameCell
-							.getStringCellValue().trim());
+					valueSetDto.setCode(getCellValueAsString(codeCell));
+					valueSetDto.setName(getCellValueAsString(nameCell));
+					valueSetDto.setDescription(getCellValueAsString(descriptionCell));
+					valueSetDto.setValueSetCatName(getCellValueAsString(categoryNameCell));
 
 					listOfvalueSets.add(valueSetDto);
 
@@ -577,5 +587,38 @@ public class ValueSetMgmtHelper {
 			throw new InvalidCSVException("Code System, Code System Version and Value Set Names need to be selected for Batch Upload");
 		}
 		
+	}
+	
+
+	/**
+	 * Gets the cell value as string.
+	 *
+	 * @param cell the cell
+	 * @return the cell value as string
+	 */
+	public static String getCellValueAsString(Cell cell) {
+		if (cell == null) {
+			return null;
+		} else if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+			logger.info("TEST: " + cell.toString());
+			return cell.toString();
+		} else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+			DataFormatter formatter = new DataFormatter();
+			String formattedValue = formatter.formatCellValue(cell);
+			return formattedValue;
+		} else {
+			throw new InvalidCSVException("Value stored in cell is invalid! Valid types are Numbers or Strings.");
+		}
+	}
+
+	/**
+	 * Gets the concept code list page size.
+	 *
+	 * @return the concept code list page size
+	 */
+	public static int getConceptCodeListPageSize() {
+		System.out.println("Page size: " + conceptCodeListPageSize);
+		
+		return conceptCodeListPageSize;
 	}
 }

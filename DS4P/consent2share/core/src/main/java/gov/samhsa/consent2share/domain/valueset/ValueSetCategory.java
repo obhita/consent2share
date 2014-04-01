@@ -48,7 +48,7 @@ public class ValueSetCategory extends AbstractNode{
 	@Column(name = "valueset_cat_id")
 	private Long id;
 
-	//optional
+	@Column(name = "description",length=5000)
 	private String description;
 	
 

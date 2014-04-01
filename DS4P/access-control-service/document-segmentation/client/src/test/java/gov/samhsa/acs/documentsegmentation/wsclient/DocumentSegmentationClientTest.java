@@ -30,7 +30,7 @@ public class DocumentSegmentationClientTest {
 	@Before
 	public void setUp() {
 		try {
-			address = "http://localhost:9000/services/DocumentSegmentationService";
+			address = "http://localhost:12345/services/DocumentSegmentationService";
 			ep = Endpoint.publish(address,
 					new DocumentSegmentationServicePortTypeImpl());
 

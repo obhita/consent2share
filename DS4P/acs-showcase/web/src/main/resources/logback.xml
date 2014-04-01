@@ -25,15 +25,14 @@
 				%d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n
 			</Pattern>
 		</layout>
-		
+
 		<!-- keep 30 days' worth of history -->
 		<maxHistory>30</maxHistory>
 	</appender>
-	
-	<!-- <logger name="gov.samhsa.consent2share"></logger> -->
-	<logger name="gov.samhsa.pixclient" level="DEBUG" />
 
-	<logger name="org.springframework" level="DEBUG" />	
+	<logger name="gov.samhsa.consent2share.showcase"/>
+	<logger name="gov.samhsa.pixclient"/>
+
 	<root>
 		<level value="WARN" />
 		<appender-ref ref="STDOUT" />

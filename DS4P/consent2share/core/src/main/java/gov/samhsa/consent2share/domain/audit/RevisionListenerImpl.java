@@ -48,22 +48,30 @@ public class RevisionListenerImpl implements RevisionListener,
 	@Autowired
 	ModifiedEntityTypeEntityRepository modifiedEntityTypeEntityRepository;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.hibernate.envers.RevisionListener#newRevision(java.lang.Object)
 	 */
 	@Override
 	public void newRevision(Object revisionEntity) {
-		if(SpringContext.getApplicationContext()!=null)
-		{
-		UserContext userContext = SpringContext.getApplicationContext()
-				.getBean(UserContext.class);
-		String username = userContext.getCurrentUser().getUsername();
-		((RevisionInfoEntity) revisionEntity).setUsername(username);
+		if (SpringContext.getApplicationContext() != null) {
+			UserContext userContext = SpringContext.getApplicationContext()
+					.getBean(UserContext.class);
+			if (userContext.getCurrentUser() != null) {
+				String username = userContext.getCurrentUser().getUsername();
+				((RevisionInfoEntity) revisionEntity).setUsername(username);
+			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.hibernate.envers.EntityTrackingRevisionListener#entityChanged(java.lang.Class, java.lang.String, java.io.Serializable, org.hibernate.envers.RevisionType, java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.hibernate.envers.EntityTrackingRevisionListener#entityChanged(java
+	 * .lang.Class, java.lang.String, java.io.Serializable,
+	 * org.hibernate.envers.RevisionType, java.lang.Object)
 	 */
 	@Override
 	public void entityChanged(@SuppressWarnings("rawtypes") Class entityClass,

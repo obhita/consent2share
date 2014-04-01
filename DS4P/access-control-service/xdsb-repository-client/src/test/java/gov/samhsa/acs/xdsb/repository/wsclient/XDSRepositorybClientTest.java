@@ -19,11 +19,11 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
-import junit.framework.Assert;
 import oasis.names.tc.ebxml_regrep.xsd.lcm._3.SubmitObjectsRequest;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
 
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ public class XDSRepositorybClientTest {
 	@BeforeClass
 	public static void setUp() {
 		try {
-			address = "http://localhost:9000/services/xdsrepositoryb";
+			address = "http://localhost:12345/services/xdsrepositoryb";
 			ep = Endpoint.publish(address, new XdsRepositorybImpl());
 
 			XdsRepositorybImpl.returnedValueOfProvideAndRegisterDocumentSet = provideAndRegisterDocumentSet;

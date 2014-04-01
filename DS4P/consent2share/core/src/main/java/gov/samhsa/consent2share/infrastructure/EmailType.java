@@ -39,5 +39,7 @@ public enum EmailType {
  /** The password confirmation. */
  PASSWORD_CONFIRMATION, 
  /** The user profile change. */
- USER_PROFILE_CHANGE;
+ USER_PROFILE_CHANGE,
+	
+	NEW_LOGIN_ACCOUNT;
 }

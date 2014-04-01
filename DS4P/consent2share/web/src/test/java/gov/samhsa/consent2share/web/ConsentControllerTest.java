@@ -3,23 +3,23 @@ package gov.samhsa.consent2share.web;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.infrastructure.CodedConceptLookupService;
 import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
+import gov.samhsa.consent2share.service.consent.ConsentHelper;
 import gov.samhsa.consent2share.service.consent.ConsentService;
 import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 import gov.samhsa.consent2share.service.dto.AddConsentFieldsDto;
@@ -44,9 +44,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,12 +51,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.owasp.esapi.AccessReferenceMap;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 /**
@@ -122,8 +115,13 @@ public class ConsentControllerTest {
 	@Mock
 	ConsentExportService consentExportService;
 	
+	/** The access reference mapper. */
 	@Mock 
 	AccessReferenceMapper accessReferenceMapper;
+	
+	/** The consent helper. */
+	@Mock
+	ConsentHelper consentHelper;
 	
 	/** The mock mvc. */
 	MockMvc mockMvc;
@@ -181,6 +179,33 @@ public class ConsentControllerTest {
      	.andExpect(status().isOk())
      	.andExpect(model().attribute("emailSent","false"))
      	.andExpect(view().name("views/consents/listConsents"));
+	}
+	
+	
+	/**
+	 * Test consentMainPage when duplicate consent parameter is set
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testConsentMainPage_When_duplciateConsentParamater_is_set() throws Exception{
+		mockMvc.perform(get("/consents/listConsents.html?duplicateconsent=1#jump_consent_1"))
+		.andExpect(status().isOk())
+		.andExpect(model().attribute("duplicateConsentId", "1"))
+		.andExpect(view().name("views/consents/listConsents"));
+	}
+	
+	/**
+	 * Test consentMainPage when duplicate consent parameter is not set
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testConsentMainPage_When_duplciateConsentParamater_is_not_set() throws Exception{
+		mockMvc.perform(get("/consents/listConsents.html"))
+		.andExpect(status().isOk())
+		.andExpect(model().attributeDoesNotExist("duplicateConsentId"))
+		.andExpect(view().name("views/consents/listConsents"));
 	}
 	
 	/**
@@ -370,8 +395,8 @@ public class ConsentControllerTest {
 				.param("doNotShareClinicalDocumentSectionTypeCodes", "46240-8")
 				.param("doNotShareClinicalDocumentTypeCodes", "18842-5")
 				.param("doNotShareForPurposeOfUseCodes", "CLINTRCH"))
-			.andExpect(view().name("redirect:listConsents.html?notify=add"));
-		verify(consentService).saveConsent(any(ConsentDto.class));
+				.andExpect(status().isOk());
+		//verify(consentService).saveConsent(any(ConsentDto.class),(long)0);
 	}
 	
 	@Test
@@ -380,8 +405,8 @@ public class ConsentControllerTest {
 		mockMvc.perform(post("/consents/addConsent.html")
 				.param("ICD9", "79571;Nonspecific serologic evidence of human immunodeficiency virus [HIV] (Nonspcf serlgc evdnc hiv)")
 				.param("ICD9", "042;Human immunodeficiency virus [HIV] disease (Human immuno virus dis)"))
-			.andExpect(view().name("views/resourceNotFound"));
-		verify(consentService,never()).saveConsent(any(ConsentDto.class));
+				.andExpect(status().isInternalServerError())
+				.andExpect(content().string("Resource Not Found"));
 	}
 	
 	@Test

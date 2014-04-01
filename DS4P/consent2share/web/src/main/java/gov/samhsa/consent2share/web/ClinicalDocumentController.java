@@ -25,8 +25,13 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.web;
 
+import gov.samhsa.acs.common.validation.XmlValidation;
+import gov.samhsa.acs.common.validation.exception.InvalidXmlDocumentException;
+import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
 import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
+import gov.samhsa.consent2share.infrastructure.security.ClamAVService;
+import gov.samhsa.consent2share.infrastructure.security.RecaptchaService;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.clinicaldata.ClinicalDocumentService;
 import gov.samhsa.consent2share.service.dto.ClinicalDocumentDto;
@@ -43,9 +48,14 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import mx4j.tools.config.DefaultConfigurationBuilder.New;
+import net.tanesha.recaptcha.ReCaptcha;
+import net.tanesha.recaptcha.ReCaptchaFactory;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -55,12 +65,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
+import com.itextpdf.text.pdf.codec.Base64.InputStream;
+
 /**
  * The Class ClinicalDocumentController.
  */
 @Controller
 @RequestMapping("/patients")
-public class ClinicalDocumentController {
+public class ClinicalDocumentController implements InitializingBean
+{
 
 	/** The clinical document service. */
 	@Autowired
@@ -81,6 +95,21 @@ public class ClinicalDocumentController {
 	/** The access reference mapper. */
 	@Autowired
 	AccessReferenceMapper accessReferenceMapper;
+	
+	@Autowired
+	ClamAVService clamAVUtil;
+	
+	@Autowired
+	RecaptchaService recaptchaUtil;
+	
+	/** The xml validator. */
+	private XmlValidation xmlValidator;
+
+	/** The Constant C32_CDA_XSD_PATH. */
+	public static final String C32_CDA_XSD_PATH = "schema/cdar2c32/infrastructure/cda/";
+
+	/** The Constant C32_CDA_XSD_NAME. */
+	public static final String C32_CDA_XSD_NAME = "C32_CDA.xsd";
 	
 	/** The logger. */
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -103,18 +132,21 @@ public class ClinicalDocumentController {
 	 * @return the string
 	 */
 	@RequestMapping("/clinicaldocuments.html")
-    public String showClinicalDocuments(Model model) {
+    public String showSecureClinicalDocuments(Model model,
+    		@RequestParam(value = "notify", required = false) String notification) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		String username = currentUser.getUsername();
 		PatientProfileDto patientDto = patientService.findPatientProfileByUsername(username);
-		
+		String captchaString=recaptchaUtil.createSecureRecaptchaHtml();
         List<ClinicalDocumentDto> clinicaldocumentDtos = clinicalDocumentService.findDtoByPatientDto(patientDto);
         accessReferenceMapper.setupAccessReferenceMap(clinicaldocumentDtos);
         List<LookupDto> allDocumentTypeCodes = clinicalDocumentTypeCodeService.findAllClinicalDocumentTypeCodes();
         model.addAttribute("clinicaldocumentDtos", clinicaldocumentDtos);
         model.addAttribute("allDocumentTypeCodes", allDocumentTypeCodes);
+        model.addAttribute("notification", notification);
+        model.addAttribute("captcha", captchaString);
         
-        return "views/clinicaldocuments/clinicalDocuments";
+        return "views/clinicaldocuments/secureClinicalDocuments";
     }
 
 	/**
@@ -129,30 +161,45 @@ public class ClinicalDocumentController {
 	 * @return the string
 	 */
 	@RequestMapping(value="/clinicaldocuments.html", method=RequestMethod.POST)
-    public String uploadClinicalDocuments(HttpServletRequest request,
+    public String uploadClinicalDocumentsSecurely(HttpServletRequest request,
             @ModelAttribute("document") ClinicalDocumentDto clinicalDocumentDto,
             @RequestParam("file") MultipartFile file,
             @RequestParam("name") String documentName,
             @RequestParam("description") String description,
             @RequestParam("documentType") String documentTypeCode) {
-
+		if(scanMultipartFile(file)!=true)
+			return "redirect:/patients/clinicaldocuments.html?notify=virus_detected";
+		if(clinicalDocumentService.isDocumentOversized(file))
+			return "redirect:/patients/clinicaldocuments.html?notify=size_over_limits";
+		if(clinicalDocumentService.isDocumentExtensionPermitted(file)==false)
+			return "redirect:/patients/clinicaldocuments.html?notify=extension_not_permitted";
+		if(recaptchaUtil.checkAnswer(request.getRemoteAddr(), 
+				request.getParameter("recaptcha_challenge_field"), 
+				request.getParameter("recaptcha_response_field"))==false)
+			return "redirect:/patients/clinicaldocuments.html?notify=wrong_captcha";
+			try {
+				xmlValidator.validate(file.getInputStream());
+			} catch (Exception e) {
+				return "redirect:/patients/clinicaldocuments.html?notify=invalid_c32";
+			}
+			
+		
 		try {
-			AuthenticatedUser currentUser = userContext.getCurrentUser();
-			String username = currentUser.getUsername();
-			
-			clinicalDocumentDto.setName(documentName);
-			clinicalDocumentDto.setDescription(description);
-			clinicalDocumentDto.setContent(file.getBytes());
-			clinicalDocumentDto.setFilename(file.getOriginalFilename());
-			clinicalDocumentDto.setContentType(file.getContentType());
-			clinicalDocumentDto.setDocumentSize(file.getSize());
-			clinicalDocumentDto.setPatientId(patientService.findIdByUsername(username));
+				AuthenticatedUser currentUser = userContext.getCurrentUser();
+				String username = currentUser.getUsername();
+				clinicalDocumentDto.setName(documentName);
+				clinicalDocumentDto.setDescription(description);
+				clinicalDocumentDto.setContent(file.getBytes());
+				clinicalDocumentDto.setFilename(file.getOriginalFilename());
+				clinicalDocumentDto.setContentType(file.getContentType());
+				clinicalDocumentDto.setDocumentSize(file.getSize());
+				clinicalDocumentDto.setPatientId(patientService.findIdByUsername(username));
 
-			LookupDto clinicalDocumentTypeCode = new LookupDto();
-			clinicalDocumentTypeCode.setCode(documentTypeCode);
-			clinicalDocumentDto.setClinicalDocumentTypeCode(clinicalDocumentTypeCode);
-			
-			clinicalDocumentService.saveClinicalDocument(clinicalDocumentDto);
+				LookupDto clinicalDocumentTypeCode = new LookupDto();
+				clinicalDocumentTypeCode.setCode(documentTypeCode);
+				clinicalDocumentDto.setClinicalDocumentTypeCode(clinicalDocumentTypeCode);
+				
+				clinicalDocumentService.saveClinicalDocument(clinicalDocumentDto);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -208,5 +255,47 @@ public class ClinicalDocumentController {
 		}
         return "redirect:/patients/clinicaldocuments.html";
     }
+    
+    Boolean scanMultipartFile(MultipartFile file){
+		java.io.InputStream inputStream=null;
+		Boolean isItClean=null;
+		try {
+			inputStream = file.getInputStream();
+			isItClean = clamAVUtil.fileScanner(inputStream);
+			inputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.warn(e.getMessage());
+		}
+    	return isItClean;
+    }
+    
+    @Override
+	public void afterPropertiesSet() throws Exception {
+		this.xmlValidator=new XmlValidation(this.getClass().getClassLoader().getResourceAsStream(C32_CDA_XSD_PATH + C32_CDA_XSD_NAME),C32_CDA_XSD_PATH);
+	}
+
+	ClinicalDocumentController(
+			ClinicalDocumentService clinicalDocumentService,
+			PatientService patientService,
+			ClinicalDocumentTypeCodeService clinicalDocumentTypeCodeService,
+			UserContext userContext,
+			AccessReferenceMapper accessReferenceMapper,
+			ClamAVService clamAVUtil, RecaptchaService recaptchaUtil,
+			XmlValidation xmlValidator) {
+		super();
+		this.clinicalDocumentService = clinicalDocumentService;
+		this.patientService = patientService;
+		this.clinicalDocumentTypeCodeService = clinicalDocumentTypeCodeService;
+		this.userContext = userContext;
+		this.accessReferenceMapper = accessReferenceMapper;
+		this.clamAVUtil = clamAVUtil;
+		this.recaptchaUtil = recaptchaUtil;
+		this.xmlValidator = xmlValidator;
+	}
 	
+	@SuppressWarnings("unused")
+	private ClinicalDocumentController() {
+	}
+
 }

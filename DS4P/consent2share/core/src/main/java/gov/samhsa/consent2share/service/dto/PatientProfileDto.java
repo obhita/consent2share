@@ -38,6 +38,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class PatientProfileDto.
  */
@@ -92,6 +93,9 @@ public class PatientProfileDto {
 	
 	/** The password. */
 	private String password;
+	
+	/** The verification Code. */
+	private String verificationCode;
 
 	/** The individual providers. */
 	private Set<IndividualProvider> individualProviders;
@@ -447,6 +451,25 @@ public class PatientProfileDto {
 	 */
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	
+
+	/**
+	 * Gets the verification code.
+	 *
+	 * @return the verification code
+	 */
+	public String getVerificationCode() {
+		return verificationCode;
+	}
+
+	/**
+	 * Sets the verification code.
+	 *
+	 * @param verificationCode the new verification code
+	 */
+	public void setVerificationCode(String verificationCode) {
+		this.verificationCode = verificationCode;
 	}
 
 	/**

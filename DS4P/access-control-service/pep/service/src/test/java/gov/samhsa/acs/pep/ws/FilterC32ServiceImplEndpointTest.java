@@ -70,7 +70,7 @@ public class FilterC32ServiceImplEndpointTest {
 				"http://www.samhsa.gov/ds4ppilot/contract/pep",
 				"FilterC32Port");
 
-		address = "http://localhost:9000/services/filterc32service";
+		address = "http://localhost:12345/services/filterc32service";
 		wsdlURL = new URL(address + "?wsdl");
 
 		filterC32Response = new FilterC32Response();

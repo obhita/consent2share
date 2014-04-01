@@ -181,7 +181,14 @@ function validateAdminEditPatientProfileForm(){
 	return isFormValid;
 }
 
-
+/**
+ * Validate input fields common to multiple forms
+ * NOTE: DO NOT CALL THIS FUNCTION DIRECTLY;
+ * Only call this function from other validation functions
+ * 
+ * @param {Boolean} inFormValid - variable from other validation function indicating validation status so far
+ * @returns {Boolean} isFormValidSub - true if validation successful so far; false if validation fails
+ */
 function validateCommonFields(inFormValid){
 	var isFormValidSub = inFormValid;
 	
@@ -244,9 +251,11 @@ function validateCommonFields(inFormValid){
 }
 
 
-
-
-/* Function to validate Create Patient Account form on Administrator/adminHome.html page */
+/**
+ * Validate Create Patient Account form on Administrator/adminHome.html page
+ * 
+ * @returns {Boolean} isFormValid - true if form validates successfully; false if validation fails
+ */
 function validateAdminCreatePatientAccount(){
 	preprocessInput();
 
@@ -296,9 +305,104 @@ function validateAdminCreatePatientAccount(){
 		$('#gender_client_error_text').attr('style', "display: none;");
 	}
 	
+	var isValidEmail = chkEmail($('#email').val());
+
+	if(isValidEmail !== true){
+		isFormValid= false;
+		$('#email_client_error_text').html(isValidEmail);
+		$('#email_client_error_text').attr('style', "");
+	}else{
+		$('#email_client_error_text').text("");
+		$('#email_client_error_text').attr('style', "display: none;");
+	}
+	
+	return isFormValid;
+}
+
+/**
+ * Validate update admin profile for on registationLinkToPatient.html page
+ * 
+ * @returns {Boolean} isFormValid - true if validation succeeds; false if it fails
+ */
+function validateSignupLinkToPatientForm(){
+	preprocessInput();
+
+	var isFormValid = true;
+	
+	var isValidDate = isDate($('#date').val());
+
+	if(isValidDate !== true){
+		isFormValidSub = false;
+		$('#dob_client_error_text').html(isValidDate);
+		$('#dob_client_error_text').attr('style', "");
+	}else{
+		$('#dob_client_error_text').text("");
+		$('#dob_client_error_text').attr('style', "display: none;");
+	}
+
+	
+	var isValidVerificationCode = chkVerificationCode($('#verificationCode').val());
+
+	if(isValidVerificationCode !== true){
+		isFormValid = false;
+		$('#verificationCode_client_error_text').html(isValidVerificationCode);
+		$('#verificationCode_client_error_text').attr('style', "");
+	}else{
+		$('#verificationCode_client_error_text').text("");
+		$('#verificationCode_client_error_text').attr('style', "display: none;");
+	}
+
 	return isFormValid;
 	
-}
+	}
+
+function validateSignupUsernamePassword(){
+	preprocessInput();
+
+	var isFormValid = true;
+	
+	var isValidUname = chkUname($('#user_name').val());
+	
+	if(isValidUname !== true){
+		isFormValid = false;
+		flagUserPassInvalid = true;
+		$('#username_client_error_text').html(isValidUname);
+		$('#username_client_error_text').attr('style', "");
+	}else{
+		$('#username_client_error_text').text("");
+		$('#username_client_error_text').attr('style', "display: none;");
+	}
+	
+	
+	var isValidPword = chkPword($('#password').val(), "");
+	
+	if(isValidPword !== true){
+		isFormValid = false;
+		flagUserPassInvalid = true;
+		$('#pwd_client_error_text').html(isValidPword);
+		$('#pwd_client_error_text').attr('style', "");
+	}else{
+		$('#pwd_client_error_text').text("");
+		$('#pwd_client_error_text').attr('style', "display: none;");
+	}
+	
+var isValidPword = chkPword($('#reenterPassword').val(), "");
+	
+	if(isValidPword !== true){
+		isFormValid = false;
+		flagUserPassInvalid = true;
+		$('#password_client_error_text2').html(isValidPword);
+		$('#password_client_error_text2').attr('style', "");
+	}else{
+		$('#password_client_error_text2').text("");
+		$('#password_client_error_text2').attr('style', "display: none;");
+	}
+
+	return isFormValid;
+	
+	}
+
+
 
 
 /* Function to validate update admin profile form
@@ -390,6 +494,17 @@ function validateUpdateAdminProfile(){
 	
 }
 
+function chkVerificationCode(inVerificationCode){
+	var returnVal = null;
+	
+	if(0 >= inVerificationCode.length){
+		returnVal = "Verification Code is required";
+	}else{
+		returnVal = true;
+	}
+	
+	return returnVal;
+}
 
 
 function chkFname(inFname){
@@ -519,6 +634,7 @@ function chkPword(inPword, inUname){
 	
 }
 
+//TODO (MH): Fix function to return consistant data type
 /** FUNCTION CHECKS FOR PHONE NUMBER
  * Uses regular expression to check for valid
  * phone number value and length.
@@ -526,9 +642,8 @@ function chkPword(inPword, inUname){
  * NOTE: As phone number is not a required field, an input
  * value with a length of zero is considered valid input.
  * 
- * @param inPhone
- * @returns Boolean true (on successful validation)
- * @returns String errorString (on failed validation)
+ * @param {String} inPhone
+ * @returns {Boolean|String} true on successful validation; errorString on failed validation
  */
 function chkPhone(inPhone){
 	var phoneRegEx = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
@@ -545,6 +660,7 @@ function chkPhone(inPhone){
 	}
 }
 
+//TODO (MH): Fix function to return consistant data type
 /** FUNCTION CHECKS FOR VALID ZIP CODE
  * Uses regular expression to check for valid
  * zip code value and length. Accepts both 5 digit
@@ -573,6 +689,7 @@ function chkZip(inZip){
 	}
 }
 
+//TODO (MH): Fix function to return consistant data type
 /** FUNCTION CHECKS FOR SSN
  * Uses regular expression to check for valid
  * SSN value and length.

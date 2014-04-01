@@ -1156,6 +1156,9 @@
 			<input id="patientUsername" name="username" type="hidden"
 				th:value="${consentDto.username}" />
 				
+				<input id="patientId" name="patientId" type="hidden"
+				th:value="${patientId}" />
+				
 			<input type="hidden" class="input_hidden" id="input_isAddConsent" th:value="${addConsent}" value="" />
 	
 			<div th:if="${!addConsent}">

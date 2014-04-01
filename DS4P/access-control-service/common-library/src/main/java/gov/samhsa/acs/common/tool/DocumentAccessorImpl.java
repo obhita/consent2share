@@ -27,6 +27,8 @@ package gov.samhsa.acs.common.tool;
 
 import gov.samhsa.acs.common.namespace.PepNamespaceContext;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -118,4 +120,21 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 		xpath.setNamespaceContext(new PepNamespaceContext());
 		return xpath;
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <ProcessingInstructionImpl> Document addingStylesheet(
+	        Document doc, String xslHref) throws TransformerConfigurationException, ParserConfigurationException {
+	    StringBuilder builder = new StringBuilder();
+	    builder.append("type=\"text/xsl\" href=");
+	    builder.append(xslHref);
+	    
+		ProcessingInstructionImpl pi = (ProcessingInstructionImpl) doc
+	            .createProcessingInstruction("xml-stylesheet",builder.toString());
+	    Element root = doc.getDocumentElement();
+	    doc.insertBefore((Node) pi, root);
+	    return doc;
+
+	}	
 }

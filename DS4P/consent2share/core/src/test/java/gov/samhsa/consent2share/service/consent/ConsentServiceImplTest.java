@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import echosign.api.clientv15.dto8.EmbeddedWidgetCreationResult;
-import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.ConsentPdfGenerator;
 import gov.samhsa.consent2share.domain.consent.ConsentRepository;
@@ -37,9 +36,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -91,7 +87,13 @@ public class ConsentServiceImplTest {
 	
 	/** The echo sign signature service. */
 	@Mock
-	EchoSignSignatureService echoSignSignatureService;
+	EchoSignSignatureService echoSignSignatureService;	
+	
+	/** The consent check service. */
+	@Mock
+	ConsentCheckService consentCheckService;
+	
+	
 	
 	/** The user context. */
 	@Mock
@@ -418,9 +420,10 @@ public class ConsentServiceImplTest {
 		when(consentExportService.exportConsent2XACML(any(Consent.class))).thenReturn(xacmlMock);
 		
 		ConsentDto consentDto=mock(ConsentDto.class);
+		when(consentCheckService.getConflictConsent(consentDto)).thenReturn(null);
 		
 		// Act
-		cstSpy.saveConsent(consentDto);
+		cstSpy.saveConsent(consentDto,0);
 		
 		// Assert
 		verify(consentRepository).save(consent);

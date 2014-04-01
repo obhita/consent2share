@@ -12,6 +12,7 @@ import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import gov.samhsa.acs.brms.RuleExecutionService;
 import gov.samhsa.acs.brms.domain.Confidentiality;
 import gov.samhsa.acs.brms.domain.FactModel;
@@ -29,9 +30,14 @@ import gov.samhsa.acs.common.tool.FileReader;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.acs.common.util.FileHelper;
+import gov.samhsa.acs.common.validation.XmlValidation;
+import gov.samhsa.acs.common.validation.exception.InvalidXmlDocumentException;
+import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentation;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentationImpl;
 import gov.samhsa.acs.documentsegmentation.audit.AuditServiceImpl;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidSegmentedClinicalDocumentException;
 import gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypterImpl;
@@ -63,14 +69,18 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.EncryptionConstants;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.itextpdf.text.pdf.codec.Base64.InputStream;
 
 public class DocumentSegmentationImplTest {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -99,6 +109,7 @@ public class DocumentSegmentationImplTest {
 	private static DocumentEncrypterImpl documentEncrypterMock;
 	private static EmbeddedClinicalDocumentExtractorImpl embeddedClinicalDocumentExtractorMock;
 	private static AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl additionalMetadataGeneratorForSegmentedClinicalDocumentImplMock;
+	private static XmlValidation xmlValidatorMock;
 
 	private static String testOriginal_C32_xml;
 	private static String testFactModel_xml;
@@ -111,8 +122,8 @@ public class DocumentSegmentationImplTest {
 
 	private static DocumentSegmentation documentSegmentation;
 
-	@BeforeClass
-	public static void setUp() throws Throwable {
+	@Before
+	public void setUp() throws Throwable {
 		senderEmailAddress = "leo.smith@direct.obhita-stage.org";
 		recipientEmailAddress = "Duane_Decouteau@direct.healthvault-stage.com";
 
@@ -240,6 +251,12 @@ public class DocumentSegmentationImplTest {
 				embeddedClinicalDocumentExtractorMock
 						.extractClinicalDocumentFromFactModel(testFactModel_xml))
 				.thenReturn(testOriginal_C32_xml);
+		
+		xmlValidatorMock = mock(XmlValidation.class);
+		when(xmlValidatorMock.validate(testOriginal_C32_xml)).thenReturn(true);
+		when(xmlValidatorMock.validate(testTagged_C32_xml)).thenReturn(true);
+		when(xmlValidatorMock.validate(testMasked_C32_xml)).thenReturn(true);
+		when(xmlValidatorMock.validate(testEncrypted_C32_xml)).thenReturn(true);
 
 		documentSegmentation = new DocumentSegmentationImpl(
 				ruleExecutionServiceClientMock, auditServiceMock,
@@ -251,12 +268,13 @@ public class DocumentSegmentationImplTest {
 				additionalMetadataGeneratorForSegmentedClinicalDocumentImplMock);
 	}
 
-	@Test(expected = DS4PException.class)
+	@Test(expected = InvalidOriginalClinicalDocumentException.class)
 	public void testSegmentDocument_Given_Real_Marshaller_Throws_DS4PException()
-			throws IOException {
+			throws IOException, InvalidOriginalClinicalDocumentException, InvalidSegmentedClinicalDocumentException {
 		// Arrange
 		boolean xdm = true;
 		boolean ecrypt = true;
+		ReflectionTestUtils.setField(documentSegmentation, "xmlValidator", xmlValidatorMock);
 		DocumentSegmentationImpl documentSegmentationWithRealMarshaller = new DocumentSegmentationImpl(
 				ruleExecutionServiceClientMock, auditServiceMock,
 				documentEditorMock, new SimpleMarshallerImpl(),
@@ -275,13 +293,43 @@ public class DocumentSegmentationImplTest {
 		// Assert
 		// expect DS4PException
 	}
-
-	@Test(expected = DS4PException.class)
-	public void testSegmentDocument_Given_Real_DocumentEditor_Throws_DS4PException()
-			throws IOException {
+	
+	@Test(expected = XmlDocumentReadFailureException .class)
+	public void testSegmentDocument_Given_Real_Marshaller_Throws_XmlDocumentReadFailureException()
+			throws IOException, InvalidXmlDocumentException {
 		// Arrange
 		boolean xdm = true;
 		boolean ecrypt = true;
+		XmlValidation validationMock = mock(XmlValidation.class);
+		doThrow(XmlDocumentReadFailureException.class).when(validationMock).validate("");
+		DocumentSegmentationImpl documentSegmentationWithRealMarshaller = new DocumentSegmentationImpl(
+				ruleExecutionServiceClientMock, auditServiceMock,
+				documentEditorMock, new SimpleMarshallerImpl(),
+				documentEncrypterMock, documentRedactorMock,
+				documentMaskerMock, documentTaggerMock,
+				documentFactModelExtractorMock,
+				embeddedClinicalDocumentExtractorMock,
+				new ValueSetServiceImplMock(fileReader),
+				additionalMetadataGeneratorForSegmentedClinicalDocumentImplMock);
+		ReflectionTestUtils.setField(documentSegmentationWithRealMarshaller, "xmlValidator", validationMock);
+		
+		// Act
+		@SuppressWarnings("unused")
+		SegmentDocumentResponse resp = documentSegmentationWithRealMarshaller
+				.segmentDocument("", "", xdm, ecrypt, "", "", "");
+
+		// Assert
+		// expect DS4PException
+	}
+
+
+	@Test(expected = InvalidOriginalClinicalDocumentException.class)
+	public void testSegmentDocument_Given_Real_DocumentEditor_Throws_DS4PException()
+			throws IOException, InvalidOriginalClinicalDocumentException, InvalidSegmentedClinicalDocumentException {
+		// Arrange
+		boolean xdm = true;
+		boolean ecrypt = true;
+		ReflectionTestUtils.setField(documentSegmentation, "xmlValidator", xmlValidatorMock);
 		DocumentEditorImpl realDocumentEditorImpl = new DocumentEditorImpl(
 				new MetadataGeneratorImpl(), new FileReaderImpl(),
 				new DocumentXmlConverterImpl());
@@ -309,6 +357,8 @@ public class DocumentSegmentationImplTest {
 			throws IOException, SAXException {
 		boolean xdm = true;
 		boolean ecrypt = true;
+		ReflectionTestUtils.setField(documentSegmentation, "xmlValidator", xmlValidatorMock);
+		
 		// Act
 		SegmentDocumentResponse resp = documentSegmentation.segmentDocument(
 				testOriginal_C32_xml, xacmlResult, xdm, ecrypt,
@@ -324,6 +374,7 @@ public class DocumentSegmentationImplTest {
 		// Arrange
 		boolean xdm = false;
 		boolean ecrypt = true;
+		ReflectionTestUtils.setField(documentSegmentation, "xmlValidator", xmlValidatorMock);
 
 		// Act
 		SegmentDocumentResponse resp = documentSegmentation.segmentDocument(
@@ -340,6 +391,7 @@ public class DocumentSegmentationImplTest {
 		// Arrange
 		boolean xdm = true;
 		boolean ecrypt = false;
+		ReflectionTestUtils.setField(documentSegmentation, "xmlValidator", xmlValidatorMock);
 
 		// Act
 		SegmentDocumentResponse resp = documentSegmentation.segmentDocument(
@@ -356,6 +408,50 @@ public class DocumentSegmentationImplTest {
 		// Arrange
 		boolean xdm = false;
 		boolean ecrypt = false;
+
+		// Act
+		SegmentDocumentResponse resp = documentSegmentation.segmentDocument(
+				testOriginal_C32_xml, xacmlResult, xdm, ecrypt,
+				senderEmailAddress, recipientEmailAddress, "123");
+
+		// Assert
+		validateResponse(resp, ecrypt);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test(expected=InvalidSegmentedClinicalDocumentException.class)
+	public void testSegmentDocument_Given_XdmFalse_EncryptFalse_Throws_InvalidSegmentedClinicalDocumentException()
+			throws IOException, SAXException {
+		// Arrange
+		boolean xdm = false;
+		boolean ecrypt = false;
+		XmlValidation validationMock = mock(XmlValidation.class);
+		when(validationMock.validate(testOriginal_C32_xml)).thenReturn(true);
+		when(validationMock.validate(testTagged_C32_xml)).thenReturn(true);
+		when(validationMock.validate(testMasked_C32_xml)).thenThrow(InvalidXmlDocumentException.class);
+		ReflectionTestUtils.setField(documentSegmentation, "xmlValidator", validationMock);
+
+		// Act
+		SegmentDocumentResponse resp = documentSegmentation.segmentDocument(
+				testOriginal_C32_xml, xacmlResult, xdm, ecrypt,
+				senderEmailAddress, recipientEmailAddress, "123");
+
+		// Assert
+		validateResponse(resp, ecrypt);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test(expected=XmlDocumentReadFailureException .class)
+	public void testSegmentDocument_Given_XdmFalse_EncryptFalse_Throws_XmlDocumentReadFailureException ()
+			throws IOException, SAXException {
+		// Arrange
+		boolean xdm = false;
+		boolean ecrypt = false;
+		XmlValidation validationMock = mock(XmlValidation.class);
+		when(validationMock.validate(testOriginal_C32_xml)).thenReturn(true);
+		when(validationMock.validate(testTagged_C32_xml)).thenReturn(true);
+		when(validationMock.validate(testMasked_C32_xml)).thenThrow(XmlDocumentReadFailureException .class);
+		ReflectionTestUtils.setField(documentSegmentation, "xmlValidator", validationMock);
 
 		// Act
 		SegmentDocumentResponse resp = documentSegmentation.segmentDocument(

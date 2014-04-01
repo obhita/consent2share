@@ -180,7 +180,8 @@ $(document).ready(function(){
 		e.stopPropagation();
 		
 		var consentId = $(this).attr("value");
-		var link = "adminPatientViewEditConsent.html?consentId=" + consentId;
+		var patientId = $('#patientId').attr("value");
+		var link = "adminPatientViewEditConsent.html?consentId=" + consentId +"&patientId="+patientId;
 		
 		window.open(link,'_self');
 		$('#consent_options_modal_' + consentId).modal('hide');
@@ -249,8 +250,23 @@ $(document).ready(function(){
 	$('#btn_add_providers').click(function(e){
 		$('div#addProviderSearch-modal').modal();
 	});
-
 	
+	$('#send_login_information').click(function(e){
+		$('#send_login_information').attr("disabled", "disabled");
+		var patientId=$(this).attr("value");
+		$.ajax({
+			url: "sendLoginInformation.html?patientId="+patientId,
+			type: "GET",
+			success: function(result){
+				window.alert(result);
+			},
+			error: function(e){
+				window.alert("ERROR: " + e.responseText);
+			}
+		});
+	
+	});
+		
 	//Bind hidden.bs.modal event handler to clear edit patient profile modal fields & error messages
 	$('#editPatient').on('hidden.bs.modal', function(){
 		resetEditPatientProfileModal();

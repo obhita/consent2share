@@ -25,13 +25,19 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.ws;
 
+import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentation;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidSegmentedClinicalDocumentException;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationServicePortType;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentRequest;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 
 import javax.jws.WebService;
 import javax.xml.ws.soap.MTOM;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Class DocumentSegmentationServiceImpl.
@@ -43,6 +49,8 @@ import javax.xml.ws.soap.MTOM;
 			endpointInterface = "gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationServicePortType")
 public class DocumentSegmentationServiceImpl implements
 		DocumentSegmentationServicePortType {
+	
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/** The document processor. */
 	private DocumentSegmentation documentSegmentationService;
@@ -77,12 +85,20 @@ public class DocumentSegmentationServiceImpl implements
 	public SegmentDocumentResponse segmentDocument(
 			SegmentDocumentRequest parameters) {
 		SegmentDocumentResponse response = new SegmentDocumentResponse();
-		response = documentSegmentationService.segmentDocument(
-				parameters.getDocument(), parameters.getEnforcementPolicies(),
-				parameters.isPackageAsXdm(), parameters.isEncryptDocument(),
-				parameters.getSenderEmailAddress(),
-				parameters.getRecipientEmailAddress(),
-				parameters.getXdsDocumentEntryUniqueId());
+		try {
+			response = documentSegmentationService.segmentDocument(
+					parameters.getDocument(), parameters.getEnforcementPolicies(),
+					parameters.isPackageAsXdm(), parameters.isEncryptDocument(),
+					parameters.getSenderEmailAddress(),
+					parameters.getRecipientEmailAddress(),
+					parameters.getXdsDocumentEntryUniqueId());
+		} catch (InvalidOriginalClinicalDocumentException e) {
+			logger.error(e.getMessage(),e);
+		} catch (InvalidSegmentedClinicalDocumentException e) {
+			logger.error(e.getMessage(),e);
+		} catch (XmlDocumentReadFailureException e) {
+			logger.error(e.getMessage(),e);
+		}
 		return response;
 	}
 }

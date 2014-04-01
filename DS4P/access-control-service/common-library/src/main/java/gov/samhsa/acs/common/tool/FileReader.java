@@ -26,11 +26,15 @@
 package gov.samhsa.acs.common.tool;
 
 import java.io.IOException;
+import java.io.InputStream;
 
+/**
+ * The Interface FileReader.
+ */
 public interface FileReader {
 
 	/**
-	 * Read a file and return string
+	 * Read a file and return string.
 	 * 
 	 * @param filename
 	 *            the filename
@@ -39,4 +43,13 @@ public interface FileReader {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public abstract String readFile(String filename) throws IOException;
+
+	/**
+	 * Read input stream as string.
+	 * 
+	 * @param inputStream
+	 *            the input stream
+	 * @return the string
+	 */
+	public abstract String readInputStreamAsString(InputStream inputStream);
 }

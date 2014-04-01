@@ -93,6 +93,14 @@ public class ConsentDto {
 	/** The purpose of use codes and values. */
 	private HashMap<String, String> purposeOfUseCodesAndValues;
 
+	/** The shared purpose names. */
+	private Set<String> sharedPurposeNames;
+	
+	/** The authorizer names. */
+	private Set<String> authorizerNames;
+	
+	/** The made to names. */
+	private Set<String> madeToNames;
 
 	/**
 	 * Gets the id.
@@ -428,6 +436,60 @@ public class ConsentDto {
 		this.purposeOfUseCodesAndValues = purposeOfUseCodesAndValues;
 	}
 	
+	/**
+	 * Gets the shared purpose names.
+	 *
+	 * @return the shared purpose names
+	 */
+	public Set<String> getSharedPurposeNames() {
+		return sharedPurposeNames;
+	}
+
+	/**
+	 * Sets the shared purpose names.
+	 *
+	 * @param sharedPurposeNames the new shared purpose names
+	 */
+	public void setSharedPurposeNames(Set<String> sharedPurposeNames) {
+		this.sharedPurposeNames = sharedPurposeNames;
+	}
+
+	/**
+	 * Gets the authorizer names.
+	 *
+	 * @return the authorizer names
+	 */
+	public Set<String> getAuthorizerNames() {
+		return authorizerNames;
+	}
+
+	/**
+	 * Sets the authorizer names.
+	 *
+	 * @param authorizerNames the new authorizer names
+	 */
+	public void setAuthorizerNames(Set<String> authorizerNames) {
+		this.authorizerNames = authorizerNames;
+	}
+
+	/**
+	 * Gets the made to names.
+	 *
+	 * @return the made to names
+	 */
+	public Set<String> getMadeToNames() {
+		return madeToNames;
+	}
+
+	/**
+	 * Sets the made to names.
+	 *
+	 * @param madeToNames the new made to names
+	 */
+	public void setMadeToNames(Set<String> madeToNames) {
+		this.madeToNames = madeToNames;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */

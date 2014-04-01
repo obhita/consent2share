@@ -25,6 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.acs.common.tool;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
@@ -78,4 +80,20 @@ public interface DocumentAccessor {
 	 */
 	public abstract NodeList getNodeList(Document xmlDocument, String xPathExpr)
 			throws XPathExpressionException;
+	
+	
+	/**
+	 * Gets the node list.
+	 * 
+	 * @param xmlDocument
+	 *            the xml document
+	 * @param xPathExpr
+	 *            the x path expr
+	 * @return the node list
+	 * @throws XPathExpressionException
+	 *             the x path expression exception
+	 */	
+	public <ProcessingInstructionImpl> Document addingStylesheet( Document doc,String xslHref) 
+			throws TransformerConfigurationException, ParserConfigurationException	;
+	
 }

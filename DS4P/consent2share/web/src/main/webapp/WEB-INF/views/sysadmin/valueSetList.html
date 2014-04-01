@@ -22,7 +22,7 @@
 			<!-- The code below is here only to enhance source code readability -->
 			
 					<a th:include="fragment/common :: mobileMenuButtonFragment" class="btn btn-info btn-mainmenu" data-toggle="collapse" data-target=".top-nav.navbar-collapse,.sidebar-nav.navbar-collapse">
-						<span class="fa fa-reorder"></span>
+						<span class="fa fa-bars"></span>
 					</a>
 					<h1>
 						<span class="nav-title">Value Set Management</span>
@@ -172,14 +172,14 @@
 	    	            								    	            								
 	    	            								<div class="input-group sysAdmin-input bottom-margin10"> 
 	    	            									<!-- <span class="input-group-addon">Value Set Code</span> -->
-	    	            									<input type="text" style="font-weight: bold;" id="txt_search_valset" class="form-control" placeholder="Enter Value Set Code"></input>
+	    	            									<input type="text" style="font-weight: bold;" id="txt_search_valset_code" class="form-control" placeholder="Enter Value Set Code"></input>
 	    	            									<span class="input-group-btn">
 														    	<button id="btn_search_valset_code_submit" class="btn btn-success" type="button"><span class="fa fa-search"></span></button>
 														    </span>
 	    	            								</div>
 	    	            								     								
 	    	            								<div class="input-group sysAdmin-input bottom-margin10">
-	    	            									<input type="text" style="font-weight: bold;" id="txt_search_valset2" class="form-control" placeholder="Enter Value Set Name"></input>
+	    	            									<input type="text" style="font-weight: bold;" id="txt_search_valset_name" class="form-control" placeholder="Enter Value Set Name"></input>
 	    	            									<span class="input-group-btn">
 	    	            										<button id="btn_search_valset_name_submit" class="btn btn-success"><span class="fa fa-search"></span></button>
 	    	            									</span>
@@ -214,7 +214,7 @@
                            </tr>
                        </thead>
 
-                       <tbody>
+                       <tbody class="hidden">
 		                    <tr>
 		                      		<th></th>
 		          		 			<th>Code</th>
@@ -255,11 +255,48 @@
                 </table>
               </section>
 			</div>
+			
+			<div id="valueset_pagination_holder" class="sysAdmin_pagination" th:include="fragment/sysadmin_fragments :: pagination_fragment">
+			<!-- ***************************************************************************************************************** -->
+			<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE pagination_fragment -->
+			<!-- The code below is here only to enhance source code readability -->
+			<!-- ***************************************************************************************************************** -->
+			
+				<div id="pagination_numresults_holder" class="pagination">
+					<span style="margin: 0;">Total Results: &lt;<span id="pagination_numresults" class="force-inline no-pad" style="margin:0; float:none;"></span>&gt;</span>
+				</div>
+				<ul class="pagination">
+  					<li id="pagination_first" class="pagination-li disabled">
+  						<span class="pagination-icon pagination-control">&laquo;</span>
+  					</li>
+  					<li id="pagination_prev" class="pagination-li disabled">
+  						<span class="pagination-icon pagination-control">&lsaquo;</span>
+  					</li>
+  					<li id="pagination_1" class="pagination-li pagination-page active">
+  						<span class="pagination-icon pagination-pagenum" data-pagenum="1">1</span>
+  					</li>
+					<li id="pagination_next" class="pagination-li disabled">
+						<span class="pagination-icon pagination-control">&rsaquo;</span>
+					</li>
+					<li id="pagination_last" class="pagination-li disabled">
+						<span class="pagination-icon pagination-control">&raquo;</span>
+					</li>
+				</ul>
+			
+			<!-- ***************************************************************************************************************** -->
+			<!-- END OF SECTION REPLACED BY THYMELEAF -->
+			<!-- ***************************************************************************************************************** -->
+			</div>
+			
 		</div>
 		</div><!--/#content.col-md-10-->
 			</div><!--/fluid-row-->
 <!-- END: Code System List --> 
 </div>
+
+	<div th:if="${panelState} eq 'resetoptions'" id="div_panelStateInfo" data-panel-state="resetoptions" class="hidden"></div>
+	<div th:if="${panelState} eq 'addnew'" id="div_panelStateInfo" data-panel-state="addnew" class="hidden"></div>
+
 </div>
 <!-- START: Footer Region -->
 <footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">

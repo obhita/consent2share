@@ -60,8 +60,12 @@ public class SelfSignedSSLHelper {
 
 		HostnameVerifier hv = new HostnameVerifier() {
 			public boolean verify(String urlHostName, SSLSession session) {
-				logger.warn("Warning: URL Host: " + urlHostName + " vs. "
-						+ session.getPeerHost());
+				StringBuilder builder = new StringBuilder();
+				builder.append("Warning: URL Host: ");
+				builder.append(urlHostName);
+				builder.append(" vs. ");
+				builder.append(session.getPeerHost());
+				logger.warn(builder.toString());
 				return true;
 			}
 		};

@@ -40,6 +40,14 @@ public interface ValueSetService {
  public List<ValueSetDto> findAll();
 
  /**
+  * Find all by page number.
+  *
+  * @param pageNumber the page number
+  * @return the list
+  */
+ public List<ValueSetDto> findAll(int pageNumber);
+ 
+ /**
   * Finds ValueSet by id.
   * @param id    The id of the wanted ValueSet.
   * @return  The found ValueSet. If no ValueSet is found, this method returns null.

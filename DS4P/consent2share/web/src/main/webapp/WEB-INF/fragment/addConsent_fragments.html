@@ -1363,10 +1363,100 @@
 									</button>
 								</span>
 							</div>
+							
+							
+							<!-- Consent Validation Modal Start-->
+							
+							<div class="modal fade" id="consent_validation_modal" tabindex="-1" role="dialog" aria-labelledby="consentValidationLabel" aria-hidden="true">
+							  <div class="modal-dialog">
+							    <div class="modal-content">
+							      <div class="modal-header">
+							        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							        <h4 class="modal-title" id="consentValidationLabel">Please review results below.</h4>
+							      </div>
+							      <div class="modal-body">
+							      	<form id="frm_consent_validation_form" class="consentValidationForm" th:object="${consentValidationDto}">
+								      	<div id="consent_validation_error_holder" class="alert alert-danger">
+									      	<h4 id="consent_validation_error_header">Whoops!</h4>
+									      	<p id="consent_validation_error_text">Please make changes to the consent being created to ensure that you are not creating a duplicate.</p>
+								      	</div>
+								        
+								        <div id="pnl_selected_consent" class="panel panel-danger">
+											<div class="panel-heading">
+												<h3 class="panel-title">Create Consent</h3>
+											</div>
+											<div class="panel-body">
+												<div id="selected_authorized_providers">
+													<label class="selected-consent-field-label">Authorized Providers:</label>
+													<span id="selected_authorized_providers_data" class="selected-consent-field-data"></span>
+												</div>
+												<div id="selected_discloseTo_providers">
+													<label class="selected-consent-field-label">Disclose To:</label>
+													<span id="selected_discloseTo_providers_data" class="selected-consent-field-data"></span>
+												</div>
+												<div id="selected_purposeOf_use">
+													<label class="selected-consent-field-label">Purpose of Use:</label>
+													<span id="selected_purposeOf_use_data" class="selected-consent-field-data"></span>
+												</div>
+												<div id="selected_consent_start_date">
+													<label class="selected-consent-field-label">Start Date:</label>
+													<span id="selected_consent_start_date_data" class="selected-consent-field-data"></span>
+												</div>
+												<div id="selected_consent_end_date">
+													<label class="selected-consent-field-label">End Date:</label>
+													<span id="selected_consent_end_date_data" class="selected-consent-field-data"></span>
+												</div>
+											</div>
+										</div>	
+										
+										<div id="pnl_existing_consent" class="panel panel-info">
+											<div class="panel-heading">
+												<h3 class="panel-title">Existing Consent</h3>
+											</div>
+											
+											<div class="panel-body">
+												<div id="existing_authorized_providers">
+													<label class="existing-consent-field-label">Authorized Providers:</label>
+													<span id="existing_authorized_providers_data" class="existing-consent-field-data"></span>
+												</div>
+												<div id="existing_discloseTo_providers">
+													<label class="existing-consent-field-label">Disclose To:</label>
+													<span id="existing_discloseTo_providers_data" class="existing-consent-field-data"></span>
+												</div>
+												<div id="existing_purposeOf_use">
+													<label class="existing-consent-field-label">Purpose of Use:</label>
+													<span id="existing_purposeOf_use_data" class="existing-consent-field-data"></span>
+												</div>
+												<div id="existing_consent_start_date">
+													<label class="existing-consent-field-label">Start Date:</label>
+													<span id="existing_consent_start_date_data" class="existing-consent-field-data"></span>
+												</div>
+												<div id="existing_consent_end_date">
+													<label class="existing-consent-field-label">End Date:</label>
+													<span id="existing_consent_end_date_data" class="existing-consent-field-data"></span>
+												</div>
+												<div id="existing_consent_status">
+													<label class="existing-consent-field-label">Status:</label>
+													<span id="existing_consent_status_data" class="existing-consent-field-data"></span>
+												</div>												
+												<div class="pull-right">
+													<button id="btn_view_existing_consent" class="btn btn-primary">View Existing Consent</button>
+												</div>
+											</div>
+									</div>
+									</form>
+							      </div>
+							      <div class="modal-footer">
+							        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+							        <button type="button" class="btn btn-success">Continue Editing</button>
+							      </div>
+							    </div>
+							  </div>
+							</div>
+							
+							<!-- Consent Validation Modal End-->							
+							
 						</section>
-
-
-
 					</div>
 
 				</div>

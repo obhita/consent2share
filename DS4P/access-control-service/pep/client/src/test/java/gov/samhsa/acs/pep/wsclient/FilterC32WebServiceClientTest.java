@@ -64,7 +64,7 @@ public class FilterC32WebServiceClientTest {
 
 	@BeforeClass
 	public static void setUp() {
-		address = "http://localhost:9000/services/FilterC32Service";
+		address = "http://localhost:12345/services/FilterC32Service";
 		ep = Endpoint.publish(address, new FilterC32ServicePortTypeImpl());
 		
 		FilterC32ServicePortTypeImpl.returnedValueOfRetrieveDocumentSet = returnedValueOfRetrieveDocumentSet;

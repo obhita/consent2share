@@ -25,6 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation;
 
+import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidSegmentedClinicalDocumentException;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
 
 /**
@@ -50,9 +53,15 @@ public interface DocumentSegmentation {
 	 * @param xdsDocumentEntryUniqueId
 	 *            the xds document entry unique id
 	 * @return the segment document response
+	 * @throws XmlDocumentReadFailureException
+	 * @throws InvalidOriginalClinicalDocumentException
+	 * @throws InvalidSegmentedClinicalDocumentException
 	 */
 	public SegmentDocumentResponse segmentDocument(String document,
 			String enforcementPolicies, boolean packageAsXdm,
 			boolean encryptDocument, String senderEmailAddress,
-			String recipientEmailAddress, String xdsDocumentEntryUniqueId);
+			String recipientEmailAddress, String xdsDocumentEntryUniqueId)
+			throws XmlDocumentReadFailureException,
+			InvalidOriginalClinicalDocumentException,
+			InvalidSegmentedClinicalDocumentException;
 }

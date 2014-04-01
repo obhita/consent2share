@@ -362,12 +362,15 @@ public class XdsbRegistryAdapter {
 		// Extract documentUniqueId if there is an association in the submission
 		// set with a NewStatus slot having SUBMISSION_SET_STATUS_DEPRECATED
 		// value. Return null, if there is not any.
-		String xPathExpr = "//rim:Association[descendant::rim:Slot[@name='NewStatus']][descendant::rim:Value[.='"
-				+ SUBMISSION_SET_STATUS_DEPRECATED
-				+ "']]/preceding-sibling::rim:ExtrinsicObject[@objectType='"
-				+ UUID_XDS_DOCUMENTENTRY
-				+ "']/descendant::rim:ExternalIdentifier[@identificationScheme='"
-				+ UUID_XDS_DOCUMENTENTRY_UNIQUEID + "']/@value";
+		StringBuilder builder = new StringBuilder();
+		builder.append("//rim:Association[descendant::rim:Slot[@name='NewStatus']][descendant::rim:Value[.='");
+		builder.append(SUBMISSION_SET_STATUS_DEPRECATED);
+		builder.append("']]/preceding-sibling::rim:ExtrinsicObject[@objectType='");
+		builder.append(UUID_XDS_DOCUMENTENTRY);
+		builder.append("']/descendant::rim:ExternalIdentifier[@identificationScheme='");
+		builder.append(UUID_XDS_DOCUMENTENTRY_UNIQUEID);
+		builder.append("']/@value");		
+		String xPathExpr = builder.toString();
 		Node node = this.documentAccessor.getNode(responseDoc, xPathExpr);
 		if (node == null) {
 			return null;
@@ -719,7 +722,11 @@ public class XdsbRegistryAdapter {
 	void addPatientId(AdhocQueryType adhocQueryType, String patientUniqueId) {
 		if (!patientUniqueId.startsWith("'") || !patientUniqueId.endsWith("'")) {
 			patientUniqueId = patientUniqueId.replace("'", "");
-			patientUniqueId = "'" + patientUniqueId + "'";
+			StringBuilder builder = new StringBuilder();
+			builder.append("'");
+			builder.append(patientUniqueId);
+			builder.append("'");
+			patientUniqueId = builder.toString();
 		}
 		SlotType1 patientIdSlotType = new SlotType1();
 		patientIdSlotType.setName(SLOT_NAME_XDS_DOCUMENT_ENTRY_PATIENT_ID);

@@ -27,6 +27,7 @@ package gov.samhsa.consent2share.service.consent;
 
 import echosign.api.clientv15.dto8.EmbeddedWidgetCreationResult;
 import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.consent.ConsentBuilder;
 import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.consent.Consent;
@@ -69,6 +70,7 @@ import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
+import gov.samhsa.consent2share.service.dto.ConsentValidationDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
 
 import java.io.ByteArrayInputStream;
@@ -117,434 +119,486 @@ import org.w3c.dom.ProcessingInstruction;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
 /**
  * The Class ConsentServiceImpl.
  */
 @Service
 @Transactional
 public class ConsentServiceImpl implements ConsentService {
-	
+
 	/** The consent repository. */
 	@Autowired
-    private ConsentRepository consentRepository;
-	
+	private ConsentRepository consentRepository;
+
 	/** The consent pdf generator. */
 	@Autowired
 	private ConsentPdfGenerator consentPdfGenerator;
-	
+
 	/** The patient repository. */
 	@Autowired
 	private PatientRepository patientRepository;
-	
+
 	/** The individual provider repository. */
 	@Autowired
 	private IndividualProviderRepository individualProviderRepository;
-	
+
 	/** The organizational provider repository. */
 	@Autowired
 	private OrganizationalProviderRepository organizationalProviderRepository;
-	
+
 	/** The clinical document type code repository. */
 	@Autowired
 	private ClinicalDocumentTypeCodeRepository clinicalDocumentTypeCodeRepository;
-	
+
 	/** The clinical document section type code repository. */
 	@Autowired
 	private ClinicalDocumentSectionTypeCodeRepository clinicalDocumentSectionTypeCodeRepository;
-	
+
 	/** The value set category repository. */
 	@Autowired
 	private ValueSetCategoryRepository valueSetCategoryRepository;
-	
+
 	/** The purpose of use code repository. */
 	@Autowired
 	private PurposeOfUseCodeRepository purposeOfUseCodeRepository;
-	
+
 	/** The echo sign signature service. */
 	@Autowired
 	private EchoSignSignatureService echoSignSignatureService;
-	
+
 	/** The user context. */
 	@Autowired
 	private UserContext userContext;
-	
+
 	/** The consent revokation pdf generator. */
 	@Autowired
-	private ConsentRevokationPdfGenerator consentRevokationPdfGenerator; 
-	
+	private ConsentRevokationPdfGenerator consentRevokationPdfGenerator;
+
 	/** The consent export service. */
 	@Autowired
 	private ConsentExportService consentExportService;
-	
-	/** 	Try policy service. */
+
+	/** Try policy service. */
 	@Autowired
 	private TryPolicyService tryPolicyService;
-	
+
 	/** The consent builder. */
 	@Autowired
 	private ConsentBuilder consentBuilder;
-	
+
 	@Autowired
-	private	ConsentFactory consentFactory;
-	
+	private ConsentFactory consentFactory;
+
+	@Autowired
+	ConsentCheckService consentCheckService;
+
 	/** The logger. */
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	/**
 	 * Count all consents.
-	 *
+	 * 
 	 * @return the long
 	 */
 	public long countAllConsents() {
-        return consentRepository.count();
-    }
+		return consentRepository.count();
+	}
 
 	/**
 	 * Delete consent.
-	 *
-	 * @param consent the consent
+	 * 
+	 * @param consent
+	 *            the consent
 	 */
 	public void deleteConsent(Consent consent) {
-        consentRepository.delete(consent);
-    }
-	
+		consentRepository.delete(consent);
+	}
 
 	/**
 	 * Delete consent.
-	 *
-	 * @param consentId the consent id
+	 * 
+	 * @param consentId
+	 *            the consent id
 	 * @return true, if successful
 	 */
 	public boolean deleteConsent(Long consentId) {
 		Consent consent = null;
-		
-		try{
+
+		try {
 			consent = findConsent(consentId);
-		}catch(IllegalArgumentException e){
+		} catch (IllegalArgumentException e) {
 			logger.warn("Attempted to call findConsent(consentId) with null or invalid consentId from deleteConsent(Long consentId) method in ConsentService.");
 			logger.warn("The exception stack trace is: " + e);
 			return false;
 		}
-		
-		if (consent.getSignedPdfConsent()!=null){
-			if (consent.getSignedPdfConsent().getSignedPdfConsentContent()!=null){
+
+		if (consent.getSignedPdfConsent() != null) {
+			if (consent.getSignedPdfConsent().getSignedPdfConsentContent() != null) {
 				return false;
 			}
 		}
-		
-		try{
+
+		try {
 			consentRepository.delete(consent);
-		}catch(IllegalArgumentException e){
+		} catch (IllegalArgumentException e) {
 			logger.warn("Attempted to call consentRepository.delete(consent) with null or invalid consent from deleteConsent(Long consentId) method in ConsentService.");
 			logger.warn("The exception stack trace is: " + e);
 			return false;
 		}
-        
-        return true;
-    }
 
+		return true;
+	}
 
 	/**
 	 * Find consent.
-	 *
-	 * @param id the id
+	 * 
+	 * @param id
+	 *            the id
 	 * @return the consent
 	 */
 	public Consent findConsent(Long id) {
-        Consent consent = consentRepository.findOne(id);
-        return consent;
-    }
-
+		Consent consent = consentRepository.findOne(id);
+		return consent;
+	}
 
 	/**
 	 * Find all consents.
-	 *
+	 * 
 	 * @return the list
 	 */
 	public List<Consent> findAllConsents() {
-        return consentRepository.findAll();
-    }
-	
-	
+		return consentRepository.findAll();
+	}
 
 	/**
 	 * Sign consent.
-	 *
-	 * @param consentPdfDto the consent pdf dto
+	 * 
+	 * @param consentPdfDto
+	 *            the consent pdf dto
 	 * @return true, if successful
 	 */
 	@Override
-	public boolean signConsent(ConsentPdfDto consentPdfDto){
-		Consent consent=consentRepository.findOne(consentPdfDto.getId());
-		if(consent==null)
+	public boolean signConsent(ConsentPdfDto consentPdfDto) {
+		Consent consent = consentRepository.findOne(consentPdfDto.getId());
+		if (consent == null)
 			return false;
 		// SignConsent
 		SignedPDFConsent signedPdfConsent = makeSignedPdfConsent();
-		Patient patient=consent.getPatient();
-		String patientEmail=patient.getEmail();
-		
-		//Email hard-coded and to be changed
-		signedPdfConsent.setDocumentId((echoSignSignatureService.sendDocumentToSign(consentPdfDto.getContent(), 
-				consentPdfDto.getFilename()+".pdf", consentPdfDto.getConsentName(), 
-				patientEmail,"consent2share@gmail.com")));
-		signedPdfConsent.setDocumentNameBySender(consentPdfDto.getConsentName());
-		signedPdfConsent.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");
+		Patient patient = consent.getPatient();
+		String patientEmail = patient.getEmail();
+
+		// Email hard-coded and to be changed
+		signedPdfConsent.setDocumentId((echoSignSignatureService
+				.sendDocumentToSign(consentPdfDto.getContent(),
+						consentPdfDto.getFilename() + ".pdf",
+						consentPdfDto.getConsentName(), patientEmail,
+						"consent2share@gmail.com")));
+		signedPdfConsent
+				.setDocumentNameBySender(consentPdfDto.getConsentName());
+		signedPdfConsent
+				.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");
 		signedPdfConsent.setSignerEmail(patientEmail);
 		signedPdfConsent.setDocumentSignedStatus("Unsigned");
 		consent.setSignedPdfConsent(signedPdfConsent);
 		consentRepository.save(consent);
 		return true;
 	}
-	
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.service.consent.ConsentService#signConsentRevokation(gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent2share.service.consent.ConsentService#signConsentRevokation
+	 * (gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto)
 	 */
-	public void signConsentRevokation(ConsentRevokationPdfDto consentRevokationPdfDto){
-		Consent consent=consentRepository.findOne(consentRevokationPdfDto.getId());
+	public void signConsentRevokation(
+			ConsentRevokationPdfDto consentRevokationPdfDto) {
+		Consent consent = consentRepository.findOne(consentRevokationPdfDto
+				.getId());
 		// SignConsentRevokation
-		SignedPDFConsentRevocation signedPDFConsentRevocation=makeSignedPDFConsentRevocation();
-		Patient patient=consent.getPatient();
-		String patientEmail=patient.getEmail();
-		
-		//TODO:Email and Email message hard-coded and to be changed
-		signedPDFConsentRevocation.setDocumentId((echoSignSignatureService.sendDocumentToSign(consentRevokationPdfDto.getContent(), 
-				consentRevokationPdfDto.getFilename()+".pdf", consentRevokationPdfDto.getConsentName() + " Revocation", 
-				patientEmail,"consent2share@gmail.com")));
-		signedPDFConsentRevocation.setDocumentNameBySender(consentRevokationPdfDto.getConsentName());
-		signedPDFConsentRevocation.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");
+		SignedPDFConsentRevocation signedPDFConsentRevocation = makeSignedPDFConsentRevocation();
+		Patient patient = consent.getPatient();
+		String patientEmail = patient.getEmail();
+
+		// TODO:Email and Email message hard-coded and to be changed
+		signedPDFConsentRevocation.setDocumentId((echoSignSignatureService
+				.sendDocumentToSign(consentRevokationPdfDto.getContent(),
+						consentRevokationPdfDto.getFilename() + ".pdf",
+						consentRevokationPdfDto.getConsentName()
+								+ " Revocation", patientEmail,
+						"consent2share@gmail.com")));
+		signedPDFConsentRevocation
+				.setDocumentNameBySender(consentRevokationPdfDto
+						.getConsentName());
+		signedPDFConsentRevocation
+				.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");
 		signedPDFConsentRevocation.setSignerEmail("consent2share@gmail.com");
 		signedPDFConsentRevocation.setDocumentSignedStatus("Unsigned");
-		signedPDFConsentRevocation.setDocumentCreatedBy(consent.getPatient().getLastName()+", "+consent.getPatient().getFirstName());
-		signedPDFConsentRevocation.setDocumentSentOutForSignatureDateTime(new Date());
+		signedPDFConsentRevocation.setDocumentCreatedBy(consent.getPatient()
+				.getLastName() + ", " + consent.getPatient().getFirstName());
+		signedPDFConsentRevocation
+				.setDocumentSentOutForSignatureDateTime(new Date());
 		consent.setConsentRevoked(true);
 		consent.setSignedPdfConsentRevoke(signedPDFConsentRevocation);
-		
-		if(consentRevokationPdfDto.getRevokationType().equals("EMERGENCY ONLY"))
+
+		if (consentRevokationPdfDto.getRevokationType()
+				.equals("EMERGENCY ONLY"))
 			consent.setConsentRevokationType("EMERGENCY ONLY");
-		if(consentRevokationPdfDto.getRevokationType().equals("NO NEVER"))
+		if (consentRevokationPdfDto.getRevokationType().equals("NO NEVER"))
 			consent.setConsentRevokationType("NO NEVER");
-		
+
 		consentRepository.save(consent);
-		}
-	
+	}
+
 	/**
 	 * Make signed pdf consent revocation.
-	 *
+	 * 
 	 * @return the signed pdf consent revocation
 	 */
-	public SignedPDFConsentRevocation makeSignedPDFConsentRevocation(){
+	public SignedPDFConsentRevocation makeSignedPDFConsentRevocation() {
 		return new SignedPDFConsentRevocation();
 	}
-	
-	
 
 	/**
 	 * Make signed pdf consent.
-	 *
+	 * 
 	 * @return the signed pdf consent
 	 */
-	public SignedPDFConsent makeSignedPdfConsent(){
+	public SignedPDFConsent makeSignedPdfConsent() {
 		return new SignedPDFConsent();
 	}
-	
 
 	/**
 	 * Find consent pdf dto.
-	 *
-	 * @param consentId the consent id
+	 * 
+	 * @param consentId
+	 *            the consent id
 	 * @return the consent pdf dto
 	 */
-	public ConsentPdfDto findConsentPdfDto(Long consentId){
-		Consent consent=consentRepository.findOne(consentId);
-		ConsentPdfDto consentPdfDto=makeConsentPdfDto();
-		if (consent.getSignedPdfConsent()!=null){
-			if (consent.getSignedPdfConsent().getSignedPdfConsentContent()!=null){
-				consentPdfDto.setContent(consent.getSignedPdfConsent().getSignedPdfConsentContent());
-			}
-			else{
+	public ConsentPdfDto findConsentPdfDto(Long consentId) {
+		Consent consent = consentRepository.findOne(consentId);
+		ConsentPdfDto consentPdfDto = makeConsentPdfDto();
+		if (consent.getSignedPdfConsent() != null) {
+			if (consent.getSignedPdfConsent().getSignedPdfConsentContent() != null) {
+				consentPdfDto.setContent(consent.getSignedPdfConsent()
+						.getSignedPdfConsentContent());
+			} else {
 				consentPdfDto.setContent(consent.getUnsignedPdfConsent());
 			}
-		}
-		else{
+		} else {
 			consentPdfDto.setContent(consent.getUnsignedPdfConsent());
 		}
-		consentPdfDto.setFilename(consent.getPatient().getFirstName()+"_"+consent.getPatient().getLastName()+"_Consent"+consent.getId());
+		consentPdfDto.setFilename(consent.getPatient().getFirstName() + "_"
+				+ consent.getPatient().getLastName() + "_Consent"
+				+ consent.getId());
 		consentPdfDto.setConsentName(consent.getName());
 		consentPdfDto.setId(consentId);
 		return consentPdfDto;
 	}
-	
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.service.consent.ConsentService#findConsentRevokationPdfDto(java.lang.Long)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see gov.samhsa.consent2share.service.consent.ConsentService#
+	 * findConsentRevokationPdfDto(java.lang.Long)
 	 */
-	public ConsentRevokationPdfDto findConsentRevokationPdfDto(Long consentId){
-		Consent consent=consentRepository.findOne(consentId);
-		ConsentRevokationPdfDto consentRevokationPdfDto=makeConsentRevokationPdfDto();
-		if(consent.getSignedPdfConsentRevoke()!=null){
-			if(consent.getSignedPdfConsentRevoke().getSignedPdfConsentRevocationContent()!=null){
-				consentRevokationPdfDto.setContent(consent.getSignedPdfConsentRevoke().getSignedPdfConsentRevocationContent());
+	public ConsentRevokationPdfDto findConsentRevokationPdfDto(Long consentId) {
+		Consent consent = consentRepository.findOne(consentId);
+		ConsentRevokationPdfDto consentRevokationPdfDto = makeConsentRevokationPdfDto();
+		if (consent.getSignedPdfConsentRevoke() != null) {
+			if (consent.getSignedPdfConsentRevoke()
+					.getSignedPdfConsentRevocationContent() != null) {
+				consentRevokationPdfDto.setContent(consent
+						.getSignedPdfConsentRevoke()
+						.getSignedPdfConsentRevocationContent());
+			} else {
+				consentRevokationPdfDto.setContent(consent
+						.getUnsignedPdfConsentRevoke());
 			}
-			else{
-				consentRevokationPdfDto.setContent(consent.getUnsignedPdfConsentRevoke());
-			}
+		} else {
+			consentRevokationPdfDto.setContent(consent
+					.getUnsignedPdfConsentRevoke());
 		}
-		else{
-			consentRevokationPdfDto.setContent(consent.getUnsignedPdfConsentRevoke());
-		}
-		consentRevokationPdfDto.setFilename(consent.getPatient().getFirstName()+"_"
-				+consent.getPatient().getLastName()+"_ConsentRevokation"+consent.getId());
+		consentRevokationPdfDto.setFilename(consent.getPatient().getFirstName()
+				+ "_" + consent.getPatient().getLastName()
+				+ "_ConsentRevokation" + consent.getId());
 		consentRevokationPdfDto.setConsentName(consent.getName());
 		consentRevokationPdfDto.setId(consent.getId());
 		return consentRevokationPdfDto;
 	}
-	
+
 	/**
 	 * Make consent revokation pdf dto.
-	 *
+	 * 
 	 * @return the consent revokation pdf dto
 	 */
-	public ConsentRevokationPdfDto makeConsentRevokationPdfDto(){
+	public ConsentRevokationPdfDto makeConsentRevokationPdfDto() {
 		return new ConsentRevokationPdfDto();
 	}
 
 	/**
 	 * Make consent pdf dto.
-	 *
+	 * 
 	 * @return the consent pdf dto
 	 */
-	public ConsentPdfDto makeConsentPdfDto(){
+	public ConsentPdfDto makeConsentPdfDto() {
 		return new ConsentPdfDto();
 	}
-	
 
 	/**
 	 * Find all consents dto by patient.
-	 *
-	 * @param patientId the patient id
+	 * 
+	 * @param patientId
+	 *            the patient id
 	 * @return the list
 	 */
-	//@PreAuthorize("ROLE_USER")
-	public List<ConsentListDto> findAllConsentsDtoByPatient(Long patientId){
-		Patient patient=patientRepository.findOne(patientId);
+	// @PreAuthorize("ROLE_USER")
+	public List<ConsentListDto> findAllConsentsDtoByPatient(Long patientId) {
+		Patient patient = patientRepository.findOne(patientId);
 		List<Consent> consents = consentRepository.findByPatient(patient);
-		List<ConsentListDto> consentListDtos=makeConsentListDtos();
-		if (consents!=null)
-		consentListDtos=consentListToConsentListDtosConverter(consents);
+		List<ConsentListDto> consentListDtos = makeConsentListDtos();
+		if (consents != null)
+			consentListDtos = consentListToConsentListDtosConverter(consents);
 		return consentListDtos;
 	}
-	
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.service.consent.ConsentService#findAllConsentsDtoByUserName(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see gov.samhsa.consent2share.service.consent.ConsentService#
+	 * findAllConsentsDtoByUserName(java.lang.String)
 	 */
 	@Override
-	public List<ConsentListDto> findAllConsentsDtoByUserName(String userName){
-		Patient patient=patientRepository.findByUsername(userName);
+	public List<ConsentListDto> findAllConsentsDtoByUserName(String userName) {
+		Patient patient = patientRepository.findByUsername(userName);
 		List<Consent> consents = consentRepository.findByPatient(patient);
-		List<ConsentListDto> consentListDtos=makeConsentListDtos();
-		if (consents!=null)
-		consentListDtos=consentListToConsentListDtosConverter(consents);
+		List<ConsentListDto> consentListDtos = makeConsentListDtos();
+		if (consents != null)
+			consentListDtos = consentListToConsentListDtosConverter(consents);
 		return consentListDtos;
 	}
-	
+
 	/**
 	 * Consent list to consent list dtos converter.
-	 *
-	 * @param consents the consents
+	 * 
+	 * @param consents
+	 *            the consents
 	 * @return the list
 	 */
-	public List<ConsentListDto> consentListToConsentListDtosConverter(List<Consent> consents) {
-		List<ConsentListDto> consentListDtos=makeConsentListDtos();
-		for (Consent consent:consents){
-			ConsentListDto consentListDto=new ConsentListDto();
-			//Get fields
-			Set<String> isMadeToName=new HashSet<String>();
-			for (ConsentIndividualProviderDisclosureIsMadeTo item:consent.getProvidersDisclosureIsMadeTo()){
-				String name=item.getIndividualProvider().getLastName()+", "+
-						item.getIndividualProvider().getFirstName();
+	public List<ConsentListDto> consentListToConsentListDtosConverter(
+			List<Consent> consents) {
+		List<ConsentListDto> consentListDtos = makeConsentListDtos();
+		for (Consent consent : consents) {
+			ConsentListDto consentListDto = new ConsentListDto();
+			// Get fields
+			Set<String> isMadeToName = new HashSet<String>();
+			for (ConsentIndividualProviderDisclosureIsMadeTo item : consent
+					.getProvidersDisclosureIsMadeTo()) {
+				String name = item.getIndividualProvider().getLastName() + ", "
+						+ item.getIndividualProvider().getFirstName();
 				isMadeToName.add(name);
 			}
-			Set<String> isMadeToOrgName=new HashSet<String>();
-			for (ConsentOrganizationalProviderDisclosureIsMadeTo item:consent.getOrganizationalProvidersDisclosureIsMadeTo()){
-				isMadeToOrgName.add(item.getOrganizationalProvider().getOrgName());
+			Set<String> isMadeToOrgName = new HashSet<String>();
+			for (ConsentOrganizationalProviderDisclosureIsMadeTo item : consent
+					.getOrganizationalProvidersDisclosureIsMadeTo()) {
+				isMadeToOrgName.add(item.getOrganizationalProvider()
+						.getOrgName());
 			}
 
-			Set<String> toDiscloseName=new HashSet<String>();
-			for (ConsentIndividualProviderPermittedToDisclose item:consent.getProvidersPermittedToDisclose()){
-				String name=item.getIndividualProvider().getLastName()+", "+
-						item.getIndividualProvider().getFirstName();
+			Set<String> toDiscloseName = new HashSet<String>();
+			for (ConsentIndividualProviderPermittedToDisclose item : consent
+					.getProvidersPermittedToDisclose()) {
+				String name = item.getIndividualProvider().getLastName() + ", "
+						+ item.getIndividualProvider().getFirstName();
 				toDiscloseName.add(name);
 			}
 
-			Set<String> toDiscloseOrgName=new HashSet<String>();
-			for (ConsentOrganizationalProviderPermittedToDisclose item:consent.getOrganizationalProvidersPermittedToDisclose()){
-				toDiscloseOrgName.add(item.getOrganizationalProvider().getOrgName());
+			Set<String> toDiscloseOrgName = new HashSet<String>();
+			for (ConsentOrganizationalProviderPermittedToDisclose item : consent
+					.getOrganizationalProvidersPermittedToDisclose()) {
+				toDiscloseOrgName.add(item.getOrganizationalProvider()
+						.getOrgName());
 			}
 
-			Set<String> consentDoNotShareClinicalDocumentTypeCode=new HashSet<String>();
-			for (ConsentDoNotShareClinicalDocumentTypeCode item:consent.getDoNotShareClinicalDocumentTypeCodes()){
-				consentDoNotShareClinicalDocumentTypeCode.add(item.getClinicalDocumentTypeCode().getDisplayName());
+			Set<String> consentDoNotShareClinicalDocumentTypeCode = new HashSet<String>();
+			for (ConsentDoNotShareClinicalDocumentTypeCode item : consent
+					.getDoNotShareClinicalDocumentTypeCodes()) {
+				consentDoNotShareClinicalDocumentTypeCode.add(item
+						.getClinicalDocumentTypeCode().getDisplayName());
 			}
 
-			Set<String> consentDoNotShareClinicalDocumentSectionTypeCode=new HashSet<String>();
-			for (ConsentDoNotShareClinicalDocumentSectionTypeCode item:consent.getDoNotShareClinicalDocumentSectionTypeCodes()){
-				consentDoNotShareClinicalDocumentSectionTypeCode.add(item.getClinicalDocumentSectionTypeCode().getDisplayName());
+			Set<String> consentDoNotShareClinicalDocumentSectionTypeCode = new HashSet<String>();
+			for (ConsentDoNotShareClinicalDocumentSectionTypeCode item : consent
+					.getDoNotShareClinicalDocumentSectionTypeCodes()) {
+				consentDoNotShareClinicalDocumentSectionTypeCode.add(item
+						.getClinicalDocumentSectionTypeCode().getDisplayName());
 			}
 
-			Set<String> consentDoNotShareSensitivityPolicyCode=new HashSet<String>();
-			for (ConsentDoNotShareSensitivityPolicyCode item:consent.getDoNotShareSensitivityPolicyCodes()){
-				consentDoNotShareSensitivityPolicyCode.add(item.getValueSetCategory().getName());
+			Set<String> consentDoNotShareSensitivityPolicyCode = new HashSet<String>();
+			for (ConsentDoNotShareSensitivityPolicyCode item : consent
+					.getDoNotShareSensitivityPolicyCodes()) {
+				consentDoNotShareSensitivityPolicyCode.add(item
+						.getValueSetCategory().getName());
 			}
 
-			Set<String> consentShareForPurposeOfUseCode=new HashSet<String>();
-			for (ConsentShareForPurposeOfUseCode item:consent.getShareForPurposeOfUseCodes()){
-				consentShareForPurposeOfUseCode.add(item.getPurposeOfUseCode().getDisplayName());
+			Set<String> consentShareForPurposeOfUseCode = new HashSet<String>();
+			for (ConsentShareForPurposeOfUseCode item : consent
+					.getShareForPurposeOfUseCodes()) {
+				consentShareForPurposeOfUseCode.add(item.getPurposeOfUseCode()
+						.getDisplayName());
 			}
 
-			Set<String> consentDoNotShareClinicalConceptCodes=new HashSet<String>();
-			for (ClinicalConceptCode item:consent.getDoNotShareClinicalConceptCodes()){
-				consentDoNotShareClinicalConceptCodes.add(item.getDisplayName());
+			Set<String> consentDoNotShareClinicalConceptCodes = new HashSet<String>();
+			for (ClinicalConceptCode item : consent
+					.getDoNotShareClinicalConceptCodes()) {
+				consentDoNotShareClinicalConceptCodes
+						.add(item.getDisplayName());
 			}
-			
-			if (consent.getSignedPdfConsent()!=null){
-				if(consent.getSignedPdfConsent().getDocumentSignedStatus().equals("SIGNED"))
+
+			if (consent.getSignedPdfConsent() != null) {
+				if (consent.getSignedPdfConsent().getDocumentSignedStatus()
+						.equals("SIGNED"))
 					consentListDto.setConsentStage("CONSENT_SIGNED");
-				else 
+				else
 					consentListDto.setConsentStage("CONSENT_SAVED");
-			}
-			else
+			} else
 				consentListDto.setConsentStage("CONSENT_SAVED");
 
-			if (!consentListDto.getConsentStage().equals("CONSENT_SIGNED")){
+			if (!consentListDto.getConsentStage().equals("CONSENT_SIGNED")) {
 				consentListDto.setRevokeStage("NA");
-			}
-			else{
-				if (consent.getSignedPdfConsentRevoke()!=null)
-					if(consent.getSignedPdfConsentRevoke().getDocumentSignedStatus().equals("SIGNED"))
+			} else {
+				if (consent.getSignedPdfConsentRevoke() != null)
+					if (consent.getSignedPdfConsentRevoke()
+							.getDocumentSignedStatus().equals("SIGNED"))
 						consentListDto.setRevokeStage("REVOCATION_REVOKED");
 					else
-						consentListDto.setRevokeStage("REVOCATION_NOT_SUBMITTED");
+						consentListDto
+								.setRevokeStage("REVOCATION_NOT_SUBMITTED");
 				else
 					consentListDto.setRevokeStage("REVOCATION_NOT_SUBMITTED");
 			}
 
-
-			//Set fields
+			// Set fields
 			isMadeToName.addAll(isMadeToOrgName);
 			toDiscloseName.addAll(toDiscloseOrgName);
-			consentListDto.setDoNotShareClinicalConceptCodes(consentDoNotShareClinicalConceptCodes);
+			consentListDto
+					.setDoNotShareClinicalConceptCodes(consentDoNotShareClinicalConceptCodes);
 			consentListDto.setId(Long.toString(consent.getId()));
 			consentListDto.setIsMadeToName(isMadeToName);
 			consentListDto.setToDiscloseName(toDiscloseName);
-			consentListDto.setDoNotShareClinicalDocumentSectionTypeCodes(consentDoNotShareClinicalDocumentSectionTypeCode);
-			consentListDto.setDoNotShareClinicalDocumentTypeCodes(consentDoNotShareClinicalDocumentTypeCode);
-			consentListDto.setShareForPurposeOfUseCodes(consentShareForPurposeOfUseCode);
-			consentListDto.setDoNotShareSensitivityPolicyCodes(consentDoNotShareSensitivityPolicyCode);
-			
+			consentListDto
+					.setDoNotShareClinicalDocumentSectionTypeCodes(consentDoNotShareClinicalDocumentSectionTypeCode);
+			consentListDto
+					.setDoNotShareClinicalDocumentTypeCodes(consentDoNotShareClinicalDocumentTypeCode);
+			consentListDto
+					.setShareForPurposeOfUseCodes(consentShareForPurposeOfUseCode);
+			consentListDto
+					.setDoNotShareSensitivityPolicyCodes(consentDoNotShareSensitivityPolicyCode);
+
 			consentListDto.setConsentStart(consent.getStartDate());
 			consentListDto.setConsentEnd(consent.getEndDate());
-				
-			//Merge all Dtos
+
+			// Merge all Dtos
 			consentListDtos.add(consentListDto);
 		}
 		return consentListDtos;
@@ -552,516 +606,602 @@ public class ConsentServiceImpl implements ConsentService {
 
 	/**
 	 * Make consent list dtos.
-	 *
+	 * 
 	 * @return the array list
 	 */
-	public ArrayList<ConsentListDto> makeConsentListDtos(){
+	public ArrayList<ConsentListDto> makeConsentListDtos() {
 		return new ArrayList<ConsentListDto>();
 	}
 
-
 	/**
 	 * Find consent entries.
-	 *
-	 * @param firstResult the first result
-	 * @param maxResults the max results
+	 * 
+	 * @param firstResult
+	 *            the first result
+	 * @param maxResults
+	 *            the max results
 	 * @return the list
 	 */
 	public List<Consent> findConsentEntries(int firstResult, int maxResults) {
-        return consentRepository.findAll(new org.springframework.data.domain.PageRequest(firstResult / maxResults, maxResults)).getContent();
-    }
-
+		return consentRepository.findAll(
+				new org.springframework.data.domain.PageRequest(firstResult
+						/ maxResults, maxResults)).getContent();
+	}
 
 	/**
 	 * Save consent.
-	 *
-	 * @param consent the consent
+	 * 
+	 * @param consent
+	 *            the consent
 	 */
 	public void saveConsent(Consent consent) {
-        consentRepository.save(consent);
-    }
-
+		consentRepository.save(consent);
+	}
 
 	/**
 	 * Update consent.
-	 *
-	 * @param consent the consent
+	 * 
+	 * @param consent
+	 *            the consent
 	 * @return the consent
 	 */
 	public Consent updateConsent(Consent consent) {
-        return consentRepository.save(consent);
-    }
-	
-
-    /**
-     * Save consent.
-     *
-     * @param consentDto the consent dto
-     * @throws ConsentGenException the consent gen exception
-     */
-    public void saveConsent(ConsentDto consentDto) throws ConsentGenException {
-	Consent consent = makeConsent();
-	Patient patient = patientRepository.findByUsername(consentDto.getUsername());
-	Map<String, AbstractProvider> providerMap=new HashMap<String, AbstractProvider>();
-	for (IndividualProvider o:patient.getIndividualProviders())
-		providerMap.put(o.getNpi(),o);
-	for (OrganizationalProvider o:patient.getOrganizationalProviders())
-		providerMap.put(o.getNpi(), o);
-	if (consentDto.getId() != null && Long.parseLong(consentDto.getId()) > 0)
-	    consent = consentRepository.findOne(Long.parseLong(consentDto.getId()));
-
-	// Set Providers
-	if (consentDto.getProvidersDisclosureIsMadeTo() != null) {
-	    Set<ConsentIndividualProviderDisclosureIsMadeTo> providersDisclosureIsMadeTo = new HashSet<ConsentIndividualProviderDisclosureIsMadeTo>();
-	    for (String item : consentDto.getProvidersDisclosureIsMadeTo()) {
-		IndividualProvider individualProvider = (IndividualProvider) providerMap.get(item);
-		ConsentIndividualProviderDisclosureIsMadeTo consentIndividualProviderPermittedToDisclose = new ConsentIndividualProviderDisclosureIsMadeTo(
-			individualProvider);
-		providersDisclosureIsMadeTo.add(consentIndividualProviderPermittedToDisclose);
-	    }
-	    consent.setProvidersDisclosureIsMadeTo(providersDisclosureIsMadeTo);
-	} else
-	    consent.setProvidersDisclosureIsMadeTo(new HashSet<ConsentIndividualProviderDisclosureIsMadeTo>());
-
-	if (consentDto.getProvidersPermittedToDisclose() != null) {
-	    Set<ConsentIndividualProviderPermittedToDisclose> providersPermittedToDisclose = new HashSet<ConsentIndividualProviderPermittedToDisclose>();
-	    for (String item : consentDto.getProvidersPermittedToDisclose()) {
-		IndividualProvider individualProvider = (IndividualProvider) providerMap.get(item);
-		ConsentIndividualProviderPermittedToDisclose consentIndividualProviderPermittedToDisclose = new ConsentIndividualProviderPermittedToDisclose(
-			individualProvider);
-		providersPermittedToDisclose.add(consentIndividualProviderPermittedToDisclose);
-	    }
-	    consent.setProvidersPermittedToDisclose(providersPermittedToDisclose);
+		return consentRepository.save(consent);
 	}
-	else
-	    consent.setProvidersPermittedToDisclose(new HashSet<ConsentIndividualProviderPermittedToDisclose>());
 
-	if (consentDto.getOrganizationalProvidersDisclosureIsMadeTo() != null) {
-	    Set<ConsentOrganizationalProviderDisclosureIsMadeTo> organizationalProvidersDisclosureIsMadeTo = new HashSet<ConsentOrganizationalProviderDisclosureIsMadeTo>();
-	    for (String item : consentDto.getOrganizationalProvidersDisclosureIsMadeTo()) {
-		OrganizationalProvider organizationalProvider = (OrganizationalProvider) providerMap.get(item);
-		ConsentOrganizationalProviderDisclosureIsMadeTo consentOrganizationalProviderPermittedToDisclose = new ConsentOrganizationalProviderDisclosureIsMadeTo(
-			organizationalProvider);
-		organizationalProvidersDisclosureIsMadeTo.add(consentOrganizationalProviderPermittedToDisclose);
-	    }
-	    consent.setOrganizationalProvidersDisclosureIsMadeTo(organizationalProvidersDisclosureIsMadeTo);
-	}
-	else
-	    consent.setOrganizationalProvidersDisclosureIsMadeTo(new HashSet<ConsentOrganizationalProviderDisclosureIsMadeTo>());
-
-	if (consentDto.getOrganizationalProvidersPermittedToDisclose() != null) {
-	    Set<ConsentOrganizationalProviderPermittedToDisclose> organizationalProvidersPermittedToDisclose = new HashSet<ConsentOrganizationalProviderPermittedToDisclose>();
-	    for (String item : consentDto.getOrganizationalProvidersPermittedToDisclose()) {
-		OrganizationalProvider organizationalProvider = (OrganizationalProvider) providerMap.get(item);
-		ConsentOrganizationalProviderPermittedToDisclose consentOrganizationalProviderPermittedToDisclose = new ConsentOrganizationalProviderPermittedToDisclose(
-			organizationalProvider);
-		organizationalProvidersPermittedToDisclose.add(consentOrganizationalProviderPermittedToDisclose);
-	    }
-	    consent.setOrganizationalProvidersPermittedToDisclose(organizationalProvidersPermittedToDisclose);
-	}
-	else
-	    consent.setOrganizationalProvidersPermittedToDisclose(new HashSet<ConsentOrganizationalProviderPermittedToDisclose>());
-	    
-	// Set Do Not Shares
-	if (consentDto.getDoNotShareClinicalDocumentTypeCodes() != null) {
-	    Set<ConsentDoNotShareClinicalDocumentTypeCode> doNotShareClinicalDocumentTypeCodes = new HashSet<ConsentDoNotShareClinicalDocumentTypeCode>();
-	    for (String item : consentDto.getDoNotShareClinicalDocumentTypeCodes()) {
-		ClinicalDocumentTypeCode clinicalDocumentTypeCode = clinicalDocumentTypeCodeRepository.findByCode(item);
-		ConsentDoNotShareClinicalDocumentTypeCode consentDoNotShareClinicalDocumentTypeCode = new ConsentDoNotShareClinicalDocumentTypeCode(
-			clinicalDocumentTypeCode);
-		doNotShareClinicalDocumentTypeCodes.add(consentDoNotShareClinicalDocumentTypeCode);
-	    }
-	    consent.setDoNotShareClinicalDocumentTypeCodes(doNotShareClinicalDocumentTypeCodes);
-	}
-	else
-	    consent.setDoNotShareClinicalDocumentTypeCodes(new HashSet<ConsentDoNotShareClinicalDocumentTypeCode>());
-
-	if (consentDto.getDoNotShareClinicalDocumentSectionTypeCodes() != null) {
-	    Set<ConsentDoNotShareClinicalDocumentSectionTypeCode> doNotShareClinicalDocumentSectionTypeCodes = new HashSet<ConsentDoNotShareClinicalDocumentSectionTypeCode>();
-	    for (String item : consentDto.getDoNotShareClinicalDocumentSectionTypeCodes()) {
-		ClinicalDocumentSectionTypeCode clinicalDocumentSectionTypeCode = clinicalDocumentSectionTypeCodeRepository
-			.findByCode(item);
-		ConsentDoNotShareClinicalDocumentSectionTypeCode consentDoNotShareClinicalDocumentSectionTypeCode = new ConsentDoNotShareClinicalDocumentSectionTypeCode(
-			clinicalDocumentSectionTypeCode);
-		doNotShareClinicalDocumentSectionTypeCodes.add(consentDoNotShareClinicalDocumentSectionTypeCode);
-	    }
-	    consent.setDoNotShareClinicalDocumentSectionTypeCodes(doNotShareClinicalDocumentSectionTypeCodes);
-	}
-	else
-	    consent.setDoNotShareClinicalDocumentSectionTypeCodes(new HashSet<ConsentDoNotShareClinicalDocumentSectionTypeCode>());
-
-	if (consentDto.getDoNotShareSensitivityPolicyCodes() != null) {
-	    Set<ConsentDoNotShareSensitivityPolicyCode> doNotShareSensitivityPolicyCodes = new HashSet<ConsentDoNotShareSensitivityPolicyCode>();
-	    for (String item : consentDto.getDoNotShareSensitivityPolicyCodes()) {
-		ValueSetCategory valueSetCategory = valueSetCategoryRepository.findByCode(item);
-		ConsentDoNotShareSensitivityPolicyCode consentDoNotShareSensitivityPolicyCode = new ConsentDoNotShareSensitivityPolicyCode(
-				valueSetCategory);
-		doNotShareSensitivityPolicyCodes.add(consentDoNotShareSensitivityPolicyCode);
-	    }
-	    consent.setDoNotShareSensitivityPolicyCodes(doNotShareSensitivityPolicyCodes);
-	}
-	else
-	    consent.setDoNotShareSensitivityPolicyCodes(new HashSet<ConsentDoNotShareSensitivityPolicyCode>());
-	
-	if (consentDto.getShareForPurposeOfUseCodes() != null) {
-	    Set<ConsentShareForPurposeOfUseCode> shareForPurposeOfUseCodes = new HashSet<ConsentShareForPurposeOfUseCode>();
-	    for (String item : consentDto.getShareForPurposeOfUseCodes()) {
-		PurposeOfUseCode purposeOfUseCode = purposeOfUseCodeRepository.findByCode(item);
-		ConsentShareForPurposeOfUseCode consentShareForPurposeOfUseCode = new ConsentShareForPurposeOfUseCode(
-			purposeOfUseCode);
-		shareForPurposeOfUseCodes.add(consentShareForPurposeOfUseCode);
-	    }
-	    consent.setShareForPurposeOfUseCodes(shareForPurposeOfUseCodes);
-	}
-	else
-	    consent.setShareForPurposeOfUseCodes(new HashSet<ConsentShareForPurposeOfUseCode>());
-
-	if (consentDto.getDoNotShareClinicalConceptCodes() != null) {
-	    Set<ClinicalConceptCode> doNotShareClinicalConceptCodes = new HashSet<ClinicalConceptCode>();
-	    for (SpecificMedicalInfoDto item : consentDto.getDoNotShareClinicalConceptCodes()) {
-		ClinicalConceptCode clinicalConceptCode = new ClinicalConceptCode();
-		clinicalConceptCode.setCode(item.getCode());
-		clinicalConceptCode.setCodeSystem(item.getCodeSystem());
-		clinicalConceptCode.setCodeSystemName(item.getCodeSystem());
-		clinicalConceptCode.setDisplayName(item.getDisplayName());
-		doNotShareClinicalConceptCodes.add(clinicalConceptCode);
-	    }
-	    consent.setDoNotShareClinicalConceptCodes(doNotShareClinicalConceptCodes);
-	}
-	else
-	    consent.setDoNotShareClinicalConceptCodes(new HashSet<ClinicalConceptCode>());
-
-	// Set Dates	
-	consent.setStartDate(consentDto.getConsentStart());
-	consent.setEndDate(consentDto.getConsentEnd());
-
-	consent.setPatient(patient);
-	consent.setName("Consent");
-	consent.setDescription("This is a consent made by " + patient.getFirstName() + " " + patient.getLastName());
-	consent.setUnsignedPdfConsent(consentPdfGenerator.generate42CfrPart2Pdf(consent));
-	try {
-		consent.setXacmlPolicyFile(consentExportService.exportConsent2XACML(consent).getBytes());
-	} catch (ConsentGenException e) {
-		logger.error("Error in saving consent in xacml format",e);
-		throw new ConsentGenException(e.getMessage());
-	}
-	
-	if(consent.getId()!=null)
-	consentRepository.save(consent);
-	else consentFactory.createNewConsent(consent);
-
-    }
-	
-	
-
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.service.consent.ConsentService#addUnsignedConsentRevokationPdf(java.lang.Long, java.lang.String)
+	/**
+	 * Save consent.
+	 * 
+	 * @param consentDto
+	 *            the consent dto
+	 * @throws ConsentGenException
+	 *             the consent gen exception
+	 * @throws DuplicateConsentException
 	 */
-	public void addUnsignedConsentRevokationPdf(Long consentId,String revokationType){
-		Consent consent=consentRepository.findOne(consentId);
+	public Object saveConsent(ConsentDto consentDto, long patientId)
+			throws ConsentGenException {
+
+		// check for duplicate policy
+		ConsentValidationDto consentValidationDto = consentCheckService
+				.getConflictConsent(consentDto);
+		if (null != consentValidationDto) {
+			logger.debug("duplicate policy found");
+			return consentValidationDto;
+		}
+		Consent consent = makeConsent();
+		Patient patient;
+		if (patientId != 0)
+			patient = patientRepository.findOne(patientId);
+		else
+			patient = patientRepository
+					.findByUsername(consentDto.getUsername());
+		patient = patientRepository.findByUsername(consentDto.getUsername());
+		Map<String, AbstractProvider> providerMap = new HashMap<String, AbstractProvider>();
+		for (IndividualProvider o : patient.getIndividualProviders())
+			providerMap.put(o.getNpi(), o);
+		for (OrganizationalProvider o : patient.getOrganizationalProviders())
+			providerMap.put(o.getNpi(), o);
+		if (consentDto.getId() != null
+				&& Long.parseLong(consentDto.getId()) > 0)
+			consent = consentRepository.findOne(Long.parseLong(consentDto
+					.getId()));
+
+		// Set Providers
+		if (consentDto.getProvidersDisclosureIsMadeTo() != null) {
+			Set<ConsentIndividualProviderDisclosureIsMadeTo> providersDisclosureIsMadeTo = new HashSet<ConsentIndividualProviderDisclosureIsMadeTo>();
+			for (String item : consentDto.getProvidersDisclosureIsMadeTo()) {
+				IndividualProvider individualProvider = (IndividualProvider) providerMap
+						.get(item);
+				ConsentIndividualProviderDisclosureIsMadeTo consentIndividualProviderPermittedToDisclose = new ConsentIndividualProviderDisclosureIsMadeTo(
+						individualProvider);
+				providersDisclosureIsMadeTo
+						.add(consentIndividualProviderPermittedToDisclose);
+			}
+			consent.setProvidersDisclosureIsMadeTo(providersDisclosureIsMadeTo);
+		} else
+			consent.setProvidersDisclosureIsMadeTo(new HashSet<ConsentIndividualProviderDisclosureIsMadeTo>());
+
+		if (consentDto.getProvidersPermittedToDisclose() != null) {
+			Set<ConsentIndividualProviderPermittedToDisclose> providersPermittedToDisclose = new HashSet<ConsentIndividualProviderPermittedToDisclose>();
+			for (String item : consentDto.getProvidersPermittedToDisclose()) {
+				IndividualProvider individualProvider = (IndividualProvider) providerMap
+						.get(item);
+				ConsentIndividualProviderPermittedToDisclose consentIndividualProviderPermittedToDisclose = new ConsentIndividualProviderPermittedToDisclose(
+						individualProvider);
+				providersPermittedToDisclose
+						.add(consentIndividualProviderPermittedToDisclose);
+			}
+			consent.setProvidersPermittedToDisclose(providersPermittedToDisclose);
+		} else
+			consent.setProvidersPermittedToDisclose(new HashSet<ConsentIndividualProviderPermittedToDisclose>());
+
+		if (consentDto.getOrganizationalProvidersDisclosureIsMadeTo() != null) {
+			Set<ConsentOrganizationalProviderDisclosureIsMadeTo> organizationalProvidersDisclosureIsMadeTo = new HashSet<ConsentOrganizationalProviderDisclosureIsMadeTo>();
+			for (String item : consentDto
+					.getOrganizationalProvidersDisclosureIsMadeTo()) {
+				OrganizationalProvider organizationalProvider = (OrganizationalProvider) providerMap
+						.get(item);
+				ConsentOrganizationalProviderDisclosureIsMadeTo consentOrganizationalProviderPermittedToDisclose = new ConsentOrganizationalProviderDisclosureIsMadeTo(
+						organizationalProvider);
+				organizationalProvidersDisclosureIsMadeTo
+						.add(consentOrganizationalProviderPermittedToDisclose);
+			}
+			consent.setOrganizationalProvidersDisclosureIsMadeTo(organizationalProvidersDisclosureIsMadeTo);
+		} else
+			consent.setOrganizationalProvidersDisclosureIsMadeTo(new HashSet<ConsentOrganizationalProviderDisclosureIsMadeTo>());
+
+		if (consentDto.getOrganizationalProvidersPermittedToDisclose() != null) {
+			Set<ConsentOrganizationalProviderPermittedToDisclose> organizationalProvidersPermittedToDisclose = new HashSet<ConsentOrganizationalProviderPermittedToDisclose>();
+			for (String item : consentDto
+					.getOrganizationalProvidersPermittedToDisclose()) {
+				OrganizationalProvider organizationalProvider = (OrganizationalProvider) providerMap
+						.get(item);
+				ConsentOrganizationalProviderPermittedToDisclose consentOrganizationalProviderPermittedToDisclose = new ConsentOrganizationalProviderPermittedToDisclose(
+						organizationalProvider);
+				organizationalProvidersPermittedToDisclose
+						.add(consentOrganizationalProviderPermittedToDisclose);
+			}
+			consent.setOrganizationalProvidersPermittedToDisclose(organizationalProvidersPermittedToDisclose);
+		} else
+			consent.setOrganizationalProvidersPermittedToDisclose(new HashSet<ConsentOrganizationalProviderPermittedToDisclose>());
+
+		// Set Do Not Shares
+		if (consentDto.getDoNotShareClinicalDocumentTypeCodes() != null) {
+			Set<ConsentDoNotShareClinicalDocumentTypeCode> doNotShareClinicalDocumentTypeCodes = new HashSet<ConsentDoNotShareClinicalDocumentTypeCode>();
+			for (String item : consentDto
+					.getDoNotShareClinicalDocumentTypeCodes()) {
+				ClinicalDocumentTypeCode clinicalDocumentTypeCode = clinicalDocumentTypeCodeRepository
+						.findByCode(item);
+				ConsentDoNotShareClinicalDocumentTypeCode consentDoNotShareClinicalDocumentTypeCode = new ConsentDoNotShareClinicalDocumentTypeCode(
+						clinicalDocumentTypeCode);
+				doNotShareClinicalDocumentTypeCodes
+						.add(consentDoNotShareClinicalDocumentTypeCode);
+			}
+			consent.setDoNotShareClinicalDocumentTypeCodes(doNotShareClinicalDocumentTypeCodes);
+		} else
+			consent.setDoNotShareClinicalDocumentTypeCodes(new HashSet<ConsentDoNotShareClinicalDocumentTypeCode>());
+
+		if (consentDto.getDoNotShareClinicalDocumentSectionTypeCodes() != null) {
+			Set<ConsentDoNotShareClinicalDocumentSectionTypeCode> doNotShareClinicalDocumentSectionTypeCodes = new HashSet<ConsentDoNotShareClinicalDocumentSectionTypeCode>();
+			for (String item : consentDto
+					.getDoNotShareClinicalDocumentSectionTypeCodes()) {
+				ClinicalDocumentSectionTypeCode clinicalDocumentSectionTypeCode = clinicalDocumentSectionTypeCodeRepository
+						.findByCode(item);
+				ConsentDoNotShareClinicalDocumentSectionTypeCode consentDoNotShareClinicalDocumentSectionTypeCode = new ConsentDoNotShareClinicalDocumentSectionTypeCode(
+						clinicalDocumentSectionTypeCode);
+				doNotShareClinicalDocumentSectionTypeCodes
+						.add(consentDoNotShareClinicalDocumentSectionTypeCode);
+			}
+			consent.setDoNotShareClinicalDocumentSectionTypeCodes(doNotShareClinicalDocumentSectionTypeCodes);
+		} else
+			consent.setDoNotShareClinicalDocumentSectionTypeCodes(new HashSet<ConsentDoNotShareClinicalDocumentSectionTypeCode>());
+
+		if (consentDto.getDoNotShareSensitivityPolicyCodes() != null) {
+			Set<ConsentDoNotShareSensitivityPolicyCode> doNotShareSensitivityPolicyCodes = new HashSet<ConsentDoNotShareSensitivityPolicyCode>();
+			for (String item : consentDto.getDoNotShareSensitivityPolicyCodes()) {
+				ValueSetCategory valueSetCategory = valueSetCategoryRepository
+						.findByCode(item);
+				ConsentDoNotShareSensitivityPolicyCode consentDoNotShareSensitivityPolicyCode = new ConsentDoNotShareSensitivityPolicyCode(
+						valueSetCategory);
+				doNotShareSensitivityPolicyCodes
+						.add(consentDoNotShareSensitivityPolicyCode);
+			}
+			consent.setDoNotShareSensitivityPolicyCodes(doNotShareSensitivityPolicyCodes);
+		} else
+			consent.setDoNotShareSensitivityPolicyCodes(new HashSet<ConsentDoNotShareSensitivityPolicyCode>());
+
+		if (consentDto.getShareForPurposeOfUseCodes() != null) {
+			Set<ConsentShareForPurposeOfUseCode> shareForPurposeOfUseCodes = new HashSet<ConsentShareForPurposeOfUseCode>();
+			for (String item : consentDto.getShareForPurposeOfUseCodes()) {
+				PurposeOfUseCode purposeOfUseCode = purposeOfUseCodeRepository
+						.findByCode(item);
+				ConsentShareForPurposeOfUseCode consentShareForPurposeOfUseCode = new ConsentShareForPurposeOfUseCode(
+						purposeOfUseCode);
+				shareForPurposeOfUseCodes.add(consentShareForPurposeOfUseCode);
+			}
+			consent.setShareForPurposeOfUseCodes(shareForPurposeOfUseCodes);
+		} else
+			consent.setShareForPurposeOfUseCodes(new HashSet<ConsentShareForPurposeOfUseCode>());
+
+		if (consentDto.getDoNotShareClinicalConceptCodes() != null) {
+			Set<ClinicalConceptCode> doNotShareClinicalConceptCodes = new HashSet<ClinicalConceptCode>();
+			for (SpecificMedicalInfoDto item : consentDto
+					.getDoNotShareClinicalConceptCodes()) {
+				ClinicalConceptCode clinicalConceptCode = new ClinicalConceptCode();
+				clinicalConceptCode.setCode(item.getCode());
+				clinicalConceptCode.setCodeSystem(item.getCodeSystem());
+				clinicalConceptCode.setCodeSystemName(item.getCodeSystem());
+				clinicalConceptCode.setDisplayName(item.getDisplayName());
+				doNotShareClinicalConceptCodes.add(clinicalConceptCode);
+			}
+			consent.setDoNotShareClinicalConceptCodes(doNotShareClinicalConceptCodes);
+		} else
+			consent.setDoNotShareClinicalConceptCodes(new HashSet<ClinicalConceptCode>());
+
+		// Set Dates
+		consent.setStartDate(consentDto.getConsentStart());
+		consent.setEndDate(consentDto.getConsentEnd());
+
+		consent.setPatient(patient);
+		consent.setName("Consent");
+		consent.setDescription("This is a consent made by "
+				+ patient.getFirstName() + " " + patient.getLastName());
+		consent.setUnsignedPdfConsent(consentPdfGenerator
+				.generate42CfrPart2Pdf(consent));
+		try {
+			consent.setXacmlPolicyFile(consentExportService
+					.exportConsent2XACML(consent).getBytes());
+		} catch (ConsentGenException e) {
+			logger.error("Error in saving consent in xacml format", e);
+			throw new ConsentGenException(e.getMessage());
+		}
+
+		if (consent.getId() != null)
+			consentRepository.save(consent);
+		else
+			consentFactory.createNewConsent(consent);
+
+		return consentDto;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see gov.samhsa.consent2share.service.consent.ConsentService#
+	 * addUnsignedConsentRevokationPdf(java.lang.Long, java.lang.String)
+	 */
+	public void addUnsignedConsentRevokationPdf(Long consentId,
+			String revokationType) {
+		Consent consent = consentRepository.findOne(consentId);
 		if (revokationType.equals("EMERGENCY ONLY"))
 			consent.setConsentRevokationType("EMERGENCY ONLY");
 		else if (revokationType.equals("NO NEVER"))
 			consent.setConsentRevokationType("NO NEVER");
-		consent.setUnsignedPdfConsentRevoke(consentRevokationPdfGenerator.generateConsentRevokationPdf(consent));
+		consent.setUnsignedPdfConsentRevoke(consentRevokationPdfGenerator
+				.generateConsentRevokationPdf(consent));
 		consentRepository.save(consent);
 	}
-	
 
 	/**
 	 * Make consent.
-	 *
+	 * 
 	 * @return the consent
 	 */
-	public Consent makeConsent(){
-		Consent consent=new Consent();
+	public Consent makeConsent() {
+		Consent consent = new Consent();
 		consent.setConsentReferenceId(UUID.randomUUID().toString());
 		return consent;
 	}
-	
 
 	/**
 	 * Make consent dto.
-	 *
+	 * 
 	 * @return the consent dto
 	 */
-	public ConsentDto makeConsentDto(){
+	public ConsentDto makeConsentDto() {
 		return new ConsentDto();
 	}
-	
 
 	/**
 	 * Checks if is consent belong to this user.
-	 *
-	 * @param consentId the consent id
-	 * @param patientId the patient id
+	 * 
+	 * @param consentId
+	 *            the consent id
+	 * @param patientId
+	 *            the patient id
 	 * @return true, if is consent belong to this user
 	 */
-        @Override
-        public boolean isConsentBelongToThisUser(Long consentId, Long patientId) {
-            if (consentRepository.findOne(consentId) != null) {
-        	    Consent consent1 = consentRepository.findOne(consentId);
-        	    Patient patient = patientRepository.findOne(patientId);
-        
-        	    return consent1.getPatient().equals(patient);
-    		} else
-    	    return false;
-        }
-	
+	@Override
+	public boolean isConsentBelongToThisUser(Long consentId, Long patientId) {
+		if (consentRepository.findOne(consentId) != null) {
+			Consent consent1 = consentRepository.findOne(consentId);
+			Patient patient = patientRepository.findOne(patientId);
+
+			return consent1.getPatient().equals(patient);
+		} else
+			return false;
+	}
+
 	/**
 	 * Returns consentDto based on consent id.
-	 *
-	 * @param consentId the consent id
+	 * 
+	 * @param consentId
+	 *            the consent id
 	 * @return ConsentDto
 	 */
 	public ConsentDto findConsentById(Long consentId) {
 		Consent consent = null;
 		ConsentDto consentDto = null;
-		
-		if(consentRepository.findOne(consentId)!=null){
-			consent=consentRepository.findOne(consentId);
 
-		 	consentDto=new ConsentDto();
-			//Get fields
-			Set<String> isMadeToName=new HashSet<String>();
-			Set<String> isMadeToNpi=new HashSet<String>();
-			for (ConsentIndividualProviderDisclosureIsMadeTo item:consent.getProvidersDisclosureIsMadeTo()){
-				String name=item.getIndividualProvider().getLastName()+", "+
-						item.getIndividualProvider().getFirstName(); 
+		if (consentRepository.findOne(consentId) != null) {
+			consent = consentRepository.findOne(consentId);
+
+			consentDto = new ConsentDto();
+			// Get fields
+			Set<String> isMadeToName = new HashSet<String>();
+			Set<String> isMadeToNpi = new HashSet<String>();
+			for (ConsentIndividualProviderDisclosureIsMadeTo item : consent
+					.getProvidersDisclosureIsMadeTo()) {
+				String name = item.getIndividualProvider().getLastName() + ", "
+						+ item.getIndividualProvider().getFirstName();
 				isMadeToName.add(name);
 				isMadeToNpi.add(item.getIndividualProvider().getNpi());
 			}
-			
-			Set<String> isMadeToOrgName=new HashSet<String>();
-			Set<String> isMadeToOrgNpi =new HashSet<String>();
-			for (ConsentOrganizationalProviderDisclosureIsMadeTo item:consent.getOrganizationalProvidersDisclosureIsMadeTo()){
-				isMadeToOrgName.add(item.getOrganizationalProvider().getOrgName());
+
+			Set<String> isMadeToOrgName = new HashSet<String>();
+			Set<String> isMadeToOrgNpi = new HashSet<String>();
+			for (ConsentOrganizationalProviderDisclosureIsMadeTo item : consent
+					.getOrganizationalProvidersDisclosureIsMadeTo()) {
+				isMadeToOrgName.add(item.getOrganizationalProvider()
+						.getOrgName());
 				isMadeToOrgNpi.add(item.getOrganizationalProvider().getNpi());
 			}
-			
-			Set<String> toDiscloseName= new HashSet<String>();
+
+			Set<String> toDiscloseName = new HashSet<String>();
 			Set<String> toDiscloseNpi = new HashSet<String>();
-			for (ConsentIndividualProviderPermittedToDisclose item:consent.getProvidersPermittedToDisclose()){
-				String name=item.getIndividualProvider().getLastName()+", "+
-						item.getIndividualProvider().getFirstName();
+			for (ConsentIndividualProviderPermittedToDisclose item : consent
+					.getProvidersPermittedToDisclose()) {
+				String name = item.getIndividualProvider().getLastName() + ", "
+						+ item.getIndividualProvider().getFirstName();
 				toDiscloseName.add(name);
 				toDiscloseNpi.add(item.getIndividualProvider().getNpi());
 			}
-			
-			Set<String> toDiscloseOrgName=new HashSet<String>();
-			Set<String> toDiscloseOrgNpi=new HashSet<String>();
-			for (ConsentOrganizationalProviderPermittedToDisclose item:consent.getOrganizationalProvidersPermittedToDisclose()){
-				toDiscloseOrgName.add(item.getOrganizationalProvider().getOrgName());
+
+			Set<String> toDiscloseOrgName = new HashSet<String>();
+			Set<String> toDiscloseOrgNpi = new HashSet<String>();
+			for (ConsentOrganizationalProviderPermittedToDisclose item : consent
+					.getOrganizationalProvidersPermittedToDisclose()) {
+				toDiscloseOrgName.add(item.getOrganizationalProvider()
+						.getOrgName());
 				toDiscloseOrgNpi.add(item.getOrganizationalProvider().getNpi());
 			}
-			
-			Set<String> consentDoNotShareClinicalDocumentTypeCode=new HashSet<String>();
-			for (ConsentDoNotShareClinicalDocumentTypeCode item:consent.getDoNotShareClinicalDocumentTypeCodes()){
-				consentDoNotShareClinicalDocumentTypeCode.add(item.getClinicalDocumentTypeCode().getDisplayName()); 
+
+			Set<String> consentDoNotShareClinicalDocumentTypeCode = new HashSet<String>();
+			for (ConsentDoNotShareClinicalDocumentTypeCode item : consent
+					.getDoNotShareClinicalDocumentTypeCodes()) {
+				consentDoNotShareClinicalDocumentTypeCode.add(item
+						.getClinicalDocumentTypeCode().getDisplayName());
 			}
-			
-			Set<String> consentDoNotShareClinicalDocumentSectionTypeCode=new HashSet<String>();
-			for (ConsentDoNotShareClinicalDocumentSectionTypeCode item:consent.getDoNotShareClinicalDocumentSectionTypeCodes()){
-				consentDoNotShareClinicalDocumentSectionTypeCode.add(item.getClinicalDocumentSectionTypeCode().getDisplayName()); 
+
+			Set<String> consentDoNotShareClinicalDocumentSectionTypeCode = new HashSet<String>();
+			for (ConsentDoNotShareClinicalDocumentSectionTypeCode item : consent
+					.getDoNotShareClinicalDocumentSectionTypeCodes()) {
+				consentDoNotShareClinicalDocumentSectionTypeCode.add(item
+						.getClinicalDocumentSectionTypeCode().getDisplayName());
 			}
-			
-			Set<String> consentDoNotShareSensitivityPolicyCode=new HashSet<String>();
-			for (ConsentDoNotShareSensitivityPolicyCode item:consent.getDoNotShareSensitivityPolicyCodes()){
-				consentDoNotShareSensitivityPolicyCode.add(item.getValueSetCategory().getName()); 
+
+			Set<String> consentDoNotShareSensitivityPolicyCode = new HashSet<String>();
+			for (ConsentDoNotShareSensitivityPolicyCode item : consent
+					.getDoNotShareSensitivityPolicyCodes()) {
+				consentDoNotShareSensitivityPolicyCode.add(item
+						.getValueSetCategory().getName());
 			}
-			
-			Set<String> consentShareForPurposeOfUseCode=new HashSet<String>();
-			for (ConsentShareForPurposeOfUseCode item:consent.getShareForPurposeOfUseCodes()){
-				consentShareForPurposeOfUseCode.add(item.getPurposeOfUseCode().getDisplayName()); 
+
+			Set<String> consentShareForPurposeOfUseCode = new HashSet<String>();
+			for (ConsentShareForPurposeOfUseCode item : consent
+					.getShareForPurposeOfUseCodes()) {
+				consentShareForPurposeOfUseCode.add(item.getPurposeOfUseCode()
+						.getDisplayName());
 			}
-			
-			Set<SpecificMedicalInfoDto> consentDoNotShareClinicalConceptCodes=new HashSet<SpecificMedicalInfoDto>();
-			for (ClinicalConceptCode item:consent.getDoNotShareClinicalConceptCodes()){
+
+			Set<SpecificMedicalInfoDto> consentDoNotShareClinicalConceptCodes = new HashSet<SpecificMedicalInfoDto>();
+			for (ClinicalConceptCode item : consent
+					.getDoNotShareClinicalConceptCodes()) {
 				SpecificMedicalInfoDto specificMedicalInfoDto = new SpecificMedicalInfoDto();
 				specificMedicalInfoDto.setCode(item.getCode());
 				specificMedicalInfoDto.setCodeSystem(item.getCodeSystem());
 				specificMedicalInfoDto.setDisplayName(item.getDisplayName());
-				consentDoNotShareClinicalConceptCodes.add(specificMedicalInfoDto); 
+				consentDoNotShareClinicalConceptCodes
+						.add(specificMedicalInfoDto);
 			}
-			
-			
-			//Set fields
-//			isMadeToName.addAll(isMadeToOrgName);
-//			toDiscloseName.addAll(toDiscloseOrgName);
-			consentDto.setDoNotShareClinicalConceptCodes(consentDoNotShareClinicalConceptCodes);
+
+			// Set fields
+			// isMadeToName.addAll(isMadeToOrgName);
+			// toDiscloseName.addAll(toDiscloseOrgName);
+			consentDto
+					.setDoNotShareClinicalConceptCodes(consentDoNotShareClinicalConceptCodes);
 			consentDto.setId(String.valueOf(consent.getId()));
 			consentDto.setUsername(consent.getPatient().getUsername());
 
 			//
-		    // Converting timestamp to Date to resolve
+			// Converting timestamp to Date to resolve
 			// rendering the values in IE
-		    //
-		    DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-		    String today = "" ;			
-		    try {
+			//
+			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+			String today = "";
+			try {
 				today = formatter.format(consent.getStartDate());
 				consentDto.setConsentStart(formatter.parse(today));
 			} catch (ParseException e) {
 				consentDto.setConsentStart(consent.getStartDate());
 				e.printStackTrace();
-			}		
+			}
 			try {
 				today = formatter.format(consent.getEndDate());
 				consentDto.setConsentEnd(formatter.parse(today));
 			} catch (ParseException e) {
 				consentDto.setConsentEnd(consent.getEndDate());
 				e.printStackTrace();
-			}	
-			
+			}
+
 			// TODO: Cleanup: combine name and npi into one object
 			// populate consent dto with selected options
-			consentDto.setOrganizationalProvidersDisclosureIsMadeTo(isMadeToOrgName);
-			consentDto.setOrganizationalProvidersDisclosureIsMadeToNpi(isMadeToOrgNpi);
-			
-			consentDto.setOrganizationalProvidersPermittedToDisclose(toDiscloseOrgName);
-			consentDto.setOrganizationalProvidersPermittedToDiscloseNpi(toDiscloseOrgNpi);
-			
+			consentDto
+					.setOrganizationalProvidersDisclosureIsMadeTo(isMadeToOrgName);
+			consentDto
+					.setOrganizationalProvidersDisclosureIsMadeToNpi(isMadeToOrgNpi);
+
+			consentDto
+					.setOrganizationalProvidersPermittedToDisclose(toDiscloseOrgName);
+			consentDto
+					.setOrganizationalProvidersPermittedToDiscloseNpi(toDiscloseOrgNpi);
+
 			consentDto.setProvidersDisclosureIsMadeTo(isMadeToName);
 			consentDto.setProvidersDisclosureIsMadeToNpi(isMadeToNpi);
 
 			consentDto.setProvidersPermittedToDisclose(toDiscloseName);
 			consentDto.setProvidersPermittedToDiscloseNpi(toDiscloseNpi);
-			
-			consentDto.setDoNotShareClinicalDocumentSectionTypeCodes(consentDoNotShareClinicalDocumentSectionTypeCode);
-			consentDto.setDoNotShareClinicalDocumentTypeCodes(consentDoNotShareClinicalDocumentTypeCode);
-			consentDto.setShareForPurposeOfUseCodes(consentShareForPurposeOfUseCode);
-			consentDto.setDoNotShareSensitivityPolicyCodes(consentDoNotShareSensitivityPolicyCode);
+
+			consentDto
+					.setDoNotShareClinicalDocumentSectionTypeCodes(consentDoNotShareClinicalDocumentSectionTypeCode);
+			consentDto
+					.setDoNotShareClinicalDocumentTypeCodes(consentDoNotShareClinicalDocumentTypeCode);
+			consentDto
+					.setShareForPurposeOfUseCodes(consentShareForPurposeOfUseCode);
+			consentDto
+					.setDoNotShareSensitivityPolicyCodes(consentDoNotShareSensitivityPolicyCode);
 
 			HashMap<String, String> purposeOfUseMap = new HashMap<String, String>();
-			for (ConsentShareForPurposeOfUseCode purposeOfUseCode : consent.getShareForPurposeOfUseCodes()) {
-				purposeOfUseMap.put(purposeOfUseCode.getPurposeOfUseCode().getCode(), purposeOfUseCode.getPurposeOfUseCode().getDisplayName());
+			for (ConsentShareForPurposeOfUseCode purposeOfUseCode : consent
+					.getShareForPurposeOfUseCodes()) {
+				purposeOfUseMap.put(purposeOfUseCode.getPurposeOfUseCode()
+						.getCode(), purposeOfUseCode.getPurposeOfUseCode()
+						.getDisplayName());
 			}
 			consentDto.setPurposeOfUseCodesAndValues(purposeOfUseMap);
-			
+
 		}
 		return consentDto;
 	}
-	
+
 	/**
 	 * Are there duplicates.
-	 *
-	 * @param set1 the set1
-	 * @param set2 the set2
+	 * 
+	 * @param set1
+	 *            the set1
+	 * @param set2
+	 *            the set2
 	 * @return true, if successful
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public boolean areThereDuplicatesInTwoSets(Set set1,Set set2){
-		Set all=new HashSet();
+	public boolean areThereDuplicatesInTwoSets(Set set1, Set set2) {
+		Set all = new HashSet();
 		all.addAll(set1);
 		all.addAll(set2);
-		if (all.size()==set1.size()+set2.size()){
+		if (all.size() == set1.size() + set2.size()) {
 			return false;
 		}
 		return true;
 	}
-	
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.service.consent.ConsentService#findConsentContentDto(java.lang.Long)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent2share.service.consent.ConsentService#findConsentContentDto
+	 * (java.lang.Long)
 	 */
-	public AbstractPdfDto findConsentContentDto(Long consentId){
-		Consent consent=findConsent(consentId);
+	public AbstractPdfDto findConsentContentDto(Long consentId) {
+		Consent consent = findConsent(consentId);
 		AbstractPdfDto consentPdfDto;
-		if (consent.getSignedPdfConsent()!=null){
-			if (consent.getSignedPdfConsent().getSignedPdfConsentContent()!=null){
-				consentPdfDto=findConsentPdfDto(consent.getId());
+		if (consent.getSignedPdfConsent() != null) {
+			if (consent.getSignedPdfConsent().getSignedPdfConsentContent() != null) {
+				consentPdfDto = findConsentPdfDto(consent.getId());
+			} else {
+				consentPdfDto = findConsentPdfDto(consent.getId());
 			}
-			else{
-				consentPdfDto=findConsentPdfDto(consent.getId());
-			}
-		}
-		else{
-			consentPdfDto=findConsentPdfDto(consent.getId());
+		} else {
+			consentPdfDto = findConsentPdfDto(consent.getId());
 		}
 
-		if (consent.getSignedPdfConsentRevoke()!=null){
-				if(consent.getSignedPdfConsentRevoke().getSignedPdfConsentRevocationContent()!=null){
-					consentPdfDto=findConsentRevokationPdfDto(consent.getId());
-				}
-				else{
-					consentPdfDto=findConsentRevokationPdfDto(consent.getId());
-				}
+		if (consent.getSignedPdfConsentRevoke() != null) {
+			if (consent.getSignedPdfConsentRevoke()
+					.getSignedPdfConsentRevocationContent() != null) {
+				consentPdfDto = findConsentRevokationPdfDto(consent.getId());
+			} else {
+				consentPdfDto = findConsentRevokationPdfDto(consent.getId());
+			}
 
 		}
 		return consentPdfDto;
-		
+
 	}
-	
 
 	/**
-	 * Return tagged c32. Entry tags that have been removed in segmented c32 were tagged and returned 
-	 *
-	 * @param originalC32 the original c32
-	 * @param consentId the consent id
-	 * @param purposeOfUse the purpose of use
+	 * Return tagged c32. Entry tags that have been removed in segmented c32
+	 * were tagged and returned
+	 * 
+	 * @param originalC32
+	 *            the original c32
+	 * @param consentId
+	 *            the consent id
+	 * @param purposeOfUse
+	 *            the purpose of use
 	 * @return the tagged c32
-	 * @throws ConsentGenException the consent gen exception
+	 * @throws ConsentGenException
+	 *             the consent gen exception
 	 */
-	public String getTaggedC32(String originalC32,
-			Long consentId, String purposeOfUse) throws ConsentGenException {
-		
+	public String getTaggedC32(String originalC32, Long consentId,
+			String purposeOfUse) throws ConsentGenException {
+
 		String xacml = consentBuilder.buildConsent2Xacml(consentId);
-		
+
 		// get segmented doc
-		String segmentedC32 = tryPolicyService.tryPolicy(originalC32, xacml, purposeOfUse);
-		
+		String segmentedC32 = tryPolicyService.tryPolicy(originalC32, xacml,
+				purposeOfUse);
+
 		List<String> originalC32Ids = new ArrayList<String>();
 		List<String> segmentedC32Ids = new ArrayList<String>();
 		List<String> taggedC32Ids = new ArrayList<String>();
-		
+
 		StringWriter writer = null;
 		ByteArrayOutputStream byteArrayOutputStream = null;
-		
+
 		try {
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setValidating(false);
-		final DocumentBuilder db = dbf.newDocumentBuilder();
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			dbf.setValidating(false);
+			final DocumentBuilder db = dbf.newDocumentBuilder();
 
-		Document taggedC32Doc = db.parse(new InputSource(new ByteArrayInputStream(originalC32.getBytes("utf-8"))));
-		changeXslPath(taggedC32Doc);
-		NodeList taggedC32List = taggedC32Doc.getElementsByTagName("entry");
-		
-		Document segmentedC32Doc = db.parse(new InputSource(new ByteArrayInputStream(segmentedC32.getBytes("utf-8"))));
-		NodeList segmentedC32List = segmentedC32Doc.getElementsByTagName("entry");
-		
-		originalC32Ids = getIds(taggedC32List);
-		segmentedC32Ids = getIds(segmentedC32List);
-		
-		taggedC32Ids = getIdsToTag(originalC32Ids, segmentedC32Ids);
-		
-		tagC32Document(taggedC32List, taggedC32Ids);
-		
-		logger.info("Tagged C32 Entry size: " + taggedC32List.getLength());
-		logger.info("Segmented C32 Entry size: " + segmentedC32List.getLength());
+			Document taggedC32Doc = db.parse(new InputSource(
+					new ByteArrayInputStream(originalC32.getBytes("utf-8"))));
+			changeXslPath(taggedC32Doc);
+			NodeList taggedC32List = taggedC32Doc.getElementsByTagName("entry");
 
-		logger.info("Original C32: " + originalC32);
-		logger.info("Segmented C32: " + segmentedC32);;
-		
-		// write the content into xml file
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		Transformer transformer = transformerFactory.newTransformer();
-		DOMSource source = new DOMSource(taggedC32Doc);
-		writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-		
-		transformer.transform(source, result);
-		logger.info("Printing tagged file: " + writer.toString());
-				
-		// xslt transformation
-		
-		TransformerFactory tFactory = TransformerFactory.newInstance();
-		InputStream is = Thread.currentThread()
-				.getContextClassLoader().getResourceAsStream("CDA_flag_redact.xsl");
-		StreamSource styleSource = new StreamSource(is);
-		Transformer transformer1 = tFactory.newTransformer(styleSource);
-		
-		byteArrayOutputStream = new ByteArrayOutputStream();
-		transformer1.transform(new DOMSource(taggedC32Doc), new StreamResult(byteArrayOutputStream));
-		logger.info("Printing transformed xslt: " + byteArrayOutputStream.toString());
+			Document segmentedC32Doc = db.parse(new InputSource(
+					new ByteArrayInputStream(segmentedC32.getBytes("utf-8"))));
+			NodeList segmentedC32List = segmentedC32Doc
+					.getElementsByTagName("entry");
+
+			originalC32Ids = getIds(taggedC32List);
+			segmentedC32Ids = getIds(segmentedC32List);
+
+			taggedC32Ids = getIdsToTag(originalC32Ids, segmentedC32Ids);
+
+			tagC32Document(taggedC32List, taggedC32Ids);
+
+			logger.info("Tagged C32 Entry size: " + taggedC32List.getLength());
+			logger.info("Segmented C32 Entry size: "
+					+ segmentedC32List.getLength());
+
+			logger.info("Original C32: " + originalC32);
+			logger.info("Segmented C32: " + segmentedC32);
+			;
+
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory
+					.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(taggedC32Doc);
+			writer = new StringWriter();
+			StreamResult result = new StreamResult(writer);
+
+			transformer.transform(source, result);
+			logger.info("Printing tagged file: " + writer.toString());
+
+			// xslt transformation
+
+			TransformerFactory tFactory = TransformerFactory.newInstance();
+			InputStream is = Thread.currentThread().getContextClassLoader()
+					.getResourceAsStream("CDA_flag_redact.xsl");
+			StreamSource styleSource = new StreamSource(is);
+			Transformer transformer1 = tFactory.newTransformer(styleSource);
+
+			byteArrayOutputStream = new ByteArrayOutputStream();
+			transformer1.transform(new DOMSource(taggedC32Doc),
+					new StreamResult(byteArrayOutputStream));
+			logger.info("Printing transformed xslt: "
+					+ byteArrayOutputStream.toString());
 
 		} catch (ParserConfigurationException e) {
 			throw new DS4PException(e.toString(), e);
@@ -1076,90 +1216,119 @@ public class ConsentServiceImpl implements ConsentService {
 		} catch (TransformerException e) {
 			throw new DS4PException(e.toString(), e);
 		}
-		
+
 		return byteArrayOutputStream.toString();
 	}
-	
-	
+
 	/**
 	 * Changes xsl path to local xsl.
-	 *
-	 * @param taggedC32Doc the tagged c32 doc
+	 * 
+	 * @param taggedC32Doc
+	 *            the tagged c32 doc
 	 */
 	private void changeXslPath(Document taggedC32Doc) {
-		
+		DocumentXmlConverterImpl c = new DocumentXmlConverterImpl();
+		try {
+			System.out.println(c.convertXmlDocToString(taggedC32Doc));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (TransformerException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		Element root = taggedC32Doc.getDocumentElement();
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		String expression = "/processing-instruction('xml-stylesheet')";
 		ProcessingInstruction pi = null;
 		try {
-			pi = (ProcessingInstruction)xpath.evaluate(expression, taggedC32Doc, XPathConstants.NODE);
+			pi = (ProcessingInstruction) xpath.evaluate(expression,
+					taggedC32Doc, XPathConstants.NODE);
 		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new DS4PException("Error processing xsl path");
 		}
-		pi.setData("type='text/xsl' href='CDA_flag_redact.xsl'");
 		
+		//<?xml-stylesheet href="http://obhita.org/CDA.xsl" type="text/xsl"?>
+		if(pi != null) {
+			pi.setData("type='text/xsl' href='CDA_flag_redact.xsl'");
+		}
+		else{
+			//Add xml style sheet at the second line of xml string
+			 pi =  taggedC32Doc.createProcessingInstruction("xml-stylesheet",
+		                    "type=\"text/xsl\" href=\"CDA_flag_redact.xsl\"");
+		    Element stylesheetEl = taggedC32Doc.getDocumentElement();
+		    taggedC32Doc.insertBefore((Node) pi, stylesheetEl);			
+			
+		}
+			
+
 		StringWriter writer = null;
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		TransformerFactory transformerFactory = TransformerFactory
+				.newInstance();
 		Transformer transformer = null;
 		try {
 			transformer = transformerFactory.newTransformer();
-			
+
 			DOMSource source = new DOMSource(taggedC32Doc);
 			writer = new StringWriter();
-	        StreamResult result = new StreamResult(writer);
-	        
+			StreamResult result = new StreamResult(writer);
+
 			transformer.transform(source, result);
 		} catch (TransformerConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}catch (TransformerException e) {
+		} catch (TransformerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/**
 	 * Gets the ids.
-	 *
-	 * @param c32List the c32 list
+	 * 
+	 * @param c32List
+	 *            the c32 list
 	 * @return the ids
 	 */
 	public List<String> getIds(NodeList c32List) {
 		List<String> listOfIdsInC32 = new ArrayList<String>();
-		
+
 		for (int i = 0; i < c32List.getLength(); i++) {
 
 			NodeList childNodes = c32List.item(i).getChildNodes();
-			
-		    for (int childIndex = 0; childIndex < childNodes.getLength(); childIndex++) {
-		        Node childNode = childNodes.item(childIndex);
 
-		        if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-		        	
-		            NodeList grandChildNodeList = childNode.getChildNodes();
-		            
-		            for (int grandChildIndex = 0; grandChildIndex < grandChildNodeList.getLength(); grandChildIndex++) {
-				        Node grandChildNode = grandChildNodeList.item(grandChildIndex);
-		            	
-		            	if (grandChildNode.getNodeName().equalsIgnoreCase("ID")) {
+			for (int childIndex = 0; childIndex < childNodes.getLength(); childIndex++) {
+				Node childNode = childNodes.item(childIndex);
 
-		            		listOfIdsInC32.add(grandChildNode.getAttributes().getNamedItem("root").getNodeValue());
-		            	}
-		            }
-		        }
-		    }
+				if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					NodeList grandChildNodeList = childNode.getChildNodes();
+
+					for (int grandChildIndex = 0; grandChildIndex < grandChildNodeList
+							.getLength(); grandChildIndex++) {
+						Node grandChildNode = grandChildNodeList
+								.item(grandChildIndex);
+
+						if (grandChildNode.getNodeName().equalsIgnoreCase("ID")) {
+
+							listOfIdsInC32.add(grandChildNode.getAttributes()
+									.getNamedItem("root").getNodeValue());
+						}
+					}
+				}
+			}
 		}
 		return listOfIdsInC32;
 	}
-	
+
 	/**
 	 * Gets the ids to tag.
-	 *
-	 * @param originalC32Ids the original c32 ids
-	 * @param segmentedC32Ids the segmented c32 ids
+	 * 
+	 * @param originalC32Ids
+	 *            the original c32 ids
+	 * @param segmentedC32Ids
+	 *            the segmented c32 ids
 	 * @return the ids to tag
 	 */
 	public List<String> getIdsToTag(List<String> originalC32Ids,
@@ -1174,89 +1343,113 @@ public class ConsentServiceImpl implements ConsentService {
 
 		return idsToTag;
 	}
-	
+
 	/**
 	 * Tag c32 document.
-	 *
-	 * @param taggedC32List the tagged c32 list
-	 * @param taggedC32Ids the tagged c32 ids
+	 * 
+	 * @param taggedC32List
+	 *            the tagged c32 list
+	 * @param taggedC32Ids
+	 *            the tagged c32 ids
 	 */
 	public void tagC32Document(NodeList taggedC32List, List<String> taggedC32Ids) {
-		
+
 		for (int i = 0; i < taggedC32List.getLength(); i++) {
 			Element elementToAddAttribute = (Element) taggedC32List.item(i);
 
 			NodeList childNodes = taggedC32List.item(i).getChildNodes();
-			
-		    for (int childIndex = 0; childIndex < childNodes.getLength(); childIndex++) {
-		        Node childNode = childNodes.item(childIndex);
 
-		        if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-		            NodeList grandChildNodeList = childNode.getChildNodes();
-		            
-		            for (int grandChildIndex = 0; grandChildIndex < grandChildNodeList.getLength(); grandChildIndex++) {
-				        Node grandChildNode = grandChildNodeList.item(grandChildIndex);
-		            	
-		            	if (grandChildNode.getNodeName().equalsIgnoreCase("ID")) {
-	            		
-		            		// tag c32 by adding redact attribute to ids that were segmented
-		            		if (taggedC32Ids.contains(grandChildNode.getAttributes().getNamedItem("root").getNodeValue())) {
-		            			logger.info("Match!");
-		            			elementToAddAttribute.setAttribute("redact", "redact");
-		            		}
-		            	}
-		            }
-		        }
-		    }
+			for (int childIndex = 0; childIndex < childNodes.getLength(); childIndex++) {
+				Node childNode = childNodes.item(childIndex);
+
+				if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+					NodeList grandChildNodeList = childNode.getChildNodes();
+
+					for (int grandChildIndex = 0; grandChildIndex < grandChildNodeList
+							.getLength(); grandChildIndex++) {
+						Node grandChildNode = grandChildNodeList
+								.item(grandChildIndex);
+
+						if (grandChildNode.getNodeName().equalsIgnoreCase("ID")) {
+
+							// tag c32 by adding redact attribute to ids that
+							// were segmented
+							if (taggedC32Ids.contains(grandChildNode
+									.getAttributes().getNamedItem("root")
+									.getNodeValue())) {
+								logger.info("Match!");
+								elementToAddAttribute.setAttribute("redact",
+										"redact");
+							}
+						}
+					}
+				}
+			}
 		}
 	}
-	
+
 	@Override
-	public String createConsentEmbeddedWidget(ConsentPdfDto consentPdfDto){
-		Consent consent=consentRepository.findOne(consentPdfDto.getId());
+	public String createConsentEmbeddedWidget(ConsentPdfDto consentPdfDto) {
+		Consent consent = consentRepository.findOne(consentPdfDto.getId());
 		// SignConsent
 		SignedPDFConsent signedPdfConsent = makeSignedPdfConsent();
-		Patient patient=consent.getPatient();
-		String patientEmail=patient.getEmail();
-		
-		EmbeddedWidgetCreationResult result=echoSignSignatureService.createEmbeddedWidget(consentPdfDto.getContent(), consentPdfDto.getFilename()+".pdf",  consentPdfDto.getConsentName(), null,patientEmail);
+		Patient patient = consent.getPatient();
+		String patientEmail = patient.getEmail();
+
+		EmbeddedWidgetCreationResult result = echoSignSignatureService
+				.createEmbeddedWidget(consentPdfDto.getContent(),
+						consentPdfDto.getFilename() + ".pdf",
+						consentPdfDto.getConsentName(), null, patientEmail);
 		signedPdfConsent.setDocumentId(result.getDocumentKey());
-		signedPdfConsent.setDocumentNameBySender(consentPdfDto.getConsentName());
-		signedPdfConsent.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");
+		signedPdfConsent
+				.setDocumentNameBySender(consentPdfDto.getConsentName());
+		signedPdfConsent
+				.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");
 		signedPdfConsent.setSignerEmail(patientEmail);
 		signedPdfConsent.setDocumentSignedStatus("Unsigned");
 		consent.setSignedPdfConsent(signedPdfConsent);
 		consentRepository.save(consent);
 		return result.getJavascript();
 	}
-	
+
 	@Override
-	public String createRevocationEmbeddedWidget(ConsentRevokationPdfDto consentRevokationPdfDto) {
-		Consent consent=consentRepository.findOne(consentRevokationPdfDto.getId());
+	public String createRevocationEmbeddedWidget(
+			ConsentRevokationPdfDto consentRevokationPdfDto) {
+		Consent consent = consentRepository.findOne(consentRevokationPdfDto
+				.getId());
 		// SignConsentRevokation
-		SignedPDFConsentRevocation signedPDFConsentRevocation=makeSignedPDFConsentRevocation();
-		Patient patient=consent.getPatient();
-		String patientEmail=patient.getEmail();
-		
-		EmbeddedWidgetCreationResult result=echoSignSignatureService.createEmbeddedWidget(consentRevokationPdfDto.getContent(), consentRevokationPdfDto.getFilename()+".pdf",  consentRevokationPdfDto.getConsentName() + " Revocation", null,patientEmail);
+		SignedPDFConsentRevocation signedPDFConsentRevocation = makeSignedPDFConsentRevocation();
+		Patient patient = consent.getPatient();
+		String patientEmail = patient.getEmail();
+
+		EmbeddedWidgetCreationResult result = echoSignSignatureService
+				.createEmbeddedWidget(consentRevokationPdfDto.getContent(),
+						consentRevokationPdfDto.getFilename() + ".pdf",
+						consentRevokationPdfDto.getConsentName()
+								+ " Revocation", null, patientEmail);
 		signedPDFConsentRevocation.setDocumentId(result.getDocumentKey());
-		signedPDFConsentRevocation.setDocumentNameBySender(consentRevokationPdfDto.getConsentName());
-		signedPDFConsentRevocation.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");
+		signedPDFConsentRevocation
+				.setDocumentNameBySender(consentRevokationPdfDto
+						.getConsentName());
+		signedPDFConsentRevocation
+				.setDocumentMessageBySender("This is a hard-coded greeting to be replaced. Hi.");
 		signedPDFConsentRevocation.setSignerEmail("consent2share@gmail.com");
 		signedPDFConsentRevocation.setDocumentSignedStatus("Unsigned");
-		signedPDFConsentRevocation.setDocumentCreatedBy(consent.getPatient().getLastName()+", "+consent.getPatient().getFirstName());
-		signedPDFConsentRevocation.setDocumentSentOutForSignatureDateTime(new Date());
+		signedPDFConsentRevocation.setDocumentCreatedBy(consent.getPatient()
+				.getLastName() + ", " + consent.getPatient().getFirstName());
+		signedPDFConsentRevocation
+				.setDocumentSentOutForSignatureDateTime(new Date());
 		consent.setConsentRevoked(true);
 		consent.setSignedPdfConsentRevoke(signedPDFConsentRevocation);
-		
-		if(consentRevokationPdfDto.getRevokationType().equals("EMERGENCY ONLY"))
+
+		if (consentRevokationPdfDto.getRevokationType()
+				.equals("EMERGENCY ONLY"))
 			consent.setConsentRevokationType("EMERGENCY ONLY");
-		if(consentRevokationPdfDto.getRevokationType().equals("NO NEVER"))
+		if (consentRevokationPdfDto.getRevokationType().equals("NO NEVER"))
 			consent.setConsentRevokationType("NO NEVER");
-		
+
 		consentRepository.save(consent);
 		return result.getJavascript();
 	}
-
 
 }

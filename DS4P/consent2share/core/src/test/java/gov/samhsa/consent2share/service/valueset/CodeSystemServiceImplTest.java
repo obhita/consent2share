@@ -29,7 +29,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
-import org.springframework.test.annotation.ExpectedException;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;

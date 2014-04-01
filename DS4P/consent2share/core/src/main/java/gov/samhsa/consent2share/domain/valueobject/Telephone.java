@@ -31,6 +31,8 @@ import gov.samhsa.consent2share.domain.reference.TelecomUseCode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
@@ -53,7 +55,7 @@ public class Telephone {
 	private String telephone;
 
 	/** The telecom use code. */
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	private TelecomUseCode telecomUseCode;
 

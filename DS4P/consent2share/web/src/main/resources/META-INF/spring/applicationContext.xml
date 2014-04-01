@@ -153,6 +153,12 @@
 		class="gov.samhsa.consent2share.pixclient.util.PixManagerRequestXMLToJava"
 		scope="prototype" autowire="constructor">
 	</bean>
+	
+
+	<bean id="accessDeniedHandler" 
+		class="gov.samhsa.consent2share.web.CustomAccessDeniedHandler">
+		<property name="accessDeniedUrl" value="views/dataAccessFailure.html" />
+	</bean>
 	<!-- ACS Beans End -->
 
 </beans>

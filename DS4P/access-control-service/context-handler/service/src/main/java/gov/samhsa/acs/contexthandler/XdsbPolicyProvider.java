@@ -140,10 +140,12 @@ public class XdsbPolicyProvider implements PolicyProvider {
 
 			// If no policies at all, throw NoPolicyFoundException to be caught
 			// at PolicyEnforcementPointImpl
+			StringBuilder noConsentsFoundErrorStringBuilder = new StringBuilder();
+			noConsentsFoundErrorStringBuilder.append("No consents found for patient:");
+			noConsentsFoundErrorStringBuilder.append(patientUniqueId);
+			noConsentsFoundErrorStringBuilder.append(" in XDS.b repository.");
 			if (retrieveDocumentSetRequest.getDocumentRequest().size() <= 0) {
-				throw new NoPolicyFoundException(
-						"No consents found for patient:" + patientUniqueId
-								+ " in XDS.b repository.");
+				throw new NoPolicyFoundException(noConsentsFoundErrorStringBuilder.toString());
 			}
 
 			// Retrieve all policies
@@ -178,9 +180,7 @@ public class XdsbPolicyProvider implements PolicyProvider {
 			// NoPolicyFoundException to be caught at
 			// PolicyEnforcementPointImpl
 			if (policiesString.size() <= 0) {
-				throw new NoPolicyFoundException(
-						"No consents found for patient:" + patientUniqueId
-								+ " in XDS.b repository.");
+				throw new NoPolicyFoundException(noConsentsFoundErrorStringBuilder.toString());
 			}
 
 			// Wrap policies in a policy set
@@ -222,9 +222,11 @@ public class XdsbPolicyProvider implements PolicyProvider {
 	 * @return the policy set header
 	 */
 	private String getPolicySetHeader() {
-		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><PolicySet xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\" PolicySetId=\"urn:oasis:names:tc:xacml:2.0:example:policysetid:1\" PolicyCombiningAlgId=\""
-				+ this.urnPolicyCombiningAlgorithm
-				+ "\"><Description/><Target/>";
+		StringBuilder builder = new StringBuilder();
+		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><PolicySet xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\" PolicySetId=\"urn:oasis:names:tc:xacml:2.0:example:policysetid:1\" PolicyCombiningAlgId=\"");
+		builder.append(this.urnPolicyCombiningAlgorithm);
+		builder.append("\"><Description/><Target/>");
+		return builder.toString();
 	}
 
 	/**

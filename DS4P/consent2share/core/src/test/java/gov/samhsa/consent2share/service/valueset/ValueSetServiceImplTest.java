@@ -1,6 +1,7 @@
 package gov.samhsa.consent2share.service.valueset;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -28,6 +29,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings("unchecked")
 public class ValueSetServiceImplTest {
 	
 	@InjectMocks
@@ -60,12 +62,10 @@ public class ValueSetServiceImplTest {
 		selected.setId((long) 1);
 		when(valueSetCategoryRepository.findOne((long) 1)).thenReturn(null);
 		
-		ValueSet valueSet=new ValueSet();
-		
 		when(valueSetMgmtHelper.createValuesetDtoFromEntity(any(ValueSet.class))).thenReturn(created);
 		
 		ValueSetDto result=vst.create(created);
-		
+		assertNotNull(result);
 		
 	}
 	
@@ -91,23 +91,59 @@ public class ValueSetServiceImplTest {
 	}
 	
 	
+
 	@Test
 	public void testfindAll(){
 		
-		List<ValueSet> valueSets=(List<ValueSet>)mock(List.class);
-		when(valueSetRepository.findAll()).thenReturn(valueSets);
+		List<ValueSet> valueSetsMock=mock(List.class);
+		when(valueSetRepository.findAll()).thenReturn(valueSetsMock);
 		
-		List<ValueSetDto> valueSetDtos=new ArrayList();
-		ValueSetDto valueSetDto=mock(ValueSetDto.class);
-		valueSetDtos.add(valueSetDto);
-		when(valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSets)).thenReturn(valueSetDtos);
+		List<ValueSetDto> valueSetDtosMock=new ArrayList<ValueSetDto>();
+		ValueSetDto valueSetDtoMock=mock(ValueSetDto.class);
+		valueSetDtosMock.add(valueSetDtoMock);
+		when(valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSetsMock)).thenReturn(valueSetDtosMock);
 		
-		when(valueSetDto.getId()).thenReturn((long) 1);
+		when(valueSetDtoMock.getId()).thenReturn((long) 1);
 		when(conceptCodeValueSetRepository.findAllByPkValueSetId(anyLong())).thenReturn(null);
 		
-		assertEquals(vst.findAll(),valueSetDtos);
+		assertEquals(vst.findAll(),valueSetDtosMock);
+	}
+
+	
+	@Test
+	public void testFindAllByName() {
+		List<ValueSet> valueSetsMock = mock(List.class);
+		when(valueSetRepository.findAllByNameLike(anyString())).thenReturn(valueSetsMock);
+		
+		List<ValueSetDto> valueSetDtosMock = new ArrayList<ValueSetDto>();
+		ValueSetDto valueSetDtoMock=mock(ValueSetDto.class);
+		valueSetDtosMock.add(valueSetDtoMock);	
+		when(valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSetsMock)).thenReturn(valueSetDtosMock);
+	
+		when(valueSetDtoMock.getId()).thenReturn((long) 1);
+		when(conceptCodeValueSetRepository.findAllByPkValueSetId(anyLong())).thenReturn(null);
+		
+		
+		assertEquals(vst.findAllByName("a"),valueSetDtosMock);
+		
 	}
 	
+	@Test
+	public void testFindAllByCode() {
+		List<ValueSet> valueSetsMock = mock(List.class);
+		when(valueSetRepository.findAllByCodeLike(anyString())).thenReturn(valueSetsMock);
+		
+		List<ValueSetDto> valueSetDtosMock = new ArrayList<ValueSetDto>();
+		ValueSetDto valueSetDtoMock=mock(ValueSetDto.class);
+		valueSetDtosMock.add(valueSetDtoMock);	
+		when(valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSetsMock)).thenReturn(valueSetDtosMock);
+		
+		when(valueSetDtoMock.getId()).thenReturn((long) 1);
+		when(conceptCodeValueSetRepository.findAllByPkValueSetId(anyLong())).thenReturn(null);
+		
+		assertEquals(vst.findAllByCode("a"),valueSetDtosMock);
+		
+	}	
 	
 	@Test(expected = ValueSetCategoryNotFoundException.class)
 	public void testfindId() throws ValueSetCategoryNotFoundException{
@@ -176,27 +212,6 @@ public class ValueSetServiceImplTest {
 		vst.create();
 		
 	}
-	
-	@Test
-	public void testFindAllByName() {
-		List<ValueSet> valueSets = mock(List.class);
-		List<ValueSetDto> valueSetDtos = mock(List.class);
-		
-		when(valueSetRepository.findAllByNameLike(anyString())).thenReturn(valueSets);
-		when(valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSets)).thenReturn(valueSetDtos);
-		assertEquals(vst.findAllByName("a"),valueSetDtos);
-		
-	}
-	
-	@Test
-	public void testFindAllByCode() {
-		List<ValueSet> valueSets = mock(List.class);
-		List<ValueSetDto> valueSetDtos = mock(List.class);
-		
-		when(valueSetRepository.findAllByCodeLike(anyString())).thenReturn(valueSets);
-		when(valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSets)).thenReturn(valueSetDtos);
-		assertEquals(vst.findAllByCode("a"),valueSetDtos);
-		
-	}
+
 	
 }

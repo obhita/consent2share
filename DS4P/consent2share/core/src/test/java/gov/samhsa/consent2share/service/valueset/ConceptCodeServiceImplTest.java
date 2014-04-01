@@ -40,7 +40,7 @@ import static org.mockito.Mockito.*;
 public class ConceptCodeServiceImplTest {
 	
 	@InjectMocks
-	ConceptCodeServiceImpl vst=new ConceptCodeServiceImpl();
+	ConceptCodeServiceImpl conceptCodeServiceImpl=new ConceptCodeServiceImpl();
 
 	@Mock
 	ConceptCodeRepository conceptCodeRepository;
@@ -69,14 +69,14 @@ public class ConceptCodeServiceImplTest {
 		ConceptCodeDto conceptCodeDto = mock(ConceptCodeDto.class);
 		when(valueSetMgmtHelper.createConceptCodeDtoFromEntity(deleted)).thenReturn(conceptCodeDto);
 		
-		Assert.assertEquals(vst.delete((long)1), conceptCodeDto);
+		Assert.assertEquals(conceptCodeServiceImpl.delete((long)1), conceptCodeDto);
 	}
 	
 	@Test(expected = ConceptCodeNotFoundException.class)
 	public void testDeleteConceptCode_throw_ConceptCodeNotFoundException() throws ConceptCodeNotFoundException {
 		
 		when(conceptCodeRepository.findOne(anyLong())).thenReturn(null);
-		vst.delete((long)1);
+		conceptCodeServiceImpl.delete((long)1);
 		
 	}
 	
@@ -90,7 +90,7 @@ public class ConceptCodeServiceImplTest {
 		ConceptCodeDto conceptCodeDto=mock(ConceptCodeDto.class);
 		when(valueSetMgmtHelper.createConceptCodeDtoFromEntity(conceptCode)).thenReturn(conceptCodeDto);
 		
-		vst.findById((long)1);
+		conceptCodeServiceImpl.findById((long)1);
 		
 	}
 	
@@ -113,14 +113,14 @@ public class ConceptCodeServiceImplTest {
 		ConceptCodeDto conceptCodeDto=mock(ConceptCodeDto.class);
 		when(valueSetMgmtHelper.createConceptCodeDtoFromEntity(conceptCode)).thenReturn(conceptCodeDto);
 		
-		vst.update(updated);
+		conceptCodeServiceImpl.update(updated);
 	}
 	
 	@Test(expected = ConceptCodeNotFoundException.class)
 	public void testUpdateConceptCode_throw_ConceptCodeNotFoundException() throws ConceptCodeNotFoundException, ValueSetNotFoundException {
 		ConceptCodeDto updated=mock(ConceptCodeDto.class);
 		when(conceptCodeRepository.findOne(anyLong())).thenReturn(null);
-		vst.update(updated);
+		conceptCodeServiceImpl.update(updated);
 		
 	}
 	
@@ -183,7 +183,7 @@ public class ConceptCodeServiceImplTest {
 		
 		when(conceptCodeValueSetRepository.findAllByPkConceptCodeId(anyLong())).thenReturn(null);
 		
-		vst.update(updated);
+		conceptCodeServiceImpl.update(updated);
 	}
 	
 	@Test
@@ -197,7 +197,7 @@ public class ConceptCodeServiceImplTest {
 		conceptCodeDtos.add(conceptCodeDto);
 		when(valueSetMgmtHelper.convertConceptCodeEntitiesToDtos(conceptCodes)).thenReturn(conceptCodeDtos);
 		
-		assertEquals(vst.findAll(),conceptCodeDtos);
+		assertEquals(conceptCodeServiceImpl.findAll(),conceptCodeDtos);
 	}
 	
 	@Test
@@ -207,7 +207,7 @@ public class ConceptCodeServiceImplTest {
 		
 		when(conceptCodeRepository.findAllByNameLike(anyString())).thenReturn(conceptCodes);
 		when(valueSetMgmtHelper.convertConceptCodeEntitiesToDtos(conceptCodes)).thenReturn(conceptCodeDtos);
-		assertEquals(vst.findAllByName("a"),conceptCodeDtos);
+		assertEquals(conceptCodeServiceImpl.findAllByName("a"),conceptCodeDtos);
 		
 	}
 	
@@ -219,7 +219,7 @@ public class ConceptCodeServiceImplTest {
 		
 		when(conceptCodeRepository.findAllByCodeLike(anyString())).thenReturn(conceptCodes);
 		when(valueSetMgmtHelper.convertConceptCodeEntitiesToDtos(conceptCodes)).thenReturn(conceptCodeDtos);
-		assertEquals(vst.findAllByCode("a"),conceptCodeDtos);
+		assertEquals(conceptCodeServiceImpl.findAllByCode("a"),conceptCodeDtos);
 	}
 	 
 	
@@ -229,7 +229,7 @@ public class ConceptCodeServiceImplTest {
 		ConceptCodeVSCSDto conceptCodeVSCSDto=mock(ConceptCodeVSCSDto.class);
 		List<ValueSet> valueSets=mock(List.class);
 		when(valueSetRepository.findAll()).thenReturn(valueSets);
-		ConceptCodeVSCSDto result=vst.create();
+		ConceptCodeVSCSDto result=conceptCodeServiceImpl.create();
 	}
 	
 	@Test(expected = CodeSystemNotFoundException.class)
@@ -242,7 +242,7 @@ public class ConceptCodeServiceImplTest {
 		when(valueSetRepository.findAll()).thenReturn(valueSets);
 		when(codeSystemVersionRepository
 				.findOne(anyLong())).thenReturn(null);
-		ConceptCodeVSCSDto result=vst.create();
+		ConceptCodeVSCSDto result=conceptCodeServiceImpl.create();
 	}
 	
 	@Test(expected = CodeSystemNotFoundException.class)
@@ -256,7 +256,7 @@ public class ConceptCodeServiceImplTest {
 		
 		when(codeSystemVersionRepository
 				.findOne(anyLong())).thenReturn(null);
-		vst.create(created);
+		conceptCodeServiceImpl.create(created);
 	}
 	
 	@Test(expected = ValueSetNotFoundException.class)
@@ -275,7 +275,7 @@ public class ConceptCodeServiceImplTest {
 		
 		when(created.getValueSetIds()).thenReturn(null);
 		
-		vst.create(created);
+		conceptCodeServiceImpl.create(created);
 	}
 	
 	@Test(expected = ValueSetNotFoundException.class)
@@ -295,7 +295,7 @@ public class ConceptCodeServiceImplTest {
 		
 		when(valueSetRepository.findOne(anyLong())).thenReturn(null);
 		
-		vst.create(created);
+		conceptCodeServiceImpl.create(created);
 	}
 	
 	@Test
@@ -328,7 +328,7 @@ public class ConceptCodeServiceImplTest {
 		when(valueSetMgmtHelper.createConceptCodeDtoFromEntity(any(ConceptCode.class))).thenReturn(conceptCodeDto);
 		
 		
-		assertEquals(vst.create(created),conceptCodeDto);
+		assertEquals(conceptCodeServiceImpl.create(created),conceptCodeDto);
 	}
 	
 	@Test
@@ -361,7 +361,7 @@ public class ConceptCodeServiceImplTest {
 		when(valueSetMgmtHelper.createConceptCodeDtoFromEntity(any(ConceptCode.class))).thenReturn(conceptCodeDto);
 		
 		
-		assertEquals(vst.create(created),conceptCodeDto);
+		assertEquals(conceptCodeServiceImpl.create(created),conceptCodeDto);
 	}
 	
 }

@@ -50,22 +50,24 @@
 			<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
 				<li class="nav-header hidden-md" role="menuitem"></li>
 				
-				<li id="sidenav_codeSystems" role="menuitem"><a href="../sysadmin/home.html" th:href="@{/sysadmin/home.html}"><div class="fa fa-file"></div>
+				<li id="sidenav_codeSystems" role="menuitem"><a href="../sysadmin/home.html" th:href="@{/sysadmin/home.html}"><div class="fa fa-th-large"></div>
 						<span class="hidden-md" th:text="#{sidebar_codeSystems}"> Code Systems </span></a></li>
 
- 				<li id="sidenav_codeSystemVersions" role="menuitem"><a href="../sysadmin/codeSystemVersionList.html" th:href="@{/sysadmin/codeSystemVersionList.html}"> <div class="fa fa-file"></div>
+ 				<li id="sidenav_codeSystemVersions" role="menuitem"><a href="../sysadmin/codeSystemVersionList.html" th:href="@{/sysadmin/codeSystemVersionList.html}"> <div class="fa fa-th"></div>
 						<span class="hidden-md" th:text="#{sidebar_codeSystemVersions}">Code System Versions</span></a></li>
 						
-				<li id="sidenav_valueSetCats" role="menuitem"><a href="../sysadmin/valueSetCategoryList.html" th:href="@{/sysadmin/valueSetCategoryList.html}"> <div class="fa fa-file"></div>
+				<li id="sidenav_valueSetCats" role="menuitem"><a href="../sysadmin/valueSetCategoryList.html" th:href="@{/sysadmin/valueSetCategoryList.html}"> <div class="fa fa-th-list"></div>
 						<span class="hidden-md" th:text="#{sidebar_valueSetCats}">Value Set Categories</span></a></li>
 
-				<li id="sidenav_valueSets" role="menuitem"><a href="../sysadmin/valueSetList.html" th:href="@{/sysadmin/valueSetList.html}"> <div class="fa fa-file"></div>
+				<li id="sidenav_valueSets" role="menuitem"><a href="../sysadmin/valueSetList.html" th:href="@{/sysadmin/valueSetList.html}"> <div class="fa fa-list-ul"></div>
 						<span class="hidden-md" th:text="#{sidebar_valueSets}">Value Sets</span></a></li>
 	
-				<li id="sidenav_conceptCodes" role="menuitem"><a href="../sysadmin/conceptCodeList.html" th:href="@{/sysadmin/conceptCodeList.html}"> <div class="fa fa-file"></div>
+				<li id="sidenav_conceptCodes" role="menuitem"><a href="../sysadmin/conceptCodeList.html" th:href="@{/sysadmin/conceptCodeList.html}"> <div class="fa fa-table"></div>
 						<span class="hidden-md" th:text="#{sidebar_conceptCodes}"> Concept Codes </span></a></li>
-				<li id="sidenav_lookup" role="menuitem"><a href="../sysadmin/lookup.html" th:href="@{/sysadmin/lookup.html}"> <div class="fa fa-file"></div>
-						<span class="hidden-md" th:text="#{sidebar_lookup}"> Lookup Service </span></a></li>		
+				<li id="sidenav_lookup" role="menuitem"><a href="../sysadmin/lookup.html" th:href="@{/sysadmin/lookup.html}"> <div class="fa fa-exchange"></div>
+						<span class="hidden-md" th:text="#{sidebar_lookup}"> Lookup Service </span></a></li>
+				<li class="shortcut-button" role="menuitem"><a href="../index.html" th:href="@{/resources/j_spring_security_logout}" class="top-margin10"><div class="fa fa-off"></div>
+						<span class="hidden-md" th:text="#{sidebar_logout}"> Logout</span></a></li>		
 			</ul>
 		</div>
 					
@@ -78,7 +80,7 @@
 	
 	<div class="navbar-header navbar-inner-header" role="navigation" th:fragment="navbarHeaderFragment">
 			<a th:substituteby="fragment/common :: mobileMenuButtonFragment" class="btn btn-info btn-mainmenu" data-toggle="collapse" data-target=".top-nav.navbar-collapse,.sidebar-nav.navbar-collapse">
-				<span class="fa fa-reorder"></span>
+				<span class="fa fa-bars"></span>
 			</a>
 			<h1>
 				<span class="nav-title" th:text="${currentPageTitle}">Page Title</span>
@@ -127,6 +129,41 @@
 	</div>
 	
 	<!-- END: Navbar Header Fragment -->
+	
+	
+	
+	<!-- START: Pagination Fragment -->
+	<div th:fragment="pagination_fragment" class="sysAdmin_pagination">
+		<div id="pagination_numresults_holder" class="pagination">
+			<span style="margin: 0;">Total Results: &lt;<span id="pagination_numresults" class="force-inline no-pad" style="margin:0; float:none;"></span>&gt;</span>
+		</div>
+		<ul class="pagination">
+			<li id="pagination_first" class="pagination-li disabled">
+  				<span class="pagination-icon pagination-control">&laquo;</span>
+  			</li>
+  			<li id="pagination_prev" class="pagination-li disabled">
+  				<span class="pagination-icon pagination-control">&lsaquo;</span>
+  			</li>
+  			<li id="pagination_ellipsis_prev" class="pagination-li pagination_ellipsis disabled hidden">
+				<span class="pagination-icon pagination-control">...</span>
+			</li>
+  			<li id="pagination_1" class="pagination-li pagination-page active">
+  				<span class="pagination-icon pagination-pagenum" data-pagenum="1">1</span>
+  			</li>
+  			<li id="pagination_ellipsis_next" class="pagination-li pagination_ellipsis disabled hidden">
+				<span class="pagination-icon pagination-control">...</span>
+			</li>
+			<li id="pagination_next" class="pagination-li disabled">
+				<span class="pagination-icon pagination-control">&rsaquo;</span>
+			</li>
+			<li id="pagination_last" class="pagination-li disabled">
+				<span class="pagination-icon pagination-control">&raquo;</span>
+			</li>
+		</ul>
+	</div>
+	
+	
+	<!-- END: Pagination Fragment -->
 	
 	
 </body>

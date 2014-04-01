@@ -212,7 +212,11 @@ public class OrganizationalProviderServiceImpl implements OrganizationalProvider
 	}
 	
 	public boolean addNewOrganizationalProvider(OrganizationalProviderDto organizationalProviderDto) {
-		Patient patient=patientRepository.findByUsername(organizationalProviderDto.getUsername());
+		
+		Patient patient;
+		if(organizationalProviderDto.getUsername()==null&&organizationalProviderDto.getPatientId()!=null)
+		patient=patientRepository.findOne(Long.valueOf(organizationalProviderDto.getPatientId()).longValue());
+		else patient=patientRepository.findByUsername(organizationalProviderDto.getUsername());
 		Set<OrganizationalProvider> organizationalProviders=patient.getOrganizationalProviders();
 		OrganizationalProvider in_organizationalProvider=null;
 		for (OrganizationalProvider o:organizationalProviders){

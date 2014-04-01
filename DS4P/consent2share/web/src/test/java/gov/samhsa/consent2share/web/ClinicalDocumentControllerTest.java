@@ -1,14 +1,19 @@
 package gov.samhsa.consent2share.web;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import gov.samhsa.acs.common.validation.XmlValidation;
 import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
+import gov.samhsa.consent2share.infrastructure.security.ClamAVService;
+import gov.samhsa.consent2share.infrastructure.security.RecaptchaService;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.clinicaldata.ClinicalDocumentService;
 import gov.samhsa.consent2share.service.dto.ClinicalDocumentDto;
@@ -31,9 +36,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @RunWith(MockitoJUnitRunner.class)
 public class ClinicalDocumentControllerTest {
 
-	@InjectMocks
-	ClinicalDocumentController clinicalDocumentController = new ClinicalDocumentController();
-
 	@Mock
 	ClinicalDocumentService clinicalDocumentService;
 
@@ -51,13 +53,28 @@ public class ClinicalDocumentControllerTest {
 	
 	@Mock 
 	AccessReferenceMapper accessReferenceMapper;
+	
+	@Mock
+	ClamAVService clamAVUtil;
+	
+	@Mock
+	RecaptchaService recaptchaUtil;
+	
+	@Mock
+	XmlValidation xmlValidator;
+	
+	ClinicalDocumentController sut;
+	
+	ClinicalDocumentController clinicalDocumentController;
 
 	MockMvc mockMvc;
 
 	@Before
 	public void before() throws AccessControlException {
+		clinicalDocumentController=new ClinicalDocumentController(clinicalDocumentService, patientService, clinicalDocumentTypeCodeService, userContext, accessReferenceMapper, clamAVUtil, recaptchaUtil, xmlValidator);
+		sut=spy(clinicalDocumentController);
 		mockMvc = MockMvcBuilders.standaloneSetup(
-				this.clinicalDocumentController).build();
+				this.sut).build();
 		doReturn((long)1).when(accessReferenceMapper).getDirectReference("ScrambledText");
 		when(userContext.getCurrentUser()).thenReturn(authenticatedUser);
 		when(authenticatedUser.getUsername()).thenReturn("albert.smith");
@@ -95,7 +112,7 @@ public class ClinicalDocumentControllerTest {
 				.thenReturn(allDocumentTypeCodes);
 
 		mockMvc.perform(get("/patients/clinicaldocuments.html")).andExpect(
-				view().name("views/clinicaldocuments/clinicalDocuments"));
+				view().name("views/clinicaldocuments/secureClinicalDocuments"));
 
 	}
 	
@@ -169,13 +186,117 @@ public class ClinicalDocumentControllerTest {
 	}
 	
 	@Test
-	public void testUploadClinicalDocuments() throws Exception{
+	public void testSecureClinicalDocumentsUploadWhenAllChecksSucced() throws Exception {
 		MockMultipartFile file = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+		doReturn(true).when(xmlValidator).validate(any(InputStream.class));
+		doReturn(true).when(sut).scanMultipartFile(file);
+		doReturn(false).when(clinicalDocumentService).isDocumentOversized(file);
+		doReturn(true).when(clinicalDocumentService).isDocumentExtensionPermitted(file);
+		doReturn(true).when(recaptchaUtil).checkAnswer(anyString(), anyString(), anyString());
 		mockMvc.perform(fileUpload("/patients/clinicaldocuments.html").file(file)
 				.param("name", "mocked_name")
 				.param("description", "mocked_description")
 				.param("documentType", "mocked_type"))
 			.andExpect(view().name("redirect:/patients/clinicaldocuments.html"));
+	}
+	
+	@Test
+	public void testSecureClinicalDocumentsUploadWhenFileIsMalicious() throws Exception {
+		MockMultipartFile file = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+		doReturn(false).when(sut).scanMultipartFile(file);
+		doReturn(false).when(clinicalDocumentService).isDocumentOversized(file);
+		doReturn(true).when(clinicalDocumentService).isDocumentExtensionPermitted(file);
+		doReturn(true).when(recaptchaUtil).checkAnswer(anyString(), anyString(), anyString());
+		mockMvc.perform(fileUpload("/patients/clinicaldocuments.html").file(file)
+				.param("name", "mocked_name")
+				.param("description", "mocked_description")
+				.param("documentType", "mocked_type"))
+			.andExpect(view().name("redirect:/patients/clinicaldocuments.html?notify=virus_detected"));
+	}
+	
+	@Test
+	public void testSecureClinicalDocumentsUploadWhenFileIsOversized() throws Exception {
+		MockMultipartFile file = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+		doReturn(true).when(sut).scanMultipartFile(file);
+		doReturn(true).when(clinicalDocumentService).isDocumentOversized(file);
+		doReturn(true).when(clinicalDocumentService).isDocumentExtensionPermitted(file);
+		doReturn(true).when(recaptchaUtil).checkAnswer(anyString(), anyString(), anyString());
+		mockMvc.perform(fileUpload("/patients/clinicaldocuments.html").file(file)
+				.param("name", "mocked_name")
+				.param("description", "mocked_description")
+				.param("documentType", "mocked_type"))
+			.andExpect(view().name("redirect:/patients/clinicaldocuments.html?notify=size_over_limits"));
+	}
+	
+	@Test
+	public void testSecureClinicalDocumentsUploadWhenFileExtensionIsNotPermitted() throws Exception {
+		MockMultipartFile file = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+		doReturn(true).when(sut).scanMultipartFile(file);
+		doReturn(false).when(clinicalDocumentService).isDocumentOversized(file);
+		doReturn(false).when(clinicalDocumentService).isDocumentExtensionPermitted(file);
+		doReturn(true).when(recaptchaUtil).checkAnswer(anyString(), anyString(), anyString());
+		mockMvc.perform(fileUpload("/patients/clinicaldocuments.html").file(file)
+				.param("name", "mocked_name")
+				.param("description", "mocked_description")
+				.param("documentType", "mocked_type"))
+			.andExpect(view().name("redirect:/patients/clinicaldocuments.html?notify=extension_not_permitted"));
+	}
+	
+	@Test
+	public void testSecureClinicalDocumentsUploadWhenWrongCaptchaIsEnterred() throws Exception {
+		MockMultipartFile file = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+		doReturn(true).when(sut).scanMultipartFile(file);
+		doReturn(false).when(clinicalDocumentService).isDocumentOversized(file);
+		doReturn(true).when(clinicalDocumentService).isDocumentExtensionPermitted(file);
+		doReturn(false).when(recaptchaUtil).checkAnswer(anyString(), anyString(), anyString());
+		mockMvc.perform(fileUpload("/patients/clinicaldocuments.html").file(file)
+				.param("name", "mocked_name")
+				.param("description", "mocked_description")
+				.param("documentType", "mocked_type"))
+			.andExpect(view().name("redirect:/patients/clinicaldocuments.html?notify=wrong_captcha"));
+	}
+	
+	@Test
+	public void testScanMultipartFileWhenFileIsClean() throws Exception {
+		MockMultipartFile file = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+		doReturn(true).when(clamAVUtil).fileScanner(any(InputStream.class));
+		assertTrue(clinicalDocumentController.scanMultipartFile(file));
+	}
+	
+	@Test
+	public void testScanMultipartFileWhenFileIsNotClean() throws Exception {
+		MockMultipartFile file = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+		doReturn(false).when(clamAVUtil).fileScanner(any(InputStream.class));
+		assertFalse(clinicalDocumentController.scanMultipartFile(file));
+	}
+	
+	@Test
+	public void testShowSecureClinicalDocuments() throws Exception {
+		PatientProfileDto patientProfileDto = mock(PatientProfileDto.class);
+		List<ClinicalDocumentDto> clinicaldocumentDtos = new ArrayList<ClinicalDocumentDto>();
+		ClinicalDocumentDto notNullClinicalDocumentDto=mock(ClinicalDocumentDto.class);
+		LookupDto lookupDto=mock(LookupDto.class);
+		when(notNullClinicalDocumentDto.getClinicalDocumentTypeCode()).thenReturn(lookupDto);
+		clinicaldocumentDtos.add(notNullClinicalDocumentDto);
+		for (int i = 0; i < 3; i++) {
+			ClinicalDocumentDto clinicalDocumentDto = mock(ClinicalDocumentDto.class);
+			clinicaldocumentDtos.add(clinicalDocumentDto);
+		}
+		List<LookupDto> allDocumentTypeCodes = new ArrayList<LookupDto>();
+		for (int i = 0; i < 3; i++) {
+			LookupDto clinicalDocumentTypeCode = mock(LookupDto.class);
+			allDocumentTypeCodes.add(clinicalDocumentTypeCode);
+		}
+		when(patientService.findPatientProfileByUsername(anyString()))
+				.thenReturn(patientProfileDto);
+		when(clinicalDocumentService.findDtoByPatientDto(patientProfileDto))
+				.thenReturn(clinicaldocumentDtos);
+		when(clinicalDocumentTypeCodeService.findAllClinicalDocumentTypeCodes())
+				.thenReturn(allDocumentTypeCodes);
+
+		mockMvc.perform(get("/patients/clinicaldocuments.html")).andExpect(
+				view().name("views/clinicaldocuments/secureClinicalDocuments"));
+
 	}
 
 }

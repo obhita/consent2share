@@ -1,5 +1,6 @@
 var lastProviderState={};
 
+
 /**********************************************************************************
  * DOCUMENT.READY FUNCTION
 **********************************************************************************/
@@ -163,7 +164,6 @@ function setupPage(addConsent_tmp, isProviderAdminUser_tmp, specMedSetObj_tmp) {
 			}
 	    }
 	});
-	
 	
 	
 	/* When show.bs.popover event is thrown, close any other visible popovers, then flag triggered
@@ -429,6 +429,9 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 			        dateTemp = new Date();
 			        startDate = new Date(dateTemp.getFullYear(), dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
 			        endDate=new Date(dateTemp.getFullYear()+1, dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
+			        
+			        // set end date as a day minus 1 year
+			        endDate.setDate(endDate.getDate() - 1);
 				} else {
 					dateTemp = new Date($('#date-picker-start').attr('value'));
 					startDate = new Date(dateTemp.getFullYear(), dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
@@ -616,8 +619,24 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 								$('#formToBeSubmitted').append(tempStr.replace(/,/g,"^^^"));
 							}
 						}
-					
+						
+						$("div#sharedpurpose div").each(function(){		
+								var sharedPurposeOfUseName = $(this).text();
+								$("<input type='hidden' value='" + sharedPurposeOfUseName + "' />" ).attr("name","sharedPurposeNames").appendTo('#formToBeSubmitted');
+						});
+						
+						$("ul#authorizers li").each(function(){		
+							var authorizersName = $(this).text();
+							$("<input type='hidden' value='" + authorizersName + "' />" ).attr("name","authorizerNames").appendTo('#formToBeSubmitted');
+						});
+						
+						$("ul#consentmadetodisplay li").each(function(){		
+							var madeToName = $(this).text();
+							$("<input type='hidden' value='" + madeToName + "' />" ).attr("name","madeToNames").appendTo('#formToBeSubmitted');
+						});
+						
 						$('#formToBeSubmitted').submit();
+
 						//#ISSUE 138 Fix Start
 						// Loop through all forms and reset the checked values by its id or class attributes
 						$("form").each(function(e){
@@ -634,9 +653,48 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 					}else{
 						$('div.navbar-inner-header').after("<div class='validation-alert'><span><div class='alert alert-danger rounded'><button type='button' class='close' data-dismiss='alert'>&times;</button>You must add provider(s).</div></span></div>");
 					}
-					
-					
+
 				});
+				
+	
+				//callback handler for form submit
+				var frm = $('#formToBeSubmitted');
+				$("#formToBeSubmitted").submit(function(e)
+				{
+				    $.ajax(
+				    {
+						url: frm.attr('action'),
+						type: frm.attr('method'),
+						data: frm.serialize(),
+				        success:function(data, textStatus, jqXHR) 
+				        {
+				            //data: return data from server
+				        	var jsonData = JSON.parse(data);
+				        	if(jsonData["isSuccess"] === true){				        		
+				        		if(jsonData["isAdmin"] === true){
+				        			// staff is creating a consent on behalf of patient
+				        			if(jsonData["isAdd"] === false){
+				        				window.location.href = "adminPatientView.html?notify=editpatientconsent&status=success&id="+ jsonData["patientId"] ; 
+				        			} else {
+				        				window.location.href = "adminPatientView.html?notify=createpatientconsent&status=success&id="+ jsonData["patientId"];
+				        			}
+				        		} else{
+				        			//patient creating a consent
+				        			window.location.href = "listConsents.html?notify=add"; 
+				        		}
+				        	}				        	
+				        },
+				        error: function(jqXHR, textStatus, errorThrown) 
+				        {
+				        	
+				        	//TODO (MH): Handle different error types from controller
+				        	populateModalData(jqXHR.responseText);
+				        	$('div#consent_validation_modal').modal();
+				        }
+				    });
+				    e.preventDefault(); //STOP default action
+				});
+				
 				
 				
 				$("#addspecmedi").click(function(){
@@ -1293,3 +1351,95 @@ function clearConsent(form){
 	
 }
 //#ISSUE 138 Fix End
+function populateModalData(jsonObj) {
+	//TODO (MH): Add try/catch block for JSON.parse
+	var validationDataObj = JSON.parse(jsonObj);
+	
+	var selected_authorized_providers_ary = validationDataObj.selectedAuthorizedProviders;
+	var selected_discloseTo_providers_ary = validationDataObj.selectedDiscloseToProviders;
+	var selected_purposeOf_use_ary = validationDataObj.selectedPurposeOfUse;
+	
+	var existing_authorized_providers_ary = validationDataObj.existingAuthorizedProviders;
+	var existing_discloseTo_providers_ary = validationDataObj.existingDiscloseToProviders;
+	var existing_purposeOf_use_ary = validationDataObj.existingPurposeOfUse;
+	
+	var selected_authorized_providers_string = "";
+	var selected_discloseTo_providers_string = "";
+	var selected_purposeOf_use_string = "";
+	
+	try{
+		selected_authorized_providers_string = arrayToUlString(selected_authorized_providers_ary);
+		selected_discloseTo_providers_string = arrayToUlString(selected_discloseTo_providers_ary);
+		selected_purposeOf_use_string = arrayToUlString(selected_purposeOf_use_ary);
+	}catch(err){
+		if(err.name === "RangeError"){
+			selected_authorized_providers_string = "<ul><li>ERROR DISPLAYING DATA</li></ul>";
+			selected_discloseTo_providers_string = "<ul><li>ERROR DISPLAYING DATA</li></ul>";
+			selected_purposeOf_use_string = "<ul><li>ERROR DISPLAYING DATA</li></ul>";
+		}
+	}
+	
+	var selected_consent_start_date_string = validationDataObj.selectedConsentStartDate;
+	var selected_consent_end_date_string = validationDataObj.selectedConsentEndDate;
+	
+	var existing_authorized_providers_string = "";
+	var existing_discloseTo_providers_string = "";
+	var existing_purposeOf_use_string = "";
+	
+	try{
+		existing_authorized_providers_string = arrayToUlString(existing_authorized_providers_ary);
+		existing_discloseTo_providers_string = arrayToUlString(existing_discloseTo_providers_ary);
+		existing_purposeOf_use_string = arrayToUlString(existing_purposeOf_use_ary);
+	}catch(err){
+		existing_authorized_providers_string = "<ul><li>ERROR DISPLAYING DATA</li></ul>";
+		existing_discloseTo_providers_string = "<ul><li>ERROR DISPLAYING DATA</li></ul>";
+		existing_purposeOf_use_string = "<ul><li>ERROR DISPLAYING DATA</li></ul>";
+	}
+	
+	var existing_consent_start_date_string = validationDataObj.existingConsentStartDate;
+	var existing_consent_end_date_string = validationDataObj.existingConsentEndDate;
+	var existing_consent_status_string = validationDataObj.existingConsentStatus;
+	
+	var existing_consent_id = validationDataObj.existingConsentId;
+	
+	var selectedConsentPanelElement = $('div#consent_validation_modal form#frm_consent_validation_form > div#pnl_selected_consent');
+	var existingConsentPanelElement = $('div#consent_validation_modal form#frm_consent_validation_form > div#pnl_existing_consent');
+	
+	selectedConsentPanelElement.find('div#selected_authorized_providers > span.selected-consent-field-data#selected_authorized_providers_data').empty().html(selected_authorized_providers_string);
+	selectedConsentPanelElement.find('div#selected_discloseTo_providers > span.selected-consent-field-data#selected_discloseTo_providers_data').empty().html(selected_discloseTo_providers_string);
+	selectedConsentPanelElement.find('div#selected_purposeOf_use > span.selected-consent-field-data#selected_purposeOf_use_data').empty().html(selected_purposeOf_use_string);
+	selectedConsentPanelElement.find('div#selected_consent_start_date > span.selected-consent-field-data#selected_consent_start_date_data').text(selected_consent_start_date_string);
+	selectedConsentPanelElement.find('div#selected_consent_end_date > span.selected-consent-field-data#selected_consent_end_date_data').text(selected_consent_end_date_string);
+	
+	existingConsentPanelElement.find('div#existing_authorized_providers > span.existing-consent-field-data#existing_authorized_providers_data').empty().html(existing_authorized_providers_string);
+	existingConsentPanelElement.find('div#existing_discloseTo_providers > span.existing-consent-field-data#existing_discloseTo_providers_data').empty().html(existing_discloseTo_providers_string);
+	existingConsentPanelElement.find('div#existing_purposeOf_use > span.existing-consent-field-data#existing_purposeOf_use_data').empty().html(existing_purposeOf_use_string);
+	existingConsentPanelElement.find('div#existing_consent_start_date > span.existing-consent-field-data#existing_consent_start_date_data').text(existing_consent_start_date_string);
+	existingConsentPanelElement.find('div#existing_consent_end_date > span.existing-consent-field-data#existing_consent_end_date_data').text(existing_consent_end_date_string);
+	existingConsentPanelElement.find('div#existing_consent_status > span.existing-consent-field-data#existing_consent_status_data').text(existing_consent_status_string);
+	
+	//Bind new click event handler to "View Existing Consent" button
+	$('div#pnl_existing_consent button#btn_view_existing_consent').on("click", function(e){
+		e.preventDefault();
+		window.location.href="listConsents.html?duplicateconsent=" + existing_consent_id + "#jump_consent_" + existing_consent_id;
+	});
+}
+
+/**
+ * Convert array into a string of HTML code defining an unordered list
+ * 
+ * @param {array} in_array - array to convert
+ * @returns {String} out_string - returned string
+ */
+function arrayToUlString(in_array){
+	var ary_len = in_array.length;
+	var out_string = "<ul>";
+	
+	for(var i = 0; i < ary_len; i++){
+		out_string = out_string.concat("<li>" + in_array[i] + "</li>");
+	}
+	
+	out_string = out_string.concat("</ul>");
+	
+	return out_string;
+}

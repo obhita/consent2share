@@ -74,26 +74,38 @@ public class RequestGenerator {
 
 		String date = getDate();
 		
-		String request="<Request xmlns=\"urn:oasis:names:tc:xacml:2.0:context:schema:os\"     " +
-				"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">     <Subject>      " +
-				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject\"       " +
-				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       " +
-				"<AttributeValue>"+recepientSubjectNPI+"</AttributeValue>      </Attribute>      " +
-				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject\"       " +
-				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>"+intermediarySubjectNPI+"</AttributeValue>      " +
-				"</Attribute>	  <Attribute AttributeId=\"gov.samhsa.consent2share.purpose-of-use-code\"       " +
-				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>"+purposeOfUse+"</AttributeValue>      " +
-				"</Attribute>     </Subject>     <Resource>      " +
-				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:resource:resource-id\"       " +
-				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       " +
-				"<AttributeValue>"+patientId+"</AttributeValue>      </Attribute>     </Resource>     " +
-				"<Action>      <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\"       " +
-				"DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>write</AttributeValue>      " +
-				"</Attribute>     </Action>     <Environment>		" +
-				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:environment:current-dateTime\"       " +
-				"DataType=\"http://www.w3.org/2001/XMLSchema#dateTime\">       " +
-				"<AttributeValue>"+date+"</AttributeValue>      </Attribute>	 </Environment>    </Request>";
-		return request;
+		StringBuilder requestStringBuilder = new StringBuilder();
+		requestStringBuilder.append("<Request xmlns=\"urn:oasis:names:tc:xacml:2.0:context:schema:os\"     ");
+		requestStringBuilder.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">     <Subject>      ");
+		requestStringBuilder.append("<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject\"       ");
+		requestStringBuilder.append("DataType=\"http://www.w3.org/2001/XMLSchema#string\">       ");
+		requestStringBuilder.append("<AttributeValue>");
+		requestStringBuilder.append(recepientSubjectNPI);
+		requestStringBuilder.append("</AttributeValue>      </Attribute>      ");
+		requestStringBuilder.append("<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject\"       ");
+		requestStringBuilder.append("DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>");
+		requestStringBuilder.append(intermediarySubjectNPI);
+		requestStringBuilder.append("</AttributeValue>      ");
+		requestStringBuilder.append("</Attribute>	  <Attribute AttributeId=\"gov.samhsa.consent2share.purpose-of-use-code\"       ");
+		requestStringBuilder.append("DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>");
+		requestStringBuilder.append(purposeOfUse);
+		requestStringBuilder.append("</AttributeValue>      ");
+		requestStringBuilder.append("</Attribute>     </Subject>     <Resource>      ");
+		requestStringBuilder.append("<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:resource:resource-id\"       ");
+		requestStringBuilder.append("DataType=\"http://www.w3.org/2001/XMLSchema#string\">       ");
+		requestStringBuilder.append("<AttributeValue>");
+		requestStringBuilder.append(patientId);
+		requestStringBuilder.append("</AttributeValue>      </Attribute>     </Resource>     ");
+		requestStringBuilder.append("<Action>      <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\"       ");
+		requestStringBuilder.append("DataType=\"http://www.w3.org/2001/XMLSchema#string\">       <AttributeValue>write</AttributeValue>      ");
+		requestStringBuilder.append("</Attribute>     </Action>     <Environment>		");
+		requestStringBuilder.append("<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:environment:current-dateTime\"       ");
+		requestStringBuilder.append("DataType=\"http://www.w3.org/2001/XMLSchema#dateTime\">       ");
+		requestStringBuilder.append("<AttributeValue>");
+		requestStringBuilder.append(date);
+		requestStringBuilder.append("</AttributeValue>      </Attribute>	 </Environment>    </Request>");
+		
+		return requestStringBuilder.toString();
 	}
 	
 	/**

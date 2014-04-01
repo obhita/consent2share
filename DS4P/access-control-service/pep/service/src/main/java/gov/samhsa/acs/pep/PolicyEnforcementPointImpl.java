@@ -7,9 +7,12 @@ import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
+import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
 import gov.samhsa.acs.contexthandler.ContextHandler;
 import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentation;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidSegmentedClinicalDocumentException;
 import gov.samhsa.acs.pep.saml.SamlTokenParser;
 import gov.samhsa.acs.xdsb.common.XdsbErrorFactory;
 import gov.samhsa.acs.xdsb.registry.wsclient.adapter.XdsbRegistryAdapter;
@@ -23,13 +26,15 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.ws.WebServiceContext;
 
@@ -37,7 +42,6 @@ import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 
 import org.apache.ws.security.SAMLTokenPrincipal;
-import org.herasaf.xacml.core.api.PDP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,34 +79,37 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 	/** The marshaller. */
 	private SimpleMarshaller marshaller;
 
+	/** The context. */
 	@Resource
 	private WebServiceContext context;
 
+	/** The saml token parser. */
 	private SamlTokenParser samlTokenParser;
 
+	/** The saml token principal. */
 	private SAMLTokenPrincipal samlTokenPrincipal;
 
 	/** The data handler to bytes converter. */
 	private DataHandlerToBytesConverter dataHandlerToBytesConverter;
 
+	/**
+	 * Instantiates a new policy enforcement point impl.
+	 */
 	public PolicyEnforcementPointImpl() {
 	}
 
 	/**
 	 * Instantiates a new policy enforcement point impl.
-	 * 
-	 * @param xdsbRegistry
-	 *            the xdsb registry
-	 * @param xdsbRepository
-	 *            the xdsb repository
-	 * @param xdsbErrorFactory
-	 *            the xdsb error factory
-	 * @param contextHandler
-	 *            the context handler
-	 * @param documentSegmentation
-	 *            the document segmentation
-	 * @param marshaller
-	 *            the marshaller
+	 *
+	 * @param xdsbRegistry the xdsb registry
+	 * @param xdsbRepository the xdsb repository
+	 * @param xdsbErrorFactory the xdsb error factory
+	 * @param contextHandler the context handler
+	 * @param documentSegmentation the document segmentation
+	 * @param marshaller the marshaller
+	 * @param context the context
+	 * @param parser the parser
+	 * @param dataHandlerToBytesConverter the data handler to bytes converter
 	 */
 	public PolicyEnforcementPointImpl(XdsbRegistryAdapter xdsbRegistry,
 			XdsbRepositoryAdapter xdsbRepository,
@@ -289,6 +296,8 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 			// Start segmentation
 			XacmlResult xacmlResult = createXacmlResult(xacmlRequest,
 					xacmlResponse);
+			Map<String, String> errorMap = new HashMap<String, String>();
+			List<DocumentResponse> removeList = new LinkedList<DocumentResponse>();
 			for (DocumentResponse documentResponse : response
 					.getDocumentResponse()) {
 				String document = new String(documentResponse.getDocument());
@@ -306,16 +315,52 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 				String recipientEmailAddress = "";
 				String xdsDocumentEntryUniqueId = documentResponse
 						.getDocumentUniqueId();
-				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
-						.segmentDocument(document, enforcementPolicies,
-								packageAsXdm, encryptDocument,
-								senderEmailAddress, recipientEmailAddress,
-								xdsDocumentEntryUniqueId);
-				documentResponse.setDocument(segmentDocumentResponse
-						.getMaskedDocument().getBytes());
+				SegmentDocumentResponse segmentDocumentResponse = null;
+				try {
+					segmentDocumentResponse = documentSegmentation
+							.segmentDocument(document, enforcementPolicies,
+									packageAsXdm, encryptDocument,
+									senderEmailAddress, recipientEmailAddress,
+									xdsDocumentEntryUniqueId);
+				} catch (InvalidOriginalClinicalDocumentException e) {
+					logger.error(
+							"Creating error response for InvalidOriginalClinicalDocumentException.",
+							e);
+					handleXmlValidationError(documentResponse, removeList,
+							errorMap, xdsDocumentEntryUniqueId);
+				} catch (InvalidSegmentedClinicalDocumentException e) {
+					logger.error(
+							"Creating error response for InvalidSegmentedClinicalDocumentException.",
+							e);
+					handleXmlValidationError(documentResponse, removeList,
+							errorMap, xdsDocumentEntryUniqueId);
+				} catch (XmlDocumentReadFailureException e) {
+					logger.error(
+							"Creating error response for XmlDocumentReadFailureException.",
+							e);
+					handleXmlValidationError(documentResponse, removeList,
+							errorMap, xdsDocumentEntryUniqueId);
+				}
+				if (segmentDocumentResponse != null) {
+					documentResponse.setDocument(segmentDocumentResponse
+							.getMaskedDocument().getBytes());
+				}
 			}
-			return response;
+
+			// If there are any document failed schema validation
+			if (removeList.size() > 0) {
+				// Remove invalid document
+				response.getDocumentResponse().removeAll(removeList);
+				// Add proper error message in the response, and return it
+				return xdsbErrorFactory
+						.errorRetrieveDocumentSetResponseSchemaValidation(
+								response, errorMap);
+			} else {
+				return response;
+			}
+
 		} else {
+			// PDP did no return PERMIT
 			return xdsbErrorFactory
 					.errorRetrieveDocumentSetResponseAccessDeniedByPDP();
 		}
@@ -415,16 +460,19 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 		return response;
 	}
 
+	/* (non-Javadoc)
+	 * @see gov.samhsa.acs.pep.PolicyTrying#tryPolicy(java.lang.String, java.lang.String, java.lang.String)
+	 */
 	@Override
-	public String tryPolicy(String c32Xml, String xacmlPolicy, String purposeOfUse) {
+	public String tryPolicy(String c32Xml, String xacmlPolicy,
+			String purposeOfUse) {
 		PdpRequestResponse pdpRequestResponse = contextHandler
 				.makeDecisionForTryingPolicy(xacmlPolicy, purposeOfUse);
 		XacmlResponse xacmlResponse = pdpRequestResponse.getXacmlResponse();
-		
+
 		XacmlRequest xacmlRequest = pdpRequestResponse.getXacmlRequest();
 
 		XacmlResult xacmlResult = createXacmlResult(xacmlRequest, xacmlResponse);
-		
 
 		String enforcementPolicies = null;
 
@@ -439,10 +487,19 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 		String senderEmailAddress = "";
 		String recipientEmailAddress = "";
 		String xdsDocumentEntryUniqueId = "UniquId";
-		SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
-				.segmentDocument(c32Xml, enforcementPolicies, packageAsXdm,
-						encryptDocument, senderEmailAddress,
-						recipientEmailAddress, xdsDocumentEntryUniqueId);
+		SegmentDocumentResponse segmentDocumentResponse = null;
+		try {
+			segmentDocumentResponse = documentSegmentation.segmentDocument(
+					c32Xml, enforcementPolicies, packageAsXdm, encryptDocument,
+					senderEmailAddress, recipientEmailAddress,
+					xdsDocumentEntryUniqueId);
+		} catch (InvalidOriginalClinicalDocumentException e) {
+			logger.error("Error in tryPolicy", e);
+		} catch (InvalidSegmentedClinicalDocumentException e) {
+			logger.error("Error in tryPolicy", e);
+		} catch (XmlDocumentReadFailureException e) {
+			logger.error("Error in tryPolicy", e);
+		}
 		String segmentedC32 = segmentDocumentResponse.getMaskedDocument();
 
 		return segmentedC32;
@@ -450,7 +507,11 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 
 	/**
 	 * Sets the xacml request.
-	 * 
+	 *
+	 * @param resourceId the resource id
+	 * @param purposeOfUse the purpose of use
+	 * @param intermediarySubject the intermediary subject
+	 * @param recipientSubject the recipient subject
 	 * @return the xacml request
 	 */
 	public XacmlRequest setXacmlRequest(String resourceId, String purposeOfUse,
@@ -490,6 +551,25 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 		String pid = xdsbRegistry.extractPatientId(req);
 		String status = xdsbRegistry.extractDocumentEntryStatus(req);
 		return isNotNull(formatCode) && isNotNull(pid) && isNotNull(status);
+	}
+	
+	/**
+	 * Handle xml validation error.
+	 *
+	 * @param documentResponse the document response
+	 * @param removeList the remove list
+	 * @param errorMap the error map
+	 * @param xdsDocumentEntryUniqueId the xds document entry unique id
+	 */
+	private void handleXmlValidationError(DocumentResponse documentResponse,
+			List<DocumentResponse> removeList, Map<String, String> errorMap,
+			String xdsDocumentEntryUniqueId) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Document validation error occured for documentUniqueId='");
+		builder.append(xdsDocumentEntryUniqueId);
+		builder.append("'. Please contact to system administrator if this error persists.");
+		errorMap.put(xdsDocumentEntryUniqueId,builder.toString());
+		removeList.add(documentResponse);
 	}
 
 	/**
@@ -542,7 +622,8 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 		xacmlResult.setMessageId(xacmlRequest.getMessageId());
 		xacmlResult.setPdpDecision(xacmlResponse.getPdpDecision());
 		xacmlResult.setPdpObligations(xacmlResponse.getPdpObligation());
-		xacmlResult.setSubjectPurposeOfUse(SubjectPurposeOfUse.fromAbbreviation(xacmlRequest.getPurposeOfUse()));
+		xacmlResult.setSubjectPurposeOfUse(SubjectPurposeOfUse
+				.fromAbbreviation(xacmlRequest.getPurposeOfUse()));
 		return xacmlResult;
 	}
 }

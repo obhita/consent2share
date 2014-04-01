@@ -26,6 +26,7 @@
 package gov.samhsa.consent2share.infrastructure;
 
 import gov.samhsa.consent2share.service.dto.AdminProfileDto;
+import gov.samhsa.consent2share.service.dto.BasicPatientAccountDto;
 import gov.samhsa.consent2share.service.dto.LegalRepresentativeDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
 import gov.samhsa.consent2share.service.dto.SignupDto;
@@ -68,7 +69,7 @@ public class FieldValidator implements Validator {
 		try {
 			if (target instanceof SignupDto
 					|| target instanceof PatientProfileDto
-					|| target instanceof LegalRepresentativeDto || target instanceof AdminProfileDto
+					|| target instanceof LegalRepresentativeDto || target instanceof AdminProfileDto || target instanceof BasicPatientAccountDto
 					) {
 
 				// First name
@@ -101,7 +102,8 @@ public class FieldValidator implements Validator {
 				// Date of Birth
 				if(target instanceof SignupDto
 						|| target instanceof PatientProfileDto
-						|| target instanceof LegalRepresentativeDto ){
+						|| target instanceof LegalRepresentativeDto 
+						|| target instanceof BasicPatientAccountDto){
 				Date birthDate = (Date) PropertyUtils.getProperty(target,
 						"birthDate");
 				if (birthDate == null) {

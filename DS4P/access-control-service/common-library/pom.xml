@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>access-control-service</artifactId>
-		<version>0.4.0-SNAPSHOT</version>
+		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>common-library</artifactId>
 
@@ -12,6 +12,11 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
+	
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>	
 
 		<dependency>
 			<groupId>org.apache.santuario</groupId>
@@ -63,6 +68,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>		
+
 	</dependencies>
 
 	<build>
@@ -84,7 +95,9 @@
 							<exclude>gov/va/ds4p/cas/*.class</exclude>
 							<exclude>gov/va/ds4p/cas/providers/*.class</exclude>
 							<exclude>gov/samhsa/acs/common/exception/*.class</exclude>
+							<exclude>gov/samhsa/acs/common/validation/exception/*.class</exclude>
 							<exclude>gov/samhsa/acs/common/bean/XacmlResult.class</exclude>
+							<exclude>gov/samhsa/acs/common/validation/LSInputImpl.class</exclude>
 <!-- 							The following classes are excluded because they are never referenced. -->
 							<exclude>gov/samhsa/acs/common/util/DecryptTool.class</exclude>
 <!-- 							The following class is excluded because it seems like a temporary solution and it's only used in test case. -->

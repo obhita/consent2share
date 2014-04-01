@@ -106,7 +106,7 @@
 		ref="notificationExceptionHandler" output-channel="nullChannel" />
 
 	<int:service-activator input-channel="errorChannel"
-		ref="unackExceptionHandler" method="handError" output-channel="nullChannel" />
+		ref="unackExceptionHandler" method="handleError" output-channel="nullChannel" />
 
 	<bean id="inboundChannelAdapterEndpointStarter" class="gov.samhsa.consent2share.si.EndpointStarter">
 		<property name="endpointStopperCounterpart" ref="inboundChannelAdapterEndpointStopper" />

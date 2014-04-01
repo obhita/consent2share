@@ -202,7 +202,10 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 	 *            the rule name
 	 */
 	private void addRuleName(String ruleName) {
-		firedRuleNames = (!firedRuleNames.equals("")) ? firedRuleNames + ", "
-				+ ruleName : ruleName;
+		StringBuilder builder = new StringBuilder();
+		builder.append(firedRuleNames);
+		builder.append(", ");
+		builder.append(ruleName);
+		firedRuleNames = (!firedRuleNames.equals("")) ? builder.toString() : ruleName;
 	}
 }

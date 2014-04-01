@@ -371,6 +371,41 @@ public class PatientServiceImpl implements PatientService {
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.patient.PatientService#findAddConsentOrganizationalProviderDtoByUsername(java.lang.String)
 	 */
+	public List<AddConsentOrganizationalProviderDto> findAddConsentOrganizationalProviderDtoByPatientId(
+			long pateintId) {
+		Patient patient = patientRepository.findOne(pateintId);
+		List<AddConsentOrganizationalProviderDto> organizationalProvidersDto = new ArrayList<AddConsentOrganizationalProviderDto>();
+		Set<OrganizationalProvider> organizationalProviders = patient
+				.getOrganizationalProviders();
+		Iterator<OrganizationalProvider> organizationalProvidersIterator = organizationalProviders
+				.iterator();
+		while (organizationalProvidersIterator.hasNext()) {
+			organizationalProvidersDto.add(modelMapper.map(
+					organizationalProvidersIterator.next(),
+					AddConsentOrganizationalProviderDto.class));
+		}
+		return organizationalProvidersDto;
+	}
+	
+	public List<AddConsentIndividualProviderDto> findAddConsentIndividualProviderDtoByPatientId(
+			long pateintId) {
+		Patient patient = patientRepository.findOne(pateintId);
+		List<AddConsentIndividualProviderDto> individualProvidersDto = new ArrayList<AddConsentIndividualProviderDto>();
+		Set<IndividualProvider> individualProviders = patient
+				.getIndividualProviders();
+		Iterator<IndividualProvider> individualProvidersIterator = individualProviders
+				.iterator();
+		while (individualProvidersIterator.hasNext()) {
+			individualProvidersDto.add(modelMapper.map(
+					individualProvidersIterator.next(),
+					AddConsentIndividualProviderDto.class));
+		}
+		return individualProvidersDto;
+	}
+
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.patient.PatientService#findAddConsentOrganizationalProviderDtoByUsername(java.lang.String)
+	 */
 	public List<AddConsentOrganizationalProviderDto> findAddConsentOrganizationalProviderDtoByUsername(
 			String username) {
 		Patient patient = patientRepository.findByUsername(username);

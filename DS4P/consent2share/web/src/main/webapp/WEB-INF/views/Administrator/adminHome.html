@@ -56,7 +56,7 @@
 			<!-- The code below is here only to enhance source code readability -->
 			
 					<!-- <a class="btn btn-info btn-mainmenu" data-toggle="collapse" data-target=".top-nav.navbar-collapse,.sidebar-nav.navbar-collapse">
-						<span class="fa fa-reorder"></span>
+						<span class="fa fa-bars"></span>
 					</a> -->
 					<h1>
 						<span class="nav-title">Administrator</span>
@@ -110,6 +110,15 @@
 				</span>
 			</div>
 			
+			<div th:switch="${notify}">
+			<span th:case ="'createPatientFailed'">
+					<div class="alert alert-danger rounded">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		    			Error when creating new patient! please check the information.
+  		    			</div>
+  		    			</span>
+					</div>
+			
 		</div>
 	</header>
 	<div id="under-header"></div>
@@ -119,23 +128,24 @@
 		<div class="row main-content-wrapper">
 			
 			<div class="col-md-12 top-margin10">
-				<form id="adminHomeSearchBar" class="summary-border" role="search">
+				<div id="adminHomeSearchBar" class="summary-border" role="search">
       				
-      				<div class="">
-    					<div class="input-group input-group-sm">
-      						<input id="searchTextBox" type="text" placeholder="Search" class="form-control" />
-      						<span class="input-group-btn">
-        						<button class="btn btn-default" type="button"><span class="fa fa-search"></span><span class="hidden-xs"> Advanced Search</span></button>
-      						</span> 
-						   	<span title="plus button" id="patient-Account-btn">
-								<button id="consent-main-plus-btn" class="btn btn-primary btn-sm add-btn" data-toggle="modal" data-target="#createPatient" onclick="window.location = '#';">
-									<span class="fa fa-plus fa-white"></span><span class="hidden-479" style="padding-left: 5px;">Patient Account</span>
-								</button>
-							</span>
-    					</div><!-- /input-group -->
-  					</div><!-- /.col-lg-6 -->
+   					<div class="input-group input-group-sm">
+     					<input id="searchTextBox" type="text" placeholder="Search" class="form-control" />
+     					<span class="input-group-btn">
+       						<button class="btn btn-default" type="button">
+       							<span class="fa fa-search"></span>
+       							<span class="hidden-xs"> Advanced Search</span>
+       						</button>
+     					</span>
+						<span title="plus button" id="patient-Account-btn" class="input-group-btn">
+							<button id="consent-main-plus-btn" class="btn btn-primary btn-sm add-btn" data-toggle="modal" data-target="#createPatient" onclick="window.location = '#';">
+								<span class="fa fa-plus fa-white"></span><span class="hidden-479" style="padding-left: 5px;">Patient Account</span>
+							</button>
+						</span>
+   					</div><!-- /input-group -->
       				
-    			</form><div class="clearfix"></div>
+    			</div>
 			</div>
 
 <!-- MODAL -->
@@ -166,23 +176,24 @@
 							</section>
 					
 							<section class="row">
-								<div class="form-group col-sm-5">
+								<div class="form-group col-sm-4 col-xs-7">
 									<div>
 										<label for="gender">Gender</label>
 									</div>
 									<div class="gender-select-controls">
 										<!-- TODO: Add Thymeleaf integration with administrativeGenderCode field -->
-										<select id="gender" class="form-control inline-block">
-											<option selected="selected" value="">--- Please Select ---</option>
-											<option value="F">Female</option>
-											<option value="M">Male</option>
+										<select id="gender" th:field="*{administrativeGenderCode}" class="form-control inline-block">
+											<option selected="selected" value="">- Please Select -</option>
+											<option th:each="gender : ${administrativeGenderCodes}"
+														th:value="${gender.code}" th:text="${gender.displayName}">F</option>
 										</select>
 										<span id="gender_error_text" class="required-text" style="display:none;">Gender Selection is required.</span>
 										<span id="gender_client_error_text" class="required-text" style="display: none;">Gender Selection is required.</span>
 									</div>
+									
 								</div>
 						
-								<div class="form-group col-sm-7">
+								<div class="form-group col-sm-8 col-xs-12">
 									<div>
 										<label class="control-label">Date of Birth</label>
 									</div>
@@ -246,6 +257,14 @@
 									</div>
 								</div>
 							</section>
+							<section class="row">
+								<div class="form-group col-sm-6">
+										<label>Email Address</label>
+										<input id="email" name="email" type="text" aria-required="true" th:field="*{email}" class="form-control inline-block" />
+										<span class="required-text" th:errors="*{email}">E-Mail is required.</span>
+										<span id="email_client_error_text" class="required-text" style="display: none;">E-Mail is required.</span>
+								</div>
+							</section>
 						</div>
 					
 						<div class="modal-footer">
@@ -262,7 +281,7 @@
 <!-- END MODAL -->			
 						
 			<div class="row">
-				<section class="box col-sm-6">
+				<section class="box col-md-6">
 					
 						<div class="box-header">
 								<h2>
@@ -311,7 +330,7 @@
                 	
 				</section>
 			
-				<section class="box col-md-6 col-sm-6">
+				<section class="box col-md-6">
 					<div class="box-header">
 								<h2>
 									<span class="fa fa-list"></span><span class="break"></span>Favorite Providers

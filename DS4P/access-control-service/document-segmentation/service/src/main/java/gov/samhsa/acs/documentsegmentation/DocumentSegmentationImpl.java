@@ -33,7 +33,12 @@ import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.common.util.EncryptTool;
+import gov.samhsa.acs.common.validation.XmlValidation;
+import gov.samhsa.acs.common.validation.exception.InvalidXmlDocumentException;
+import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
 import gov.samhsa.acs.documentsegmentation.audit.AuditService;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
+import gov.samhsa.acs.documentsegmentation.exception.InvalidSegmentedClinicalDocumentException;
 import gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocument;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEditor;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypter;
@@ -105,6 +110,15 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 	/** The additional metadata generator for segmented clinical document. */
 	private final AdditionalMetadataGeneratorForSegmentedClinicalDocument additionalMetadataGeneratorForSegmentedClinicalDocument;
 
+	/** The xml validator. */
+	private XmlValidation xmlValidator;
+
+	/** The Constant C32_CDA_XSD_PATH. */
+	public static final String C32_CDA_XSD_PATH = "schema/cdar2c32/infrastructure/cda/";
+
+	/** The Constant C32_CDA_XSD_NAME. */
+	public static final String C32_CDA_XSD_NAME = "C32_CDA.xsd";
+
 	/**
 	 * Instantiates a new document processor impl.
 	 * 
@@ -160,6 +174,7 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 		this.embeddedClinicalDocumentExtractor = embeddedClinicalDocumentExtractor;
 		this.valueSetService = valueSetService;
 		this.additionalMetadataGeneratorForSegmentedClinicalDocument = additionalMetadataGeneratorForSegmentedClinicalDocument;
+		this.xmlValidator = createXmlValidator();
 	}
 
 	/**
@@ -180,14 +195,39 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 	 * @param xdsDocumentEntryUniqueId
 	 *            the xds document entry unique id
 	 * @return the process document response
+	 * @throws XmlDocumentReadFailureException
+	 *             the xml document read failure exception
+	 * @throws InvalidOriginalClinicalDocumentException
+	 *             the invalid original clinical document exception
+	 * @throws InvalidSegmentedClinicalDocumentException
+	 *             the invalid segmented clinical document exception
 	 */
 	@Override
 	public SegmentDocumentResponse segmentDocument(String document,
 			String enforcementPolicies, boolean packageAsXdm,
 			boolean encryptDocument, String senderEmailAddress,
-			String recipientEmailAddress, String xdsDocumentEntryUniqueId) {
+			String recipientEmailAddress, String xdsDocumentEntryUniqueId)
+			throws XmlDocumentReadFailureException,
+			InvalidOriginalClinicalDocumentException,
+			InvalidSegmentedClinicalDocumentException {
 
 		Assert.notNull(document);
+		String err = "";
+		try {
+			StringBuilder builder = new StringBuilder();
+			builder.append("Schema validation is failed for original clinical document.");
+			builder.append((xdsDocumentEntryUniqueId != null ? " documentUniqueId:" + xdsDocumentEntryUniqueId:""));
+			err =  builder.toString() ;
+			Assert.isTrue(xmlValidator.validate(document),err);
+		} catch (InvalidXmlDocumentException e) {
+			logger.error(err, e);
+			logger.error("Invalid Original Clinical Document: ");
+			logger.error(document);
+			throw new InvalidOriginalClinicalDocumentException(err, e);
+		} catch (XmlDocumentReadFailureException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
 		Assert.notNull(enforcementPolicies);
 
 		RuleExecutionContainer ruleExecutionContainer = null;
@@ -314,6 +354,30 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 			throw new DS4PException(e.toString(), e);
 		}
 
+		try {
+			StringBuilder builder = new StringBuilder();
+			builder.append("Schema validation is failed for segmented clinical document.");
+			builder.append((xdsDocumentEntryUniqueId != null ? " documentUniqueId:" + xdsDocumentEntryUniqueId:""));
+			err = builder.toString();
+			Assert.isTrue(xmlValidator.validate(document),err);
+		} catch (InvalidXmlDocumentException e) {
+			logger.error(err, e);
+			logger.error("Invalid Segmented Clinical Document: ");
+			logger.error(document);
+			throw new InvalidSegmentedClinicalDocumentException(err, e);
+		} catch (XmlDocumentReadFailureException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
 		return segmentDocumentResponse;
+	}
+
+	/**
+	 * Creates the xml validator.
+	 * 
+	 * @return the xml validation
+	 */
+	private XmlValidation createXmlValidator() {
+		return new XmlValidation(this.getClass().getClassLoader().getResourceAsStream(C32_CDA_XSD_PATH + C32_CDA_XSD_NAME),C32_CDA_XSD_PATH);
 	}
 }

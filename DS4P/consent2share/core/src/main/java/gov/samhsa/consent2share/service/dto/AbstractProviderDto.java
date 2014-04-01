@@ -39,6 +39,9 @@ public abstract class AbstractProviderDto implements HasId{
 	
 	/** The id. */
 	private String id;
+	
+	/** The id. */
+	private String patientId;
 
 	/** The npi. */
     @Size(min = 3, max = 30)
@@ -524,6 +527,16 @@ public abstract class AbstractProviderDto implements HasId{
 	public void setPracticeLocationAddressCountryCode(
 			String practiceLocationAddressCountryCode) {
 		this.practiceLocationAddressCountryCode = practiceLocationAddressCountryCode;
+	}
+
+
+	public String getPatientId() {
+		return patientId;
+	}
+
+
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
 	}
 
 

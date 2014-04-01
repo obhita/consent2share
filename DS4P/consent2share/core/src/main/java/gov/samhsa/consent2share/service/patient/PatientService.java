@@ -157,6 +157,20 @@ public interface PatientService {
 	 */
 	List<AddConsentOrganizationalProviderDto> findAddConsentOrganizationalProviderDtoByUsername(
 			String username);
+	
+	
+	
+	List<AddConsentIndividualProviderDto> findAddConsentIndividualProviderDtoByPatientId(
+			long pateintId);
+
+	/**
+	 * Find add consent organizational provider dto by username.
+	 *
+	 * @param username the username
+	 * @return the array list
+	 */
+	List<AddConsentOrganizationalProviderDto> findAddConsentOrganizationalProviderDtoByPatientId(
+			long pateintId);
 
 
 	/**

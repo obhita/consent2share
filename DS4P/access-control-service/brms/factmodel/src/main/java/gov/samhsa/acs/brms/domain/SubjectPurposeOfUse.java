@@ -81,6 +81,10 @@ public enum SubjectPurposeOfUse {
 				return p;
 			}
 		}
-		throw new IllegalArgumentException("The abbreviation '"+purposeOfUse+"' is not defined in this enum.");
+		StringBuilder builder = new StringBuilder();
+		builder.append("The abbreviation '");
+		builder.append(purposeOfUse);
+		builder.append("' is not defined in this enum.");
+		throw new IllegalArgumentException(builder.toString());
 	}
 }

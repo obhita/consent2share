@@ -25,12 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.service.dto;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.Version;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -42,7 +37,7 @@ public class ClinicalDocumentDto implements HasId{
 
 	/** The name. */
 	@NotEmpty
-	@Size(max = 30)
+	@Size(max = 100)
 	private String name;
 
 	/** The clinical document type code. */
@@ -66,7 +61,6 @@ public class ClinicalDocumentDto implements HasId{
 	private String contentType;
 
 	/** The document size. */
-	@NotEmpty
 	private Long documentSize;
 
 	/** The document url. */

@@ -16,6 +16,8 @@ http://www.springframework.org/schema/task/spring-task-3.2.xsd">
 	<task:scheduled-tasks scheduler="theScheduler">
 
 		<task:scheduled ref="consentEffectiveAndToBeExpiredPollingService" method="poll" cron="${taskScheduler.consentToBeExpiredPolling.cron}"/>
+		<task:scheduled ref="esignaturePollingService" method="poll"
+			fixed-delay="${esignaturePollingServicePollTaskFixedDelayInMilliseconds}" />
 	</task:scheduled-tasks>
 
 </beans>

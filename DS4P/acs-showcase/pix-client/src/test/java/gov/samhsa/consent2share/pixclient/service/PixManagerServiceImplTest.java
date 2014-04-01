@@ -43,7 +43,7 @@ public class PixManagerServiceImplTest {
 		serviceName = new QName("urn:org:openhie:openpixpdq:services",
 				"PIXManager_Service");
 
-		address = "http://localhost:9000/services/PIXManager_Service";
+		address = "http://localhost:12345/services/PIXManager_Service";
 		wsdlURL = ClassLoader.getSystemResource("PIXPDQManager.wsdl");
 		sut.setPort(pIXManagerPortTypeMock);
 	}

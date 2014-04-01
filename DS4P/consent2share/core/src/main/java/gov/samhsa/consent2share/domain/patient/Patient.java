@@ -63,6 +63,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
@@ -133,38 +134,41 @@ public class Patient {
 	/** The username. */
 	@Size(min = 3, max = 30)
 	private String username;
+	
+	/** The verification Code. */
+	private String verificationCode;
 
 	/** The social security number. */
 	@Pattern(regexp = "(\\d{3}-?\\d{2}-?\\d{4})*")
 	private String socialSecurityNumber;
 
 	/** The administrative gender code. */
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	private AdministrativeGenderCode administrativeGenderCode;
 
 	/** The marital status code. */
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	private MaritalStatusCode maritalStatusCode;
 
 	/** The religious affiliation code. */
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	private ReligiousAffiliationCode religiousAffiliationCode;
 
 	/** The race code. */
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	private RaceCode raceCode;
 
 	/** The ethnic group code. */
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	private EthnicGroupCode ethnicGroupCode;
 
 	/** The language code. */
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	private LanguageCode languageCode;
 
@@ -486,6 +490,26 @@ public class Patient {
 	 */
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	
+	
+	/**
+	 * Gets the verification code.
+	 *
+	 * @return the verification code
+	 */
+	public String getVerificationCode() {
+		return verificationCode;
+	}
+
+	/**
+	 * Sets the verification code.
+	 *
+	 * @param verificationCode the new verification code
+	 */
+	public void setVerificationCode(String verificationCode) {
+		this.verificationCode = verificationCode;
 	}
 
 	/**

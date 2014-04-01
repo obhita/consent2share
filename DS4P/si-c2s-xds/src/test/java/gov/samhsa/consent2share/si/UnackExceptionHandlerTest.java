@@ -24,7 +24,7 @@ public class UnackExceptionHandlerTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testHandError_Throws_Exception_Given_Null_Message() throws Throwable {
-		sut.handError(null);
+		sut.handleError(null);
 	}
 
 	public void testHandError_ReThrows_Exception_As_Expected() {
@@ -37,7 +37,7 @@ public class UnackExceptionHandlerTest {
 
 
 		try {
-			sut.handError(errorMessageMock);
+			sut.handleError(errorMessageMock);
 		} catch (Throwable e) {
 			assertEquals(exMock, e);
 		}

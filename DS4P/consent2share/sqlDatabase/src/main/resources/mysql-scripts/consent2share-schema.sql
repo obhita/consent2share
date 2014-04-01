@@ -20,8 +20,7 @@ create unique index ix_auth_username on authorities
 
 
 # Section two: The following is generated from domain using JPA mapping and JSR303 validation annotations
-    
-
+ 
     create table address_use_code (
         id bigint not null auto_increment,
         code varchar(250) not null,
@@ -145,7 +144,7 @@ create unique index ix_auth_username on authorities
         document_size bigint not null,
         document_url varchar(100),
         filename varchar(255) not null,
-        name varchar(30) not null,
+        name varchar(100) not null,
         version integer,
         clinical_document_type_code bigint,
         patient bigint,
@@ -163,7 +162,7 @@ create unique index ix_auth_username on authorities
         document_size bigint,
         document_url varchar(100),
         filename varchar(255),
-        name varchar(30),
+        name varchar(100),
         clinical_document_type_code bigint,
         patient bigint,
         primary key (id, rev)
@@ -191,6 +190,83 @@ create unique index ix_auth_username on authorities
         original_text varchar(250),
         version integer,
         primary key (id)
+    ) ENGINE=InnoDB
+;
+
+    create table code_system (
+        code_system_id bigint not null auto_increment unique,
+        creation_time datetime,
+        modification_time datetime,
+        user_name varchar(255) not null,
+        code varchar(255) not null,
+        name varchar(255) not null,
+        code_system_oid varchar(255) not null unique,
+        display_name varchar(255),
+        primary key (code_system_id)
+    ) ENGINE=InnoDB
+;
+
+    create table code_system_aud (
+        code_system_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        code_system_oid varchar(255),
+        display_name varchar(255),
+        primary key (code_system_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table code_system_version (
+        code_system_version_id bigint not null auto_increment unique,
+        creation_time datetime,
+        modification_time datetime,
+        user_name varchar(255) not null,
+        description varchar(255),
+        version_name varchar(255) not null,
+        fk_code_system_id bigint,
+        primary key (code_system_version_id)
+    ) ENGINE=InnoDB
+;
+
+    create table code_system_version_aud (
+        code_system_version_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        description varchar(255),
+        version_name varchar(255),
+        fk_code_system_id bigint,
+        primary key (code_system_version_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table concept_code (
+        concept_code_id bigint not null auto_increment unique,
+        creation_time datetime,
+        modification_time datetime,
+        user_name varchar(255) not null,
+        code varchar(255) not null,
+        name varchar(5000) not null,
+        description varchar(5000),
+        fk_code_system_version_id bigint,
+        primary key (concept_code_id),
+        unique (code, fk_code_system_version_id)
+    ) ENGINE=InnoDB
+;
+
+    create table concept_code_aud (
+        concept_code_id bigint not null,
+        rev bigint not null,
+        revtype tinyint,
+        description varchar(5000),
+        fk_code_system_version_id bigint,
+        primary key (concept_code_id, rev)
+    ) ENGINE=InnoDB
+;
+
+    create table conceptcode_valueset (
+        fk_concept_code_id bigint,
+        fk_valueset_id bigint,
+        primary key (fk_concept_code_id, fk_valueset_id)
     ) ENGINE=InnoDB
 ;
 
@@ -353,10 +429,11 @@ create unique index ix_auth_username on authorities
         id bigint not null auto_increment,
         expire_in_hours integer not null,
         is_token_used boolean,
+        patient_id bigint not null,
         request_date_time datetime not null,
         token varchar(100) not null,
         token_type integer not null,
-        username varchar(30) not null,
+        username varchar(30),
         version integer,
         primary key (id)
     ) ENGINE=InnoDB
@@ -660,6 +737,7 @@ create unique index ix_auth_username on authorities
         social_security_number varchar(255),
         telephone varchar(255),
         username varchar(30),
+        verification_code varchar(255),
         version integer,
         address_use_code bigint,
         country_code bigint,
@@ -692,6 +770,7 @@ create unique index ix_auth_username on authorities
         social_security_number varchar(255),
         telephone varchar(255),
         username varchar(30),
+        verification_code varchar(255),
         address_use_code bigint,
         country_code bigint,
         state_code bigint,
@@ -1192,82 +1271,6 @@ create unique index ix_auth_username on authorities
     ) ENGINE=InnoDB
 ;
 
-    create table code_system (
-        code_system_id bigint not null auto_increment unique,
-        creation_time datetime,
-        modification_time datetime,
-        user_name varchar(255) not null,
-        code varchar(255) not null,
-        name varchar(255) not null,
-        code_system_oid varchar(255) not null unique,
-        display_name varchar(255),
-        primary key (code_system_id)
-    ) ENGINE=InnoDB
-;
-
-    create table code_system_aud (
-        code_system_id bigint not null,
-        rev bigint not null,
-        revtype tinyint,
-        code_system_oid varchar(255),
-        display_name varchar(255),
-        primary key (code_system_id, rev)
-    ) ENGINE=InnoDB
-;
-
-    create table code_system_version (
-        code_system_version_id bigint not null auto_increment unique,
-        creation_time datetime,
-        modification_time datetime,
-        user_name varchar(255) not null,
-        description varchar(255),
-        version_name varchar(255) not null,
-        fk_code_system_id bigint,
-        primary key (code_system_version_id)
-    ) ENGINE=InnoDB
-;
-
-    create table code_system_version_aud (
-        code_system_version_id bigint not null,
-        rev bigint not null,
-        revtype tinyint,
-        description varchar(255),
-        version_name varchar(255),
-        fk_code_system_id bigint,
-        primary key (code_system_version_id, rev)
-    ) ENGINE=InnoDB
-;
-
-    create table concept_code (
-        concept_code_id bigint not null auto_increment unique,
-        creation_time datetime,
-        modification_time datetime,
-        user_name varchar(255) not null,
-        code varchar(255) not null,
-        name varchar(255) not null,
-        description varchar(255),
-        fk_code_system_version_id bigint,
-        primary key (concept_code_id),
-        unique (code, fk_code_system_version_id)
-    ) ENGINE=InnoDB
-;
-
-    create table concept_code_aud (
-        concept_code_id bigint not null,
-        rev bigint not null,
-        revtype tinyint,
-        description varchar(255),
-        fk_code_system_version_id bigint,
-        primary key (concept_code_id, rev)
-    ) ENGINE=InnoDB
-;
-
-    create table conceptcode_valueset (
-        fk_concept_code_id bigint,
-        fk_valueset_id bigint,
-        primary key (fk_concept_code_id, fk_valueset_id)
-    ) ENGINE=InnoDB
-;
     create table value_set (
         valueset_id bigint not null auto_increment,
         creation_time datetime,
@@ -1298,7 +1301,7 @@ create unique index ix_auth_username on authorities
         user_name varchar(255) not null,
         code varchar(255) not null unique,
         name varchar(255) not null,
-        description varchar(255),
+        description varchar(5000),
         primary key (valueset_cat_id)
     ) ENGINE=InnoDB
 ;
@@ -1307,7 +1310,7 @@ create unique index ix_auth_username on authorities
         valueset_cat_id bigint not null,
         rev bigint not null,
         revtype tinyint,
-        description varchar(255),
+        description varchar(5000),
         primary key (valueset_cat_id, rev)
     ) ENGINE=InnoDB
 ;
@@ -1368,7 +1371,56 @@ create unique index ix_auth_username on authorities
         references revinfo (rev)
 ;
 
-     alter table consent 
+    alter table code_system_aud 
+        add index FK4A7E0E32CDA971CE (rev), 
+        add constraint FK4A7E0E32CDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table code_system_version 
+        add index FKE0181F5A7AE9A440 (fk_code_system_id), 
+        add constraint FKE0181F5A7AE9A440 
+        foreign key (fk_code_system_id) 
+        references code_system (code_system_id)
+;
+
+    alter table code_system_version_aud 
+        add index FKCE118C4BCDA971CE (rev), 
+        add constraint FKCE118C4BCDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table concept_code 
+        add index FKC2CE2D64243834C5 (fk_code_system_version_id), 
+        add constraint FKC2CE2D64243834C5 
+        foreign key (fk_code_system_version_id) 
+        references code_system_version (code_system_version_id)
+;
+
+    alter table concept_code_aud 
+        add index FK2B9D8555CDA971CE (rev), 
+        add constraint FK2B9D8555CDA971CE 
+        foreign key (rev) 
+        references revinfo (rev)
+;
+
+    alter table conceptcode_valueset 
+        add index FKDE3A75FBF298D340 (fk_concept_code_id), 
+        add constraint FKDE3A75FBF298D340 
+        foreign key (fk_concept_code_id) 
+        references concept_code (concept_code_id)
+;
+
+    alter table conceptcode_valueset 
+        add index FKDE3A75FB19232D71 (fk_valueset_id), 
+        add constraint FKDE3A75FB19232D71 
+        foreign key (fk_valueset_id) 
+        references value_set (valueset_id)
+;
+
+    alter table consent 
         add index FK38B6C01AB2036D5 (patient), 
         add constraint FK38B6C01AB2036D5 
         foreign key (patient) 
@@ -1886,55 +1938,6 @@ create unique index ix_auth_username on authorities
         references organizational_provider (id)
 ;
 
-    alter table code_system_aud 
-        add index FK4A7E0E32DF74E053 (rev), 
-        add constraint FK4A7E0E32DF74E053 
-        foreign key (rev) 
-        references revinfo (rev)
-;
-
-    alter table code_system_version 
-        add index FKE0181F5A7AE9A440 (fk_code_system_id), 
-        add constraint FKE0181F5A7AE9A440 
-        foreign key (fk_code_system_id) 
-        references code_system (code_system_id)
-;
-
-    alter table code_system_version_aud 
-        add index FKCE118C4BDF74E053 (rev), 
-        add constraint FKCE118C4BDF74E053 
-        foreign key (rev) 
-        references revinfo (rev)
-;
-
-    alter table concept_code 
-        add index FKC2CE2D64243834C5 (fk_code_system_version_id), 
-        add constraint FKC2CE2D64243834C5 
-        foreign key (fk_code_system_version_id) 
-        references code_system_version (code_system_version_id)
-;
-
-    alter table concept_code_aud 
-        add index FK2B9D8555DF74E053 (rev), 
-        add constraint FK2B9D8555DF74E053 
-        foreign key (rev) 
-        references revinfo (rev)
-;
-
-    alter table conceptcode_valueset 
-        add index FKDE3A75FBF298D340 (fk_concept_code_id), 
-        add constraint FKDE3A75FBF298D340 
-        foreign key (fk_concept_code_id) 
-        references concept_code (concept_code_id)
-;
-
-    alter table conceptcode_valueset 
-        add index FKDE3A75FB19232D71 (fk_valueset_id), 
-        add constraint FKDE3A75FB19232D71 
-        foreign key (fk_valueset_id) 
-        references value_set (valueset_id)
-;
-
     alter table value_set 
         add index FKD2615C94ED451F98 (fk_valueset_cat_id), 
         add constraint FKD2615C94ED451F98 
@@ -1943,18 +1946,17 @@ create unique index ix_auth_username on authorities
 ;
 
     alter table value_set_aud 
-        add index FKD2A59C85DF74E053 (rev), 
-        add constraint FKD2A59C85DF74E053 
+        add index FKD2A59C85CDA971CE (rev), 
+        add constraint FKD2A59C85CDA971CE 
         foreign key (rev) 
         references revinfo (rev)
 ;
 
     alter table value_set_category_aud 
-        add index FKB7F8D5BADF74E053 (rev), 
-        add constraint FKB7F8D5BADF74E053 
+        add index FKB7F8D5BACDA971CE (rev), 
+        add constraint FKB7F8D5BACDA971CE 
         foreign key (rev) 
         references revinfo (rev)
 ;
 
- 
  

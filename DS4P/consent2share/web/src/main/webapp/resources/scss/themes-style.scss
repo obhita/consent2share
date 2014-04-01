@@ -61,7 +61,7 @@ span:last-child{
 /* ACME Theme START */
 
 	/*
-	#consent-current-active, #share-all-med, #share-for-purpose {
+	.consent-current-active, #share-all-med, #share-for-purpose {
 		.badge {
 		 -webkit-border-radius: 2px;
      		-moz-border-radius: 2px;
@@ -80,7 +80,7 @@ span:last-child{
 	} 
 	*/
 	
-	#consent-current-active, #share-all-med {
+	.consent-current-active, #share-all-med {
 		.badge {
 			position: relative;
 		 -webkit-border-radius: 3px;
@@ -381,7 +381,8 @@ ul.dashboard-list li a span {
 	}
 	
 .box-header {
-	height: 20px;
+/*	height: 20px; */
+	height: auto;
   	border: 1px solid #ddd;
 	margin-bottom: -1px;
   	padding: 10px;

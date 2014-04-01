@@ -55,7 +55,11 @@ public class XdsbDocumentReference extends DocumentRequest {
 	 */
 	@Override
 	public String toString() {
-		return repositoryUniqueId + ":" + documentUniqueId;
+		StringBuilder builder = new StringBuilder();
+		builder.append(repositoryUniqueId);
+		builder.append(":");
+		builder.append(documentUniqueId);
+		return builder.toString();
 	}
 
 	/**

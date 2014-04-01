@@ -15,7 +15,7 @@ public class NotificationExceptionHandler {
 	@Autowired
 	private NotificationPublisher notificationPublisher;
 
-	public void handError(Message<MessagingException> errorMessage) {
+	public void handleError(Message<MessagingException> errorMessage) {
 		Assert.notNull(errorMessage);
 		
 		MessagingException messagingExceptionPayload = errorMessage.getPayload();

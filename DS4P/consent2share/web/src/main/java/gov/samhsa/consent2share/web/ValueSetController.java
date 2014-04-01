@@ -110,12 +110,19 @@ public class ValueSetController extends AbstractNodeController {
 	 * @return The name of the create valueSet form view.
 	 */
 	@RequestMapping(value = REQUEST_MAPPING_LIST, method = RequestMethod.GET)
-	public String showCreateValueSetForm(Model model, HttpServletRequest request) {
+	public String showCreateValueSetForm(Model model,
+				@RequestParam(value = "panelState", required = false, defaultValue = "") String panelState) {
 
 		LOGGER.debug("Rendering Value Set  list page");
 
 		List<ValueSetDto> valueSets = valueSetService.findAll();
 		List<ValueSetCategoryDto> valueSetCategories = valueSetCategoryService.findAll();
+		
+		if(panelState.equals("resetoptions")){
+			model.addAttribute("panelState", "resetoptions");
+		}else if(panelState.equals("addnew")){
+			model.addAttribute("panelState", "addnew");
+		}
 
 		model.addAttribute(MODEL_ATTRIBUTE_VALUESETCATEGORYDTOS, valueSetCategories);
 		model.addAttribute(MODEL_ATTRIBUTE_VALUESETDTOS, valueSets);
@@ -203,8 +210,10 @@ public class ValueSetController extends AbstractNodeController {
 		redirectAttribute
 				.addFlashAttribute(MODEL_ATTIRUTE_VALUESETDTO, created);
 		model.addAttribute("notification", notification);
+		
+		String panelState = "?panelState=addnew";
 
-		return createRedirectViewPath(path);
+		return createRedirectViewPath(path) + panelState;
 	}
 
 	/**
@@ -226,9 +235,15 @@ public class ValueSetController extends AbstractNodeController {
 					+ deleted.getCode() + " and Name: " + deleted.getName()
 					+ " is deleted Successfully.");
 		} catch (ValueSetNotFoundException e) {
-			LOGGER.debug("No valueSet found with id: " + id);
+			LOGGER.debug(e.getMessage());
 			deleted.setError(true);
-			deleted.setErrorMessage(ERROR_MESSAGE_KEY_DELETED_VALUESET_WAS_NOT_FOUND);
+			deleted.setErrorMessage(e.getMessage());
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+			
+		} catch (Throwable t){
+			LOGGER.warn("An unknown error has occured." + t.getMessage() + t);
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+			
 		}
 		
 		redirectAttribute.addFlashAttribute(MODEL_ATTIRUTE_VALUESETDTO, deleted);

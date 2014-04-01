@@ -35,17 +35,11 @@ import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.springframework.security.access.annotation.Secured;
-import org.xml.sax.SAXException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -152,9 +146,9 @@ public interface ConsentService {
 	 *
 	 * @param consentDto the consent dto
 	 * @throws ConsentGenException the consent gen exception
+	 * @throws DuplicateConsentException 
 	 */
-	void saveConsent(ConsentDto consentDto) throws ConsentGenException;
-	
+	Object saveConsent(ConsentDto consentDto, long patientId) throws ConsentGenException;
 	/**
 	 * Update consent.
 	 *

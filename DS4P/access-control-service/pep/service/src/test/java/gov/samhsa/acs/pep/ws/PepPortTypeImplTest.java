@@ -47,7 +47,7 @@ public class PepPortTypeImplTest {
 		serviceName = new QName("http://www.samhsa.gov/ds4ppilot/contract/pep",
 				"PepService");
 
-		address = "http://localhost:9000/services/PepService";
+		address = "http://localhost:12345/services/PepService";
 		wsdlURL = new URL(address + "?wsdl");
 
 		ep = Endpoint.publish(address, new PepPortTypeImpl(pep));
