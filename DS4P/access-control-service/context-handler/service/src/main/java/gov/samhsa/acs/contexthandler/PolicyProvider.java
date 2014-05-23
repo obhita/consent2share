@@ -25,6 +25,10 @@
  ******************************************************************************/
 package gov.samhsa.acs.contexthandler;
 
+import gov.samhsa.acs.common.dto.XacmlRequest;
+import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
+import gov.samhsa.acs.contexthandler.exception.PolicyProviderException;
+
 import java.util.List;
 
 import org.herasaf.xacml.core.policy.Evaluatable;
@@ -36,15 +40,11 @@ public interface PolicyProvider {
 
 	/**
 	 * Gets the policies.
-	 * 
-	 * @param patientUniqueId
-	 *            the patient unique id
-	 * @param recipientSubjectNPI
-	 *            the recipient subject npi
-	 * @param intermediarySubjectNPI
-	 *            the intermediary subject npi
+	 *
+	 * @param xacmlRequest the xacml request
 	 * @return the policies
+	 * @throws NoPolicyFoundException the no policy found exception
+	 * @throws PolicyProviderException the policy provider exception
 	 */
-	public abstract List<Evaluatable> getPolicies(String patientUniqueId,
-			String recipientSubjectNPI, String intermediarySubjectNPI);
+	public abstract List<Evaluatable> getPolicies(XacmlRequest xacmlRequest) throws NoPolicyFoundException, PolicyProviderException;
 }

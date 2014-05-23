@@ -7,6 +7,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -17,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.HashMapResultToProviderDtoConverter;
 import gov.samhsa.consent2share.infrastructure.PixQueryService;
+import gov.samhsa.consent2share.infrastructure.eventlistener.EventService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.admin.AdminService;
@@ -52,6 +55,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
@@ -62,6 +67,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -142,6 +148,12 @@ public class AdminControllerTest {
 	@Mock
 	ProviderSearchLookupService providerSearchLookupService;
 	
+	@Mock
+	EventService eventService;
+	
+	@Mock
+	UserContext userContext;
+	
 	@InjectMocks
 	AdminController adminController;
 	
@@ -157,6 +169,7 @@ public class AdminControllerTest {
 	final String validGenderCode = "administrativeGenderCode";
 	final String validMrn = "PUI100000000001";
 	final String validEid = "1c5c59f0-5788-11e3-84b3-00155d3a2124";
+	final String remoteAddress = "127.0.0.1";
 	
 	@Before
 	public void setUp(){
@@ -234,6 +247,9 @@ public class AdminControllerTest {
 	
 	@Test
 	public void testDownloadConsentPdfFile() throws Exception{
+		AuthenticatedUser user=mock(AuthenticatedUser.class);
+		doReturn(user).when(userContext).getCurrentUser();
+		doReturn("user1").when(user).getUsername();
 		AbstractPdfDto pdfDto=mock(AbstractPdfDto.class);
 		byte[] byteArray=new byte[]{1,2,3};
 		when(pdfDto.getContent()).thenReturn(byteArray);

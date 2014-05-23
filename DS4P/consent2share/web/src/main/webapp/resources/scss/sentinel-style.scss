@@ -294,6 +294,25 @@ used more than once per page.
 	.joyride-tip-guide{
 		z-index: 1501;
 	}
+	
+	
+	
+	/* Override margin-left on div.icheckbox_square-blue when inside of wizard */
+	form.wizard div.content div.icheckbox_square-blue{
+		margin-left: 0px;
+		background-color: #fff;
+	}
+	
+	/* Override default rules for wizard plug-in body */
+	.wizard > .content > .body {
+		width: 100% !important;
+		height: 100% !important;
+		overflow-y: auto;
+		
+		input {
+			display: inline-block !important;
+		}
+	}
 
 
 /* ----------------------------------------------------[ General Page Features ] */
@@ -433,6 +452,14 @@ used more than once per page.
 	}
 
 	
+	.table-hover > tbody > tr:last-of-type > td {
+		&:first-child {
+			border-bottom-left-radius: 7px !important;
+		}
+		&:last-child {
+			border-bottom-right-radius: 7px;
+		}
+	}	
 	
 	#adminHomeSearchBar {
 		.hidden-xs {
@@ -442,6 +469,27 @@ used more than once per page.
 	}
 	
 	.admin-pages {
+		.ui-menu {		
+			padding: 8px !important;
+			
+			a#ui-active-menuitem.ui-state-hover {
+				background: none;
+				border: none;
+			}
+		}
+		.ui-widget-content {
+			margin-top: 2px;  
+			background-color: white !important;
+			background-image: none;
+			li a {
+				padding: 3px 4px;
+				&:hover {
+					cursor: pointer;
+					background-color: #faf2c9 !important;
+				}
+			}
+		}
+	
 		#adminCreateConsent-2buttons {
 			float: right !important;
 		}
@@ -471,9 +519,9 @@ used more than once per page.
 		}
 	}
 
-	#adminPatientView-page {
-		div.hover-state {
-			padding: 5px 15px;
+	#adminPatientView-page, #listConsent-page {
+/*		div.hover-state {
+			padding: 5px 15px !important;
 			border-radius: 4px;			
 			&:hover {
 				
@@ -483,7 +531,7 @@ used more than once per page.
 				& span:first-child {font-size: 20px;}
 			}
 		}
-		
+*/		
 		div#editPatient.modal { 
 			form > div {
 				padding-left: 15px !important;
@@ -677,39 +725,200 @@ used more than once per page.
 		float: left;
 		margin-top: 6px;
 	}
-	
-	
-	
-	.summary-record-details-container {
-			display: inline;
-		ul {
-			width: 47%;
-			margin: 0 0 15px;
-			display: inline-block;
-			vertical-align: top;
-			background-color: #f8f8f8;
-			&.summary-border {
-				padding: 8px 1% 4px;
-			}
 
-				&.right {
-					float: right;
-				}
-					&:hover {
-						background-color: beige;
-					}
-		}
-		
-	}
-	
+
 /* ----------------------------------------------------[ Consent Layout ] */	
 
-	#share-all-med, #share-for-purpose, #consent-date-fill {
+	div.hover-state {
+		padding: 5px 15px;
+		border-radius: 4px;
+		color: #646464;
+		a {color: inherit;}			
+		&:hover {			
+			color: #428abd !important;
+			font-size: 15px;
+			background-color: #DCE4E8;
+			& span:first-child {
+				font-size: 20px;
+			}
+		}
+	}
+	
+	.modal-opts-row {
+		padding-bottom: 4px;
+		border-bottom: #e5e5e5 1pt solid;
+		margin-bottom: 5px;
+	}
+	
+	#listConsent-page {
+/*		[class^='col-md-'], section[class*=' col-md-'], section[class^='col-sm-'], section[class*=' col-sm-'] {
+			@extend .no-pad;   */
+		[class*='col-'] {
+			@extend .no-pad;
+		}
+		.summary-border {padding: 0 !important}
+	}
+	
+	.consent-name {
+		font-weight: 700;
+		font-size: small;
+		margin: -10px 10px 15px 0px;
+	}
+	
+	.consent-status { 
+		margin: 5px -15px 0 -20px;
+			p {
+				padding: 5px 20px;
+			/*	font-style: italic;*/
+				font-size: small;
+				&.saved {
+					color: #c32432;
+				}
+				&.signed {
+					background-color: #e6e9ea;
+				}
+			}
+		}
+	
+	.summary-section {
+		padding-top: 15px;
+		padding-bottom: 0px;
+		padding-right: 15px;
+		padding-left: 20px;
+		
+		&.top {	
+			border-bottom-color: lightgrey;
+			border-bottom-style: solid;
+			border-bottom-width: thin;
+			background-color:#ebeff1;
+			border-top-right-radius:3px;
+			-webkit-border-top-right-radius:3px;
+			-moz-border-top-right-radius:3px;
+		}
+			
+		&.bottom {
+			background-color: white;
+			border-bottom-right-radius:3px;
+			-webkit-border-bottom-right-radius:3px;
+			-moz-border-bottom-right-radius:3px;
+			border-bottom-left-radius:3px;
+			-webkit-border-bottom-left-radius:3px;
+			-moz-border-bottom-left-radius:3px;
+		}		
+ 
+	}
+	
+	.authorized-summary-container {
+	display: inline-block;
+/*	width: auto;
+	margin-right: 80px;
+	margin-bottom: 10px; */
+	
+		.authorize {
+		font-family: helvetica, sans-serif;
+		font-size: small;
+		font-weight: 500;
+		color: #25abdc;
+		display: block;
+		}	
+					
+		ul {
+		font-size: smaller;
+		width: auto;
+		margin: 0 0 15px;
+		display: inline-block;
+		vertical-align: top;
+		
+			&.right {
+				float: right;
+			}
+		}
+						
+	}
+	
+	.summary-button-container {
+/*			display: inline-block;
+			vertical-align: text-top;
+			margin-right: 20px;
+			margin-bottom: 10px; */
+			
+			label {
+				font-size: small;
+			}
+		}
+	
+	
+	.date-display {
+	position: absolute;
+	top: 1px;
+	right: 1px;
+	padding-right: 5px;
+	padding-left: 5px; 
+	background-color: white;
+	color: gray;
+	display: inline-block;
+	border-color: lightgrey;
+	border-width: thin;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-right-radius: 3px;
+	-webkit-border-top-right-radius: 3px;
+	-moz-border-top-right-radius: 3px;
+	border-bottom-left-radius: 3px;
+	-webkit-border-bottom-left-radius: 3px;
+	-moz-border-bottom-left-radius: 3px;
+			label {
+				font-size: x-small;
+			}
+	}
+	
+
+	.sharing-summary-container {
+	display: inline-block;
+	width: 48%;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	vertical-align: top;
+	font-family: helvetica, sans-serif;
+		 
+		 .sharing-summary-header {
+			 font-size: small;
+			 font-weight: 700;
+			 color: black;
+			 margin-bottom: 0px;
+		 }
+		 
+		 span {
+			 font-size: smaller;
+			 font-weight: 200;
+			 color: grey; 
+		 } 
+		 
+		 .sharing-indicator {
+		 	width: 100%;
+		 	height: 4px;
+		 	margin-bottom: 5px;
+		 	margin-top: 5px;
+		 	
+		 	&.false {
+			 background-color: #c32432;
+		 	}
+		 	&.true {
+			 background-color: #3d98ce;	
+		 	}
+		 		
+		 }
+		 
+	}
+
+	
+	div#share-all-med, div#share-for-purpose, div#consent-date-fill {
+
 		background-color: rgba(210, 210, 210, .1);
 		border-color: lightgrey;
-		p{
-			color: #8f8f8f;
-		}
+			p {
+				color: #8f8f8f;
+			}
 			&:hover {
 				background-color: rgba(210, 210, 210, .2);
 				border-color: #0088cc;
@@ -717,6 +926,7 @@ used more than once per page.
 					color: #0088cc;
 				}
 			}
+
 		ul{
 			margin-bottom: 20px;
 			li:nth-of-type(1) {
@@ -1169,6 +1379,12 @@ used more than once per page.
 		.inputform, form { 
 		    > div{
                 padding-left: 25px;
+                
+             /* The following rule is a temporary fix. In the long term, the
+                padding-left: 25px rule above needs to be given a more specific selector */
+                &.steps, &.clearfix{
+                	padding-left: 0px;
+                }
 		    }
 			label {
 				display: inline-block;
@@ -1176,8 +1392,8 @@ used more than once per page.
 				input {
 					margin-left: -25px
 				}
-				}
-			} 	
+			}
+		} 	
 		.collapse.in{
 			overflow: initial;
 			}
@@ -1226,7 +1442,7 @@ since they may be used more than once.
 ============================================================*/
 
 
-/* ----------------------------------------------------[ Validation Modal ] */
+/* ----------------------------------------------------[ Duplicate Consent Validation Modal ] */
 
 
 .status-copy {
@@ -1590,6 +1806,9 @@ since they may be used more than once.
 			a, a:hover {
 				text-decoration: underline;
 			}
+			button.close {
+				margin-left: 10px;
+			}
 		}
 	}
 	
@@ -1765,6 +1984,15 @@ since they may be used more than once.
 		
 /* ----------------------------------------------------[ Margins ] */	
 	
+	.side-padding0 {
+		@extend .no-pad;
+	}
+	
+	.side-margin0 {
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+	}
+	
 	.top-margin0 {
 		margin-top: 0px !important;
 	}
@@ -1890,19 +2118,20 @@ since they may be used more than once.
 	
 	/* end sidenavMenu modifications to Bootstrap 3.0 upgrade.
 	---------------------------------------------------------*/
-
+	
 	.summary-border {
 		padding:10px 8px;
 		border:1px solid lightgrey;
-		border-radius:4px;
-		-webkit-border-radius:6px;
-		-moz-border-radius:6px;
+		border-radius:3px;
+		-webkit-border-radius:3px;
+		-moz-border-radius:3px;
 		margin-bottom:10px;
 		&:hover {
 			border-color: #0088cc;
 		}
 		
 		ul.provider-ul {
+		margin-bottom: 0px;
 			li {
 				overflow: auto !important;
 				white-space: normal !important;
@@ -1911,12 +2140,9 @@ since they may be used more than once.
 		}
 	}
 	
-	.consent-current-active {
-		div.summary-border {
-			&.duplicate-consent {
-				border-color: red !important;
-				border-width: medium !important;
-			}
+	.consent-current-active, table#patient_consents_list {
+		.duplicate-consent {
+			border: 2px solid #FAC000 !important;
 		}
 	}
 	
@@ -2065,6 +2291,10 @@ Utility rules modify minor aspects of an element
 .force-italic {
 	font-style: italic !important;
 }
+
+.grayout{
+	color: #BABABA !important;
+}
 	 
 	 
 /* !STATE RULES */
@@ -2120,8 +2350,20 @@ class selector.
 		display: inline;
 	}
 	
-	/*  This class is used to fix the Flash of Unstyled Content (FOUC) issue  */
 	
+	
+	    /* ----- START: jQuery Validate plugin component styling ----- */
+	       
+	       /* Hide error container divs within forms by default */
+	       form div.error {
+		       display: none;
+	       }
+	       
+	    /* ----- END: jQuery Validatie plugin component styling ----- */
+	
+	
+	
+	/*  This class is used to fix the Flash of Unstyled Content (FOUC) issue  */
 	body.fouc_loading {
 		display: none !important;
 	}
@@ -2189,6 +2431,26 @@ Media Query - defines how things should be styles under defined criteria
 
 
 /*======================================================================
+	769 Min-Width to 894px Max-width - WIDE SCREEN
+====================================================================== */
+@media only screen and (min-width: 769px) and (max-width: 894px) {
+
+
+	.sharing-summary-container {
+	display: inline-block;
+	width: 47%;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	vertical-align: top;
+	font-family: helvetica, sans-serif;
+	}
+
+
+}
+
+
+
+/*======================================================================
 	769 Min-Width to 979px Max-width - WIDE SCREEN
 ====================================================================== */
 @media only screen and (min-width: 769px) and (max-width: 979px) {
@@ -2208,6 +2470,27 @@ Media Query - defines how things should be styles under defined criteria
 ====================================================================== */
 
 @media only screen and (max-width: 768px) {
+
+
+/* ----------------------------------------------------[ Consent List Page - 300px wide ] */
+
+	.authorized-summary-container {
+	display: inline-block;
+/*	width: auto;
+	margin-right: 20px;
+	margin-bottom: 10px; */
+	}
+	
+	.sharing-summary-container {
+	display: inline-block;
+	width: 47%;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	vertical-align: top;
+	font-family: helvetica, sans-serif;
+	}
+
+
 	
 /* ----------------------------------------------------[ Navbar - 768px wide] */
 	#sidenavMenu {
@@ -2415,6 +2698,11 @@ Media Query - defines how things should be styles under defined criteria
 	
 }
 
+
+
+
+
+
 /*============================================================================ 
 Min Width 480px to Max Width 768px Wide - MOBILE - Landscape, Tablet Portrait (devices and browsers) 
 	(min-width: 480px) and (max-width: 768px)
@@ -2436,6 +2724,26 @@ Min Width 480px to Max Width 768px Wide - MOBILE - Landscape, Tablet Portrait (d
 ============================================================================*/
 
 @media only screen and (max-width: 479px) {
+
+
+/* ----------------------------------------------------[ Consent List Page - 300px wide ] */
+
+	.authorized-summary-container {
+	display: inline-block;
+/*	width: auto;
+	margin-right: 20px;
+	margin-bottom: 10px; */
+	}
+	
+	.sharing-summary-container {
+	display: inline-block;
+	width: 98%;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	vertical-align: top;
+	font-family: helvetica, sans-serif;
+	}
+
 
 /* ----------------------------------------------------------[ SysAdmin ] */
 
@@ -2874,6 +3182,27 @@ Min Width 480px to Max Width 768px Wide - MOBILE - Landscape, Tablet Portrait (d
 
 @media only screen and (min-width: 300px) and (max-width: 399px) {
 
+
+/* ----------------------------------------------------[ Consent List Page - 300px wide ] */
+
+	.authorized-summary-container {
+	display: inline-block;
+/*	width: auto;
+	margin-right: 20px;
+	margin-bottom: 10px; */
+	}
+	
+	.sharing-summary-container {
+	display: inline-block;
+	width: 98%;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	vertical-align: top;
+	font-family: helvetica, sans-serif;
+	}
+
+
+/* ----------------------------------------------------[ Staff Admin Page - 300px wide ] */
 	 #adminhome-page, #adminPatientView-page, #patientViewCreateConsent-page {
 		.navbar > .container {
 			.navbar-inner-header {

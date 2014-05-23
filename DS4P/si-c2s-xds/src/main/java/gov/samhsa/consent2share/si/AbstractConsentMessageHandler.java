@@ -25,6 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.si;
 
+import gov.samhsa.acs.audit.AuditService;
+import gov.samhsa.acs.common.tool.SimpleMarshaller;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -44,14 +47,21 @@ public abstract class AbstractConsentMessageHandler {
 	/** The consent getter. */
 	@Autowired
 	protected ConsentGetter consentGetter;
+	
+	/** The audit service. */
+	@Autowired
+	protected AuditService auditService;
+
+	/** The marshaller. */
+	@Autowired
+	protected SimpleMarshaller marshaller;
 
 	/**
 	 * Handle message.
-	 * 
-	 * @param data
-	 *            the data
+	 *
+	 * @param data the data
 	 * @return the string
-	 * @throws Throwable 
+	 * @throws Throwable the throwable
 	 */
 	public abstract String handleMessage(String data) throws Throwable;
 }

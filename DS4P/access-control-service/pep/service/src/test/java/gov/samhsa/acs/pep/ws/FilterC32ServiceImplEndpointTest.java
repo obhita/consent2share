@@ -17,6 +17,7 @@ import gov.samhsa.ds4ppilot.schema.pep.RetrieveDocumentSetResponse;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -41,6 +42,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+
 public class FilterC32ServiceImplEndpointTest {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(FilterC32ServiceImplEndpointTest.class);
@@ -63,6 +68,12 @@ public class FilterC32ServiceImplEndpointTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
+    	Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
+    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
+    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+
+        address = String.format("http://localhost:%s/services/filterc32service", portNumber);
+        
 		serviceName = new QName(
 				"http://www.samhsa.gov/ds4ppilot/contract/pep",
 				"FilterC32Service");
@@ -70,7 +81,6 @@ public class FilterC32ServiceImplEndpointTest {
 				"http://www.samhsa.gov/ds4ppilot/contract/pep",
 				"FilterC32Port");
 
-		address = "http://localhost:12345/services/filterc32service";
 		wsdlURL = new URL(address + "?wsdl");
 
 		filterC32Response = new FilterC32Response();

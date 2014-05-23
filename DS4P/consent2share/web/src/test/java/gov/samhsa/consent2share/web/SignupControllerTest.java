@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
+import gov.samhsa.consent2share.infrastructure.eventlistener.EventService;
 import gov.samhsa.consent2share.infrastructure.security.RecaptchaService;
 import gov.samhsa.consent2share.service.account.AccountService;
 import gov.samhsa.consent2share.service.account.AccountVerificationService;
@@ -39,23 +40,26 @@ public class SignupControllerTest {
 	@Mock
 	RecaptchaService recaptchaUtil;
 	
+	@Mock
+	EventService eventService;
+	
 	MockMvc mockMvc;
 	
 	@Before
 	public void before() {
 		doReturn("RecaptchaHtml").when(recaptchaUtil).createSecureRecaptchaHtml();
-		SignupController signupController = new SignupController(accountService, administrativeGenderCodeService, fieldValidator, accountVerificationService,recaptchaUtil);
+		SignupController signupController = new SignupController(accountService, administrativeGenderCodeService, fieldValidator, accountVerificationService,recaptchaUtil,eventService);
 		mockMvc = MockMvcBuilders.standaloneSetup(signupController).build();
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testConstructor_when_accountService_is_null_verify_exception_is_thrown(){
-		new SignupController(null,administrativeGenderCodeService,fieldValidator,accountVerificationService,recaptchaUtil);
+		new SignupController(null,administrativeGenderCodeService,fieldValidator,accountVerificationService,recaptchaUtil,eventService);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testConstructor_when_administrativeGenderCodeService_is_null_verify_exception_is_thrown(){
-		new SignupController(accountService,null,fieldValidator,accountVerificationService,recaptchaUtil);
+		new SignupController(accountService,null,fieldValidator,accountVerificationService,recaptchaUtil,eventService);
 	}
 	
 	@Test
@@ -68,16 +72,20 @@ public class SignupControllerTest {
 	public void testSignupSignupDtoBindingResultHttpServletRequestRedirectAttributesModel() throws Exception {
 		when(recaptchaUtil.checkAnswer(anyString(), anyString(), anyString())).thenReturn(true);
 		mockMvc.perform(post("/registration.html")
-				.requestAttr("recaptcha_challenge_field", "recaptcha_challenge_field")
-				.requestAttr("recaptcha_response_field", "recaptcha_response_field"))
+				.param("recaptcha_challenge_field", "recaptcha_challenge_field")
+				.param("recaptcha_response_field", "recaptcha_response_field"))
 			.andExpect(view().name("views/registration"));
 		mockMvc.perform(post("/registration.html")
-			.param("genderCode", "M"))
+				.param("recaptcha_challenge_field", "recaptcha_challenge_field")
+				.param("recaptcha_response_field", "recaptcha_response_field")
+				.param("genderCode", "M"))
 				.andExpect(view().name("views/signupVerification"));
 		Users user = mock(Users.class);
 		when(accountService.findUserByUsername(anyString())).thenReturn(user);
 		mockMvc.perform(post("/registration.html")
-			.param("genderCode", "M"))
+				.param("recaptcha_challenge_field", "recaptcha_challenge_field")
+				.param("recaptcha_response_field", "recaptcha_response_field")
+				.param("genderCode", "M"))
 				.andExpect(view().name("views/registration"));
 	}
 

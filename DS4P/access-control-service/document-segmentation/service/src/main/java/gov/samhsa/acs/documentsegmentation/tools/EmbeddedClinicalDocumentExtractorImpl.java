@@ -27,8 +27,12 @@ package gov.samhsa.acs.documentsegmentation.tools;
 
 import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
+import gov.samhsa.acs.common.tool.exception.DocumentXmlConverterException;
+import gov.samhsa.acs.documentsegmentation.tools.exception.DocumentSegmentationException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -79,19 +83,26 @@ public class EmbeddedClinicalDocumentExtractorImpl implements
 	 */
 	@Override
 	public String extractClinicalDocumentFromFactModel(String factModel)
-			throws Exception {
-		Document factModelDocument = documentXmlConverter
-				.loadDocument(factModel);
-		Node clinicalDocumentNode = documentAccessor.getNode(factModelDocument,
-				XPATH_CLINICALDOCUMENT);
+			throws DocumentSegmentationException {
+		Document newXmlDocument;
+		try {
+			Document factModelDocument = documentXmlConverter
+					.loadDocument(factModel);
+			Node clinicalDocumentNode = documentAccessor.getNode(
+					factModelDocument, XPATH_CLINICALDOCUMENT);
 
-		// Create new document
-		Document newXmlDocument = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder().newDocument();
-		// Import ClinicalDocument node to the new document
-		Node copyNode = newXmlDocument.importNode(clinicalDocumentNode, true);
-		// Add ClinicalDocument node as the root node to the document
-		newXmlDocument.appendChild(copyNode);
+			// Create new document
+			newXmlDocument = DocumentBuilderFactory.newInstance()
+					.newDocumentBuilder().newDocument();
+			// Import ClinicalDocument node to the new document
+			Node copyNode = newXmlDocument.importNode(clinicalDocumentNode,
+					true);
+			// Add ClinicalDocument node as the root node to the document
+			newXmlDocument.appendChild(copyNode);
+		} catch (XPathExpressionException | ParserConfigurationException
+				| DocumentXmlConverterException e) {
+			throw new DocumentSegmentationException(e);
+		}
 		return documentXmlConverter.convertXmlDocToString(newXmlDocument);
 	}
 }

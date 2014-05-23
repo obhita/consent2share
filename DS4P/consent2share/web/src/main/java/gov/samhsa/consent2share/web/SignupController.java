@@ -27,12 +27,14 @@ package gov.samhsa.consent2share.web;
 
 import gov.samhsa.consent2share.domain.account.Users;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
+import gov.samhsa.consent2share.infrastructure.eventlistener.EventService;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.RecaptchaService;
 import gov.samhsa.consent2share.infrastructure.security.TokenExpiredException;
 import gov.samhsa.consent2share.infrastructure.security.TokenNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
+import gov.samhsa.consent2share.infrastructure.securityevent.UserCreatedEvent;
 import gov.samhsa.consent2share.service.account.AccountService;
 import gov.samhsa.consent2share.service.account.AccountVerificationService;
 import gov.samhsa.consent2share.service.dto.AccountVerificationDto;
@@ -83,6 +85,10 @@ public class SignupController extends AbstractController {
 	/** The recaptcha util. */
 	@Autowired
 	RecaptchaService recaptchaUtil;
+	
+	@Autowired
+	EventService eventService;
+
 
 	/**
 	 * Instantiates a new signup controller.
@@ -97,7 +103,8 @@ public class SignupController extends AbstractController {
 			AdministrativeGenderCodeService administrativeGenderCodeService,
 			FieldValidator fieldValidator,
 			AccountVerificationService accountVerificationService,
-			RecaptchaService recaptchaUtil) {
+			RecaptchaService recaptchaUtil,
+			EventService eventService) {
 		if (accountService == null) {
 			throw new IllegalArgumentException("accountService cannot be null");
 		}
@@ -110,6 +117,7 @@ public class SignupController extends AbstractController {
 		this.fieldValidator = fieldValidator;
 		this.accountVerificationService = accountVerificationService;
 		this.recaptchaUtil=recaptchaUtil;
+		this.eventService=eventService;
 	}
 
 	/**
@@ -149,17 +157,31 @@ public class SignupController extends AbstractController {
 			HttpServletRequest request, RedirectAttributes redirectAttributes,
 			Model model) throws MessagingException, ParseException,
 			UsernameNotExistException, EmailAddressNotExistException {
-		
+		boolean captchaIsWrong=false;
+		if(request.getParameter("recaptcha_response_field")==null)
+			captchaIsWrong=true;
 		if(recaptchaUtil.checkAnswer(request.getRemoteAddr(), 
 				request.getParameter("recaptcha_challenge_field"), 
 				request.getParameter("recaptcha_response_field"))==false) {
-			return "redirect:/registration.html?notify=wrong_captcha";
+			captchaIsWrong=true;
+		}
+		
+		if (captchaIsWrong==true) {
+			model.addAttribute("signupDto", signupDto);
+			List<LookupDto> genderCodes = administrativeGenderCodeService.findAllAdministrativeGenderCodes();
+			String captchaString=recaptchaUtil.createSecureRecaptchaHtml();
+			model.addAttribute("captcha", captchaString);
+			model.addAttribute("genderCodes", genderCodes);
+			model.addAttribute("notification", "wrong_captcha");
+			return "views/registration";
 		}
 			
 
 		fieldValidator.validate(signupDto, result);
 
 		if (result.hasErrors()) {
+			String captchaString=recaptchaUtil.createSecureRecaptchaHtml();
+			model.addAttribute("captcha", captchaString);
 			List<LookupDto> genderCodes = administrativeGenderCodeService.findAllAdministrativeGenderCodes();
 			model.addAttribute("genderCodes", genderCodes);
 
@@ -171,6 +193,8 @@ public class SignupController extends AbstractController {
 		Users user = accountService.findUserByUsername(username);
 
 		if (user != null) {
+			String captchaString=recaptchaUtil.createSecureRecaptchaHtml();
+			model.addAttribute("captcha", captchaString);
 			List<LookupDto> genderCodes = administrativeGenderCodeService.findAllAdministrativeGenderCodes();
 			model.addAttribute("genderCodes", genderCodes);
 			FieldError error = new FieldError("signupDto", "username",
@@ -182,6 +206,7 @@ public class SignupController extends AbstractController {
 
 		String linkUrl = getServletUrl(request);
 		accountService.signup(signupDto, linkUrl.toString());
+		eventService.raiseSecurityEvent(new UserCreatedEvent(request.getRemoteAddr(),signupDto.getUsername()));
 		SecurityContextHolder.clearContext();
 		
 		model.addAttribute("tokenSuccess", true);

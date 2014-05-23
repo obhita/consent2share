@@ -26,6 +26,7 @@
 package gov.samhsa.acs.documentsegmentation.valueset;
 
 import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryDto;
+import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryListDto;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import java.util.Set;
 
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -91,6 +93,10 @@ public class ValueSetServiceImpl implements ValueSetService {
 		this.endpointAddress = endpointAddress;
 		this.restUrl = null;
 		this.selfSignedSSLHelper = selfSignedSSLHelper;
+
+		if (selfSignedSSLHelper != null) {
+			selfSignedSSLHelper.trustSelfSignedSSL();
+		}		
 	}
 
 	/*
@@ -108,16 +114,41 @@ public class ValueSetServiceImpl implements ValueSetService {
 		Map<String, String> parameterMap = createParameterMap(code, codeSystem);
 
 		RestTemplate restTemplate = configureRestTemplate();
-
+/*
 		if (selfSignedSSLHelper != null) {
 			selfSignedSSLHelper.trustSelfSignedSSL();
-		}
+		}*/
 
 		ValueSetQueryDto resp = restTemplate.getForObject(restUrl,
 				ValueSetQueryDto.class, parameterMap);
 
 		return resp.getVsCategoryCodes();
 	}
+	
+	@Override
+	public ValueSetQueryListDto RestfulValueSetCategories(
+			ValueSetQueryListDto valueSetQueryListDtos) {
+	
+		RestTemplate restTemplate = configureRestTemplate();
+
+		if (selfSignedSSLHelper != null) {
+			selfSignedSSLHelper.trustSelfSignedSSL();
+		}
+
+		ValueSetQueryListDto resp = null;
+		try {
+			resp = restTemplate.postForObject(endpointAddress + "/rest/",valueSetQueryListDtos,
+					ValueSetQueryListDto.class);
+		} catch (RestClientException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return resp;
+	}
+	
+	
+	
 	
 	/**
 	 * Configures the rest template.
@@ -127,17 +158,19 @@ public class ValueSetServiceImpl implements ValueSetService {
 	RestTemplate configureRestTemplate() {
 
 		RestTemplate restTemplate = new RestTemplate();
-
+		
 		List<HttpMessageConverter<?>> messageConverters = restTemplate
 				.getMessageConverters();
-
+		
+		//Create a list for the message converters
 		List<HttpMessageConverter<?>> converters = new ArrayList<HttpMessageConverter<?>>(
 				messageConverters);
-
+		
 		MappingJacksonHttpMessageConverter jsonConverter = new MappingJacksonHttpMessageConverter();
-
+		
+		//Add the Jackson Message converter
 		converters.add(jsonConverter);
-
+		
 		restTemplate.setMessageConverters(converters);
 
 		return restTemplate;
@@ -187,4 +220,7 @@ public class ValueSetServiceImpl implements ValueSetService {
 		builder.append(param);
 		builder.append("}");
 	}
+
+
+
 }

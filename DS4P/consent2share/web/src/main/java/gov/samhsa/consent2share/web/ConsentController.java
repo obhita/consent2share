@@ -28,10 +28,13 @@ package gov.samhsa.consent2share.web;
 import gov.samhsa.consent.ConsentGenException;
 import gov.samhsa.consent2share.domain.clinicaldata.ClinicalDocument;
 import gov.samhsa.consent2share.infrastructure.CodedConceptLookupService;
+import gov.samhsa.consent2share.infrastructure.eventlistener.EventService;
 import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
+import gov.samhsa.consent2share.infrastructure.securityevent.FileDownloadedEvent;
 import gov.samhsa.consent2share.service.clinicaldata.ClinicalDocumentService;
+import gov.samhsa.consent2share.service.consent.ConsentCheckService;
 import gov.samhsa.consent2share.service.consent.ConsentHelper;
 import gov.samhsa.consent2share.service.consent.ConsentService;
 import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
@@ -46,6 +49,7 @@ import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentValidationDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
+import gov.samhsa.consent2share.service.dto.PreConsentDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
 import gov.samhsa.consent2share.service.dto.TryMyPolicyDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
@@ -160,6 +164,12 @@ public class ConsentController extends AbstractController {
 	@Autowired
 	private ConsentHelper consentHelper;
 
+	@Autowired
+	private ConsentCheckService consentCheckService;
+
+	@Autowired
+	private EventService eventService;
+
 	/** The logger. */
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -187,7 +197,9 @@ public class ConsentController extends AbstractController {
 		Long directConsentId = accessReferenceMapper
 				.getDirectReference(consentId);
 		if (consentService
-				.isConsentBelongToThisUser(directConsentId, patientId)) {
+				.isConsentBelongToThisUser(directConsentId, patientId)
+				&& consentService.getConsentSignedStage(directConsentId)
+						.equals("CONSENT_SAVED")) {
 			ConsentPdfDto consentPdfDto = consentService
 					.findConsentPdfDto(directConsentId);
 			String javascriptCode = consentService
@@ -249,27 +261,52 @@ public class ConsentController extends AbstractController {
 	 * @return the string
 	 */
 	@RequestMapping(value = "listConsents.html")
-	public String consentMainPage(Model model, HttpServletRequest request,
+	public String consentMainPage(
+			Model model,
+			HttpServletRequest request,
 			@RequestParam(value = "duplicateconsent", defaultValue = "-1") String duplicateConsentId) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		String username = currentUser.getUsername();
+
 		String notify = request.getParameter("notify");
 		String notification = notificationService.notificationStage(username,
 				notify);
 		String emailSent = request.getParameter("emailsent");
-		if (emailSent == null)
+
+		if (emailSent == null) {
 			emailSent = "false";
+		}
+
 		List<ConsentListDto> consentListDtos = consentService
 				.findAllConsentsDtoByPatient(patientService
 						.findIdByUsername(currentUser.getUsername()));
+
 		accessReferenceMapper.setupAccessReferenceMap(consentListDtos);
-		if(duplicateConsentId.equals("-1") == false){
+
+		if (duplicateConsentId.equals("-1") == false) {
 			model.addAttribute("duplicateConsentId", duplicateConsentId);
 		}
+
+		List<AddConsentIndividualProviderDto> individualProvidersDto = patientService
+				.findAddConsentIndividualProviderDtoByUsername(username);
+		List<AddConsentOrganizationalProviderDto> organizationalProvidersDto = patientService
+				.findAddConsentOrganizationalProviderDtoByUsername(username);
+
+		List<AddConsentFieldsDto> purposeOfUseDto = purposeOfUseCodeService
+				.findAllPurposeOfUseCodesAddConsentFieldsDto();
+
+		PreConsentDto preConsentDto = new PreConsentDto();
+
 		model.addAttribute("listConsentDtos", consentListDtos);
+		model.addAttribute("preConsentDto", preConsentDto);
 		model.addAttribute("currentUser", currentUser);
 		model.addAttribute("emailSent", emailSent);
+		model.addAttribute("individualProvidersDto", individualProvidersDto);
+		model.addAttribute("organizationalProvidersDto",
+				organizationalProvidersDto);
+		model.addAttribute("purposeOfUse", purposeOfUseDto);
 		model.addAttribute("notification", notification);
+
 		return "views/consents/listConsents";
 	}
 
@@ -316,6 +353,57 @@ public class ConsentController extends AbstractController {
 
 	}
 
+	/*
+	 * // check for duplicate policy ConsentValidationDto consentValidationDto =
+	 * consentCheckService .getConflictConsent(consentDto);
+	 */
+
+	@RequestMapping(value = "/checkDuplicateConsent", method = RequestMethod.POST)
+	public @ResponseBody
+	String checkDuplicateConsent(PreConsentDto preConsentDto)
+			throws JSONException, IOException {
+		AuthenticatedUser currentUser = userContext.getCurrentUser();
+		PatientProfileDto currentPatient = null;
+
+		if (currentUser.getIsProviderAdmin() == false) {
+			currentPatient = patientService
+					.findPatientProfileByUsername(currentUser.getUsername());
+
+			if (currentPatient == null) {
+				// TODO (MH): Convert to AjaxException
+				throw new PatientNotFoundException(
+						"Patient not found by username");
+			}
+
+		} else {
+			// TODO (MH): Convert to AjaxException
+			throw new IllegalStateException(
+					"ProviderAdmin users cannot access the ConsentController");
+		}
+
+		ConsentValidationDto consentValidationDto = consentService
+				.checkForDuplicateConsents(preConsentDto,
+						currentPatient.getUsername());
+
+		// check for duplicate policy
+		if (consentValidationDto != null) {
+			String indirRef = accessReferenceMapper
+					.getIndirectReference(consentValidationDto
+							.getExistingConsentId());
+
+			consentValidationDto.setExistingConsentId(indirRef);
+			// duplicate policy found
+			ObjectMapper mapper = new ObjectMapper();
+			throw new AjaxException(HttpStatus.CONFLICT,
+					mapper.writeValueAsString(consentValidationDto));
+		} else {
+			JSONObject succObj = new JSONObject();
+			succObj.put("isSuccess", true);
+			succObj.put("isAdmin", false);
+			return succObj.toString();
+		}
+	}
+
 	/**
 	 * Consent add.
 	 * 
@@ -323,8 +411,8 @@ public class ConsentController extends AbstractController {
 	 *            the model
 	 * @return the string
 	 */
-	@RequestMapping(value = "addConsent.html")
-	public String consentAdd(Model model) {
+	@RequestMapping(value = "addNewConsent.html", method = RequestMethod.POST)
+	public String consentAdd(PreConsentDto preConsentDto, Model model) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		PatientProfileDto currentPatient = null;
 
@@ -367,6 +455,32 @@ public class ConsentController extends AbstractController {
 				.findAllClinicalDocumentSectionTypeCodesAddConsentFieldsDto();
 		List<AddConsentFieldsDto> clinicalDocumentTypeDto = clinicalDocumentTypeCodeService
 				.findAllClinicalDocumentTypeCodesAddConsentFieldsDto();
+
+		consentDto.setProvidersDisclosureIsMadeTo(preConsentDto
+				.getProvidersDisclosureIsMadeTo());
+		consentDto.setProvidersDisclosureIsMadeToNpi(preConsentDto
+				.getProvidersDisclosureIsMadeTo());
+		consentDto.setProvidersPermittedToDisclose(preConsentDto
+				.getProvidersPermittedToDisclose());
+		consentDto.setProvidersPermittedToDiscloseNpi(preConsentDto
+				.getProvidersPermittedToDisclose());
+
+		consentDto.setOrganizationalProvidersDisclosureIsMadeTo(preConsentDto
+				.getOrganizationalProvidersDisclosureIsMadeTo());
+		consentDto
+				.setOrganizationalProvidersDisclosureIsMadeToNpi(preConsentDto
+						.getOrganizationalProvidersDisclosureIsMadeTo());
+		consentDto.setOrganizationalProvidersPermittedToDisclose(preConsentDto
+				.getOrganizationalProvidersPermittedToDisclose());
+		consentDto
+				.setOrganizationalProvidersPermittedToDiscloseNpi(preConsentDto
+						.getOrganizationalProvidersPermittedToDisclose());
+
+		consentDto.setShareForPurposeOfUseCodes(preConsentDto
+				.getShareForPurposeOfUseCodes());
+		consentDto.setConsentStart(preConsentDto.getConsentStart());
+		consentDto.setConsentEnd(preConsentDto.getConsentEnd());
+
 		model.addAttribute("defaultStartDate",
 				dateFormat.format(today.getTime()));
 		model.addAttribute("defaultEndDate",
@@ -490,13 +604,14 @@ public class ConsentController extends AbstractController {
 	 *            the icd9
 	 * @return the string
 	 * @throws ConsentGenException
-	 * @throws IOException 
-	 * @throws JSONException 
-	 * @throws JsonMappingException 
-	 * @throws JsonGenerationException 
+	 * @throws IOException
+	 * @throws JSONException
+	 * @throws JsonMappingException
+	 * @throws JsonGenerationException
 	 */
 	@RequestMapping(value = "addConsent.html", method = RequestMethod.POST)
-	public @ResponseBody String consentAddPost(@Valid ConsentDto consentDto,
+	public @ResponseBody
+	String consentAddPost(@Valid ConsentDto consentDto,
 			BindingResult bindingResult, Model model,
 			@RequestParam(value = "ICD9", required = false) HashSet<String> icd9)
 			throws ConsentGenException, IOException, JSONException {
@@ -535,49 +650,57 @@ public class ConsentController extends AbstractController {
 			} else {
 				Set<SpecificMedicalInfoDto> doNotShareClinicalConceptCodes = new HashSet<SpecificMedicalInfoDto>();
 				if (icd9 != null)
-					doNotShareClinicalConceptCodes = consentHelper.getDoNotShareClinicalConceptCodes(icd9);
+					doNotShareClinicalConceptCodes = consentHelper
+							.getDoNotShareClinicalConceptCodes(icd9);
 
-				consentDto.setDoNotShareClinicalConceptCodes(doNotShareClinicalConceptCodes);
+				consentDto
+						.setDoNotShareClinicalConceptCodes(doNotShareClinicalConceptCodes);
 
 				Object obj = consentService.saveConsent(consentDto, 0);
 				if (null != obj && obj instanceof ConsentValidationDto) {
-					
-					ConsentValidationDto conDto= (ConsentValidationDto) obj;
-					String indirRef = accessReferenceMapper.getIndirectReference(conDto.getExistingConsentId());
-					
+
+					ConsentValidationDto conDto = (ConsentValidationDto) obj;
+					String indirRef = accessReferenceMapper
+							.getIndirectReference(conDto.getExistingConsentId());
+
 					conDto.setExistingConsentId(indirRef);
 					// duplicate policy found
 					ObjectMapper mapper = new ObjectMapper();
-					throw new AjaxException(HttpStatus.CONFLICT, mapper.writeValueAsString(conDto));
+					throw new AjaxException(HttpStatus.CONFLICT,
+							mapper.writeValueAsString(conDto));
 				}
 				JSONObject succObj = new JSONObject();
 				succObj.put("isSuccess", true);
 				succObj.put("isAdmin", false);
 				return succObj.toString();
 			}
-		}else{
-			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "Resource Not Found");
+		} else {
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Resource Not Found");
 		}
 
 	}
 
-	@RequestMapping(value="addConsentCheck.html")
+	@RequestMapping(value = "addConsentCheck.html")
 	public String addConsentCheck(Model model) {
-		
+
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		PatientProfileDto currentPatient = null;
-		
+
 		if (currentUser.getIsProviderAdmin() == false) {
-			currentPatient = patientService.findPatientProfileByUsername(currentUser.getUsername());
-			
-			if (currentPatient == null){
-				throw new PatientNotFoundException("Patient not found by username");
+			currentPatient = patientService
+					.findPatientProfileByUsername(currentUser.getUsername());
+
+			if (currentPatient == null) {
+				throw new PatientNotFoundException(
+						"Patient not found by username");
 			}
-			
-		}else{
-			throw new IllegalStateException("ProviderAdmin users cannot access the ConsentController");
+
+		} else {
+			throw new IllegalStateException(
+					"ProviderAdmin users cannot access the ConsentController");
 		}
-		
+
 		List<AddConsentIndividualProviderDto> individualProvidersDto = patientService
 				.findAddConsentIndividualProviderDtoByUsername(currentPatient
 						.getUsername());
@@ -585,9 +708,9 @@ public class ConsentController extends AbstractController {
 				.findAddConsentOrganizationalProviderDtoByUsername(currentPatient
 						.getUsername());
 		ConsentDto consentDto = consentService.makeConsentDto();
-		
+
 		consentDto.setUsername(currentPatient.getUsername());
-		
+
 		populateLookupCodes(model);
 
 		List<AddConsentFieldsDto> purposeOfUseDto = purposeOfUseCodeService
@@ -606,7 +729,7 @@ public class ConsentController extends AbstractController {
 		return "views/consents/addConsentCheck";
 
 	}
-	
+
 	/**
 	 * Call hippa space.
 	 * 
@@ -676,7 +799,9 @@ public class ConsentController extends AbstractController {
 				IOUtils.copy(new ByteArrayInputStream(pdfDto.getContent()), out);
 				out.flush();
 				out.close();
-
+				eventService.raiseSecurityEvent(new FileDownloadedEvent(request
+						.getRemoteAddr(), "User_" + currentUser.getUsername(),
+						"Consent_" + directConsentId));
 			} catch (IOException e) {
 				logger.warn("Error while reading pdf file.");
 				logger.warn("The exception is: ", e);
@@ -754,6 +879,10 @@ public class ConsentController extends AbstractController {
 
 					out.flush();
 					out.close();
+					eventService.raiseSecurityEvent(new FileDownloadedEvent(
+							request.getRemoteAddr(), "User_"
+									+ currentUser.getUsername(), "CDAR2_"
+									+ directConsentId));
 
 				} catch (IOException e) {
 
@@ -793,6 +922,10 @@ public class ConsentController extends AbstractController {
 
 					out.flush();
 					out.close();
+					eventService.raiseSecurityEvent(new FileDownloadedEvent(
+							request.getRemoteAddr(), "User_"
+									+ currentUser.getUsername(), "Consent_"
+									+ directConsentId));
 
 				} catch (IOException e) {
 
@@ -923,7 +1056,7 @@ public class ConsentController extends AbstractController {
 						.findAllAdministrativeGenderCodes());
 		model.addAttribute("stateCodes", stateCodeService.findAllStateCodes());
 	}
-	
+
 	/**
 	 * Redirect to email login page.
 	 * 
@@ -932,7 +1065,6 @@ public class ConsentController extends AbstractController {
 	@RequestMapping(value = "validationModal.html")
 	public String redirectToValidationModal() {
 		return "views/consents/consent-validation-modal";
-	}	
-	
+	}
 
 }

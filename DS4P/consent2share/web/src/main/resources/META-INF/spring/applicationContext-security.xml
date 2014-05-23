@@ -27,7 +27,7 @@
 		<intercept-url pattern="/patients/**" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/clinicaldocuments/**" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/consents/**" access="hasRole('ROLE_USER')" />
-		<intercept-url pattern="/sysadmin/lookupService" access="permitAll" />
+		<intercept-url pattern="/sysadmin/lookupService/**" access="permitAll" />
 		<intercept-url pattern="/sysadmin/**" access="hasRole('ROLE_SYSADMIN')" />
 		<intercept-url pattern="/**" access="permitAll" />
 		<logout invalidate-session="true" logout-url="/index.html" delete-cookies="true" />

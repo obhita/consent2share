@@ -71,7 +71,7 @@ public class XmlValidation {
 			this.validator = createValidator(xsdInputStream, resourceResolver);
 		} catch (XmlSchemaFailureException e) {
 			logger.error("XmlValidation initialization is failed: the schema cannot be loaded.");
-			logger.error(e.getMessage(), e);
+			//logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -92,10 +92,10 @@ public class XmlValidation {
 		try {
 			validator.validate(new StreamSource(xmlInputStream));
 		} catch (SAXException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(e.getMessage());
 			throw new InvalidXmlDocumentException(e);
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(e.getMessage());
 			throw new XmlDocumentReadFailureException(e);
 		}
 		return true;
@@ -135,6 +135,7 @@ public class XmlValidation {
 		try {
 			schema = factory.newSchema(schemaSource);
 		} catch (SAXException e) {
+			logger.error(e.getMessage());
 			throw new XmlSchemaFailureException(e);
 		}
 		Validator validator = schema.newValidator();

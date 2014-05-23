@@ -3,6 +3,10 @@ package gov.samhsa.acs.xdsb.repository.wsclient.adapter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReader;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
@@ -16,11 +20,20 @@ import gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
 
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
+import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
+import org.custommonkey.xmlunit.ElementNameQualifier;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("unused")
 public class XdsbRepositoryAdapterIT {
@@ -44,14 +57,15 @@ public class XdsbRepositoryAdapterIT {
 	private static final String DEV_CLINICAL_DOCUMENT_ID = "41421263015.98411.41414.91230.401390172014139";
 	private static final String DEV_XACML_DOCUMENT_ID = "115131313411.1521214.42153.10531.01415253967874";
 
-	private static final String QA_CLINICAL_DOCUMENT_ID = "822104.131561.47149.915712.121310311514154155";
-	private static final String QA_XACML_DOCUMENT_ID = "13812431219.815137.41525.116410.7895113107152013";
+	private static final String QA_CLINICAL_DOCUMENT_ID = "21411614111313.111559.412156.88122.51310810121010135131";
+	private static final String QA_XACML_DOCUMENT_ID = "10121163121112.145102.4999.1181413.11101339479154213";
 
 	private static final String DEMO_CLINICAL_DOCUMENT_ID = "1159100196.8727.4619.9589.55410001012119150";
 	private static final String DEMO_XACML_DOCUMENT_ID = "12156561203.101298.41246.11843.2145892121061503";
 
 	// Variables
 	private static String c32;
+	private static String uploadC32;
 	private static String xacml;
 	private static String clinicalDocumentId;
 	private static String xacmlDocumentId;
@@ -69,34 +83,35 @@ public class XdsbRepositoryAdapterIT {
 		fileReader = new FileReaderImpl();
 		marshaller = new SimpleMarshallerImpl();
 		c32 = fileReader.readFile("unitTestC32.xml");
+		uploadC32 = fileReader.readFile("uploadC32.xml");
 		xacml = fileReader.readFile("xacml_policy.xml");
 
 		// Set these to the values of the environment under test
-		endpointAddress = DEV_XDSB_REPO_ENDPOINT;
-		clinicalDocumentId = DEV_CLINICAL_DOCUMENT_ID;
-		xacmlDocumentId = DEV_XACML_DOCUMENT_ID;
+		endpointAddress = QA_XDSB_REPO_ENDPOINT;
+		clinicalDocumentId = QA_CLINICAL_DOCUMENT_ID;
+		xacmlDocumentId = QA_XACML_DOCUMENT_ID;
 
 		xdsbRepositoryAdapter = new XdsbRepositoryAdapter(
 				new XDSRepositorybWebServiceClient(endpointAddress),
 				new SimpleMarshallerImpl(), new RetrieveDocumentSetResponseFilter(new DocumentXmlConverterImpl(), new XdsbErrorFactory()));
 	}
 
-	@Ignore
+
 	@Test
 	public void testProvideAndRegisterDocumentSetRequest_C32() throws Throwable {
 		// Act
 		RegistryResponse registryResponse = xdsbRepositoryAdapter
-				.provideAndRegisterDocumentSet(c32, OPENEMPI_DOMAIN_ID,
+				.provideAndRegisterDocumentSet(uploadC32, OPENEMPI_DOMAIN_ID,
 						XDSB_DOCUMENT_TYPE_CLINICAL_DOCUMENT, null, null);
 		String result = marshaller.marshall(registryResponse);
 		logger.debug("testProvideAndRegisterDocumentSet_C32 Result:");
 		logger.debug(result);
+		System.out.println(result);
 
 		// Assert
 		assertEquals(XDSB_SUCCESS_MESSAGE, result);
 	}
 
-	@Ignore
 	@Test
 	public void testProvideAndRegisterDocumentSetRequest_Xacml_Consent()
 			throws Throwable {
@@ -126,8 +141,25 @@ public class XdsbRepositoryAdapterIT {
 				.getDocumentResponse().get(0).getDocument());
 		logger.debug(result);
 
-		// Assert
-		assertEquals(c32, result);
+		/**
+		 * list of regular expressions that custom difference listener used
+		 * during xml comparison.
+		 */
+		final List<String> ignorableXPathsRegex = new ArrayList<String>();
+		ignorableXPathsRegex.add("\\/ClinicalDocument\\[1\\]/effectiveTime\\[1\\]\\/@value");
+		// these values will be changed from original rem c32 before uploading to xdsb by showcase program
+		// thats why we are ignoring these elemetns as they won't match with original c32
+		ignorableXPathsRegex.add("\\/ClinicalDocument\\[1\\]/recordTarget\\[1\\]/patientRole\\[1\\]/id\\[1\\]");
+		ignorableXPathsRegex.add("\\/ClinicalDocument\\[1\\]\\/author\\[1\\]\\/assignedAuthor\\[1\\]\\/id\\[1\\]");
+
+			
+		DetailedDiff diff = compareXMLs(c32, result, ignorableXPathsRegex);
+		// Diff provides two methods for comparison identical and similar.
+		// Identical expects content and order of elements to be same.
+		// Similar is less stricter and allows change in order
+		Assert.assertEquals(true, diff.similar());
+		
+		
 	}
 
 	// make sure you have "xacml_policy.xml" in your XDS.b endpoint with
@@ -146,4 +178,53 @@ public class XdsbRepositoryAdapterIT {
 		// Assert
 		assertEquals(xacml, result);
 	}
+	
+	private void setXMLUnitConfig() {
+
+		XMLUnit.setIgnoreWhitespace(Boolean.TRUE);
+		XMLUnit.setIgnoreComments(Boolean.TRUE);
+		XMLUnit.setIgnoreDiffBetweenTextAndCDATA(Boolean.TRUE);
+		XMLUnit.setIgnoreAttributeOrder(Boolean.TRUE);
+	}
+	
+	private DetailedDiff compareXMLs(String expectedResult,
+			String actualResult, List<String> ignorableXPathsRegex) {
+
+		DetailedDiff diff = null;
+		try {
+			setXMLUnitConfig();
+
+			diff = new DetailedDiff((XMLUnit.compareXML(expectedResult,
+					actualResult)));
+			diff.overrideElementQualifier(new ElementNameAndTextQualifier());
+			diff.overrideElementQualifier(new ElementNameQualifier());
+			diff.overrideElementQualifier(new ElementNameAndAttributeQualifier());
+			diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
+
+			if (ignorableXPathsRegex != null) {
+				RegexBasedDifferenceListener ignorableElementsListener = new RegexBasedDifferenceListener(
+						ignorableXPathsRegex);
+				/** setting our custom difference listener */
+				diff.overrideDifferenceListener(ignorableElementsListener);
+			}
+
+			@SuppressWarnings("unchecked")
+			List<Difference> differences = diff.getAllDifferences();
+			for (Object object : differences) {
+				Difference difference = (Difference) object;
+				System.out.println("***********************");
+				System.out.println(difference);
+				System.out.println("***********************");
+			}
+
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return diff;
+
+	}	
+	
 }

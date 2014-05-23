@@ -1,41 +1,22 @@
 package gov.samhsa.acs.pep.saml;
 
-import java.io.PrintStream;
+import gov.samhsa.acs.common.log.NO_LOG;
+
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.opensaml.Configuration;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.saml2.core.Action;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Attribute;
 import org.opensaml.saml2.core.AttributeStatement;
-import org.opensaml.saml2.core.AuthnContext;
-import org.opensaml.saml2.core.AuthnStatement;
-import org.opensaml.saml2.core.AuthzDecisionStatement;
 import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import org.opensaml.common.xml.SAMLConstants;
 
 /*
  * This sample SOAP Protocol Handler for DoubleIt checks for X.509 authentication,
@@ -47,22 +28,23 @@ import org.opensaml.common.xml.SAMLConstants;
 public class SamlTokenParser {
 
 	// change this to redirect output if desired
-	private static PrintStream out = System.out;
+	//private static PrintStream out = System.out;
 
-	private static String WS_SECURITY_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+//	private static String WS_SECURITY_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 
+	@NO_LOG
 	public String parse(AssertionWrapper assertionWrapper, String urn) {
 		try {
 			Assertion samlAssertion = assertionWrapper.getSaml2();
-			List<AttributeStatement> stmt = samlAssertion.getAttributeStatements();
-			String nameId = samlAssertion.getSubject().getNameID().getValue();
+		//	List<AttributeStatement> stmt = samlAssertion.getAttributeStatements();
+		//	String nameId = samlAssertion.getSubject().getNameID().getValue();
 			
 			/** Below code works with OpenSAML API to check Authentication,
             * Authorization, and attributes. Using the XPath API with the
             * assertionElement above would probably be an easier and more
             * readable option.*/
 			
-			Element assertionElement = assertionWrapper.getElement();
+		//	Element assertionElement = assertionWrapper.getElement();
 			
             
 			// Check if math degree, error otherwise

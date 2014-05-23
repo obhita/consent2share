@@ -35,8 +35,10 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
         // create custom attributes
         AttributeBean attributeBeanResourceId = createDefaultAttribute(tokenType, "urn:oasis:names:tc:xacml:1.0:resource:resource-id", "d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO");
         AttributeBean attributeBeanPurposeOfUse = createDefaultAttribute(tokenType, "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse", "TREAT");
-        AttributeBean attributeBeanIntermediarySubject = createDefaultAttribute(tokenType, "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject", "1114252178");
-        AttributeBean attributeBeanRecipientSubject = createDefaultAttribute(tokenType, "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject", "1760717789");
+        //1114252178 MORGAN, TERRENCE ..from1740515725  HOANG, DAN
+        AttributeBean attributeBeanIntermediarySubject = createDefaultAttribute(tokenType, "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject", "1740515725");
+        //1760717789  LAMONT BUNYON, OD, PA  .. to1902131865 MASTER CARE, INC.
+        AttributeBean attributeBeanRecipientSubject = createDefaultAttribute(tokenType, "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject", "1902131865");
         
         attributeList.add(attributeBeanResourceId);
         attributeList.add(attributeBeanPurposeOfUse);

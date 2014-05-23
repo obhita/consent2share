@@ -46,3 +46,23 @@ function addressParserZip5(address, city, state, zip){
 	
 	return str_address;
 }
+
+
+/**
+ * Convert array into a string of HTML code defining an unordered list
+ * 
+ * @param {array} in_array - array to convert
+ * @returns {String} out_string - returned string
+ */
+function arrayToUlString(in_array){
+	var ary_len = in_array.length;
+	var out_string = "<ul>";
+	
+	for(var i = 0; i < ary_len; i++){
+		out_string = out_string.concat("<li>" + in_array[i] + "</li>");
+	}
+	
+	out_string = out_string.concat("</ul>");
+	
+	return out_string;
+}

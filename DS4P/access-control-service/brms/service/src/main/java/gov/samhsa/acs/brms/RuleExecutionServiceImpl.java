@@ -25,7 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.acs.brms;
 
-import javax.xml.bind.JAXBException;
+import java.util.HashSet;
+import java.util.Set;
 
 import gov.samhsa.acs.brms.domain.ClinicalFact;
 import gov.samhsa.acs.brms.domain.FactModel;
@@ -33,6 +34,8 @@ import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.brms.guvnor.GuvnorService;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
+
+import javax.xml.bind.JAXBException;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -59,9 +62,6 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 
 	/** The marshaller. */
 	private SimpleMarshaller marshaller;
-
-	/** The fired rule names. */
-	private String firedRuleNames = "";
 
 	/** The logger. */
 	private final Logger LOGGER = LoggerFactory
@@ -95,6 +95,7 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 		RuleExecutionContainer executionResponseContainer = null;
 		AssertAndExecuteClinicalFactsResponse assertAndExecuteResponse = new AssertAndExecuteClinicalFactsResponse();
 		String executionResponseContainerXMLString = null;
+		final Set<String> firedRuleNames = new HashSet<String>();
 
 		StatefulKnowledgeSession session = createStatefulKnowledgeSession();
 		try {
@@ -108,8 +109,7 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 				public void afterActivationFired(AfterActivationFiredEvent event) {
 					super.afterActivationFired(event);
 					final Rule rule = event.getActivation().getRule();
-					addRuleName(rule.getName());
-
+					firedRuleNames.add(rule.getName());
 				}
 			});
 
@@ -124,11 +124,13 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 			// Marshal rule execution response
 			executionResponseContainerXMLString = marshaller
 					.marshall(executionResponseContainer);
-
+			if(firedRuleNames.size() > 0){
+				assertAndExecuteResponse.setRulesFired(firedRuleNames.toString());	
+			}
 		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(), e);
 		} finally {
-			firedRuleNames = "";
+			firedRuleNames.clear();
 			if (session != null) {
 				session.dispose();
 			}
@@ -193,19 +195,5 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 			LOGGER.error(e.toString(), e);
 		}
 		return session;
-	}
-
-	/**
-	 * Adds the rule name.
-	 * 
-	 * @param ruleName
-	 *            the rule name
-	 */
-	private void addRuleName(String ruleName) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(firedRuleNames);
-		builder.append(", ");
-		builder.append(ruleName);
-		firedRuleNames = (!firedRuleNames.equals("")) ? builder.toString() : ruleName;
 	}
 }

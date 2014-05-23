@@ -37,7 +37,10 @@ public class PolicyIdDto {
 	private String policyId;
 
 	/** The patient id. */
-	private String patientId;
+	private String patientEid;
+	
+	/** The patient id. */
+	private long patientId;
 
 	/**
 	 * Gets the consent id.
@@ -78,21 +81,38 @@ public class PolicyIdDto {
 	}
 
 	/**
+	 * Gets the patient eid.
+	 *
+	 * @return the patient eid
+	 */
+	public String getPatientEid() {
+		return patientEid;
+	}
+
+	/**
+	 * Sets the patient eid.
+	 *
+	 * @param patientEid the new patient eid
+	 */
+	public void setPatientEid(String patientEid) {
+		this.patientEid = patientEid;
+	}
+
+	/**
 	 * Gets the patient id.
-	 * 
+	 *
 	 * @return the patient id
 	 */
-	public String getPatientId() {
+	public long getPatientId() {
 		return patientId;
 	}
 
 	/**
 	 * Sets the patient id.
-	 * 
-	 * @param patientId
-	 *            the new patient id
+	 *
+	 * @param patientId the new patient id
 	 */
-	public void setPatientId(String patientId) {
+	public void setPatientId(long patientId) {
 		this.patientId = patientId;
-	}
+	}	
 }

@@ -58,9 +58,14 @@ public class XdsbRegistryAdapterIT {
 		clinicalDocumentId = DEV_CLINICAL_DOCUMENT_ID;
 		xacmlDocumentId = DEV_XACML_DOCUMENT_ID;
 
-		xdsbRegistryAdapter = new XdsbRegistryAdapter(new XdsbRegistryWebServiceClient(
-				endpointAddress), new AdhocQueryResponseFilter(new SimpleMarshallerImpl(), new DocumentXmlConverterImpl()), new SimpleMarshallerImpl(),
-				new DocumentXmlConverterImpl(), new DocumentAccessorImpl());
+		xdsbRegistryAdapter = new XdsbRegistryAdapter(
+				new XdsbRegistryWebServiceClient(endpointAddress,
+						new SimpleMarshallerImpl()),
+				new AdhocQueryResponseFilter(new SimpleMarshallerImpl(),
+						new DocumentXmlConverterImpl(),
+						new DocumentAccessorImpl()),
+				new SimpleMarshallerImpl(), new DocumentXmlConverterImpl(),
+				new DocumentAccessorImpl());
 	}
 
 	// make sure you have a clinical document in your XDS.b endpoint with
@@ -78,7 +83,7 @@ public class XdsbRegistryAdapterIT {
 		// Act
 		AdhocQueryResponse adhocQueryResponse = xdsbRegistryAdapter
 				.registryStoredQuery(PATIENT_ID, HOME_COMMUNITY_ID,
-						xdsbDocumentType,false);
+						xdsbDocumentType, false, "");
 		List<XdsbDocumentReference> xdsbDocumentReferenceList = xdsbRegistryAdapter
 				.extractXdsbDocumentReferenceList(adhocQueryResponse);
 		logger.debug(xdsbDocumentType.toString());
@@ -103,7 +108,7 @@ public class XdsbRegistryAdapterIT {
 		// Act
 		AdhocQueryResponse adhocQueryResponse = xdsbRegistryAdapter
 				.registryStoredQuery(PATIENT_ID, HOME_COMMUNITY_ID,
-						xdsbDocumentType,true);
+						xdsbDocumentType, true, "");
 		List<XdsbDocumentReference> xdsbDocumentReferenceList = xdsbRegistryAdapter
 				.extractXdsbDocumentReferenceList(adhocQueryResponse);
 		logger.debug(xdsbDocumentType.toString());

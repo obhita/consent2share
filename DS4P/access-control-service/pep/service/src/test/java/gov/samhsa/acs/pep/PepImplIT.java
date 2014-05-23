@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import gov.samhsa.acs.brms.RuleExecutionServiceImpl;
 import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.brms.guvnor.GuvnorServiceImpl;
+import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
@@ -16,7 +17,6 @@ import gov.samhsa.acs.contexthandler.PolicyDecisionPoint;
 import gov.samhsa.acs.contexthandler.PolicyDecisionPointImpl;
 import gov.samhsa.acs.contexthandler.RequestGenerator;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentationImpl;
-import gov.samhsa.acs.documentsegmentation.audit.AuditServiceImpl;
 import gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypterImpl;
@@ -133,8 +133,7 @@ public class PepImplIT {
 
 		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
 		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
-				ruleExecutionService, new AuditServiceImpl(
-						endpointAddressForAuditServcie), documentEditor,
+				ruleExecutionService, null, documentEditor,
 				marshaller, documentEncrypter, documentRedactor,
 				documentMasker, documentTagger, documentFactModelExtractor,
 				null, null, additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
@@ -149,7 +148,7 @@ public class PepImplIT {
 
 		String samplePolicyPath = "src/test/resources/samplePolicy.xml";
 		String samplePolicyRequestPath = "src/test/resources/samplePolicyRequest.xml";
-		String recepientSubjectNPI = "1568797520";
+		String recipientSubjectNPI = "1568797520";
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "consent2share@outlook.com";
 		// String purposeOfUse = "PWATRNY";
@@ -167,9 +166,11 @@ public class PepImplIT {
 		}
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
-		when(
-				pdpSpy.getPolicies(resourceId, recepientSubjectNPI,
-						intermediarySubjectNPI)).thenReturn(policies);
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setPatientId(resourceId);
+		xacmlRequest.setRecipientSubjectNPI(recipientSubjectNPI);
+		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
+		when(pdpSpy.getPolicies(xacmlRequest)).thenReturn(policies);
 
 		// pdp request
 		RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
@@ -182,11 +183,11 @@ public class PepImplIT {
 			LOGGER.debug(e.toString(), e);
 		}
 		when(
-				requestGeneratorMock.generateRequest(recepientSubjectNPI,
+				requestGeneratorMock.generateRequest(recipientSubjectNPI,
 						intermediarySubjectNPI, purposeOfUse, resourceId))
 				.thenReturn(request);
 
-		testPermit(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+		testPermit(recipientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
 				requestGeneratorMock);
 	}
@@ -229,7 +230,7 @@ public class PepImplIT {
 		// xdsbRegistry
 		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
-				xdsbRegistryEndpointAddress);
+				xdsbRegistryEndpointAddress, null);
 
 		// pep
 		PepImpl pep = new PepImpl(contextHandler, c32Getter,
@@ -288,7 +289,7 @@ public class PepImplIT {
 
 		String samplePolicyPath = "src/test/resources/samplePolicyDenyByIntermediarySubjectNPIMismatch.xml";
 		String samplePolicyRequestPath = "src/test/resources/samplePolicyRequest.xml";
-		String recepientSubjectNPI = "1568797520";
+		String recipientSubjectNPI = "1568797520";
 		String intermediarySubjectNPI = "1111111111";
 		String resourceId = "consent2share@outlook.com";
 		// String purposeOfUse = "PWATRNY";
@@ -306,9 +307,11 @@ public class PepImplIT {
 		}
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
-		when(
-				pdpSpy.getPolicies(resourceId, recepientSubjectNPI,
-						intermediarySubjectNPI)).thenReturn(policies);
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setPatientId(resourceId);
+		xacmlRequest.setRecipientSubjectNPI(recipientSubjectNPI);
+		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
+		when(pdpSpy.getPolicies(xacmlRequest)).thenReturn(policies);
 
 		// pdp request
 		RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
@@ -321,11 +324,11 @@ public class PepImplIT {
 			LOGGER.debug(e.toString(), e);
 		}
 		when(
-				requestGeneratorMock.generateRequest(recepientSubjectNPI,
+				requestGeneratorMock.generateRequest(recipientSubjectNPI,
 						intermediarySubjectNPI, purposeOfUse, resourceId))
 				.thenReturn(request);
 
-		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+		testDeny(recipientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
 				requestGeneratorMock);
 	}
@@ -361,7 +364,7 @@ public class PepImplIT {
 		// xdsbRegistry
 		final String xdsbRegistryEndpointAddress = "http://feijboss01:8080/axis2/services/xdsregistryb";
 		XdsbRegistryImpl xdsbRegistry = new XdsbRegistryImpl(
-				xdsbRegistryEndpointAddress);
+				xdsbRegistryEndpointAddress, null);
 
 		// pep
 		PepImpl pep = new PepImpl(contextHandler, c32Getter,
@@ -403,7 +406,7 @@ public class PepImplIT {
 
 		String samplePolicyPath = "src/test/resources/samplePolicy.xml";
 		// String samplePolicyRequestPath = "";
-		String recepientSubjectNPI = "1568797520";
+		String recipientSubjectNPI = "1568797520";
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "consent2share@outlook.com";
 		// String purposeOfUse = "PWATRNY";
@@ -421,14 +424,16 @@ public class PepImplIT {
 		}
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
-		when(
-				pdpSpy.getPolicies(resourceId, recepientSubjectNPI,
-						intermediarySubjectNPI)).thenReturn(policies);
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setPatientId(resourceId);
+		xacmlRequest.setRecipientSubjectNPI(recipientSubjectNPI);
+		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
+		when(pdpSpy.getPolicies(xacmlRequest)).thenReturn(policies);
 
 		// pdp request
 		RequestGenerator requestGenerator = new RequestGenerator();
 
-		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+		testDeny(recipientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
 				requestGenerator);
 	}
@@ -442,7 +447,7 @@ public class PepImplIT {
 
 		String samplePolicyPath = "src/test/resources/samplePolicyDenyByRecepientSubjectNPIMismatch.xml";
 		String samplePolicyRequestPath = "src/test/resources/samplePolicyRequest.xml";
-		String recepientSubjectNPI = "1111111111";
+		String recipientSubjectNPI = "1111111111";
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "consent2share@outlook.com";
 		// String purposeOfUse = "PWATRNY";
@@ -460,9 +465,11 @@ public class PepImplIT {
 		}
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
-		when(
-				pdpSpy.getPolicies(resourceId, recepientSubjectNPI,
-						intermediarySubjectNPI)).thenReturn(policies);
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setPatientId(resourceId);
+		xacmlRequest.setRecipientSubjectNPI(recipientSubjectNPI);
+		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
+		when(pdpSpy.getPolicies(xacmlRequest)).thenReturn(policies);
 
 		// pdp request
 		RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
@@ -475,11 +482,11 @@ public class PepImplIT {
 			LOGGER.debug(e.toString(), e);
 		}
 		when(
-				requestGeneratorMock.generateRequest(recepientSubjectNPI,
+				requestGeneratorMock.generateRequest(recipientSubjectNPI,
 						intermediarySubjectNPI, purposeOfUse, resourceId))
 				.thenReturn(request);
 
-		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+		testDeny(recipientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
 				requestGeneratorMock);
 	}
@@ -493,7 +500,7 @@ public class PepImplIT {
 
 		String samplePolicyPath = "src/test/resources/samplePolicyDenyByResourceIdMismatch.xml";
 		String samplePolicyRequestPath = "src/test/resources/samplePolicyRequest.xml";
-		String recepientSubjectNPI = "1568797520";
+		String recipientSubjectNPI = "1568797520";
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "wrongresourceid@outlook.com";
 		// String purposeOfUse = "PWATRNY";
@@ -511,9 +518,11 @@ public class PepImplIT {
 		}
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
-		when(
-				pdpSpy.getPolicies(resourceId, recepientSubjectNPI,
-						intermediarySubjectNPI)).thenReturn(policies);
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setPatientId(resourceId);
+		xacmlRequest.setRecipientSubjectNPI(recipientSubjectNPI);
+		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
+		when(pdpSpy.getPolicies(xacmlRequest)).thenReturn(policies);
 
 		// pdp request
 		RequestGenerator requestGeneratorMock = mock(RequestGenerator.class);
@@ -526,11 +535,11 @@ public class PepImplIT {
 			LOGGER.debug(e.toString(), e);
 		}
 		when(
-				requestGeneratorMock.generateRequest(recepientSubjectNPI,
+				requestGeneratorMock.generateRequest(recipientSubjectNPI,
 						intermediarySubjectNPI, purposeOfUse, resourceId))
 				.thenReturn(request);
 
-		testDeny(recepientSubjectNPI, intermediarySubjectNPI, resourceId,
+		testDeny(recipientSubjectNPI, intermediarySubjectNPI, resourceId,
 				purposeOfUse, xdsDocumentEntryUniqueId, pdpSpy,
 				requestGeneratorMock);
 	}

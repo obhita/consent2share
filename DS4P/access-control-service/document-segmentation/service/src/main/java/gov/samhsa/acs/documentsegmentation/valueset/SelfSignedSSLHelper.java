@@ -49,14 +49,14 @@ public class SelfSignedSSLHelper {
 	 * Instantiates a new self signed ssl helper.
 	 */
 	public SelfSignedSSLHelper() {
-		logger.warn("SelfSignedSSLHelper should only be used in development environment. It shouldn't be used in actual production enviornment.");
+		logger.warn("SelfSignedSSLHelper should only be used in development environment. It shouldn't be used in actual production environment.");
 	}
 
 	/**
 	 * Trust self signed ssl.
 	 */
 	public void trustSelfSignedSSL() {
-		logger.warn("Trusting self signed SSL. This should only be done in development environment.");
+		logger.debug("Trusting self signed SSL. This should only be done in development environment.");
 
 		HostnameVerifier hv = new HostnameVerifier() {
 			public boolean verify(String urlHostName, SSLSession session) {
@@ -65,7 +65,7 @@ public class SelfSignedSSLHelper {
 				builder.append(urlHostName);
 				builder.append(" vs. ");
 				builder.append(session.getPeerHost());
-				logger.warn(builder.toString());
+				logger.debug(builder.toString());
 				return true;
 			}
 		};

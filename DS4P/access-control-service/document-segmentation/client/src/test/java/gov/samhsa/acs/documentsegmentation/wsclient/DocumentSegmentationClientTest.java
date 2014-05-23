@@ -7,6 +7,7 @@ import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentati
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationServicePortType;
 
 import java.net.URL;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -19,6 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 public class DocumentSegmentationClientTest {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -30,7 +34,12 @@ public class DocumentSegmentationClientTest {
 	@Before
 	public void setUp() {
 		try {
-			address = "http://localhost:12345/services/DocumentSegmentationService";
+			Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
+	    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
+	    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+
+	        address = String.format("http://localhost:%s/services/DocumentSegmentationService", portNumber);
+	        
 			ep = Endpoint.publish(address,
 					new DocumentSegmentationServicePortTypeImpl());
 

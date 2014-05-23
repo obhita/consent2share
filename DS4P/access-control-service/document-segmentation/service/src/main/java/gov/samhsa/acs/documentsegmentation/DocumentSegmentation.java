@@ -25,6 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation;
 
+import ch.qos.logback.audit.AuditException;
+import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
 import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
 import gov.samhsa.acs.documentsegmentation.exception.InvalidSegmentedClinicalDocumentException;
@@ -37,31 +39,27 @@ public interface DocumentSegmentation {
 
 	/**
 	 * Segment document.
-	 * 
-	 * @param document
-	 *            the document
-	 * @param enforcementPolicies
-	 *            the enforcement policies
-	 * @param packageAsXdm
-	 *            the package as xdm
-	 * @param encryptDocument
-	 *            the encrypt document
-	 * @param senderEmailAddress
-	 *            the sender email address
-	 * @param recipientEmailAddress
-	 *            the recipient email address
-	 * @param xdsDocumentEntryUniqueId
-	 *            the xds document entry unique id
+	 *
+	 * @param document the document
+	 * @param enforcementPolicies the enforcement policies
+	 * @param packageAsXdm the package as xdm
+	 * @param encryptDocument the encrypt document
+	 * @param senderEmailAddress the sender email address
+	 * @param recipientEmailAddress the recipient email address
+	 * @param xdsDocumentEntryUniqueId the xds document entry unique id
+	 * @param xacmlRequest the xacml request
+	 * @param isAudited the is audited
 	 * @return the segment document response
-	 * @throws XmlDocumentReadFailureException
-	 * @throws InvalidOriginalClinicalDocumentException
-	 * @throws InvalidSegmentedClinicalDocumentException
+	 * @throws XmlDocumentReadFailureException the xml document read failure exception
+	 * @throws InvalidOriginalClinicalDocumentException the invalid original clinical document exception
+	 * @throws InvalidSegmentedClinicalDocumentException the invalid segmented clinical document exception
+	 * @throws AuditException the audit exception
 	 */
 	public SegmentDocumentResponse segmentDocument(String document,
 			String enforcementPolicies, boolean packageAsXdm,
 			boolean encryptDocument, String senderEmailAddress,
-			String recipientEmailAddress, String xdsDocumentEntryUniqueId)
+			String recipientEmailAddress, String xdsDocumentEntryUniqueId, XacmlRequest xacmlRequest, boolean isAudited)
 			throws XmlDocumentReadFailureException,
 			InvalidOriginalClinicalDocumentException,
-			InvalidSegmentedClinicalDocumentException;
+			InvalidSegmentedClinicalDocumentException, AuditException;
 }

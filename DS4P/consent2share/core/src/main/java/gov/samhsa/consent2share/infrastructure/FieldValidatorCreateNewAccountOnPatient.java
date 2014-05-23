@@ -25,18 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.infrastructure;
 
-import gov.samhsa.consent2share.service.dto.AdminProfileDto;
-import gov.samhsa.consent2share.service.dto.BasicPatientAccountDto;
-import gov.samhsa.consent2share.service.dto.LegalRepresentativeDto;
-import gov.samhsa.consent2share.service.dto.PatientProfileDto;
-import gov.samhsa.consent2share.service.dto.SignupDto;
 import gov.samhsa.consent2share.service.dto.SignupLinkToPatientDto;
 
 import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

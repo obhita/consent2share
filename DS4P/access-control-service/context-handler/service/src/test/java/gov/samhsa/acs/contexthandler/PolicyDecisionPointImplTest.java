@@ -1,17 +1,28 @@
 package gov.samhsa.acs.contexthandler;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import gov.samhsa.acs.audit.AuditService;
+import gov.samhsa.acs.audit.AuditVerb;
+import gov.samhsa.acs.audit.PredicateKey;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
-import gov.samhsa.acs.contexthandler.PolicyDecisionPointImpl;
-import gov.samhsa.acs.contexthandler.PolicyProvider;
-import gov.samhsa.acs.contexthandler.RequestGenerator;
+import gov.samhsa.acs.common.tool.DocumentAccessor;
+import gov.samhsa.acs.common.tool.DocumentXmlConverter;
+import gov.samhsa.acs.common.tool.exception.DocumentAccessorException;
+import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
+import gov.samhsa.acs.contexthandler.exception.PolicyProviderException;
 import gov.samhsa.consent2share.commonunit.io.ResourceFileReader;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,12 +38,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
-import static org.mockito.Mockito.*;
+import ch.qos.logback.audit.AuditException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PolicyDecisionPointImplTest {
@@ -43,16 +58,26 @@ public class PolicyDecisionPointImplTest {
 	private List<Evaluatable> policies;
 	private List<Evaluatable> policies_invalid;
 	private RequestType request;
-	private PolicyDecisionPointImpl pdp;
 	private PDP simplePDP;
+	
 	@Mock
 	private PolicyProvider policyProvider;
 	@Mock
 	private RequestGenerator requestGeneratorMock;
+	@Mock
+	private AuditService auditServiceMock;
+	@Mock
+	private DocumentXmlConverter documentXmlConverterMock;
+	@Mock
+	private DocumentAccessor documentAccessorMock;
+	
+	@Spy
+	@InjectMocks
+	private PolicyDecisionPointImpl pdp;
 
 	@Before
 	public void setUp() throws Exception {
-		pdp = new PolicyDecisionPointImpl(policyProvider, requestGeneratorMock);
+		doNothing().when(auditServiceMock).audit(anyObject(), anyString(), isA(AuditVerb.class), anyString(), anyMapOf(PredicateKey.class, String.class));
 		simplePDP = SimplePDPFactory.getSimplePDP();
 		try {
 			InputStream is = new FileInputStream(
@@ -98,12 +123,13 @@ public class PolicyDecisionPointImplTest {
 	}
 
 	@Test
-	public void testDeployPoliciesListOfEvaluatable_NOT_APPLICABLE() {
+	public void testDeployPoliciesListOfEvaluatable_NOT_APPLICABLE() throws AuditException {
 		// Arrange
 		LinkedList<Evaluatable> emptyPolicyList = new LinkedList<Evaluatable>();
+		XacmlRequest xacmlRequest = new XacmlRequest();
 
 		// Act
-		String decision = pdp.evaluateRequest(request, emptyPolicyList)
+		String decision = pdp.evaluateRequest(request, emptyPolicyList, xacmlRequest)
 				.getPdpDecision();
 
 		// Assert
@@ -111,9 +137,16 @@ public class PolicyDecisionPointImplTest {
 	}
 
 	@Test
-	public void testDeployPoliciesListOfEvaluatable_PERMIT() {
+	public void testDeployPoliciesListOfEvaluatable_PERMIT() throws AuditException, DocumentAccessorException {
+		// Arrange
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		NodeList nodeListMock = mock(NodeList.class);
+		Document documentMock = mock(Document.class);
+		when(documentXmlConverterMock.loadDocument(anyString())).thenReturn(documentMock);
+		when(documentAccessorMock.getNodeList(eq(documentMock), anyString())).thenReturn(nodeListMock);
+		
 		// Act
-		String decision = pdp.evaluateRequest(simplePDP, request, policies)
+		String decision = pdp.evaluateRequest(simplePDP, request, policies, xacmlRequest)
 				.getPdpDecision();
 
 		// Assert
@@ -121,116 +154,129 @@ public class PolicyDecisionPointImplTest {
 	}
 
 	@Test
-	public void testUndeployPolicy() {
-		pdp.deployPolicies(simplePDP, policies);
+	public void testUndeployPolicy() throws AuditException {
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		pdp.deployPolicies(simplePDP, policies, xacmlRequest, false);
 		pdp.undeployPolicy(simplePDP, policy);
 		assertEquals(
 				"NOT_APPLICABLE",
 				pdp.evaluateRequest(simplePDP, request,
-						new LinkedList<Evaluatable>()).getPdpDecision());
+						new LinkedList<Evaluatable>(), xacmlRequest).getPdpDecision());
 	}
 
 	@Test
-	public void testUndeployPolicies() {
+	public void testUndeployPolicies() throws AuditException {
+		XacmlRequest xacmlRequest = new XacmlRequest();
 		EvaluatableID id = policy.getId();
 		List<EvaluatableID> ids = new LinkedList<EvaluatableID>();
 		ids.add(id);
-		pdp.deployPolicies(simplePDP, policies);
+		pdp.deployPolicies(simplePDP, policies, xacmlRequest, false);
 		assertEquals(
 				"PERMIT",
 				pdp.evaluateRequest(simplePDP, request,
-						new LinkedList<Evaluatable>()).getPdpDecision());
+						new LinkedList<Evaluatable>(), xacmlRequest).getPdpDecision());
 		pdp.undeployPoliciesById(simplePDP, ids);
 		assertEquals(
 				"NOT_APPLICABLE",
 				pdp.evaluateRequest(simplePDP, request,
-						new LinkedList<Evaluatable>()).getPdpDecision());
+						new LinkedList<Evaluatable>(), xacmlRequest).getPdpDecision());
 	}
 
 	@Test
-	public void testEvaluateRequest() {
-		pdp.deployPolicies(simplePDP, policies);
+	public void testEvaluateRequest() throws AuditException {
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		pdp.deployPolicies(simplePDP, policies, xacmlRequest, false);
 		assertEquals(
 				"PERMIT",
 				pdp.evaluateRequest(simplePDP, request,
-						new LinkedList<Evaluatable>()).getPdpDecision());
+						new LinkedList<Evaluatable>(), xacmlRequest).getPdpDecision());
 		pdp.undeployPolicy(simplePDP, policy);
-		pdp.deployPolicies(simplePDP, policies_invalid);
+		pdp.deployPolicies(simplePDP, policies_invalid, xacmlRequest, false);
 		assertEquals(
 				"DENY",
 				pdp.evaluateRequest(simplePDP, request,
-						new LinkedList<Evaluatable>()).getPdpDecision());
+						new LinkedList<Evaluatable>(), xacmlRequest).getPdpDecision());
 	}
 
 	@Test
-	public void testEvaluateRequestWithPatientUniqueId() {
-		pdp.deployPolicies(simplePDP, policies);
+	public void testEvaluateRequestWithPatientUniqueId() throws AuditException, NoPolicyFoundException, PolicyProviderException {
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setPatientId("1");
+		xacmlRequest.setRecipientSubjectNPI("");
+		xacmlRequest.setIntermediarySubjectNPI("");
+		pdp.deployPolicies(simplePDP, policies, xacmlRequest, false);
 		assertEquals(
 				"PERMIT",
 				pdp.evaluateRequest(simplePDP, request,
-						new LinkedList<Evaluatable>()).getPdpDecision());
+						new LinkedList<Evaluatable>(), xacmlRequest).getPdpDecision());
 		pdp.undeployPolicy(simplePDP, policy);
-		pdp.deployPolicies(simplePDP, policies_invalid);
+		pdp.deployPolicies(simplePDP, policies_invalid, xacmlRequest, false);
 		assertEquals("DENY",
-				pdp.evaluateRequest(simplePDP, request, "1", "", "")
+				pdp.evaluateRequest(simplePDP, request, xacmlRequest)
 						.getPdpDecision());
 	}
 
 	@Test
 	public void testEvaluateRequestWithRequestAndPatientUniqueId()
 			throws SecurityException, NoSuchFieldException,
-			IllegalArgumentException, IllegalAccessException {
-		pdp.deployPolicies(simplePDP, policies);
+			IllegalArgumentException, IllegalAccessException, AuditException, NoPolicyFoundException, PolicyProviderException {
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setPatientId("1");
+		xacmlRequest.setRecipientSubjectNPI("");
+		xacmlRequest.setIntermediarySubjectNPI("");
+		pdp.deployPolicies(simplePDP, policies, xacmlRequest, false);
 		assertEquals(
 				"PERMIT",
 				pdp.evaluateRequest(simplePDP, request,
-						new LinkedList<Evaluatable>()).getPdpDecision());
+						new LinkedList<Evaluatable>(), xacmlRequest).getPdpDecision());
 		pdp.undeployPolicy(simplePDP, policy);
-		pdp.deployPolicies(simplePDP, policies_invalid);
-		Field simplePDPField = pdp.getClass().getDeclaredField("simplePDP");
-		simplePDPField.setAccessible(true);
-		simplePDPField.set(pdp, simplePDP);
-		assertEquals("DENY", pdp.evaluateRequest(request, "1", "", "")
+		pdp.deployPolicies(simplePDP, policies_invalid, xacmlRequest, false);
+		when(pdp.getSimplePDP()).thenReturn(simplePDP);
+		
+		assertEquals("DENY", pdp.evaluateRequest(request, xacmlRequest)
 				.getPdpDecision());
 	}
 
 	@Test
 	public void testEvaluateRequestWithXacmlRequest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
-			IllegalAccessException {
+			IllegalAccessException, AuditException, NoPolicyFoundException, PolicyProviderException {
 		XacmlRequest xacmlRequest = new XacmlRequest();
 		xacmlRequest.setIntermediarySubjectNPI("1285969170");
-		xacmlRequest.setRecepientSubjectNPI("1568797520");
+		xacmlRequest.setRecipientSubjectNPI("1568797520");
 		xacmlRequest.setPurposeOfUse("TREAT");
 		xacmlRequest.setPatientId("consent2share@outlook.com");
 		when(
 				requestGeneratorMock.generateRequest("1568797520",
 						"1285969170", "TREAT", "consent2share@outlook.com"))
 				.thenReturn(request);
-		pdp.deployPolicies(simplePDP, policies);
+		pdp.deployPolicies(simplePDP, policies, xacmlRequest, false);
 		assertEquals(
 				"PERMIT",
 				pdp.evaluateRequest(simplePDP, request,
-						new LinkedList<Evaluatable>()).getPdpDecision());
+						new LinkedList<Evaluatable>(), xacmlRequest).getPdpDecision());
 		pdp.undeployPolicy(simplePDP, policy);
-		pdp.deployPolicies(simplePDP, policies_invalid);
-		Field simplePDPField = pdp.getClass().getDeclaredField("simplePDP");
-		simplePDPField.setAccessible(true);
-		simplePDPField.set(pdp, simplePDP);
+		pdp.deployPolicies(simplePDP, policies_invalid, xacmlRequest, false);
+		when(pdp.getSimplePDP()).thenReturn(simplePDP);
 		assertEquals("DENY", pdp.evaluateRequest(xacmlRequest).getPdpDecision());
 	}
 
 	@Test
-	public void testGetPolicies() {
+	public void testGetPolicies() throws NoPolicyFoundException, PolicyProviderException {
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
-		when(policyProvider.getPolicies("1", "", "")).thenReturn(policies);
-		assertEquals(pdp.getPolicies("1", "", ""), policies);
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setPatientUniqueId("1");
+		xacmlRequest.setRecipientSubjectNPI("");
+		xacmlRequest.setIntermediarySubjectNPI("");
+		xacmlRequest.setMessageId("");
+		when(policyProvider.getPolicies(xacmlRequest)).thenReturn(policies);
+		assertEquals(pdp.getPolicies(xacmlRequest), policies);
 	}
 
 	@Test
 	public void testEvaluatePolicyForTrying_Given_Correct_Policy_Successds() {
 		// Arrange
-		PolicyDecisionPointImpl thePdp = new PolicyDecisionPointImpl(null, new RequestGenerator());
+		PolicyDecisionPointImpl thePdp = new PolicyDecisionPointImpl(null, new RequestGenerator(), documentAccessorMock, documentXmlConverterMock, auditServiceMock);
 		
 		// Read policy file from resource
 		final String policyFileUri = "xacmlPolicyForTrying.xml";

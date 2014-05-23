@@ -72,7 +72,7 @@ public class ConsentRevokeServiceImplTest {
 		Node policyIdNode = mock(Node.class);
 		when(
 				xdsbRegistryMock.registryStoredQuery(patientUniqueIdMock, null,
-						XdsbDocumentType.PRIVACY_CONSENT, false)).thenReturn(
+						XdsbDocumentType.PRIVACY_CONSENT, false, "")).thenReturn(
 				adhocQueryResponseMock);
 		when(marshallerMock.marshall(adhocQueryResponseMock)).thenReturn(
 				adhocQueryResponseXmlMock);
@@ -115,7 +115,7 @@ public class ConsentRevokeServiceImplTest {
 
 		// Act
 		String result = sut.findConsentEntryUuidByPolicyId(patientUniqueIdMock,
-				valueMock);
+				valueMock, "");
 
 		// Assert
 		assertEquals(registryObjectMock, result);
@@ -127,9 +127,10 @@ public class ConsentRevokeServiceImplTest {
 		String patientUniqueIdMock = "patientUniqueIdMock";
 		String policyIdMock = "policyIdMock";
 		String consentUuidMock = "consentUuidMock";
+		String messageIdMock = "messageIdMock";
 		RegistryResponse registryResponseMock = mock(RegistryResponse.class);
 		doReturn(consentUuidMock).when(sut).findConsentEntryUuidByPolicyId(
-				patientUniqueIdMock, policyIdMock);
+				patientUniqueIdMock, policyIdMock, messageIdMock);
 		when(
 				xdsbRepositoryMock.provideAndRegisterDocumentSet(
 						XdsbRepositoryAdapter.EMPTY_XML_DOCUMENT, null,
@@ -139,7 +140,7 @@ public class ConsentRevokeServiceImplTest {
 
 		// Act
 		RegistryResponse actualRespnose = sut.revokeConsent(
-				patientUniqueIdMock, policyIdMock);
+				patientUniqueIdMock, policyIdMock, messageIdMock);
 
 		// Assert
 		assertEquals(registryResponseMock, actualRespnose);

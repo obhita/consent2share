@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
-	xmlns:soap="http://cxf.apache.org/bindings/soap" xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="
-         http://www.springframework.org/schema/beans 
-         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-         http://cxf.apache.org/jaxws
-         http://cxf.apache.org/schemas/jaxws.xsd
-         http://www.springframework.org/schema/util
-         http://www.springframework.org/schema/util/spring-util-3.0.xsd"
-	default-lazy-init="true" default-init-method="afterPropertiesSet">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:soap="http://cxf.apache.org/bindings/soap"
+	xmlns:util="http://www.springframework.org/schema/util"
+	default-lazy-init="true" default-init-method="afterPropertiesSet"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+		http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
+		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
 	<!-- Import statement optional but often required if you're declaring other 
 		CXF beans in this file such as CXF's JMX MBeans -->
@@ -112,7 +113,12 @@
 		scope="prototype" />
 	<bean id="documentAccessorImpl"
 		class="gov.samhsa.acs.common.tool.DocumentAccessorImpl"
-		scope="prototype" />		
+		scope="prototype" />
+	
+	<!-- ACS Audit Service -->
+	<bean id="auditServiceImpl" class="gov.samhsa.acs.audit.AuditServiceImpl" scope="singleton" init-method="init" destroy-method="destroy">
+		<constructor-arg value="AcsAuditService" />
+	</bean>
 		
 	<!-- XDS.b -->
 	<!-- XDS.b: common -->
@@ -127,7 +133,7 @@
 	<!-- XDS.b: clients -->
 	<bean id="xdsbRegistryWebServiceClient"
 		class="gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient"
-		scope="prototype">
+		scope="prototype" autowire="constructor">
 		<constructor-arg value="#{endpointAddressProperties.xdsbRegistry}" />
 	</bean>
 	<bean id="xdsbRepositorybWebServiceClient"
@@ -161,7 +167,7 @@
 
 	<bean id="xdsbRegistryImpl"
 		class="gov.samhsa.acs.pep.xdsbregistry.XdsbRegistryImpl"
-		scope="prototype">
+		scope="prototype" autowire="constructor">
 		<constructor-arg value="#{endpointAddressProperties.xdsbRegistry}" />
 	</bean>
 	
@@ -208,12 +214,6 @@
 		scope="prototype" autowire="constructor" />
 	
 	<!-- DocumentSegmentation -->
-	<!-- DocumentSegmentation: audit -->
-	<bean id="auditServiceImpl"
-		class="gov.samhsa.acs.documentsegmentation.audit.AuditServiceImpl"
-		scope="prototype">
-		<constructor-arg value="#{endpointAddressProperties.auditService}" />
-	</bean>
 	<!-- DocumentSegmentation: tools -->
 	<bean id="documentEditorImpl"
 		class="gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl"
@@ -295,5 +295,21 @@
 	<bean id="policyTryingServiceImpl"
 		class="gov.samhsa.acs.pep.ws.PolicyTryingServiceImpl"
 		scope="prototype" autowire="constructor" />
+		
+	<!-- Enable AspectJ style of Spring AOP -->
+	<aop:aspectj-autoproxy />	
+		
+	<!-- Configure Aspect Beans, without this Aspects advices wont execute -->		
+<!-- 	<bean name="aspectUtils" class="gov.samhsa.acs.pep.aspect.AspectUtils" scope="prototype" autowire="constructor">
+		<constructor-arg index="0" ref="simpleMarshallerImpl"/>
+	</bean>
+		
+	<bean name="loggingAspect" class="gov.samhsa.acs.pep.aspect.LoggingAspect" scope="prototype" autowire="constructor" >
+		<constructor-arg index="0" ref="aspectUtils"/>
+	</bean>	 -->
+	<bean name="aspectUtils" class="gov.samhsa.acs.pep.aspect.AspectUtils" scope="prototype" />
+	<bean name="loggingAspect" class="gov.samhsa.acs.pep.aspect.LoggingAspect" scope="prototype" />
+		
+		
 		
 </beans>

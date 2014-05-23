@@ -25,6 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.valueset;
 
+
+import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryListDto;
+
 import java.util.Set;
 
 /**
@@ -43,4 +46,9 @@ public interface ValueSetService {
 	 */
 	public abstract Set<String> lookupValueSetCategories(String code,
 			String codeSystem);
+	
+	
+	 public ValueSetQueryListDto RestfulValueSetCategories(ValueSetQueryListDto valueSetQueryListDtos) ;
+	
+	
 }

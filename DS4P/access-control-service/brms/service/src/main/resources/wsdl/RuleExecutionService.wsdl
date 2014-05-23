@@ -19,6 +19,7 @@
 				<xsd:complexType>
 					<xsd:sequence>
 						<xsd:element name="ruleExecutionResponseContainer" type="xsd:string" />
+						<xsd:element name="rulesFired" type="xsd:string"/>
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>

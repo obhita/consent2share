@@ -28,11 +28,15 @@ package gov.samhsa.consent2share.si;
 import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
+import gov.samhsa.acs.common.tool.exception.DocumentAccessorException;
+import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
 import gov.samhsa.acs.xdsb.common.UniqueOidProviderImpl;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.common.XdsbMetadataGeneratorImpl;
 import gov.samhsa.acs.xdsb.registry.wsclient.adapter.XdsbRegistryAdapter;
+import gov.samhsa.acs.xdsb.registry.wsclient.exception.XdsbRegistryAdapterException;
 import gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter;
+import gov.samhsa.acs.xdsb.repository.wsclient.exception.XdsbRepositoryAdapterException;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
@@ -109,13 +113,15 @@ public class ConsentRevokeServiceImpl implements ConsentRevokeService {
 	 */
 	@Override
 	public String findConsentEntryUuidByPolicyId(String patientUniqueId,
-			String policyId) throws Exception, Throwable {
+			String policyId, String messageId)
+			throws SimpleMarshallerException, DocumentAccessorException,
+			XdsbRegistryAdapterException {
 		Assert.notNull(patientUniqueId);
 		Assert.notNull(policyId);
 
 		AdhocQueryResponse adhocQueryResponse = xdsbRegistry
 				.registryStoredQuery(patientUniqueId, null,
-						XdsbDocumentType.PRIVACY_CONSENT, false);
+						XdsbDocumentType.PRIVACY_CONSENT, false, messageId);
 		String adhocQueryResponseXml = marshaller.marshall(adhocQueryResponse);
 		Document adhocQueryResponseDoc = documentXmlConverter
 				.loadDocument(adhocQueryResponseXml);
@@ -157,11 +163,13 @@ public class ConsentRevokeServiceImpl implements ConsentRevokeService {
 	 */
 	@Override
 	public RegistryResponse revokeConsent(String patientUniqueId,
-			String policyId) throws Exception, Throwable {
+			String policyId, String messageId)
+			throws DocumentAccessorException, SimpleMarshallerException,
+			XdsbRepositoryAdapterException, XdsbRegistryAdapterException {
 		Assert.notNull(patientUniqueId);
 		Assert.notNull(policyId);
 		String consentUuid = findConsentEntryUuidByPolicyId(patientUniqueId,
-				policyId);
+				policyId, messageId);
 		Assert.notNull(consentUuid, "Consent UUID cannot be found in XDS.b");
 		RegistryResponse resp = xdsbRepository.provideAndRegisterDocumentSet(
 				XdsbRepositoryAdapter.EMPTY_XML_DOCUMENT, null,
@@ -169,12 +177,16 @@ public class ConsentRevokeServiceImpl implements ConsentRevokeService {
 				consentUuid);
 		return resp;
 	}
-	
-	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.si.ConsentRevokeService#getPatientUniqueId(java.lang.String, java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent2share.si.ConsentRevokeService#getPatientUniqueId(java
+	 * .lang.String, java.lang.String)
 	 */
 	@Override
-	public String getPatientUniqueId(String patientId, String domainId){
+	public String getPatientUniqueId(String patientId, String domainId) {
 		return this.xdsbRegistry.getPatientUniqueId(patientId, domainId);
 	}
 

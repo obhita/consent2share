@@ -335,6 +335,18 @@ public class ConsentListDto implements HasId,Serializable{
 		this.revokeStage = revokeStage;
 	}
 	
-	
+	/**
+	 * Checks if is medical information not disclosed.
+	 *
+	 * @return true, if is medical information not disclosed
+	 */
+	public boolean isMedicalInformationNotDisclosed() {
+		boolean medicalInformationNotDisclosed = false;
+		if (!doNotShareClinicalConceptCodes.isEmpty() || !doNotShareClinicalDocumentSectionTypeCodes.isEmpty() || !doNotShareClinicalDocumentTypeCodes.isEmpty() || !doNotShareSensitivityPolicyCodes.isEmpty()) {
+			medicalInformationNotDisclosed = true;
+		}
+		
+		return medicalInformationNotDisclosed;
+	}
 
 }

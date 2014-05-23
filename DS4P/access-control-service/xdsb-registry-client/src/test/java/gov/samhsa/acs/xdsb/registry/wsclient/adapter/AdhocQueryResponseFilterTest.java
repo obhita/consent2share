@@ -1,6 +1,7 @@
 package gov.samhsa.acs.xdsb.registry.wsclient.adapter;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import gov.samhsa.acs.common.tool.DocumentAccessorImpl;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
@@ -14,6 +15,7 @@ public class AdhocQueryResponseFilterTest {
 	private SimpleMarshallerImpl marshaller;
 	private FileReaderImpl fileReader;
 	private DocumentXmlConverterImpl documentXmlConverter;
+	private DocumentAccessorImpl documentAccessor;
 
 	private AdhocQueryResponseFilter sut;
 
@@ -22,7 +24,8 @@ public class AdhocQueryResponseFilterTest {
 		marshaller = new SimpleMarshallerImpl();
 		documentXmlConverter = new DocumentXmlConverterImpl();
 		fileReader = new FileReaderImpl();
-		sut = new AdhocQueryResponseFilter(marshaller, documentXmlConverter);
+		documentAccessor = new DocumentAccessorImpl();
+		sut = new AdhocQueryResponseFilter(marshaller, documentXmlConverter, documentAccessor);
 
 	}
 

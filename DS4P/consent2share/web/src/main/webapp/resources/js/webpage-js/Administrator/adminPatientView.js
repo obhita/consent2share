@@ -158,6 +158,12 @@ $(document).ready(function(){
 	initAllDOBFields();
 	initOrigDataVals();
 	
+	var duplicate_consent_id = $('input#duplicate_consent_id').val();
+	
+	if((typeof duplicate_consent_id != 'undefined') && (typeof duplicate_consent_id != 'null')){
+		var trElement = $("table#patient_consents_list > tbody > tr > input#consentId_" + duplicate_consent_id).parent("tr");
+		trElement.addClass("duplicate-consent");
+	}
 	
 	
 	/** 

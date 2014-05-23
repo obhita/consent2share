@@ -1,19 +1,29 @@
 package gov.samhsa.acs.contexthandler;
 
-import gov.samhsa.acs.common.exception.DS4PException;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import gov.samhsa.acs.common.dto.XacmlRequest;
+import gov.samhsa.acs.contexthandler.exception.PolicyProviderException;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.registry.wsclient.adapter.XdsbRegistryAdapter;
+import gov.samhsa.acs.xdsb.registry.wsclient.exception.XdsbRegistryAdapterException;
 import gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter;
-
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest.DocumentRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 
 import org.herasaf.xacml.core.policy.Evaluatable;
@@ -25,9 +35,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class XdsbPolicyProviderTest {
@@ -113,7 +120,7 @@ public class XdsbPolicyProviderTest {
 		doReturn(evaluatable).when(sut).unmarshal(any(InputStream.class));
 		when(
 				xdsbRegistry.registryStoredQuery("1", null,
-						XdsbDocumentType.PRIVACY_CONSENT, true)).thenReturn(
+						XdsbDocumentType.PRIVACY_CONSENT, true, "")).thenReturn(
 				response);
 		when(
 				xdsbRegistry
@@ -130,8 +137,13 @@ public class XdsbPolicyProviderTest {
 		when(retrieveDocumentSetRequest.getDocumentRequest()).thenReturn(
 				docReqListMock);
 		when(docReqListMock.size()).thenReturn(1);
-
-		sut.getPolicies("1", "1568797520", "1285969170");
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setPatientUniqueId("1");
+		xacmlRequest.setRecipientSubjectNPI("1568797520");
+		xacmlRequest.setIntermediarySubjectNPI("1285969170");
+		xacmlRequest.setMessageId("");
+		
+		sut.getPolicies(xacmlRequest);
 
 		verify(xdsbRegistry, times(1))
 				.extractXdsbDocumentReferenceListAsRetrieveDocumentSetRequest(
@@ -140,7 +152,7 @@ public class XdsbPolicyProviderTest {
 				retrieveDocumentSetRequest);
 	}
 
-	@Test(expected = DS4PException.class)
+	@Test(expected = PolicyProviderException.class)
 	public void testGetPoliciesWhenDocumentCannotBeFound() throws Exception,
 			Throwable {
 		XdsbPolicyProvider sut = spy(policyDecisionPointImplDataXdsb);
@@ -158,9 +170,9 @@ public class XdsbPolicyProviderTest {
 		doReturn(evaluatable).when(sut).unmarshal(any(InputStream.class));
 		when(
 				xdsbRegistry.registryStoredQuery("1", null,
-						XdsbDocumentType.PRIVACY_CONSENT, true)).thenReturn(
+						XdsbDocumentType.PRIVACY_CONSENT, true, "")).thenReturn(
 				response);
-		doThrow(new IOException()).when(xdsbRegistry)
+		doThrow(new XdsbRegistryAdapterException()).when(xdsbRegistry)
 				.extractXdsbDocumentReferenceListAsRetrieveDocumentSetRequest(
 						response);
 		when(xdsbRepository.retrieveDocumentSet(retrieveDocumentSetRequest))
@@ -169,8 +181,13 @@ public class XdsbPolicyProviderTest {
 				policyDocuments);
 		when(docResponse2.getDocument()).thenReturn(xacmlPolicy);
 		when(docResponse1.getDocument()).thenReturn(xacmlPolicy);
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		xacmlRequest.setPatientUniqueId("1");
+		xacmlRequest.setRecipientSubjectNPI("1568797520");
+		xacmlRequest.setIntermediarySubjectNPI("1285969170");
+		xacmlRequest.setMessageId("");
 
-		sut.getPolicies("1", "1568797520", "1285969170");
+		sut.getPolicies(xacmlRequest);
 	}
 
 }

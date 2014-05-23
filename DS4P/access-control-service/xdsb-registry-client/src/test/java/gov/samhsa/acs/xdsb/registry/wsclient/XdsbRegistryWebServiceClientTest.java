@@ -4,11 +4,13 @@ import static org.junit.Assert.*;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.mockito.Mockito.*;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
+import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient;
 import gov.samhsa.ds4p.xdsbregistry.DocumentRegistryService;
 import ihe.iti.xds_b._2007.XDSRegistry;
 
 import java.net.URL;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -25,7 +27,12 @@ import org.hl7.v3.PRPAIN201304UV02;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 public class XdsbRegistryWebServiceClientTest {
 
@@ -38,7 +45,12 @@ public class XdsbRegistryWebServiceClientTest {
 	public static void setUp() {
 		fileReader = new FileReaderImpl();
 		try {
-			address = "http://localhost:12345/services/xdsregistryb";
+			Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
+	    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
+	    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+
+	        address = String.format("http://localhost:%s/services/xdsregistryb", portNumber);
+
 			ep = Endpoint.publish(address, new XdsbRegistryServiceImpl());
 
 			XdsbRegistryServiceImpl.returnedValueOfRegistryStoredQuery = returnedValueOfRegistryStoredQuery;
@@ -74,11 +86,11 @@ public class XdsbRegistryWebServiceClientTest {
 		AdhocQueryRequest adhocQueryRequest = new AdhocQueryRequest();
 
 		XdsbRegistryWebServiceClient wsc = new XdsbRegistryWebServiceClient(
-				address);
+				address, new SimpleMarshallerImpl());
 		Object resp = wsc.registryStoredQuery(adhocQueryRequest);
 		validateResponseOfRetrieveDocumentSetRequest(resp);
 	}
-	
+
 	@Test
 	public void testAddPatientRegistryRecord() throws Throwable{
 		// Arrange
@@ -87,15 +99,15 @@ public class XdsbRegistryWebServiceClientTest {
 		MCCIIN000002UV01 responseMock = setMCCIIN000002UV01();
 		XdsbRegistryServiceImpl.returnedValueOfPatientRegistryRecordAdded = responseMock;
 		XdsbRegistryWebServiceClient wsc = new XdsbRegistryWebServiceClient(
-				address);
-		
+				address, new SimpleMarshallerImpl());
+
 		// Act
 		String actualResponse = wsc.addPatientRegistryRecord(requestMock);
-		
+
 		// Assert
 		assertXMLEqual("", expectedResponse, actualResponse);
 	}
-	
+
 	@Test
 	public void testResolvePatientRegistryDuplicates() throws Throwable{
 		// Arrange
@@ -104,15 +116,15 @@ public class XdsbRegistryWebServiceClientTest {
 		MCCIIN000002UV01 responseMock = setMCCIIN000002UV01();
 		XdsbRegistryServiceImpl.returnedValueOfPatientRegistryDuplicatesResolved = responseMock;
 		XdsbRegistryWebServiceClient wsc = new XdsbRegistryWebServiceClient(
-				address);
-		
+				address, new SimpleMarshallerImpl());
+
 		// Act
 		String actualResponse = wsc.resolvePatientRegistryDuplicates(requestMock);
-		
+
 		// Assert
 		assertXMLEqual("", expectedResponse, actualResponse);
 	}
-	
+
 	@Test
 	public void testRevisePatientRegistryRecord() throws Throwable{
 		// Arrange
@@ -121,15 +133,15 @@ public class XdsbRegistryWebServiceClientTest {
 		MCCIIN000002UV01 responseMock = setMCCIIN000002UV01();
 		XdsbRegistryServiceImpl.returnedValueOfPatientRegistryRecordRevised = responseMock;
 		XdsbRegistryWebServiceClient wsc = new XdsbRegistryWebServiceClient(
-				address);
-		
+				address, new SimpleMarshallerImpl());
+
 		// Act
 		String actualResponse = wsc.revisePatientRegistryRecord(requestMock);
-		
+
 		// Assert
 		assertXMLEqual("", expectedResponse, actualResponse);
 	}
-	
+
 	private MCCIIN000002UV01 setMCCIIN000002UV01() {
 		MCCIIN000002UV01 responseMock = new MCCIIN000002UV01();
 		Id idMock = new Id();

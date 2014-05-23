@@ -39,6 +39,12 @@ public class SimpleConsentDto {
 	/** The e id. */
 	private String eId;
 
+	/** The xacml policy id. */
+	private String xacmlPolicyId;
+
+	/** The consent id. */
+	private String consentId;
+
 	/**
 	 * Instantiates a new simple consent dto.
 	 */
@@ -54,12 +60,19 @@ public class SimpleConsentDto {
 	 *            the patient id
 	 * @param eId
 	 *            the e id
+	 * @param xacmlPolicyId
+	 *            the xacml policy id
+	 * @param consentId
+	 *            the consent id
 	 */
-	public SimpleConsentDto(String consent, long patientId, String eId) {
+	public SimpleConsentDto(String consent, long patientId, String eId,
+			String xacmlPolicyId, String consentId) {
 		super();
 		this.consent = consent;
 		this.patientId = patientId;
 		this.eId = eId;
+		this.xacmlPolicyId = xacmlPolicyId;
+		this.consentId = consentId;
 	}
 
 	/**
@@ -117,5 +130,43 @@ public class SimpleConsentDto {
 	 */
 	public void seteId(String eId) {
 		this.eId = eId;
+	}
+
+	/**
+	 * Gets the xacml policy id.
+	 * 
+	 * @return the xacml policy id
+	 */
+	public String getXacmlPolicyId() {
+		return xacmlPolicyId;
+	}
+
+	/**
+	 * Sets the xacml policy id.
+	 * 
+	 * @param xacmlPolicyId
+	 *            the new xacml policy id
+	 */
+	public void setXacmlPolicyId(String xacmlPolicyId) {
+		this.xacmlPolicyId = xacmlPolicyId;
+	}
+
+	/**
+	 * Gets the consent id.
+	 * 
+	 * @return the consent id
+	 */
+	public String getConsentId() {
+		return consentId;
+	}
+
+	/**
+	 * Sets the consent id.
+	 * 
+	 * @param consentId
+	 *            the new consent id
+	 */
+	public void setConsentId(String consentId) {
+		this.consentId = consentId;
 	}
 }

@@ -108,6 +108,60 @@ public class XdsbErrorFactory {
 	}
 
 	/**
+	 * Error retrieve document set response construct by error message.
+	 * 
+	 * @param errorMessage
+	 *            the error message
+	 * @return the retrieve document set response
+	 */
+	public RetrieveDocumentSetResponse errorRetrieveDocumentSetResponseConstructByErrorMessage(
+			String errorMessage) {
+		String codeContext = errorMessage;
+		String errorCode = "XDSRepositoryError";
+		boolean isPartial = false;
+
+		return createRetrieveDocumentSetResponseError(codeContext, errorCode,
+				isPartial);
+	}
+
+	/**
+	 * Error retrieve document set internal server error.
+	 * 
+	 * @return the retrieve document set response
+	 */
+	public RetrieveDocumentSetResponse errorRetrieveDocumentSetInternalServerError() {
+		String codeContext = "Internal server error in Policy Enforcement Point.";
+		String errorCode = "XDSRepositoryError";
+		boolean isPartial = false;
+
+		return createRetrieveDocumentSetResponseError(codeContext, errorCode,
+				isPartial);
+	}
+
+	/**
+	 * No clinical document found.
+	 * 
+	 * @param patientId
+	 *            the patient id
+	 * @param authorNPI
+	 *            the author npi
+	 * @return the retrieve document set response
+	 */
+	public RetrieveDocumentSetResponse noClinicalDocumentFound(
+			String patientId, String authorNPI) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Requested Document is not a valid C32(Clinic Personal Health Record Extract) For the Patient : ");
+		builder.append(patientId);
+		builder.append(" authored by : ");
+		builder.append(authorNPI);
+		String codeContext = builder.toString();
+		String errorCode = "XDSRepositoryError";
+		boolean isPartial = true;
+		return createRetrieveDocumentSetResponseError(codeContext, errorCode,
+				isPartial);
+	}
+
+	/**
 	 * Error retrieve document set response schema validation.
 	 * 
 	 * @param response
@@ -224,23 +278,15 @@ public class XdsbErrorFactory {
 	}
 
 	/**
-	 * Error adhoc query response inconsistent patient unique id.
+	 * Error adhoc query response construct by error message.
 	 * 
-	 * @param patientUniqueIdFromRequest
-	 *            the patient unique id from request
-	 * @param patientUniqueIdFromSAML
-	 *            the patient unique id from saml
+	 * @param errorMessage
+	 *            the error message
 	 * @return the adhoc query response
 	 */
-	public AdhocQueryResponse errorAdhocQueryResponseInconsistentPatientUniqueId(
-			String patientUniqueIdFromRequest, String patientUniqueIdFromSAML) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("The document entry patient id in $XDSDocumentEntryPatientId (");
-		builder.append(patientUniqueIdFromRequest);
-		builder.append(") does not match the patient unique id (");
-		builder.append(patientUniqueIdFromSAML);
-		builder.append(") generated from SAML header.");
-		String codeContext = builder.toString();
+	public AdhocQueryResponse errorAdhocQueryResponseConstructByErrorMessage(
+			String errorMessage) {
+		String codeContext = errorMessage;
 		String errorCode = "XDSRegistryError";
 
 		return createAdhocQueryResponseError(codeContext, errorCode);
@@ -271,6 +317,18 @@ public class XdsbErrorFactory {
 	}
 
 	/**
+	 * Error adhoc query response internal server error.
+	 * 
+	 * @return the adhoc query response
+	 */
+	public AdhocQueryResponse errorAdhocQueryResponseInternalServerError() {
+		String codeContext = "Internal server error in Policy Enforcement Point.";
+		String errorCode = "XDSRegistryError";
+
+		return createAdhocQueryResponseError(codeContext, errorCode);
+	}
+
+	/**
 	 * Error adhoc query response no documents found.
 	 * 
 	 * @param patientUniqueId
@@ -287,63 +345,6 @@ public class XdsbErrorFactory {
 		builder.append(" authored by ");
 		builder.append(intermediarySubjectNPI);
 		builder.append(".");
-		String codeContext = builder.toString();
-		String errorCode = "XDSRegistryError";
-
-		return createAdhocQueryResponseError(codeContext, errorCode);
-	}
-
-	/**
-	 * Error adhoc query response no consents found.
-	 * 
-	 * @param patientUniqueId
-	 *            the patient unique id
-	 * @return the adhoc query response
-	 */
-	public AdhocQueryResponse errorAdhocQueryResponseNoConsentsFound(
-			String patientUniqueId) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("No consents found for patient ");
-		builder.append(patientUniqueId);
-		builder.append(".");
-		String codeContext = builder.toString();
-		String errorCode = "XDSRegistryError";
-
-		return createAdhocQueryResponseError(codeContext, errorCode);
-	}
-
-	/**
-	 * Error adhoc query response unsupported format code.
-	 * 
-	 * @param unsupportedFormatCode
-	 *            the unsupported format code
-	 * @return the adhoc query response
-	 */
-	public AdhocQueryResponse errorAdhocQueryResponseUnsupportedFormatCode(
-			String unsupportedFormatCode) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(unsupportedFormatCode);
-		builder.append(" format code is not supported by Policy Enforcement Point.");
-		builder.append(" The only supported format code is '2.16.840.1.113883.10.20.1^^HITSP'.");
-		String codeContext = builder.toString();
-		String errorCode = "XDSRegistryError";
-
-		return createAdhocQueryResponseError(codeContext, errorCode);
-	}
-
-	/**
-	 * Error adhoc query response unsupported response option type.
-	 * 
-	 * @param supportedResponseOptionType
-	 *            the supported response option type
-	 * @return the adhoc query response
-	 */
-	public AdhocQueryResponse errorAdhocQueryResponseUnsupportedResponseOptionType(
-			String supportedResponseOptionType) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Policy Enforcement Point only supports '");
-		builder.append(supportedResponseOptionType);
-		builder.append("' response option return type.");
 		String codeContext = builder.toString();
 		String errorCode = "XDSRegistryError";
 
@@ -444,4 +445,5 @@ public class XdsbErrorFactory {
 		registryErrorList.getRegistryError().add(error);
 		return registryErrorList;
 	}
+
 }

@@ -2,6 +2,7 @@ package gov.samhsa.acs.documentsegmentation.valueset;
 
 import gov.samhsa.acs.common.tool.FileReader;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
+import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryListDto;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -96,5 +97,12 @@ public class ValueSetServiceImplMock implements ValueSetService {
 		System.out.println(v.lookupValueSetCategories("111880001",
 				"2.16.840.1.113883.6.96"));
 		System.out.println(v);
+	}
+
+	@Override
+	public ValueSetQueryListDto RestfulValueSetCategories(
+			ValueSetQueryListDto valueSetQueryListDtos) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

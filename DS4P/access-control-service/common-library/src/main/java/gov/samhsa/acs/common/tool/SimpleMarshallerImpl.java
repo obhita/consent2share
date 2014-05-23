@@ -25,6 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.acs.common.tool;
 
+import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
+
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 
@@ -41,46 +43,60 @@ public class SimpleMarshallerImpl implements SimpleMarshaller {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.common.tool.Marshaller#
+	 * @see gov.samhsa.acs.common.tool.Marshaller#
 	 * unmarshallFromXml(java.lang.Class, java.lang.String)
 	 */
 	@Override
 	public <T> T unmarshallFromXml(Class<T> clazz, String xml)
-			throws JAXBException {
-		JAXBContext context = JAXBContext.newInstance(clazz);
-		return unmarshallFromXml(context,clazz, xml);
+			throws SimpleMarshallerException {
+		JAXBContext context;
+		try {
+			context = JAXBContext.newInstance(clazz);
+		} catch (JAXBException e) {
+			throw new SimpleMarshallerException(e);
+		}
+		return unmarshallFromXml(context, clazz, xml);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.common.tool.Marshaller#
-	 * marshall(java.lang.Object)
+	 * @see gov.samhsa.acs.common.tool.Marshaller# marshall(java.lang.Object)
 	 */
 	@Override
-	public String marshall(Object obj) throws Throwable {
-		final JAXBContext context = JAXBContext.newInstance(obj.getClass());
+	public String marshall(Object obj) throws SimpleMarshallerException {
+		JAXBContext context;
+		String output;
+		try {
+			context = JAXBContext.newInstance(obj.getClass());
 
-		// Create the marshaller, this is the nifty little thing that will
-		// actually transform the object into XML
-		final Marshaller marshaller = context.createMarshaller();
+			// Create the marshaller, this is the nifty little thing that will
+			// actually transform the object into XML
+			final Marshaller marshaller = context.createMarshaller();
 
-		// Create a stringWriter to hold the XML
-		final StringWriter stringWriter = new StringWriter();
+			// Create a stringWriter to hold the XML
+			final StringWriter stringWriter = new StringWriter();
 
-		// Marshal the javaObject and write the XML to the stringWriter
-		marshaller.marshal(obj, stringWriter);
+			// Marshal the javaObject and write the XML to the stringWriter
+			marshaller.marshal(obj, stringWriter);
+			output = stringWriter.toString();
+		} catch (JAXBException e) {
+			throw new SimpleMarshallerException(e);
+		}
+		return output;
+	}
 
-		return stringWriter.toString();
-	}	
-	
 	@SuppressWarnings("unchecked")
 	private <T> T unmarshallFromXml(JAXBContext context, Class<T> clazz,
-			String xml) throws JAXBException {
-		Unmarshaller um = context.createUnmarshaller();
-		ByteArrayInputStream input = new ByteArrayInputStream(xml.getBytes());
-		return (T) um.unmarshal(input);
+			String xml) throws SimpleMarshallerException {
+		Unmarshaller um;
+		try {
+			um = context.createUnmarshaller();
+			ByteArrayInputStream input = new ByteArrayInputStream(
+					xml.getBytes());
+			return (T) um.unmarshal(input);
+		} catch (JAXBException e) {
+			throw new SimpleMarshallerException(e);
+		}
 	}
 }

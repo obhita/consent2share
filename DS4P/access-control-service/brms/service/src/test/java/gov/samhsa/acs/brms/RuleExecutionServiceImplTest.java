@@ -14,6 +14,7 @@ import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.brms.guvnor.GuvnorService;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
+import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
 import gov.samhsa.consent2share.commonunit.io.ResourceFileReader;
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
 
@@ -49,7 +50,7 @@ public class RuleExecutionServiceImplTest {
 	private RuleExecutionServiceImpl sut;
 
 	@Test
-	public void testAssertAndExecuteClinicalFacts() throws Throwable {
+	public void testAssertAndExecuteClinicalFacts() throws JAXBException {
 		// Arrange
 		StatefulKnowledgeSession sessionMock = mock(StatefulKnowledgeSession.class);
 		doReturn(sessionMock).when(sut).createStatefulKnowledgeSession();
@@ -99,7 +100,7 @@ public class RuleExecutionServiceImplTest {
 		String factModelStringMock = "factModelStringMock";
 		when(
 				marshallerMock.unmarshallFromXml(FactModel.class,
-						factModelStringMock)).thenThrow(JAXBException.class);
+						factModelStringMock)).thenThrow(SimpleMarshallerException.class);
 
 		// Act
 		AssertAndExecuteClinicalFactsResponse response = sut
@@ -112,8 +113,8 @@ public class RuleExecutionServiceImplTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testAssertAndExecuteClinicalFacts_Marshaller_Throws_Throwable()
-			throws Throwable {
+	public void testAssertAndExecuteClinicalFacts_Marshaller_Throws_JAXBException2()
+			throws JAXBException {
 		// Arrange
 		StatefulKnowledgeSession sessionMock = mock(StatefulKnowledgeSession.class);
 		doReturn(sessionMock).when(sut).createStatefulKnowledgeSession();
@@ -140,7 +141,7 @@ public class RuleExecutionServiceImplTest {
 		when(sessionMock.getGlobal("ruleExecutionContainer")).thenReturn(
 				ruleExecutionContainerMock);
 		when(marshallerMock.marshall(ruleExecutionContainerMock)).thenThrow(
-				Throwable.class);
+				JAXBException.class);
 
 		// Act
 		AssertAndExecuteClinicalFactsResponse response = sut

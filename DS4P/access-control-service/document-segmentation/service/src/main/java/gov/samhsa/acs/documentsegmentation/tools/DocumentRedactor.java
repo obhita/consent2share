@@ -28,6 +28,7 @@ package gov.samhsa.acs.documentsegmentation.tools;
 import gov.samhsa.acs.brms.domain.FactModel;
 import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.brms.domain.XacmlResult;
+import gov.samhsa.acs.documentsegmentation.tools.dto.RedactedDocument;
 
 /**
  * The Interface DocumentRedactor.
@@ -47,7 +48,7 @@ public interface DocumentRedactor {
 	 *            the fact model
 	 * @return the string
 	 */
-	public abstract String redactDocument(String document,
+	public abstract RedactedDocument redactDocument(String document,
 			RuleExecutionContainer ruleExecutionContainer,
 			XacmlResult xacmlResult, FactModel factModel);
 

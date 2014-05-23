@@ -9,7 +9,7 @@
 	<artifactId>brms-client</artifactId>
 	<name>BRMS - Client</name>
 	<packaging>jar</packaging>
-	
+
 	<properties>
 		<service-project-wsdl-folder>../service/src/main/resources/wsdl</service-project-wsdl-folder>
 	</properties>
@@ -27,22 +27,22 @@
 			<artifactId>cxf-rt-transports-http</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 		</dependency>
-		
+
 		<!-- Testing -->
 
-		<!-- Web stack-specific dependencies that are internally needed by the 
+		<!-- Web stack-specific dependencies that are internally needed by the
 			Endpoint object as it exposes a web service -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http-jetty</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Below used by embedded Jetty (which implements Endpoint in CXF) -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -70,6 +70,23 @@
 				</includes>
 			</resource>
 		</resources>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
 
 		<plugins>
 			<!-- Generate Java classes from WSDL during build -->

@@ -84,6 +84,8 @@ public class DocumentSegmentationServiceImpl implements
 	@Override
 	public SegmentDocumentResponse segmentDocument(
 			SegmentDocumentRequest parameters) {
+		throw new UnsupportedOperationException("Webservice interface for DocumentSegmentation is removed.");
+		/*
 		SegmentDocumentResponse response = new SegmentDocumentResponse();
 		try {
 			response = documentSegmentationService.segmentDocument(
@@ -91,7 +93,7 @@ public class DocumentSegmentationServiceImpl implements
 					parameters.isPackageAsXdm(), parameters.isEncryptDocument(),
 					parameters.getSenderEmailAddress(),
 					parameters.getRecipientEmailAddress(),
-					parameters.getXdsDocumentEntryUniqueId());
+					parameters.getXdsDocumentEntryUniqueId(), null);
 		} catch (InvalidOriginalClinicalDocumentException e) {
 			logger.error(e.getMessage(),e);
 		} catch (InvalidSegmentedClinicalDocumentException e) {
@@ -100,5 +102,6 @@ public class DocumentSegmentationServiceImpl implements
 			logger.error(e.getMessage(),e);
 		}
 		return response;
+		*/
 	}
 }

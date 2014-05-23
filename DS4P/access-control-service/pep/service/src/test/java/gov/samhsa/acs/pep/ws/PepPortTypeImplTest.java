@@ -13,6 +13,7 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 
 import java.net.URL;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
@@ -26,6 +27,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 public class PepPortTypeImplTest {
 
@@ -42,12 +46,17 @@ public class PepPortTypeImplTest {
 
 	@Before
 	public void setUp() throws Exception {
+		Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
+    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
+    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+
+        address = String.format("http://localhost:%s/services/PepService", portNumber);
+        
 		MockitoAnnotations.initMocks(this);
 
 		serviceName = new QName("http://www.samhsa.gov/ds4ppilot/contract/pep",
 				"PepService");
 
-		address = "http://localhost:12345/services/PepService";
 		wsdlURL = new URL(address + "?wsdl");
 
 		ep = Endpoint.publish(address, new PepPortTypeImpl(pep));

@@ -71,6 +71,7 @@ import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentValidationDto;
+import gov.samhsa.consent2share.service.dto.PreConsentDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
 
 import java.io.ByteArrayInputStream;
@@ -1227,16 +1228,6 @@ public class ConsentServiceImpl implements ConsentService {
 	 *            the tagged c32 doc
 	 */
 	private void changeXslPath(Document taggedC32Doc) {
-		DocumentXmlConverterImpl c = new DocumentXmlConverterImpl();
-		try {
-			System.out.println(c.convertXmlDocToString(taggedC32Doc));
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (TransformerException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		Element root = taggedC32Doc.getDocumentElement();
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		String expression = "/processing-instruction('xml-stylesheet')";
@@ -1450,6 +1441,46 @@ public class ConsentServiceImpl implements ConsentService {
 
 		consentRepository.save(consent);
 		return result.getJavascript();
+	}
+
+	@Override
+	public ConsentValidationDto checkForDuplicateConsents(PreConsentDto preConsentDto, String patientUsername) {
+		ConsentDto consentDto = makeConsentDto();
+
+		consentDto.setUsername(patientUsername);
+		
+		consentDto.setProvidersDisclosureIsMadeTo(preConsentDto.getProvidersDisclosureIsMadeTo());
+		consentDto.setProvidersDisclosureIsMadeToNpi(preConsentDto.getProvidersDisclosureIsMadeTo());
+		consentDto.setProvidersPermittedToDisclose(preConsentDto.getProvidersPermittedToDisclose());
+		consentDto.setProvidersPermittedToDiscloseNpi(preConsentDto.getProvidersPermittedToDisclose());
+		
+		consentDto.setOrganizationalProvidersDisclosureIsMadeTo(preConsentDto.getOrganizationalProvidersDisclosureIsMadeTo());
+		consentDto.setOrganizationalProvidersDisclosureIsMadeToNpi(preConsentDto.getOrganizationalProvidersDisclosureIsMadeTo());
+		consentDto.setOrganizationalProvidersPermittedToDisclose(preConsentDto.getOrganizationalProvidersPermittedToDisclose());
+		consentDto.setOrganizationalProvidersPermittedToDiscloseNpi(preConsentDto.getOrganizationalProvidersPermittedToDisclose());
+		
+		consentDto.setShareForPurposeOfUseCodes(preConsentDto.getShareForPurposeOfUseCodes());
+		consentDto.setConsentStart(preConsentDto.getConsentStart());
+		consentDto.setConsentEnd(preConsentDto.getConsentEnd());
+		
+		ConsentValidationDto consentValidationDto = consentCheckService.getConflictConsent(consentDto);
+		
+		return consentValidationDto;
+	}
+
+	@Override
+	public String getConsentSignedStage(Long consentId) {
+		String signStatus="NA";
+		Consent consent=consentRepository.findOne(consentId);
+		if (consent.getSignedPdfConsent() != null) {
+			if (consent.getSignedPdfConsent().getDocumentSignedStatus()
+					.equals("SIGNED"))
+				signStatus="CONSENT_SIGNED";
+			else
+				signStatus="CONSENT_SAVED";
+		} else
+			signStatus="CONSENT_SAVED";
+		return signStatus;
 	}
 
 }

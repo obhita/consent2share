@@ -30,11 +30,13 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
+import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
 import gov.samhsa.acs.xdsb.common.UniqueOidProviderImpl;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.common.XdsbMetadataGenerator;
 import gov.samhsa.acs.xdsb.common.XdsbMetadataGeneratorImpl;
 import gov.samhsa.acs.xdsb.repository.wsclient.XDSRepositorybWebServiceClient;
+import gov.samhsa.acs.xdsb.repository.wsclient.exception.XdsbRepositoryAdapterException;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequest;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequest.Document;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
@@ -120,13 +122,14 @@ public class XdsbRepositoryAdapter {
 	 *            the entry uuid (Pass this only if deprecating a document.
 	 *            Otherwise, pass null.)
 	 * @return the registry response
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRepositoryAdapterException
+	 *             the xdsb repository adapter exception
 	 */
 	public RegistryResponse provideAndRegisterDocumentSet(
 			String documentXmlString, String homeCommunityId,
 			XdsbDocumentType documentTypeForXdsbMetadata,
-			String patientUniqueId, String entryUUID) throws Throwable {
+			String patientUniqueId, String entryUUID)
+			throws XdsbRepositoryAdapterException {
 		switch (documentTypeForXdsbMetadata) {
 		case DEPRECATE_PRIVACY_CONSENT:
 			String messageDeprecate = "patientUniqueId and entryUUID must be injected to deprecate a document.";
@@ -143,9 +146,13 @@ public class XdsbRepositoryAdapter {
 		String submitObjectRequestXml = generateMetadata(documentXmlString,
 				homeCommunityId, documentTypeForXdsbMetadata, patientUniqueId,
 				entryUUID);
-		SubmitObjectsRequest submitObjectRequest = marshaller
-				.unmarshallFromXml(SubmitObjectsRequest.class,
-						submitObjectRequestXml);
+		SubmitObjectsRequest submitObjectRequest;
+		try {
+			submitObjectRequest = marshaller.unmarshallFromXml(
+					SubmitObjectsRequest.class, submitObjectRequestXml);
+		} catch (SimpleMarshallerException e) {
+			throw new XdsbRepositoryAdapterException(e);
+		}
 
 		Document document = null;
 		if (!documentXmlString.equals(EMPTY_XML_DOCUMENT)) {
@@ -181,17 +188,21 @@ public class XdsbRepositoryAdapter {
 	 * @param authorNPI
 	 *            the author npi
 	 * @return the retrieve document set response
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRepositoryAdapterException
+	 *             the xdsb repository adapter exception
 	 */
 	public RetrieveDocumentSetResponse retrieveDocumentSet(
 			RetrieveDocumentSetRequest request, String patientId,
-			String authorNPI) throws Throwable {
-		RetrieveDocumentSetResponse response = xdsbRepository
-				.retrieveDocumentSet(request);
-		response = responseFilter.filterByPatientAndAuthor(response, patientId,
-				authorNPI);
-		return response;
+			String authorNPI) throws XdsbRepositoryAdapterException {
+		try {
+			RetrieveDocumentSetResponse response = xdsbRepository
+					.retrieveDocumentSet(request);
+			response = responseFilter.filterByPatientAndAuthor(response,
+					patientId, authorNPI);
+			return response;
+		} catch (Throwable t) {
+			throw new XdsbRepositoryAdapterException(t);
+		}
 	}
 
 	/**

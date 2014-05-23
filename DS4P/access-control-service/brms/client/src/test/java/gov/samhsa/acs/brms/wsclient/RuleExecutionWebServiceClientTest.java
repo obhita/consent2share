@@ -1,8 +1,8 @@
 /*******************************************************************************
  * Copyright 2012 SAMHSA
- * 
+ *
  * Licensed under the Substance Abuse & Mental Health Services Administration (SAMHSA), you may not use this file except in compliance with the License.
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +18,8 @@ import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClin
 import gov.samhsa.consent2share.schema.ruleexecutionservice.AssertAndExecuteClinicalFactsResponse;
 
 import java.net.URL;
+import java.util.Properties;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
@@ -29,6 +31,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 public class RuleExecutionWebServiceClientTest {
 	protected static Endpoint ep;
@@ -39,8 +48,13 @@ public class RuleExecutionWebServiceClientTest {
 	private static final String ruleExecutionResponseContaine = "RuleExecutionResponseContaine";
 
 	@BeforeClass
-	public static void setUp() {
-		address = "http://localhost:12345/services/RuleExecutionService";
+	public static void setUp() throws Exception {
+		Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
+    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
+    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+
+        address = String.format("http://localhost:%s/services/RuleExecutionService", portNumber);
+
 		ep = Endpoint.publish(address,
 				new RuleExecutionServicePortTypeImpl());
 

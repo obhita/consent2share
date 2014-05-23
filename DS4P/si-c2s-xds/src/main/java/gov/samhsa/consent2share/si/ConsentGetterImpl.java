@@ -56,14 +56,14 @@ public class ConsentGetterImpl implements ConsentGetter {
 	
 	/** The Constant SQL_GET_CONSENT. */
 	public static final String SQL_GET_CONSENT = 
-			"select consent.xacml_policy_file, consent.patient, consent.id, patient.enterprise_identifier "
+			"select consent.xacml_policy_file, consent.patient, consent.id, consent.consent_reference_id, patient.enterprise_identifier "
 			+ "from consent "
 			+ "join patient on consent.patient=patient.id "
 			+ "where consent.id=?";
 	
 	/** The Constant SQL_GET_POLICY_ID. */
 	public static final String SQL_GET_POLICY_ID = 
-			"select consent.id, consent.consent_reference_id, patient.enterprise_identifier "
+			"select consent.id, consent.consent_reference_id, patient.enterprise_identifier, consent.patient "
 			+ "from consent "
 			+ "join patient on consent.patient=patient.id "
 			+ "where consent.id=?";

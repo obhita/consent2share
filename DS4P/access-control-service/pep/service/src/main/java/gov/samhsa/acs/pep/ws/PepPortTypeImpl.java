@@ -1,24 +1,16 @@
 package gov.samhsa.acs.pep.ws;
 
 import gov.samhsa.acs.pep.PolicyEnforcementPoint;
-import gov.samhsa.acs.pep.saml.SamlTokenParser;
 import gov.samhsa.ds4ppilot.contract.pep.PepPortType;
 import gov.samhsa.ds4ppilot.schema.pep.DirectEmailSendRequest;
 import gov.samhsa.ds4ppilot.schema.pep.DirectEmailSendResponse;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 
-import javax.annotation.Resource;
 import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
 
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
-
-import org.apache.cxf.feature.Features;
-import org.apache.cxf.interceptor.InInterceptors;
-import org.apache.cxf.interceptor.OutInterceptors;
-import org.apache.ws.security.SAMLTokenPrincipal;
 
 /**
  * The Class PepPortTypeImpl.

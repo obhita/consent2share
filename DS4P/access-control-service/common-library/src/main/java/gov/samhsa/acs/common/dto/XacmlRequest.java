@@ -25,48 +25,62 @@
  ******************************************************************************/
 package gov.samhsa.acs.common.dto;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * The Class XacmlRequest.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name="XacmlRequest")
 public class XacmlRequest {
 
-	/** The recepient subject npi. */
-	private String recepientSubjectNPI;
+	/** The recipient subject npi. */
+	@XmlElement(name="RecipientSubjectNPI")
+	private String recipientSubjectNPI;
 
 	/** The intermediary subject npi. */
+	@XmlElement(name="IntermediarySubjectNPI")
 	private String intermediarySubjectNPI;
 
 	/** The purpose of use. */
+	@XmlElement(name="PurposeOfUse")
 	private String purposeOfUse;
 
 	/** The patient id. */
+	@XmlElement(name="PatientId")
 	private String patientId;
 
 	/** The patient unique id. */
+	@XmlElement(name="PatientUniqueId")
 	private String patientUniqueId;
 
 	/** The home community id. */
+	@XmlElement(name="HomeCommunityId")
 	private String homeCommunityId;
 
 	/** The message id. */
+	@XmlElement(name="MessageId")
 	private String messageId;
 
 	/**
-	 * Gets the recepient subject npi.
+	 * Gets the recipient subject npi.
 	 *
-	 * @return the recepient subject npi
+	 * @return the recipient subject npi
 	 */
-	public String getRecepientSubjectNPI() {
-		return recepientSubjectNPI;
+	public String getRecipientSubjectNPI() {
+		return recipientSubjectNPI;
 	}
 
 	/**
-	 * Sets the recepient subject npi.
+	 * Sets the recipient subject npi.
 	 *
-	 * @param recepientSubjectNPI the new recepient subject npi
+	 * @param recipientSubjectNPI the new recipient subject npi
 	 */
-	public void setRecepientSubjectNPI(String recepientSubjectNPI) {
-		this.recepientSubjectNPI = recepientSubjectNPI;
+	public void setRecipientSubjectNPI(String recipientSubjectNPI) {
+		this.recipientSubjectNPI = recipientSubjectNPI;
 	}
 
 	/**

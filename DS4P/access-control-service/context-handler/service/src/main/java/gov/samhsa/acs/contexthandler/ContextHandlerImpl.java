@@ -28,10 +28,14 @@ package gov.samhsa.acs.contexthandler;
 import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
+import gov.samhsa.acs.common.log.AcsLogger;
+import gov.samhsa.acs.common.log.AcsLoggerFactory;
+import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
+import gov.samhsa.acs.contexthandler.exception.PolicyProviderException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
+
+import ch.qos.logback.audit.AuditException;
 
 /**
  * The Class ContextHandlerImpl.
@@ -42,7 +46,7 @@ public class ContextHandlerImpl implements ContextHandler {
 	private PolicyDecisionPoint policyDesicionPoint;
 
 	/** The Constant LOGGER. */
-	private static final Logger LOGGER = LoggerFactory
+	private static final AcsLogger LOGGER = AcsLoggerFactory
 			.getLogger(ContextHandlerImpl.class);
 
 	/**
@@ -63,18 +67,28 @@ public class ContextHandlerImpl implements ContextHandler {
 	 * gov.samhsa.acs.common.dto.XacmlRequest)
 	 */
 	@Override
-	public XacmlResponse enforcePolicy(XacmlRequest xacmlRequest) {
-		LOGGER.debug("policyDesicionPoint.evaluateRequest(xacmlRequest) is invoked");
+	public XacmlResponse enforcePolicy(XacmlRequest xacmlRequest)
+			throws AuditException, NoPolicyFoundException,
+			PolicyProviderException {
+		LOGGER.debug(xacmlRequest.getMessageId(),
+				"policyDesicionPoint.evaluateRequest(xacmlRequest) is invoked");
 		return policyDesicionPoint.evaluateRequest(xacmlRequest);
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.acs.contexthandler.ContextHandler#makeDecisionForTryingPolicy(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.acs.contexthandler.ContextHandler#makeDecisionForTryingPolicy
+	 * (java.lang.String)
 	 */
 	@Override
-	public PdpRequestResponse makeDecisionForTryingPolicy(String xacmlPolicy, String purposeOfUse) {
-		LOGGER.debug("makeDecisionForTryingPolicy(xacmlPolicy) is invoked");
+	public PdpRequestResponse makeDecisionForTryingPolicy(String xacmlPolicy,
+			String purposeOfUse) {
+
+		LOGGER.debug("", "makeDecisionForTryingPolicy(xacmlPolicy) is invoked");
 		Assert.hasText(xacmlPolicy, "Xaml policy is not set");
-		return policyDesicionPoint.evaluatePolicyForTrying(xacmlPolicy, purposeOfUse);
+		return policyDesicionPoint.evaluatePolicyForTrying(xacmlPolicy,
+				purposeOfUse);
 	}
 }

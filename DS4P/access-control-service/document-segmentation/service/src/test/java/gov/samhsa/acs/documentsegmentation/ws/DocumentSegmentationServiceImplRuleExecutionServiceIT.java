@@ -8,7 +8,6 @@ import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentationImpl;
-import gov.samhsa.acs.documentsegmentation.audit.AuditServiceImpl;
 import gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentEncrypterImpl;
@@ -20,7 +19,6 @@ import gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl;
 import gov.samhsa.acs.documentsegmentation.tools.EmbeddedClinicalDocumentExtractorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl;
 import gov.samhsa.acs.documentsegmentation.valueset.ValueSetServiceImplMock;
-import gov.samhsa.acs.documentsegmentation.ws.DocumentSegmentationServiceImpl;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationService;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationServicePortType;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentRequest;
@@ -117,8 +115,7 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 						new DocumentSegmentationServiceImpl(
 								new DocumentSegmentationImpl(
 										ruleExecutionService,
-										new AuditServiceImpl(
-												endpointAddressForAuditService),
+										null,
 										documentEditor, marshaller,
 										documentEncrypter, documentRedactor,
 										documentMasker, documentTagger,

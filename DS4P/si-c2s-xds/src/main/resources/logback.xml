@@ -1,43 +1,51 @@
 <!DOCTYPE Configuration>
 <configuration scan="true" scanPeriod="3 seconds">
 
-	<statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
-
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<pattern>
-				%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{32} - %msg%n
-			</pattern>
-		</layout>
+	<statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+	
+	<appender name="LogbackClassic" class="ch.qos.logback.classic.net.SocketAppender">
+	    <RemoteHost>localhost</RemoteHost>
+	    <Port>4560</Port>
+	    <ReconnectionDelay>170</ReconnectionDelay>
+	    <IncludeCallerData>true</IncludeCallerData>
 	</appender>
 
-	<appender name="FILE"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<File>si-c2s-xds.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<FileNamePattern>
-				si-c2s-xds.%d{yyyy-MM-dd}.log.zip
-			</FileNamePattern>
-		</rollingPolicy>
 
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>
-				%d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n
-			</Pattern>
-		</layout>
-		
-		<!-- keep 30 days' worth of history -->
-		<maxHistory>30</maxHistory>
-	</appender>
-	
-	<logger name="gov.samhsa.consent2share"></logger>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+                 ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{"yyyy-MM-dd HH:mm:ss,SSS"} [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </encoder>
+    </appender>
 
-	<!-- <logger name="org.springframework" level="DEBUG" />	 -->
-	
-	<root>
-		<level value="WARN" />
-		<appender-ref ref="STDOUT" />
-		<appender-ref ref="FILE" />
-	</root>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>si-c2s-xds.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>si-c2s-xds.%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- keep 7 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
 
+		<encoder>
+            <charset>UTF-8</charset>
+				%d{"yyyy-MM-dd HH:mm:ss,SSS"} %level [%thread] %logger{10} [%file : %line] %msg%n
+		</encoder>
+    </appender> 
+
+      
+	<logger name="gov.samhsa.consent2share" level="debug"/>
+
+    <root level="error">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" /> 
+  <!--       <appender-ref ref="LogbackClassic" /> -->
+     </root>
 </configuration>

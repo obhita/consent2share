@@ -25,9 +25,12 @@
  ******************************************************************************/
 package gov.samhsa.acs.contexthandler;
 
+import ch.qos.logback.audit.AuditException;
 import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
+import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
+import gov.samhsa.acs.contexthandler.exception.PolicyProviderException;
 
 /**
  * The Interface ContextHandler.
@@ -39,8 +42,18 @@ public interface ContextHandler {
 	 *
 	 * @param xacmlRequest the xacml request
 	 * @return the xacml response
+	 * @throws AuditException the audit exception
+	 * @throws NoPolicyFoundException the no policy found exception
+	 * @throws PolicyProviderException the policy provider exception
 	 */
-	public XacmlResponse enforcePolicy(XacmlRequest xacmlRequest);
+	public XacmlResponse enforcePolicy(XacmlRequest xacmlRequest) throws AuditException, NoPolicyFoundException, PolicyProviderException;
 	
+	/**
+	 * Make decision for trying policy.
+	 *
+	 * @param xacmlPolicy the xacml policy
+	 * @param purposeOfUse the purpose of use
+	 * @return the pdp request response
+	 */
 	public PdpRequestResponse makeDecisionForTryingPolicy(String xacmlPolicy, String purposeOfUse);
 }

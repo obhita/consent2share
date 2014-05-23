@@ -1,7 +1,14 @@
 package gov.samhsa.acs.common.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import static org.mockito.Mockito.*;
+
+import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.util.ArrayHelper;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -66,4 +73,21 @@ public class ArrayHelperTest {
 		
 		Assert.assertTrue(!hasSubArray);
 	}
+	
+	@Test
+	public void testResourceToChars(){
+				
+		char[] hasSubArray = ArrayHelper.resourceToChars("validC32.xml");
+		
+		Assert.assertNotNull(hasSubArray);
+	}
+	
+	@Test
+	public void testResourceToBytes(){
+				
+		byte[] hasSubArray = ArrayHelper.resourceToBytes("validC32.xml");
+		
+		Assert.assertNotNull(hasSubArray);
+	}
+	
 }

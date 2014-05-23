@@ -34,6 +34,13 @@
 		class="gov.samhsa.acs.xdsb.common.XdsbErrorFactory"
 		scope="prototype" autowire="constructor">
 	</bean>
+	
+	<!-- XDS.b: registry webservice client-->
+	<bean id="xdsbRegistryWebServiceClient"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient"
+		scope="prototype" autowire="constructor">
+		<constructor-arg value="${xdsbRegistryEndpointAddress}" />
+	</bean>	
 
 	<!-- XDS.b: adapters -->
 	<bean id="retrieveDocumentSetResponseFilter"

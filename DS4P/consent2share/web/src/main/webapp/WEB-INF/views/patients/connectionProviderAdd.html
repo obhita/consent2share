@@ -180,7 +180,7 @@
 								                    	</a>
 													</div>
 												</div>						            	 
-													<div id="collapseOne" class="panel-collapse collapse">
+												<div id="collapseOne" class="panel-collapse collapse">
 													
 												      <div class="panel-body"> 
 												        <div>
@@ -188,35 +188,38 @@
 													        	<button type="button" class="close" data-dismiss="alert">&times;</button>
 													         	<span>Enter the provider State, City or Zip Code to search</span>
 														    </div>
-													        <form>
-																<div class="control-group" >
-																
-																<div style="margin-left:0px; padding: 10px 15px;" class="username-container">
-										                            <label for="state">State</label> 
-																	<select id="state_name"  class="form-control">
-																	<option selected="selected" value="">--- Please Select ---</option>
-																	<option th:each="addressState : ${stateCodes}" th:value="${addressState.code}" th:text="${addressState.displayName}">Alabama</option>
-																	</select>	
-										                            
-										                            <label for="city_name">City <span style="font-size: small; color: #8a8a8a;"><em>(not required)</em></span></label>
-										                            <input id="city_name" name="cityname" type="text" class="form-control" /> 
-																	<span id="city_client_error_text" class="required-text" style="display: none;">The length of city name cannot be less than 3.</span>
-										                       						                            
+													        <section>
+																<div class="row" >															
+																	<div class="username-container col-sm-8 col-xs-12">
+											                            <div class="form-group">
+												                            <label for="state">State</label> 
+																			<select id="state_name"  class="form-control">
+																			<option selected="selected" value="">--- Please Select ---</option>
+																			<option th:each="addressState : ${stateCodes}" th:value="${addressState.code}" th:text="${addressState.displayName}">Alabama</option>
+																			</select>	
+												                        </div>
+												                        <div class="form-group">
+												                            <label for="city_name">City <span style="font-size: small; color: #8a8a8a;"><em>(not required)</em></span></label>
+												                            <input id="city_name" name="cityname" type="text" class="form-control" /> 
+																			<span id="city_client_error_text" class="required-text" style="display: none;">The length of city name cannot be less than 3.</span>
+											                       		</div>				                            
+																	</div>
 																</div>
-
-
-
-																	<p style="font-weight:600; margin:5px 0 8px 20px;">OR</p>
-																	<label for="zip_code">Zip Code</label>
-																	<input id="zip_code" name="zipcode" type="text" class="form-control"/>
-																	<span id="zip_client_error_text" class="required-text" style="display: none;">Please provide a valid zip code.</span>
+															</section>
+															<section>
+																<div class="row">	
+																	<p style="font-weight: 600; color: #428bca; margin: 5px 0 8px 20px;">OR</p>
+																	<div class="form-group col-sm-7">
+																		<label for="zip_code">Zip Code</label>
+																		<input id="zip_code" name="zipcode" type="text" class="form-control"/>
+																		<span id="zip_client_error_text" class="required-text" style="display: none;">Please provide a valid zip code.</span>
+										                       		</div>
 										                       </div>
-										                       <button type="button" class="btn btn-default " style="margin: 10px 10px 0 0;" onclick="clearLocation()">Clear</button>
-										                       
-															</form>												     	
-													        </div>
-												        </div>
-												    </div>
+										                       <button type="button" class="btn btn-default " style="margin: 10px 10px 0 0;" onclick="clearLocation()">Clear</button>										                       
+															</section>												     	
+													     </div>
+												     </div>
+												</div>
 							                    
 					                        </div>    
 						                    <div class="panel panel-default" >
@@ -235,34 +238,45 @@
 													        	<button type="button" class="close" data-dismiss="alert">&times;</button>
 													         	<span>Enter Last Name/Facility, Phone, or Specialty.</span>
 														    </div>
-					        				                <div class="control-group">
-																<label for="last_name">Last Name / Facility Name</label>
-									                            <input id="last_name" name="lastname" type="text" class="form-control"/>
-																<span id="lname_client_error_text" class="required-text" style="display: none;">Please provide a valid last name.</span>
+					        				                <section class="">
+																<div class="form-group">
+																	<label for="last_name">Last Name / Facility Name</label>
+										                            <input id="last_name" name="lastname" type="text" class="form-control"/>
+																	<span id="lname_client_error_text" class="required-text" style="display: none;">Please provide a valid last name.</span>
+									                            </div>
 									                                   		
-																<label for="first_name">First Name</label>
-									                            <input id="first_name" name="firstname" type="text" class="form-control"/>       		
-																<span id="fname_client_error_text" class="required-text" style="display: none;">Please provide a valid first name.</span>
-																
-																<label for="gender">Gender</label>
-																<select id="gender" class="form-control">
-																<option selected="selected" value="">--- Please Select ---</option>
-																<option th:each="gender : ${administrativeGenderCodes}"
-																th:value="${gender.code}" th:text="${gender.displayName}">F</option>
-																</select>
-																
-<!-- 																<label for="gender">Gender</label> -->
-<!-- 									                            <input id="gender" name="gender" type="text" class="form-control"/>       		 -->
-																<label for="specialty">Specialty</label>
-									                            <input id="specialty" name="specialty" type="text" class="form-control"/>       		
-																<label for="phone">Phone</label>
-									  							<div class="form-group">
-									  							<input style="width:3em" maxlength="3" id="phone1" name="phone" type="text" class="form-control force-inline"/>
-									                            <input style="width:3em" maxlength="3" id="phone2" size="3" name="phone" type="text" class="form-control force-inline"/>
-									                            <input style="width:4em" maxlength="4" id="phone3" size="4" name="phone" type="text" class="form-control force-inline"/>       		
+																<div class="form-group">
+																	<label for="first_name">First Name</label>
+										                            <input id="first_name" name="firstname" type="text" class="form-control"/>       		
+																	<span id="fname_client_error_text" class="required-text" style="display: none;">Please provide a valid first name.</span>
 																</div>
-																<span id="phone_client_error_text" class="required-text" style="display: none;">Please provide a valid phone number.</span>
-									                       </div>
+																
+																<div class="row form-group">
+																<div class="col-sm-8 side-padding0">
+																	<label for="gender">Gender</label>
+																	<select id="gender" class="form-control">
+																	<option selected="selected" value="">--- Please Select ---</option>
+																	<option th:each="gender : ${administrativeGenderCodes}"
+																	th:value="${gender.code}" th:text="${gender.displayName}">F</option>
+																	</select>
+																</div>
+																</div>
+																
+																<div class="form-group">
+																	<label for="specialty">Specialty</label>
+										                            <input id="specialty" name="specialty" type="text" class="form-control"/>       		
+																</div>
+																
+																<div class="form-group">
+																	<label for="phone">Phone</label>
+										  							<div class="form-group">
+										  							<input style="width:4em" maxlength="3" id="phone1" name="phone" type="text" class="form-control force-inline"/>
+										                            <input style="width:4em" maxlength="3" id="phone2" size="3" name="phone" type="text" class="form-control force-inline"/>
+										                            <input style="width:5em" maxlength="4" id="phone3" size="4" name="phone" type="text" class="form-control force-inline"/>       		
+																	</div>
+																	<span id="phone_client_error_text" class="required-text" style="display: none;">Please provide a valid phone number.</span>
+									                       		</div>
+									                       </section>
 									                       <button type="button" class="btn btn-default" style="margin: 10px 10px 0 0;" onclick="clearName()">Clear</button>		
 								                       </div>
 												      </div>

@@ -25,6 +25,10 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.si;
 
+import gov.samhsa.acs.common.tool.exception.DocumentAccessorException;
+import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
+import gov.samhsa.acs.xdsb.registry.wsclient.exception.XdsbRegistryAdapterException;
+import gov.samhsa.acs.xdsb.repository.wsclient.exception.XdsbRepositoryAdapterException;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponse;
 
 /**
@@ -39,15 +43,20 @@ public interface ConsentRevokeService {
 	 *            the patient unique id
 	 * @param policyId
 	 *            the policy id
+	 * @param messageId
+	 *            the message id
 	 * @return the string
-	 * @throws Exception
-	 *             the exception
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws SimpleMarshallerException
+	 *             the simple marshaller exception
+	 * @throws DocumentAccessorException
+	 *             the document accessor exception
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public abstract String findConsentEntryUuidByPolicyId(
-			String patientUniqueId, String policyId) throws Exception,
-			Throwable;
+			String patientUniqueId, String policyId, String messageId)
+			throws SimpleMarshallerException, DocumentAccessorException,
+			XdsbRegistryAdapterException;
 
 	/**
 	 * Revoke consent in XDS.b. This invokes a provideAndRegister operation to
@@ -59,14 +68,22 @@ public interface ConsentRevokeService {
 	 *            the patient unique id
 	 * @param policyId
 	 *            the policy id
+	 * @param messageId
+	 *            the message id
 	 * @return the registry response
-	 * @throws Exception
-	 *             the exception
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws DocumentAccessorException
+	 *             the document accessor exception
+	 * @throws SimpleMarshallerException
+	 *             the simple marshaller exception
+	 * @throws XdsbRepositoryAdapterException
+	 *             the xdsb repository adapter exception
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public abstract RegistryResponse revokeConsent(String patientUniqueId,
-			String policyId) throws Exception, Throwable;
+			String policyId, String messageId)
+			throws DocumentAccessorException, SimpleMarshallerException,
+			XdsbRepositoryAdapterException, XdsbRegistryAdapterException;
 
 	/**
 	 * Gets the patient unique id.

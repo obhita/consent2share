@@ -32,13 +32,13 @@ public class XdsbErrorFactoryTest {
 	}
 	
 	@Test
-	public void testErrorAdhocQueryResponseNoConsentsFound() throws SAXException, IOException, Throwable{
+	public void testErrorAdhocQueryResponseConstructByErrorMessage() throws SAXException, IOException, Throwable{
 		// Arrange
-		String expectedResponse = fileReader.readFile("errorAdhocQueryResponseNoConsentsFound.xml");
-		String patientUniqueIdMock = "patientUniqueIdMock";
+		String expectedResponse = fileReader.readFile("errorAdhocQueryResponseConstructByErrorMessage.xml");
+		String errorMessageMock = "errorMessageMock";
 		
 		// Act
-		AdhocQueryResponse actualResponse =sut.errorAdhocQueryResponseNoConsentsFound(patientUniqueIdMock);
+		AdhocQueryResponse actualResponse =sut.errorAdhocQueryResponseConstructByErrorMessage(errorMessageMock);
 		
 		// Assert
 		assertResponse(expectedResponse, actualResponse);
@@ -232,25 +232,6 @@ public class XdsbErrorFactoryTest {
 	}
 
 	@Test
-	public void testErrorAdhocQueryResponseInconsistentPatientUniqueId()
-			throws SAXException, Throwable {
-		// Arrange
-		String expectedResponse = fileReader
-				.readFile("errorAdhocQueryResponseInconsistentPatientUniqueId.xml");
-		String patientUniqueIdFromRequestMock = "patientUniqueIdFromRequestMock";
-		String patientUniqueIdFromSAMLMock = "patientUniqueIdFromSAMLMock";
-
-		// Act
-		AdhocQueryResponse actualResponse = sut
-				.errorAdhocQueryResponseInconsistentPatientUniqueId(
-						patientUniqueIdFromRequestMock,
-						patientUniqueIdFromSAMLMock);
-
-		// Assert
-		assertResponse(expectedResponse, actualResponse);
-	}
-
-	@Test
 	public void testErrorAdhocQueryResponseRegistryNotAvailable()
 			throws SAXException, Throwable {
 		// Arrange
@@ -293,38 +274,6 @@ public class XdsbErrorFactoryTest {
 		AdhocQueryResponse actualResponse = sut
 				.errorAdhocQueryResponseNoDocumentsFound(patientUniqueIdMock,
 						intermediarySubjectNPIMock);
-
-		// Assert
-		assertResponse(expectedResponse, actualResponse);
-	}
-
-	@Test
-	public void testErrorAdhocQueryResponseUnsupportedFormatCode()
-			throws SAXException, Throwable {
-		// Arrange
-		String expectedResponse = fileReader
-				.readFile("errorAdhocQueryResponseUnsupportedFormatCode.xml");
-		String unsupportedFormatCodeMock = "unsupportedFormatCodeMock";
-
-		// Act
-		AdhocQueryResponse actualResponse = sut
-				.errorAdhocQueryResponseUnsupportedFormatCode(unsupportedFormatCodeMock);
-
-		// Assert
-		assertResponse(expectedResponse, actualResponse);
-	}
-
-	@Test
-	public void testErrorAdhocQueryResponseUnsupportedResponseOptionType()
-			throws SAXException, Throwable {
-		// Arrange
-		String expectedResponse = fileReader
-				.readFile("errorAdhocQueryResponseUnsupportedResponseOptionType.xml");
-		String supportedResponseOptionTypeMock = "supportedResponseOptionTypeMock";
-
-		// Act
-		AdhocQueryResponse actualResponse = sut
-				.errorAdhocQueryResponseUnsupportedResponseOptionType(supportedResponseOptionTypeMock);
 
 		// Assert
 		assertResponse(expectedResponse, actualResponse);

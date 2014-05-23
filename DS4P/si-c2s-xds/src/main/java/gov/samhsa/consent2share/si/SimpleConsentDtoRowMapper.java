@@ -73,10 +73,11 @@ public class SimpleConsentDtoRowMapper implements RowMapper<SimpleConsentDto> {
 		String eId = rs.getString("patient.enterprise_identifier");
 		String consent = new String(lobHandler.getBlobAsBytes(rs,
 				"consent.xacml_policy_file"));
+		String xacmlPolicyId = rs.getString("consent.consent_reference_id");
 
 		logger.info("EID:" + eId + "; PatientId:" + patientId + "; Consent:"
 				+ consentIdLong + " is fetched.");
 		logger.debug("Consent File:\n" + consent);
-		return new SimpleConsentDto(consent, patientId, eId);
+		return new SimpleConsentDto(consent, patientId, eId, xacmlPolicyId, Long.toString(consentIdLong));
 	}
 }

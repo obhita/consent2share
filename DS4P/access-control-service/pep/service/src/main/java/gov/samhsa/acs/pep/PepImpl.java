@@ -114,6 +114,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
+import ch.qos.logback.audit.AuditException;
+
 /**
  * The Class PepImpl.
  */
@@ -248,7 +250,7 @@ public class PepImpl implements Pep {
 						.segmentDocument(originalC32,
 								xacmlResponseXml.toString(), packageAsXdm,
 								true, senderEmailAddress,
-								recipientEmailAddress, "");
+								recipientEmailAddress, "", null, false);
 
 				processedPayload = dataHandlerToBytesConverter
 						.toByteArray(segmentDocumentResponse
@@ -266,6 +268,8 @@ public class PepImpl implements Pep {
 			} catch (InvalidOriginalClinicalDocumentException e) {
 				throw new DS4PException(e.toString(), e);
 			} catch (InvalidSegmentedClinicalDocumentException e) {
+				throw new DS4PException(e.toString(), e);
+			} catch (AuditException e) {
 				throw new DS4PException(e.toString(), e);
 			}
 		}
@@ -371,7 +375,7 @@ public class PepImpl implements Pep {
 						.segmentDocument(originalC32,
 								xacmlResponseXml.toString(), packageAsXdm,
 								true, senderEmailAddress,
-								recipientEmailAddress, xdsDocumentEntryUniqueId);
+								recipientEmailAddress, xdsDocumentEntryUniqueId, null, false);
 
 				processedPayload = dataHandlerToBytesConverter
 						.toByteArray(segmentDocumentResponse
@@ -389,6 +393,8 @@ public class PepImpl implements Pep {
 			} catch (InvalidOriginalClinicalDocumentException e) {
 				throw new DS4PException(e.toString(), e);
 			} catch (InvalidSegmentedClinicalDocumentException e) {
+				throw new DS4PException(e.toString(), e);
+			} catch (AuditException e) {
 				throw new DS4PException(e.toString(), e);
 			}
 		}
@@ -673,7 +679,7 @@ public class PepImpl implements Pep {
 									false, true,
 									"leo.smith@direct.obhita-stage.org",
 									enforcePolicy.getXspasubject()
-											.getSubjectEmailAddress(), "");
+											.getSubjectEmailAddress(), "", null, false);
 					processedPayload = dataHandlerToBytesConverter
 							.toByteArray(segmentDocumentResponse
 									.getProcessedDocument());
@@ -999,7 +1005,7 @@ public class PepImpl implements Pep {
 		XacmlRequest xacmlRequest = new XacmlRequest();
 		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
 		xacmlRequest.setPurposeOfUse(purposeOfUse);
-		xacmlRequest.setRecepientSubjectNPI(recepientSubjectNPI);
+		xacmlRequest.setRecipientSubjectNPI(recepientSubjectNPI);
 		xacmlRequest.setPatientId(resourceId);
 		xacmlRequest.setPatientUniqueId(resourceId);
 		xacmlRequest.setMessageId(messageId);

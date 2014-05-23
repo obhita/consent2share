@@ -285,7 +285,7 @@ public class PepImplTest {
 		final String demoEndpoint = "http://feijboss01:8080/axis2/services/xdsregistryb";
 
 		XdsbRegistryWebServiceClient xdsService = new XdsbRegistryWebServiceClient(
-				demoEndpoint);
+				demoEndpoint, null);
 		// PatientPerson
 		PatientPerson patientPerson = new PatientPerson();
 		Name name = new Name();

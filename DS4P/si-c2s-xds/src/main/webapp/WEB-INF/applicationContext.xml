@@ -26,6 +26,11 @@
 		base-package="gov.samhsa.consent2share.si">
 	</context:component-scan>
 	
+	<!-- SI Audit Service -->
+	<bean id="auditServiceImpl" class="gov.samhsa.acs.audit.AuditServiceImpl" scope="singleton" init-method="init" destroy-method="destroy">
+		<constructor-arg value="SIAuditService" />
+	</bean>	
+	
 	<!-- Consent Revoke Service -->
 	<bean id="consentRevokeServiceImpl"
 		class="gov.samhsa.consent2share.si.ConsentRevokeServiceImpl"
@@ -89,7 +94,7 @@
 	</bean>
 	<bean id="xdsbRegistryWebServiceClient"
 		class="gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient"
-		scope="prototype">
+		scope="prototype" autowire="constructor">
 		<constructor-arg value="${xdsbRegistry}" />
 	</bean>	
 	<!-- XDS.b: adapters -->

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>consent2share</artifactId>
-		<version>0.5.0-SNAPSHOT</version>
+		<version>0.6.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>consent2share-core</artifactId>
@@ -55,7 +55,12 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+
 		<!-- Test -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -209,7 +214,7 @@
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
@@ -222,7 +227,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 		</dependency>
-            
+
 
 		<!-- TODO: Remove aspectj dependencies -->
 		<dependency>
@@ -266,11 +271,15 @@
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>common-library</artifactId>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>try-policy-client</artifactId>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>audit-service</artifactId>
+		</dependency>
 		<!-- Our own projects End -->
 
 		<!-- xmlschema-core (required by pix-client) -->
@@ -278,13 +287,13 @@
 			<groupId>org.apache.ws.xmlschema</groupId>
 			<artifactId>xmlschema-core</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.taldius</groupId>
 			<artifactId>libclamav</artifactId>
 			<version>1.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.owasp.esapi</groupId>
 			<artifactId>esapi</artifactId>
@@ -294,17 +303,17 @@
 					<groupId>commons-logging</groupId>
 				</exclusion>
 				<exclusion>
-						<groupId>log4j</groupId>
-						<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.tanesha.recaptcha4j</groupId>
 			<artifactId>recaptcha4j</artifactId>
 		</dependency>
-		
+
 	</dependencies>
 
 </project>

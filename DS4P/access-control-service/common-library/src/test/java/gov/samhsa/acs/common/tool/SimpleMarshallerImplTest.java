@@ -61,7 +61,7 @@ public class SimpleMarshallerImplTest {
 	}
 	
 	@Test
-	public void testMarshall() throws Throwable
+	public void testMarshall() throws JAXBException
 	{
 		// Arrange
 		RuleExecutionContainer r = createRuleExecutionContainer();

@@ -11,13 +11,13 @@ public abstract class EventListener implements InitializingBean {
    Logger log = LoggerFactory.getLogger(this.getClass());
 
    @Autowired
-   EventDispatcher eventDispatcher;
+   EventService eventService;
 
    /* (non-Javadoc)
     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
     */
    public void afterPropertiesSet() throws Exception {
-       eventDispatcher.registerListener(this);
+       eventService.registerListener(this);
    }
 
    /**

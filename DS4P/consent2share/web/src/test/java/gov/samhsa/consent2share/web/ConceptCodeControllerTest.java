@@ -69,19 +69,36 @@ public class ConceptCodeControllerTest {
 	
 	@Test
 	public void testGetConceptCodeList() throws Exception{
-		List<ConceptCodeDto> conceptCodeDtos=(List<ConceptCodeDto>) mock(List.class);
+		ConceptCodeVSCSDto conceptCodeVSCSDto = mock(ConceptCodeVSCSDto.class);
+		
 		List<CodeSystemDto> codeSystems = (List<CodeSystemDto>) mock(List.class);
 		List<ValueSetDto> valueSets = (List<ValueSetDto>) mock(List.class);
 		
-		when(conceptCodeService.findAll()).thenReturn(conceptCodeDtos);
+		when(conceptCodeService.create()).thenReturn(conceptCodeVSCSDto);
 		when(codeSystemService.findAll()).thenReturn(codeSystems);
 		when(valueSetService.findAll()).thenReturn(valueSets);
 		
 		mockMvc.perform(get("/sysadmin/conceptCodeList"))
 			.andExpect(status().isOk())
-			.andExpect(model().attribute("conceptCodeDtos",conceptCodeDtos))
+			.andExpect(model().attribute("conceptCodeVSCSDto", conceptCodeVSCSDto))
+			.andExpect(model().attribute("codeSystems", codeSystems))
+			.andExpect(model().attribute("valueSets", valueSets))
 			.andExpect(view().name("views/sysadmin/conceptCodeList"));
 	}
+	
+	
+	@Test
+	public void testAjaxGetAllConceptCodes() throws Exception{
+		List<ConceptCodeDto> conceptCodes = conceptCodeService.findAll();
+		
+		when(conceptCodeService.findAll()).thenReturn(conceptCodes);
+		
+		mockMvc.perform(get("/sysadmin/conceptCode/ajaxGetAllConceptCodes"))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType("application/json;charset=UTF-8"));
+	}
+	
+	
 	
 	@Test
 	public void testAjaxSearchConceptCode_By_Name() throws Exception{

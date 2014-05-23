@@ -4,6 +4,8 @@ import gov.samhsa.acs.pep.ws.contract.TryPolicyPortType;
 import gov.samhsa.acs.pep.ws.contract.TryPolicyService;
 
 import java.net.URL;
+import java.util.Properties;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
@@ -13,16 +15,25 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+
 public class TryPolicyWebServiceClientTest {
 
 	protected static Endpoint ep;
 	protected static String address;
-	
+
 	private static final String returnedValueOfTryPolicy = "Policy is tried";
 
 	@BeforeClass
-	public static void setUp() {
-		address = "http://localhost:12345/services/TryPolicyService";
+	public static void setUp() throws Exception {
+		Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
+    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
+    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+
+    	address = String.format("http://localhost:%s/services/TryPolicyService", portNumber);
+
 		ep = Endpoint.publish(address, new TryPolicyPortTypeImpl());
 		TryPolicyPortTypeImpl.returnedValueOfTryPolicy = returnedValueOfTryPolicy;
 	}
@@ -42,7 +53,7 @@ public class TryPolicyWebServiceClientTest {
 		final String c32Xml = "";
 		final String xacmlPolicy = "";
 		final String purposeOfUse = "";
-		
+
 		String resp = createPort().tryPolicy(c32Xml, xacmlPolicy, purposeOfUse);
 		validateResponse(resp);
 	}

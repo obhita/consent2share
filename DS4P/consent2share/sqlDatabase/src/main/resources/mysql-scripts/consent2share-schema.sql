@@ -2,6 +2,7 @@
 
 # Section one: The following section is NOT generated
 # DO NOT override
+
 create table users(
 username varchar(200) not null primary key,
 password varchar(256) not null,
@@ -17,6 +18,16 @@ foreign key(username) references users(username)
 );
 create unique index ix_auth_username on authorities
 (username,authority);
+
+GRANT USAGE ON *.* TO '${maven.database.consent2share.username}'@'%' identified by '${maven.database.consent2share.password}';
+DROP USER '${maven.database.consent2share.username}'@'%';
+create user '${maven.database.consent2share.username}'@'%' identified by '${maven.database.consent2share.password}';
+GRANT INSERT,SELECT,UPDATE,DELETE ON *.* to '${maven.database.consent2share.username}'@'%';
+
+GRANT USAGE ON *.* TO '${maven.database.dbadmin.username}'@'${maven.database.address}' identified by '${maven.database.dbadmin.password}';
+DROP USER '${maven.database.dbadmin.username}'@'${maven.database.address}';
+create user '${maven.database.dbadmin.username}'@'${maven.database.address}' identified by '${maven.database.dbadmin.password}';
+GRANT ALL PRIVILEGES ON *.* to '${maven.database.dbadmin.username}'@'${maven.database.address}' WITH GRANT OPTION;
 
 
 # Section two: The following is generated from domain using JPA mapping and JSR303 validation annotations

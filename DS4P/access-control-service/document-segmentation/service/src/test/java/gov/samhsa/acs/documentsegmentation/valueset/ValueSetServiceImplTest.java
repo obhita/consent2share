@@ -6,6 +6,7 @@ import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryDto;
+import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryListDto;
 
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +28,7 @@ public class ValueSetServiceImplTest {
 	private final String CODE_MOCK = "CODE_MOCK";
 	private final String CODE_SYSTEM_MOCK = "CODE_SYSTEM_MOCK";
 	private final String EXPECTED_REST_URL = "ENDPOINT_ADDRESS_MOCK?code={code}&codeSystemOid={codeSystemOid}";
+	private final String EXPECTED_REST_LIST_URL = "ENDPOINT_ADDRESS_MOCK/rest";
 
 	@Mock
 	private RestTemplate restTemplateMock;
@@ -64,4 +66,28 @@ public class ValueSetServiceImplTest {
 		// Assert
 		assertEquals(valueSetCategorySetMock, response);
 	}
+	
+/*	@SuppressWarnings("unchecked")
+	@Test
+	public void testRestfulValueSetCategories() {
+		// Arrange
+		ValueSetQueryListDto queryMock = mock(ValueSetQueryListDto.class);
+		@SuppressWarnings("rawtypes")
+		Set<ValueSetQueryDto> valueSetCategorySetMock = mock(Set.class);
+
+		when(
+				restTemplateMock.postForObject(eq(EXPECTED_REST_LIST_URL),queryMock,
+						eq(ValueSetQueryListDto.class), isA(ValueSetQueryListDto.class)))
+				.thenReturn(queryMock);
+		when(queryMock.getValueSetQueryDtos())
+				.thenReturn(valueSetCategorySetMock);
+
+		// Act
+		@SuppressWarnings("rawtypes")
+		Set response = sut
+				.lookupValueSetCategories(CODE_MOCK, CODE_SYSTEM_MOCK);
+
+		// Assert
+		assertEquals(valueSetCategorySetMock, response);
+	}	*/
 }

@@ -462,7 +462,6 @@ ul.dashboard-list li a span {
 	left: 0;
 	padding: 0px;
 	margin-top: 1px;
-	z-index: 1070;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px; /*.dow { border-top: 1px solid #ddd !important; }*/
@@ -587,6 +586,10 @@ ul.dashboard-list li a span {
 
 .datepicker.dropdown-menu {
 	z-index: 1501;
+}
+
+body#listConsent-page .datepicker.dropdown-menu {
+	z-index: 1601 !important;
 }
 
 

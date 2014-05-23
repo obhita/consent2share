@@ -26,6 +26,7 @@
 package gov.samhsa.acs.common.tool;
 
 import gov.samhsa.acs.common.namespace.PepNamespaceContext;
+import gov.samhsa.acs.common.tool.exception.DocumentAccessorException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -64,7 +65,7 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 	 */
 	@Override
 	public Element getElement(Document xmlDocument, String xPathExpr)
-			throws XPathExpressionException {
+			throws DocumentAccessorException {
 
 		Node node = getNode(xmlDocument, xPathExpr);
 
@@ -80,13 +81,18 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 	 */
 	@Override
 	public Node getNode(Document xmlDocument, String xPathExpr)
-			throws XPathExpressionException {
+			throws DocumentAccessorException {
 		// Create XPath instance
 		XPath xpath = createXPathInstance();
 
 		// Evaluate XPath expression against parsed document
-		Node node = (Node) xpath.evaluate(xPathExpr, xmlDocument,
-				XPathConstants.NODE);
+		Node node;
+		try {
+			node = (Node) xpath.evaluate(xPathExpr, xmlDocument,
+					XPathConstants.NODE);
+		} catch (XPathExpressionException e) {
+			throw new DocumentAccessorException(e);
+		}
 		return node;
 	}
 
@@ -99,13 +105,18 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 	 */
 	@Override
 	public NodeList getNodeList(Document xmlDocument, String xPathExpr)
-			throws XPathExpressionException {
+			throws DocumentAccessorException {
 		// Create XPath instance
 		XPath xpath = createXPathInstance();
 
 		// Evaluate XPath expression against parsed document
-		NodeList nodeList = (NodeList) xpath.evaluate(xPathExpr, xmlDocument,
-				XPathConstants.NODESET);
+		NodeList nodeList;
+		try {
+			nodeList = (NodeList) xpath.evaluate(xPathExpr, xmlDocument,
+					XPathConstants.NODESET);
+		} catch (XPathExpressionException e) {
+			throw new DocumentAccessorException(e);
+		}
 		return nodeList;
 	}
 

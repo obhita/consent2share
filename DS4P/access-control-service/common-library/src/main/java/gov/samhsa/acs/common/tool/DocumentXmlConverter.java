@@ -25,37 +25,36 @@
  ******************************************************************************/
 package gov.samhsa.acs.common.tool;
 
-import java.io.IOException;
-
-import javax.xml.transform.TransformerException;
+import gov.samhsa.acs.common.tool.exception.DocumentXmlConverterException;
 
 import org.w3c.dom.Document;
 
+/**
+ * The Interface DocumentXmlConverter.
+ */
 public interface DocumentXmlConverter {
 
 	/**
-	 * Load XML document from string
+	 * Load XML document from string.
 	 * 
 	 * @param xmlString
 	 *            the xml string
 	 * @return the document
-	 * @throws Exception
-	 *             the exception
+	 * @throws DocumentXmlConverterException
+	 *             the document xml converter exception
 	 */
-	public abstract Document loadDocument(String xmlString) throws Exception;
+	public abstract Document loadDocument(String xmlString)
+			throws DocumentXmlConverterException;
 
 	/**
-	 * ***************************************** Convert XML document to string
-	 * ******************************************.
+	 * Convert XML document to string.
 	 * 
 	 * @param xmlDocument
 	 *            the xml document
 	 * @return the string
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws TransformerException
-	 *             the transformer exception
+	 * @throws DocumentXmlConverterException
+	 *             the document xml converter exception
 	 */
 	public abstract String convertXmlDocToString(Document xmlDocument)
-			throws IOException, TransformerException;
+			throws DocumentXmlConverterException;
 }

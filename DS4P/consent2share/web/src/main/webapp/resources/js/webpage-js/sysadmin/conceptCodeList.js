@@ -27,22 +27,17 @@ var conceptCodeListDataStore = (function() {
 			}
 			
 			if(found_index === null){
-				console.log("ERROR: found_index variable was null in pushConceptCodeValSetByConceptCodeId method.");
-				window.alert("ERROR: An unknown error occured. Please reload the page.");
-				return false;
+				//TODO (MH): Catch this error in code that calls this function
+				throw new TypeError("found_index variable was null in pushConceptCodeValSetByConceptCodeId method.");
 			}else{
 				if((in_valset_key === null) || (in_valset_key === undefined)){
-					console.log("ERROR: in_valset_key was either null or undefined in pushConceptCodeValSetByConceptCodeId method.");
-					console.log("     in_valset_key = " + in_valset_key);
-					window.alert("ERROR: Invalid data passed to pushConceptCodeValSetByConceptCodeId method");
-					return false;
+					//TODO (MH): Catch this error in code that calls this function
+					throw new TypeError("in_valset_key was either null or undefined in pushConceptCodeValSetByConceptCodeId method.");
 				}
 				
 				if((in_valset_name === null) || (in_valset_name === undefined)){
-					console.log("ERROR: in_valset_name was either null or undefined in pushConceptCodeValSetByConceptCodeId method.");
-					console.log("     in_valset_name = " + in_valset_name);
-					window.alert("ERROR: Invalid data passed to pushConceptCodeValSetByConceptCodeId method");
-					return false;
+					//TODO (MH): Catch this error in code that calls this function
+					throw new TypeError("in_valset_name was either null or undefined in pushConceptCodeValSetByConceptCodeId method.");
 				}
 				
 				var tempAry = new Array();
@@ -53,9 +48,8 @@ var conceptCodeListDataStore = (function() {
 					ary_conceptCodeList[found_index]['conceptcode_valsets_ary'].push(tempAry);
 				}catch(e){
 					console.log("ERROR: An unknown error occured in pushConceptCodeValSetByConceptCodeId method.");
-					console.log("    Error stack trace: ", e);
-					window.alert("ERROR: An unknown error occured.");
-					return false;
+					//TODO (MH): Catch this error in code that calls this function
+					throw e;
 				}
 				return true;
 			}
@@ -85,9 +79,8 @@ var conceptCodeListDataStore = (function() {
 			}
 			
 			if(found_index === null){
-				console.log("ERROR: found_index variable was null in getConceptCodeValSetsAryByConceptCodeId method.");
-				window.alert("ERROR: An unknown error occured. Please reload the page.");
-				return null;
+				//TODO (MH): Catch this error in code that calls this function
+				throw new TypeError("found_index variable was null in getConceptCodeValSetsAryByConceptCodeId method.");
 			}else{
 				var concept_code_record = ary_conceptCodeList.slice(found_index, found_index + 1);
 				var out_ary = new Array();
@@ -113,10 +106,11 @@ var conceptCodeListDataStore = (function() {
 			}
 			
 			if(found_index === null){
-				console.log("ERROR: found_index variable was null in removeConceptCodeByConceptCodeId method.");
-				window.alert("ERROR: An unknown error occured. Please reload the page.");
+				//TODO (MH): Catch this error in code that calls this function
+				throw new TypeError("found_index variable was null in removeConceptCodeByConceptCodeId method.");
 			}else{
 				ary_conceptCodeList.splice(found_index, 1);
+				return found_index;
 			}
 		},
 		emptyConceptCodeArray: function(){
@@ -157,8 +151,59 @@ var filteredConceptCodeListIndex = (function(){
 				ary_filteredConceptCodeList.splice(in_pos, 1);
 			}
 		},
+		removeCodeIndexByCodeIndex: function(in_index){
+			var ary_len = ary_filteredConceptCodeList.length;
+			var found_pos = null;
+			
+			for(var i = 0; i < ary_len; i++){
+				var tempCodeIndex = ary_filteredConceptCodeList[i];
+				if(tempCodeIndex == in_index){
+					found_pos = i;
+					break;
+				}
+			}
+			
+			if(found_pos === null){
+				//TODO (MH): Catch this error in code that calls this function
+				throw new TypeError("found_pos variable was null in removeCodeIndexByCodeIndex method.");
+			}else{
+				ary_filteredConceptCodeList.splice(found_pos, 1);
+				return found_pos;
+			}
+		},
 		emptyCodeIndexArray: function(){
 			ary_filteredConceptCodeList = new Array();
+		}
+	};
+	
+})();
+
+var lastValsetModalState = (function(){
+	var ary_lastModalState = new Array();
+	
+	return {
+		pushValsetId: function(in_valsetId){
+			ary_lastModalState.push(in_valsetId);
+		},
+		isValsetIdInAry: function(in_valsetId){
+			var arylen = ary_lastModalState.length;
+			var isFound = false;
+			
+			for(var i = 0; i < arylen; i++){
+				if(ary_lastModalState[i] == in_valsetId){
+					isFound = true;
+					break;
+				}
+			}
+			
+			return isFound;
+		},
+		emptyValsetModalStateAry: function(){
+			ary_lastModalState = new Array();
+		},
+		getAllValsetIdsInAry: function(){
+			var tempAry = deepCopy(ary_lastModalState);
+			return tempAry;
 		}
 	};
 	
@@ -178,29 +223,8 @@ $(document).ready(function(){
 	$('form').on("click", "button", function(e){
 		e.preventDefault();
 	});
-
-	$('tr.conceptcode-record').each(function(){
-		var in_conceptcode_id = $(this).data("conceptcode-id");
-		var in_conceptcode_code = $(this).data("conceptcode-code");
-		var in_conceptcode_name = $(this).data("conceptcode-name");
-		var in_conceptcode_cs_name = $(this).data("conceptcode-cs-name");
-		var in_conceptcode_cs_vs_name = $(this).data("conceptcode-cs-vs-name");
-		
-		conceptCodeListDataStore.pushConceptCode(in_conceptcode_id, in_conceptcode_code, in_conceptcode_name, in_conceptcode_cs_name, in_conceptcode_cs_vs_name);
-		
-		$(this).find('div.conceptcode-valset-record').each(function(){
-			var in_valset_key = $(this).data("conceptcode-valset-key");
-			var in_valset_name = $(this).data("conceptcode-valset-name");
-			
-			try{
-				conceptCodeListDataStore.pushConceptCodeValSetByConceptCodeId(in_conceptcode_id, in_valset_key, in_valset_name);
-			}catch(e){
-				console.log("ERROR: An unknown error occured while attempting to call conceptCodeListDataStore.pushConceptCodeValSetByConceptCodeId() from within the $(this).find('div.conceptcode-valset-record').each() loop, inside the document.ready() method.");
-				console.log("    Error stack trace: ", e);
-				window.alert("ERROR: An unknown error occured.");
-			}
-		});
-	});
+	
+	loadAllConceptCodes();
 	
 	showTable();
 	
@@ -224,8 +248,10 @@ $(document).ready(function(){
 			gotoPrevPage();
 		}else if((clickedParent.is("#pagination_first")) && (clickedParent.hasClass("disabled") === false)){
 			jumpToFirstPagegroup();
+			gotoFirstPage();
 		}else if((clickedParent.is("#pagination_last")) && (clickedParent.hasClass("disabled") === false)){
 			jumpToLastPagegroup();
+			gotoLastPage();
 		}
 	});
 	
@@ -240,9 +266,8 @@ $(document).ready(function(){
 			$.ajax({url: "conceptCode/delete/" + clickedConceptCodeId,
 					type: "DELETE",
 					success: function(response){
-						var cur_conceptcode_id = clickedElement.parents("tr").data("conceptcode-id");
-						conceptCodeListDataStore.removeConceptCodeByConceptCodeId(cur_conceptcode_id);
-						clickedElement.parents("tr").remove();
+						var clickedElementParentTr = clickedElement.parents("tr");
+						deleteConceptCode(clickedElementParentTr);
 					},
 					error: function(jqXHRobj, err, errThrown) {
 						console.log("ERROR: Unable to delete concept code.");
@@ -251,6 +276,49 @@ $(document).ready(function(){
 						window.alert("ERROR: Unable to delete concept code.");
 					}
 			});
+		}
+	});
+	
+	
+	$('table#current_conceptcodes_table').on("recordDeleted.c2s_ui.data_display", function(evt){
+		try{
+			rebuildTableFromAry();
+		}catch(err){
+			if(err.name == "RangeError"){
+				if(err.message.search("Sanity Check Failed:") > -1){
+					var new_cur_page = cur_page - 1;
+					
+					//Sanity Check
+					if(checkIsPage(new_cur_page) !== true){
+						//rethrow original error
+						throw err;
+					}else{
+						try{
+							setPaginationActiveClass(new_cur_page);
+							rebuildTableFromAry();
+						}catch(err2){
+							//set pagination active class back to original value
+							setPaginationActiveClass(cur_page);
+							//rethrow original error
+							throw err;
+						}
+					}
+				}
+			}
+		}
+		var cur_page = getCurrentPagenum();
+		try{
+			rebuildPagination(null, cur_page);
+		}catch(err){
+			if(err.name == "TypeError"){
+				
+				if(err.message.search("Invalid pagenum_to_set") > -1){
+					rebuildPagination(1, 1);
+				}else{
+					//rethrow error
+					throw err;
+				}
+			}
 		}
 	});
 	
@@ -298,7 +366,7 @@ $(document).ready(function(){
 				}
 			});
 			
-			filterCodeSysName(selCodeSysName);
+			filterCodeSysNameFromSelect();
 			
 			//Change table header text
 			setHeaderForFilter();
@@ -330,10 +398,10 @@ $(document).ready(function(){
 		resetFilterArray();
 		
 		//Reapply previous filter
-		filterCodeSysName(selCodeSysName);
+		filterCodeSysNameFromSelect();
 		
 		if(selCodeSysVersionName != ""){
-			filterCodeSysVersionName(selCodeSysVersionName);
+			filterCodeSysVersionNameFromSelect();
 			
 			//Change table header text
 			setHeaderForFilter();
@@ -354,7 +422,6 @@ $(document).ready(function(){
 	$('select#select_filter_on_valset_name').change(function(evt){
 		var selValSetNameId = $(this).val();
 		var selCodeSysName = $('select#select_filter_on_cs').val();
-		var selCodeSysVersionName = $('select#select_filter_on_cs_vs').val();
 		
 		//Hide table while rebuilding
 		hideTable();
@@ -363,11 +430,11 @@ $(document).ready(function(){
 		resetFilterArray();
 		
 		//Reapply previous filters
-		filterCodeSysName(selCodeSysName);
-		filterCodeSysVersionName(selCodeSysVersionName);
+		filterCodeSysNameFromSelect();
+		filterCodeSysVersionNameFromSelect();
 		
 		if(selValSetNameId != ""){
-			filterValueSetName(selValSetNameId);
+			filterValueSetNameFromSelect();
 			
 			//Change table header text
 			setHeaderForFilter();
@@ -484,30 +551,13 @@ $(document).ready(function(){
 							conceptCodeListDataStore.emptyConceptCodeArray();
 							
 							for(var i = 0; i < responseLength; i++){
-								var in_conceptcode_id = responseObj[i].id;
-								var in_conceptcode_code = responseObj[i].code;
-								var in_conceptcode_name = responseObj[i].name;
-								var in_conceptcode_cs_name = responseObj[i].codeSystemName;
-								var in_conceptcode_cs_vs_name = responseObj[i].codeSystemVersionName;
-								
-								conceptCodeListDataStore.pushConceptCode(in_conceptcode_id, in_conceptcode_code, in_conceptcode_name, in_conceptcode_cs_name, in_conceptcode_cs_vs_name);
-								
-								var in_conceptcode_valsets_ary = new Array();
-								in_conceptcode_valsets_ary = responseObj[i].valueSetMap;
-								
-								for (curValSet in in_conceptcode_valsets_ary){
-									var in_valset_key = curValSet;
-									var in_valset_name = in_conceptcode_valsets_ary[curValSet];
-								
-									try{
-										conceptCodeListDataStore.pushConceptCodeValSetByConceptCodeId(in_conceptcode_id, in_valset_key, in_valset_name);
-									}catch(e){
-										console.log("ERROR: An unknown error has occured while attempting to call conceptCodeListDataStore.pushConceptCodeValSetByConceptCodeId() inside ajax success function for ajaxSearchConceptCode by code.");
-										console.log("      Error details: " + e);
-										window.alert("ERROR: An unknown error has occured.");
-									}
+								try{
+									storeConceptCodeRecord(responseObj[i]);
+								}catch(e){
+									console.log("ERROR: An unknown error has occured while attempting to call storeConceptCodeRecord() inside AJAX call to ajaxSearchConceptCode");
+									console.log("      Error details: " + e);
+									window.alert("ERROR: An unknown error has occured.");
 								}
-								
 							}
 							clearSearchConceptCodeNameInput();
 							
@@ -533,19 +583,23 @@ $(document).ready(function(){
 		}
 	});
 	
-	/* event handler for hidden.bs.modal event on valueSetName-modal to
-	   display selected value set names once the modal is saved */
-	$('div#valueSetName-modal').on("hidden.bs.modal", function(){
-		displayValSetNames();
-		
+	/* event handler for hide.bs.modal event on valueSetName-modal to
+	   display selected value set names when the modal is closed */
+	$('div#valueSetName-modal').on("hide.bs.modal", function(){
+		handleLastValsetModalStates();
 	});
 	
-	/* event handler for click event on input.valset_list_record elements inside
-	   valueSetName-modal */
-	$('input.valset_list_record').click(function(){
-		displayValSetNames();
-	});	
+	/* event handler for show.bs.modal event on valueSetName-modal to
+	   display selected value set names when the modal is loaded */
+	$('div#valueSetName-modal').on("show.bs.modal", function(){
+		handleLastValsetModalStates();
+	});
 	
+	/* event handler for when btn_save_valuesetname is clicked
+	   to save selected value set names from modal */
+	$('div#valueSetName-modal button#btn_save_valuesetname').click(function(){
+		storeValsetModalState();
+	});
 	
 	/**
 	 * Initialize jquery validate plugin to validate batch concept code upload form
@@ -578,6 +632,47 @@ $(document).ready(function(){
 	
 }); //End of document.ready function
 
+/**
+ * Load all concept code records from sever via AJAX
+ */
+function loadAllConceptCodes(){
+	var responseObj = {};
+	
+	$.ajax({url: "conceptCode/ajaxGetAllConceptCodes",
+		    success: function(response){
+		    	responseObj = response;
+				
+				var responseLength = responseObj.length;
+				
+				if(responseLength > 0){
+					conceptCodeListDataStore.emptyConceptCodeArray();
+					
+					for(var i = 0; i < responseLength; i++){
+						try{
+							storeConceptCodeRecord(responseObj[i]);
+						}catch(e){
+							console.log("ERROR: An unknown error has occured while attempting to call storeConceptCodeRecord() inside AJAX call to ajaxSearchConceptCode");
+							console.log("      Error details: " + e);
+							window.alert("ERROR: An unknown error has occured.");
+						}
+					}
+					clearSearchConceptCodeNameInput();
+					
+					resetSelectFilterOnCs();
+					resetSelectFilterOnCsVs();
+					resetSelectFilterOnValSetName();
+					
+					//Reset Filter
+					resetFilterArray();
+					
+					initTableFromAry();
+				}
+		    },
+		    error: function(err){
+		    	window.alert("ERROR: " + err.responseText);}
+		    }
+	);
+}
 
 /**
  * Initialize HTML table rows on initial page load & when filter/search changes
@@ -586,6 +681,32 @@ function initTableFromAry(){
 	setPaginationActiveClass(1);
 	var num_pages = rebuildTableFromAry();
 	rebuildPagination(num_pages);
+}
+
+function storeConceptCodeRecord(in_conceptCodeRecord){
+	var in_conceptcode_id = in_conceptCodeRecord.id;
+	var in_conceptcode_code = in_conceptCodeRecord.code;
+	var in_conceptcode_name = in_conceptCodeRecord.name;
+	var in_conceptcode_cs_name = in_conceptCodeRecord.codeSystemName;
+	var in_conceptcode_cs_vs_name = in_conceptCodeRecord.codeSystemVersionName;
+	
+	conceptCodeListDataStore.pushConceptCode(in_conceptcode_id, in_conceptcode_code, in_conceptcode_name, in_conceptcode_cs_name, in_conceptcode_cs_vs_name);
+	
+	var in_conceptcode_valsets_ary = new Array();
+	in_conceptcode_valsets_ary = in_conceptCodeRecord.valueSetMap;
+	
+	for (curValSet in in_conceptcode_valsets_ary){
+		var in_valset_key = curValSet;
+		var in_valset_name = in_conceptcode_valsets_ary[curValSet];
+	
+		try{
+			conceptCodeListDataStore.pushConceptCodeValSetByConceptCodeId(in_conceptcode_id, in_valset_key, in_valset_name);
+		}catch(e){
+			console.log("ERROR: An unknown error has occured while attempting to call conceptCodeListDataStore.pushConceptCodeValSetByConceptCodeId() inisde storeConceptCodeRecord() method");
+			console.log("      Error details: " + e);
+			window.alert("ERROR: An unknown error has occured.");
+		}
+	}
 }
 
 /**
@@ -600,6 +721,8 @@ function rebuildTableFromAry(){
 	
 	var ary_len = filteredConceptCodeListIndex.getArySize();
 	
+	var num_pages = null;
+	
 	clearTable();
 	
 	if(ary_len > 0){
@@ -613,51 +736,94 @@ function rebuildTableFromAry(){
 			current_page_last_record_index = ary_len - 1;
 		}
 		
-		//Sanity Check
-		if(current_page_first_record_index > current_page_last_record_index){
-			//TODO (MH): Catch this error in code that calls this function
-			throw new RangeError(current_page_first_record_index + " > " + current_page_last_record_index);
-		}
+		try{
+			//Sanity Check
+			if(current_page_first_record_index > current_page_last_record_index){
+				throw new RangeError("Sanity Check Failed: " + current_page_first_record_index + " > " + current_page_last_record_index);
+			}
 		
-		//Sanity Check
-		if(current_page_first_record_index < 0){
-			//TODO (MH): Catch this error in code that calls this function
-			throw new RangeError();
-		}
+			//Sanity Check
+			if(current_page_first_record_index < 0){
+				throw new RangeError();
+			}
 		
-		//Sanity Check
-		if(current_page_last_record_index < 0){
-			//TODO (MH): Catch this error in code that calls this function
-			throw new RangeError();
-		}
+			//Sanity Check
+			if(current_page_last_record_index < 0){
+				throw new RangeError();
+			}
 		
-		for(var i = current_page_first_record_index; i <= current_page_last_record_index; i++){
-			var curRecIndex = filteredConceptCodeListIndex.getCodeIndex(i);
+			for(var i = current_page_first_record_index; i <= current_page_last_record_index; i++){
+				var curRecIndex = filteredConceptCodeListIndex.getCodeIndex(i);
+				
+				var curRecord = conceptCodeListDataStore.getConceptCodeByIndex(curRecIndex);
+				
+				var temp_conceptcode_id = curRecord["conceptcode_id"];
+				var temp_conceptcode_code = curRecord["conceptcode_code"];
+				var temp_conceptcode_name = curRecord["conceptcode_name"];
+				var temp_conceptcode_cs_name = curRecord["conceptcode_cs_name"];
+				var temp_conceptcode_cs_vs_name = curRecord["conceptcode_cs_vs_name"];
+				
+				var temp_conceptcode_valsets_ary = new Array();
+				
+				try{
+					temp_conceptcode_valsets_ary = conceptCodeListDataStore.getConceptCodeValSetsAryByConceptCodeId(temp_conceptcode_id);
+				}catch(err){
+					if(err.name == "TypeError"){
+						console.log("ERROR: A TypeError was caught inside of for loop within the rebuildTableFromAry() method.");
+						
+						//FIXME (MH): Remove the following console.log lines of code when done testing
+						console.log("Error message: " + err.message);
+						console.log("Error stack trace: " + err.stack);
+					}
+					
+					throw err;
+				}
+				
+				insertTableRow(temp_conceptcode_id, temp_conceptcode_code, temp_conceptcode_name, temp_conceptcode_cs_name, temp_conceptcode_cs_vs_name, temp_conceptcode_valsets_ary);
+			}
+		}catch(err){
+			if(err.name = "RangeError"){
+				if(err.message.search("Sanity Check Failed:")){
+					//rethrow error
+					throw err;
+				}
+			}else{
+				console.log("ERROR: Error caught in rebuildTableFromAry() method. Clearing out table and data...");
 			
-			var curRecord = conceptCodeListDataStore.getConceptCodeByIndex(curRecIndex);
-			
-			var temp_conceptcode_id = curRecord["conceptcode_id"];
-			var temp_conceptcode_code = curRecord["conceptcode_code"];
-			var temp_conceptcode_name = curRecord["conceptcode_name"];
-			var temp_conceptcode_cs_name = curRecord["conceptcode_cs_name"];
-			var temp_conceptcode_cs_vs_name = curRecord["conceptcode_cs_vs_name"];
-			var temp_conceptcode_valsets_ary = conceptCodeListDataStore.getConceptCodeValSetsAryByConceptCodeId(temp_conceptcode_id);
-			
-			insertTableRow(temp_conceptcode_id, temp_conceptcode_code, temp_conceptcode_name, temp_conceptcode_cs_name, temp_conceptcode_cs_vs_name, temp_conceptcode_valsets_ary);
+				console.log("    Clearing table...");
+				clearTable();
+				
+				console.log("    Emptying conceptCodeListDataStore array...");
+				conceptCodeListDataStore.emptyConceptCodeArray();
+				
+				console.log("    Emptying filteredConceptCodeListIndex array...");
+				filteredConceptCodeListIndex.emptyCodeIndexArray();
+				
+				//FIXME (MH): Remove the following console.log lines of code when done with testing
+				console.log("");
+				console.log("  Error Type: " + err.name);
+				console.log("  Error Message: " + err.message);
+				console.log("  Error Stack Trace: " + err.stack);
+				
+				window.alert("ERROR: An unknown error has occured. Please reload the page.");
+			}
 		}
-		
-		//Calculate the number of pages for pagination to return from function
-		var num_pages = Math.ceil(ary_len / page_len);
 		
 		setNumResultsDisplay(ary_len);
 		
-		//Return the calculated number of pages for pagination
-		return num_pages;
+		//Calculate the number of pages for pagination to return from function
+		num_pages = Math.ceil(ary_len / page_len);
 	}else{
 		setNumResultsDisplay(0);
-		//Return the number of pages for pagination as 1
-		return 1;
+		//Set num_pages to 1
+		num_pages = 1;
 	}
+	
+	//Trigger tableRebuilt event
+	$("table#current_conceptcodes_table > tbody").trigger("tableRebuilt.c2s_ui.data_display");
+	
+	//Return the calculated number of pages for pagination
+	return num_pages;
 }
 
 /**
@@ -703,6 +869,27 @@ function insertTableRow(temp_conceptcode_id, temp_conceptcode_code, temp_concept
 						"</tr>");
 }
 
+
+function deleteConceptCode(clickedElementParentTr){
+	var cur_conceptcode_id = clickedElementParentTr.data("conceptcode-id");
+	
+	try{
+		clickedElementParentTr.trigger("recordDeleting.c2s_ui.data_display", {concept_code_id: cur_conceptcode_id});
+		
+		conceptCodeListDataStore.removeConceptCodeByConceptCodeId(cur_conceptcode_id);
+		//filteredConceptCodeListIndex.removeCodeIndexByCodeIndex(conceptCodeIndex);
+		resetFilterArray();
+		filterCodeSysNameFromSelect();
+		filterCodeSysVersionNameFromSelect();
+		filterValueSetNameFromSelect();
+		
+		$("table#current_conceptcodes_table > tbody").trigger("recordDeleted.c2s_ui.data_display", {concept_code_id: cur_conceptcode_id});
+	}catch(err){
+		//FIXME (MH): Catch & handle certain types of specific errors here; rethrow errors when appropriate
+		throw err;
+	}
+}
+
 /**
  * Clear HTML table display
  */
@@ -723,6 +910,14 @@ function resetFilterArray(){
 }
 
 /**
+ * Filter concept codes by code system name selected in select input element
+ */
+function filterCodeSysNameFromSelect(){
+	var selVal = $("select#select_filter_on_cs").val();
+	filterCodeSysName(selVal);
+}
+
+/**
  * Remove concept code references that do not match selected
  * code system name from filteredConceptCodeListIndex array
  * 
@@ -735,6 +930,14 @@ function filterCodeSysName(selCodeSysName){
 }
 
 /**
+ * Filter concept codes by code system version name selected in select input element
+ */
+function filterCodeSysVersionNameFromSelect(){
+	var selVal = $("select#select_filter_on_cs_vs").val();
+	filterCodeSysVersionName(selVal);
+}
+
+/**
  * Remove concept code references that do not match selected
  * code system version name from filteredConceptCodeListIndex array
  * 
@@ -744,6 +947,14 @@ function filterCodeSysVersionName(selCodeSysVersionName){
 	if(selCodeSysVersionName != ""){
 		applyFilter(selCodeSysVersionName, 'conceptcode_cs_vs_name');
 	}
+}
+
+/**
+ * Filter concept codes by value set name selected in select input element
+ */
+function filterValueSetNameFromSelect(){
+	var selVal = $("select#select_filter_on_valset_name").val();
+	filterValueSetName(selVal);
 }
 
 /**
@@ -857,7 +1068,6 @@ function setHeaderForNoSearch(){
 function resetBatchSelectVersionDropdown(){
 	$('select#batch_select_version').empty();
 	appendOptionToSelect("batch_select_version", "", "- Please Select -", true);
-	$('select#batch_select_version').trigger("change");
 }
 
 /**
@@ -865,7 +1075,6 @@ function resetBatchSelectVersionDropdown(){
  */
 function resetSelectFilterOnCs(){
 	$('select#select_filter_on_cs').val("");
-	$('select#select_filter_on_cs').trigger("change");
 }
 
 /**
@@ -874,7 +1083,6 @@ function resetSelectFilterOnCs(){
 function resetSelectFilterOnCsVs(){
 	$('select#select_filter_on_cs_vs').empty();
 	appendOptionToSelect("select_filter_on_cs_vs", "", "- Please Select -");
-	$('select#select_filter_on_cs_vs').trigger("change");
 }
 
 /**
@@ -882,7 +1090,6 @@ function resetSelectFilterOnCsVs(){
  */
 function resetSelectFilterOnValSetName(){
 	$('select#select_filter_on_valset_name').val("");
-	$('select#select_filter_on_valset_name').trigger("change");
 }
 
 /**
@@ -925,20 +1132,37 @@ function setSelectBatchCsVsIsEnabled(setEnabledDisabled){
 	}
 }
 
-
-function displayValSetNames(){
+function handleLastValsetModalStates(){
+	uncheckAllValsetModalInputs();
 	clearDisplaySelectedValsets();
 	
 	$('input.valset_list_record').each(function(){
+		var curElement = $(this);
+		var curValsetName = curElement.data('valset-name');
+		var curValsetId = curElement.data('valset-id');
 		
-		var list_vs_name = $(this).data('valset-name');
-		
-		if($(this).prop("checked")){
-			showSelValSetNames(list_vs_name);
+		if(lastValsetModalState.isValsetIdInAry(curValsetId) === true){
+			curElement.prop("checked", true);
+			showSelValSetNames(curValsetName);
 		}
-		
 	});
+}
+
+function storeValsetModalState(){
+	lastValsetModalState.emptyValsetModalStateAry();
 	
+	$('input.valset_list_record').each(function(){
+		var curElement = $(this);
+		var list_vs_id = curElement.data('valset-id');
+		
+		if(curElement.prop("checked")){
+			lastValsetModalState.pushValsetId(list_vs_id);
+		}
+	});
+}
+
+function uncheckAllValsetModalInputs(){
+	$('input.valset_list_record').prop("checked", false);
 }
 
 function showSelValSetNames(list_vs_name){
@@ -991,10 +1215,32 @@ function setNumResultsDisplay(num_results){
 /**
  * Rebuild the pagination icons with the specified number of pages
  * 
- * @param {integer} num_pages
+ * @param {integer} num_pages (optional) - the number of pages to show in the pagination bar
+ * @param {integer} pagenum_to_set (optional) - the page number to set as the current page
  */
-function rebuildPagination(num_pages){
+function rebuildPagination(num_pages, pagenum_to_set){
+	//Select pagination ul element
+	var pagination_ul_element = $('div#conceptcode_pagination_holder > ul.pagination');
+	
+	pagination_ul_element.trigger("paginationRebuilding.c2s_ui.pagination");
+	
 	hidePaginationHolder();
+	
+	/* If value of num_pages passed to function is undefined or null, then
+	 * calcualte the number of pages to show in the pagination bar based on
+	 * the length of the filteredConceptCodeListIndex data structure array
+	 * and the number of results to show per page (page_len)
+	 */
+	if((num_pages === undefined) || (num_pages === null)){
+		//Set page_len to equal number of results to show per page
+		//TODO (MH): Change this number to use a value read from a properties file
+		var page_len = 20;
+		
+		var ary_len = filteredConceptCodeListIndex.getArySize();
+		
+		//Calculate the number of pages to show in pagination bar
+		num_pages = Math.ceil(ary_len / page_len);
+	}
 	
 	//Number of page icons to show in pagination bar at a time
 	var num_page_icons_at_once = 5;
@@ -1010,9 +1256,6 @@ function rebuildPagination(num_pages){
 		num_pages_on_screen = num_pages;
 		isEllipsisOn = false;
 	}
-	
-	//Select pagination ul element
-	var pagination_ul_element = $('div#conceptcode_pagination_holder > ul.pagination');
 	
 	pagination_ul_element.empty();
 	
@@ -1060,9 +1303,36 @@ function rebuildPagination(num_pages){
 		disableNextPageIcon();
 	}
 	
-	setPaginationActiveClass(1);
+	var isValidPage = false;
+	
+	try{
+		isValidPage = checkIsPage(pagenum_to_set);
+	}catch(err){
+		pagenum_to_set = 1;
+		if(err.name == "TypeError"){
+			isValidPage = true;
+		}else{
+			isValidPage = null;
+			//rethrow error
+			throw err;
+		}
+	}
+	
+	if(isValidPage === false){
+		pagenum_to_set = getLastPagenum();
+		
+		//Check for empty page and throw error to be handled by calling code
+		if((pagenum_to_set === undefined) || (pagenum_to_set === null)){
+			throw new TypeError("Invalid pagenum_to_set");
+		}
+	}
+	
+	changePagegroup("jumpToTargetPagegroup", null, null, null, pagenum_to_set);
+	gotoTargetPage(pagenum_to_set);
 	
 	showPaginationHolder();
+	
+	pagination_ul_element.trigger("paginationRebuilt.c2s_ui.pagination");
 }
 
 /**
@@ -1079,7 +1349,6 @@ function gotoTargetPage(in_targetPage){
 		//TODO (MH): Catch this error in code that calls this function
 		throw new RangeError("Range Error in gotoTargetPage(): in_targetPage value (" + in_targetPage + ") out of valid range");
 	}else{
-		removePaginationActiveClass();
 		setPaginationActiveClass(in_targetPage);
 		
 		var num_pages = getLastPagenum();
@@ -1111,6 +1380,7 @@ function gotoTargetPage(in_targetPage){
 		}
 		
 		rebuildTableFromAry();
+		$('div#conceptcode_pagination_holder > ul.pagination').trigger("gotoTargetPageComplete.c2s_ui.pagination", {newPagenum: in_targetPage});
 	}
 }
 
@@ -1122,12 +1392,15 @@ function gotoNextPage(){
 	
 	if(checkNextPages(current_pagenum) === true){
 		var isEndOfPagegroup = checkIsEndOfPagegroup(current_pagenum);
+		var next_pagenum = current_pagenum + 1;
+		
 		if(isEndOfPagegroup === true){
 			incrementPagegroup();
-		}else{
-			var next_pagenum = current_pagenum + 1;
-			gotoTargetPage(next_pagenum);
 		}
+		
+		gotoTargetPage(next_pagenum);
+		
+		$('div#conceptcode_pagination_holder > ul.pagination').trigger("gotoNextPageComplete.c2s_ui.pagination", {oldPagenum: current_pagenum});
 	}
 }
 
@@ -1139,12 +1412,15 @@ function gotoPrevPage(){
 	
 	if(checkPrevPages(current_pagenum) === true){
 		var isStartOfPagegroup = checkIsStartOfPagegroup(current_pagenum);
+		var prev_pagenum = current_pagenum - 1;
+		
 		if(isStartOfPagegroup === true){
 			decrementPagegroup();
-		}else{
-			var prev_pagenum = current_pagenum - 1;
-			gotoTargetPage(prev_pagenum);
 		}
+		
+		gotoTargetPage(prev_pagenum);
+		
+		$('div#conceptcode_pagination_holder > ul.pagination').trigger("gotoPrevPageComplete.c2s_ui.pagination", {oldPagenum: current_pagenum});
 	}
 }
 
@@ -1153,6 +1429,7 @@ function gotoPrevPage(){
  */
 function gotoFirstPage(){
 	gotoTargetPage(1);
+	$('div#conceptcode_pagination_holder > ul.pagination').trigger("gotoFirstPageComplete.c2s_ui.pagination");
 }
 
 /**
@@ -1161,6 +1438,7 @@ function gotoFirstPage(){
 function gotoLastPage(){
 	var last_pagenum = getLastPagenum(); 
 	gotoTargetPage(last_pagenum);
+	$('div#conceptcode_pagination_holder > ul.pagination').trigger("gotoLastPageComplete.c2s_ui.pagination");
 }
 
 /**
@@ -1172,18 +1450,7 @@ function incrementPagegroup(){
 	
 	var new_last_pagegroup_pagenum = cur_last_pagegroup_pagenum + 1;
 	
-	try{
-		setPageEllipsisNone(new_last_pagegroup_pagenum);
-		setPageEllipsisLeading(cur_first_pagegroup_pagenum);
-		gotoTargetPage(new_last_pagegroup_pagenum);
-	}catch(err){
-		if(err.name === 'RangeError'){
-			//FIXME (MH): Remove this console.log line when done testing
-			console.log("Unable to increment pagegroup");
-		}else{
-			throw err;
-		}
-	}
+	changePagegroup("incrementPagegroup", new_last_pagegroup_pagenum, null, cur_first_pagegroup_pagenum, new_last_pagegroup_pagenum);
 }
 
 /**
@@ -1195,18 +1462,7 @@ function decrementPagegroup(){
 	
 	var new_first_pagegroup_pagenum = (cur_first_pagegroup_pagenum > 1) ? cur_first_pagegroup_pagenum - 1 : 1;
 	
-	try{
-		setPageEllipsisNone(new_first_pagegroup_pagenum);
-		setPageEllipsisTrailing(cur_last_pagegroup_pagenum);
-		gotoTargetPage(new_first_pagegroup_pagenum);
-	}catch(err){
-		if(err.name === 'RangeError'){
-			//FIXME (MH): Remove this console.log line when done testing
-			console.log("Unable to decrement pagegroup");
-		}else{
-			throw err;
-		}
-	}
+	changePagegroup("decrementPagegroup", new_first_pagegroup_pagenum, cur_last_pagegroup_pagenum, null, new_first_pagegroup_pagenum);
 }
 
 /**
@@ -1220,20 +1476,7 @@ function jumpToLastPagegroup(){
 	
 	var new_first_pagegroup_pagenum = ((last_pagenum - page_len + 1) >= 1) ? (last_pagenum - page_len + 1) : 1;
 	
-	try{
-		setAllPagesEllipsisLeading();
-		for(var i = last_pagenum; i >= new_first_pagegroup_pagenum; i--){
-			setPageEllipsisNone(i);
-		}
-		gotoLastPage();
-	}catch(err){
-		if(err.name === 'RangeError'){
-			//FIXME (MH): Remove this console.log line when done testing
-			console.log("Unable to jump to last pagegroup");
-		}else{
-			throw err;
-		}
-	}
+	changePagegroup("jumpToLastPagegroup", null, last_pagenum, new_first_pagegroup_pagenum, null);
 }
 
 /**
@@ -1248,19 +1491,134 @@ function jumpToFirstPagegroup(){
 	
 	var new_last_pagegroup_pagenum = ((first_pagenum + page_len - 1) <= last_pagenum) ? (first_pagenum + page_len - 1) : last_pagenum;
 	
-	try{
-		setAllPagesEllipsisTrailing();
-		for(var i = first_pagenum; i <= new_last_pagegroup_pagenum; i++){
-			setPageEllipsisNone(i);
-		}
-		gotoFirstPage();
-	}catch(err){
-		if(err.name === 'RangeError'){
-			//FIXME (MH): Remove this console.log line when done testing
-			console.log("Unable to jump to first pagegroup");
-		}else{
+	changePagegroup("jumpToFirstPagegroup", null, new_last_pagegroup_pagenum, first_pagenum, null);
+}
+
+/**
+ * Change Pagegroup
+ * 
+ * @param {String} mode
+ * @param {integer} ellipsisNonePage
+ * @param {integer} ellipsisTrailingPage
+ * @param {integer} ellipsisLeadingPage
+ * @param {integer} targetPage
+ */
+function changePagegroup(mode, ellipsisNonePage, ellipsisTrailingPage, ellipsisLeadingPage, targetPage){
+	var isSuccess = false;
+	
+	//TODO (MH): Replace with value from a properties file
+	var num_pages = 5;
+	
+	if(mode == "jumpToLastPagegroup"){
+		try{
+			setAllPagesEllipsisLeading();
+			for(var i = ellipsisTrailingPage; i >= ellipsisLeadingPage; i--){
+				setPageEllipsisNone(i);
+			}
+			isSuccess = true;
+		}catch(err){
+			isSuccess = false;
+			//rethrow error
 			throw err;
 		}
+	}else if(mode == "jumpToFirstPagegroup"){
+		try{
+			setAllPagesEllipsisTrailing();
+			for(var i = ellipsisLeadingPage; i <= ellipsisTrailingPage; i++){
+				setPageEllipsisNone(i);
+			}
+			isSuccess = true;
+		}catch(err){
+			isSuccess = false;
+			//rethrow error
+			throw err;
+		}
+	}else if(mode == "jumpToTargetPagegroup"){
+		try{
+			var last_pagenum = getLastPagenum();
+			
+			if(num_pages > last_pagenum){
+				num_pages = last_pagenum;
+			}
+			
+			var last_pagegroup_pagenum = targetPage;
+			var first_pagegroup_pagenum = targetPage - num_pages + 1;
+			
+			if(first_pagegroup_pagenum < 1){
+				first_pagegroup_pagenum = 1;
+				last_pagegroup_pagenum = num_pages;
+			}
+			
+			//Set Ellipis Leading For Loop
+			for(var i = 1; i < first_pagegroup_pagenum; i++){
+				try{
+					setPageEllipsisLeading(i);
+				}catch(err){
+					if(err.name == "RangeError"){
+						console.log("ERROR: A RangeError was caught in the changePagegroup() method, within the jumpToTargetPagegroup elseif code block, inside of the Set Ellipsis Leading for loop.");
+					}
+					//rethrow error
+					throw err;
+				}
+			}
+			
+			//Set Ellipis None For Loop
+			for(var i = first_pagegroup_pagenum; i <= last_pagegroup_pagenum; i++){
+				try{
+					setPageEllipsisNone(i);
+				}catch(err){
+					if(err.name == "RangeError"){
+						console.log("ERROR: A RangeError was caught in the changePagegroup() method, within the jumpToTargetPagegroup elseif code block, inside of the Set Ellipsis None for loop.");
+					}
+					//rethrow error
+					throw err;
+				}
+			}
+			
+			//Set Ellipis Trailing For Loop
+			for(var i = last_pagegroup_pagenum + 1; i <= last_pagenum; i++){
+				try{
+					setPageEllipsisTrailing(i);
+				}catch(err){
+					if(err.name == "RangeError"){
+						console.log("ERROR: A RangeError was caught in the changePagegroup() method, within the jumpToTargetPagegroup elseif code block, inside of the Set Ellipsis Trailing for loop.");
+					}
+					//rethrow error
+					throw err;
+				}
+			}
+			
+			isSuccess= true;
+		}catch(err){
+			isSuccess = false;
+			//rethrow error
+			throw err;
+		}
+	}else{
+		if ((ellipsisNonePage !== undefined) && (ellipsisNonePage !== null)){
+			//TODO (MH): Add try/catch block here
+			setPageEllipsisNone(ellipsisNonePage);
+			isSuccess = true;
+		}else{
+			isSuccess = false;
+		}
+		
+		if ((ellipsisTrailingPage !== undefined) && (ellipsisTrailingPage !== null)){
+			//TODO (MH): Add try/catch block here
+			setPageEllipsisTrailing(ellipsisTrailingPage);
+		}
+		
+		if ((ellipsisLeadingPage !== undefined) && (ellipsisLeadingPage !== null)){
+			//TODO (MH): Add try/catch block here
+			setPageEllipsisLeading(ellipsisLeadingPage);
+		}
+	}
+	
+	if(isSuccess === true){
+		//Trigger changePagegroupComplete event
+		$('div#conceptcode_pagination_holder > ul.pagination').trigger("changePagegroupComplete.c2s_ui.pagination", {mode: mode});
+	}else{
+		throw new Error("ERROR: Unable to change pagegroup.");
 	}
 }
 
@@ -1598,6 +1956,7 @@ function getCurrentPagenum(){
  */
 function removePaginationActiveClass(){
 	$('div#conceptcode_pagination_holder > ul.pagination > li.pagination-li.pagination-page').removeClass("active");
+	$('div#conceptcode_pagination_holder > ul.pagination').trigger("activeClassRemoved.c2s_ui.pagination");
 }
 
 /**
@@ -1615,6 +1974,8 @@ function setPaginationActiveClass(current_pagenum){
 		throw new RangeError("Range Error in setPaginationActiveClass(): current_pagenum value (" + current_pagenum + ") out of valid range");
 	}else{
 		removePaginationActiveClass();
-		$("div#conceptcode_pagination_holder > ul.pagination > li#pagination_" + current_pagenum).addClass("active");
+		var currentPageElement = $("div#conceptcode_pagination_holder > ul.pagination > li#pagination_" + current_pagenum);
+		currentPageElement.addClass("active");
+		currentPageElement.trigger("activeClassAdded.c2s_ui.pagination");
 	}
 }

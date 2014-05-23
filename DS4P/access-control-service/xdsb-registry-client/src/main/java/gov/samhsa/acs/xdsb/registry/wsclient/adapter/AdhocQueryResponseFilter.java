@@ -25,14 +25,12 @@
  ******************************************************************************/
 package gov.samhsa.acs.xdsb.registry.wsclient.adapter;
 
-import gov.samhsa.acs.common.namespace.PepNamespaceContext;
+import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
+import gov.samhsa.acs.common.tool.exception.DocumentAccessorException;
+import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
+import gov.samhsa.acs.xdsb.registry.wsclient.exception.XdsbRegistryAdapterException;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 
 import org.w3c.dom.Document;
@@ -54,6 +52,9 @@ public class AdhocQueryResponseFilter {
 	/** The converter. */
 	private DocumentXmlConverter converter;
 
+	/** The document accessor. */
+	private DocumentAccessor documentAccessor;
+
 	/**
 	 * Instantiates a new adhoc query response filter.
 	 * 
@@ -61,12 +62,15 @@ public class AdhocQueryResponseFilter {
 	 *            the marshaller
 	 * @param converter
 	 *            the converter
+	 * @param documentAccessor
+	 *            the document accessor
 	 */
 	public AdhocQueryResponseFilter(SimpleMarshaller marshaller,
-			DocumentXmlConverter converter) {
+			DocumentXmlConverter converter, DocumentAccessor documentAccessor) {
 		super();
 		this.marshaller = marshaller;
 		this.converter = converter;
+		this.documentAccessor = documentAccessor;
 	}
 
 	/**
@@ -77,41 +81,42 @@ public class AdhocQueryResponseFilter {
 	 * @param authorNPI
 	 *            the author npi
 	 * @return the adhoc query response
-	 * @throws Exception
-	 *             the exception
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public AdhocQueryResponse filterByAuthor(AdhocQueryResponse response,
-			String authorNPI) throws Exception, Throwable {
-		// select the ExtrinsicObjects that doesn't have an author id starting
-		// with authorNPI^
-		String xPathExpr = "//rim:Classification[@classificationScheme='$']/descendant::rim:Value[not(starts-with(.,concat('%', '^')))]/ancestor::rim:ExtrinsicObject";
-		xPathExpr = xPathExpr.replace("%", authorNPI);
-		xPathExpr = xPathExpr.replace("$",
-				UUID_CLASSIFICATIONSCHEME_XDSDOCUMENTENTRY_AUTHOR);
-
-		String docString = marshaller.marshall(response);
-		Document xmlDocument = converter.loadDocument(docString);
-
-		// Create XPath instance
-		XPathFactory xpathFact = XPathFactory.newInstance();
-		XPath xpath = xpathFact.newXPath();
-		xpath.setNamespaceContext(new PepNamespaceContext());
-
-		// Evaluate XPath expression against parsed document
-		NodeList nodeSet = (NodeList) xpath.evaluate(xPathExpr, xmlDocument,
-				XPathConstants.NODESET);
-		for (int i = 0; i < nodeSet.getLength(); i++) {
-			Node node = nodeSet.item(i);
-			Element elementToBeRedacted = (Element) node;
-			// remove the ExtrinsicObjects that have an authorId not starting
+			String authorNPI) throws XdsbRegistryAdapterException {
+		try {
+			// select the ExtrinsicObjects that doesn't have an author id
+			// starting
 			// with authorNPI^
-			elementToBeRedacted.getParentNode()
-					.removeChild(elementToBeRedacted);
+			String xPathExpr = "//rim:Classification[@classificationScheme='$']/descendant::rim:Value[not(starts-with(.,concat('%', '^')))]/ancestor::rim:ExtrinsicObject";
+			xPathExpr = xPathExpr.replace("%", authorNPI);
+			xPathExpr = xPathExpr.replace("$",
+					UUID_CLASSIFICATIONSCHEME_XDSDOCUMENTENTRY_AUTHOR);
+
+			String docString = marshaller.marshall(response);
+
+			Document xmlDocument = converter.loadDocument(docString);
+
+			// Evaluate XPath expression against parsed document
+			NodeList nodeSet = documentAccessor.getNodeList(xmlDocument,
+					xPathExpr);
+			for (int i = 0; i < nodeSet.getLength(); i++) {
+				Node node = nodeSet.item(i);
+				Element elementToBeRedacted = (Element) node;
+				// remove the ExtrinsicObjects that have an authorId not
+				// starting
+				// with authorNPI^
+				elementToBeRedacted.getParentNode().removeChild(
+						elementToBeRedacted);
+			}
+			xmlDocument.normalize();
+			return marshaller.unmarshallFromXml(AdhocQueryResponse.class,
+					converter.convertXmlDocToString(xmlDocument));
+
+		} catch (SimpleMarshallerException | DocumentAccessorException e) {
+			throw new XdsbRegistryAdapterException(e);
 		}
-		xmlDocument.normalize();
-		return marshaller.unmarshallFromXml(AdhocQueryResponse.class,
-				converter.convertXmlDocToString(xmlDocument));
 	}
 }

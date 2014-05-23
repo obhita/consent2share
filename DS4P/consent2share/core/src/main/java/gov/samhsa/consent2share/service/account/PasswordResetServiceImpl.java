@@ -134,14 +134,10 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 			throw new IllegalArgumentException("Email link is required.");
 		}
 
-		try {
-			usersRepository.loadUserByUsername(username);
-		} catch (UsernameNotFoundException e) {
-			logger.warn(e.getMessage(), e);
-			throw new UsernameNotExistException(e.getMessage());
-		}
-
 		Patient patient = patientRepository.findByUsername(username);
+		if (patient==null) {
+			throw new UsernameNotExistException("The username is not found.");
+		}
 		String patientEmailAddress = patient.getEmail();
 		if (!patientEmailAddress.equalsIgnoreCase(emailAddress)) {
 			String message = String.format(

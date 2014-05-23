@@ -3,6 +3,7 @@ package gov.samhsa.consent2share.web;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.ValueSetLookUpDto;
 import gov.samhsa.consent2share.service.dto.ValueSetQueryDto;
+import gov.samhsa.consent2share.service.dto.ValueSetQueryListDto;
 import gov.samhsa.consent2share.service.valueset.CodeSystemVersionNotFoundException;
 import gov.samhsa.consent2share.service.valueset.ConceptCodeNotFoundException;
 import gov.samhsa.consent2share.service.valueset.ValueSetLookupService;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ValueSetLookupController {
 	protected static final String REQUEST_MAPPING_LIST = "/lookup";
 	protected static final String REDIRECT_MAPPING_LIST = "/lookupService";
-
+	protected static final String REST_MAPPING_LIST = "/lookupService/rest";
 	protected static final String LOOKUP_GET = "/lookup/get";
 	protected static final String MODEL_ATTIRUTE_LOOKUPDTO = "lookupDto";
 
@@ -104,6 +106,8 @@ public class ValueSetLookupController {
 		LOGGER.debug("Rendering Concept Code list page");
 		ValueSetQueryDto valueSetQueryDto = new ValueSetQueryDto();
 		try {
+			valueSetQueryDto.setCodeSystemOid(codeSystemOid);
+			valueSetQueryDto.setConceptCode(code);
 			valueSetQueryDto = lookupService.RestfulValueSetCategories(code.trim(),
 					codeSystemOid.trim());
 		} catch (CodeSystemVersionNotFoundException e) {
@@ -116,5 +120,30 @@ public class ValueSetLookupController {
 
 		return valueSetQueryDto;
 	}
+	
+	/**
+	 * Processes create conceptCode requests.
+	 * 
+	 * @param model
+	 * @return The name of the create conceptCode form view.
+	 */
+	@RequestMapping(value = REST_MAPPING_LIST, method = RequestMethod.POST, consumes="application/json" )
+	@ResponseBody
+	public ValueSetQueryListDto lookupValuesetCategoriesList( @RequestBody ValueSetQueryListDto valueSetQueryListDtos) {
+
+		LOGGER.debug("Rendering Concept Code list page");
+		//Set<ValueSetQueryDto> valueSetQueryDtos = valueSetQueryListDtos.getValueSetQueryDtos();
+		try {
+			valueSetQueryListDtos = lookupService.RestfulValueSetCategories(valueSetQueryListDtos);
+		} catch (CodeSystemVersionNotFoundException e) {
+			LOGGER.debug(e.getMessage());
+		} catch (ConceptCodeNotFoundException e) {
+			LOGGER.debug(e.getMessage());
+		} catch (ValueSetNotFoundException e) {
+			LOGGER.debug(e.getMessage());
+		}
+
+		return valueSetQueryListDtos;
+	}	
 
 }

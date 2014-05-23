@@ -25,22 +25,38 @@
  ******************************************************************************/
 package gov.samhsa.acs.contexthandler;
 
+import static gov.samhsa.acs.audit.AcsAuditVerb.*;
+import static gov.samhsa.acs.audit.AcsPredicateKey.*;
+
+import gov.samhsa.acs.audit.AuditService;
+import gov.samhsa.acs.audit.PredicateKey;
 import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
+import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
+import gov.samhsa.acs.common.tool.exception.DocumentAccessorException;
+import gov.samhsa.acs.common.tool.exception.DocumentXmlConverterException;
+import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
+import gov.samhsa.acs.contexthandler.exception.PolicyProviderException;
 
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.herasaf.xacml.core.WritingException;
 import org.herasaf.xacml.core.api.PDP;
 import org.herasaf.xacml.core.api.PolicyRepository;
 import org.herasaf.xacml.core.api.PolicyRetrievalPoint;
@@ -62,13 +78,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import ch.qos.logback.audit.AuditException;
+
 /**
  * The Class PolicyDecisionPointImpl.
  */
 public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 
-	/** The Constant LOGGER. */
-	private static final Logger LOGGER = LoggerFactory
+	/** The logger. */
+	private final Logger logger = LoggerFactory
 			.getLogger(PolicyDecisionPointImpl.class);
 
 	/** The policy provider. */
@@ -78,7 +96,18 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	private RequestGenerator requestGenerator;
 
 	/** The simple pdp. */
+	@SuppressWarnings("unused")
+	// Need to initialize simplePDP
 	private PDP simplePDP;
+
+	/** The document accessor. */
+	private DocumentAccessor documentAccessor;
+
+	/** The document xml converter. */
+	private DocumentXmlConverter documentXmlConverter;
+
+	/** The audit service. */
+	private AuditService auditService;
 
 	/**
 	 * Instantiates a new policy decision point impl.
@@ -87,31 +116,41 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 *            the policy provider
 	 * @param requestGenerator
 	 *            the request generator
+	 * @param documentAccessor
+	 *            the document accessor
+	 * @param documentXmlConverter
+	 *            the document xml converter
+	 * @param auditService
+	 *            the audit service
 	 */
 	public PolicyDecisionPointImpl(PolicyProvider policyProvider,
-			RequestGenerator requestGenerator) {
+			RequestGenerator requestGenerator,
+			DocumentAccessor documentAccessor,
+			DocumentXmlConverter documentXmlConverter, AuditService auditService) {
 		super();
 		this.policyProvider = policyProvider;
 		this.requestGenerator = requestGenerator;
+		this.documentAccessor = documentAccessor;
+		this.documentXmlConverter = documentXmlConverter;
+		this.auditService = auditService;
 		this.simplePDP = getSimplePDP();
 	}
 
 	/**
 	 * Gets all xacml policies of a patient unique id.
 	 * 
-	 * @param patientUniqueId
-	 *            the patient unique id
-	 * @param recipientSubjectNPI
-	 *            the recipient subject npi
-	 * @param intermediarySubjectNPI
-	 *            the intermediary subject npi
+	 * @param xacmlRequest
+	 *            the xacml request
 	 * @return the policies
+	 * @throws NoPolicyFoundException
+	 *             the no policy found exception
+	 * @throws PolicyProviderException
+	 *             the policy provider exception
 	 */
-	public List<Evaluatable> getPolicies(String patientUniqueId,
-			String recipientSubjectNPI, String intermediarySubjectNPI) {
+	public List<Evaluatable> getPolicies(XacmlRequest xacmlRequest)
+			throws NoPolicyFoundException, PolicyProviderException {
 
-		return policyProvider.getPolicies(patientUniqueId, recipientSubjectNPI,
-				intermediarySubjectNPI);
+		return policyProvider.getPolicies(xacmlRequest);
 	}
 
 	/**
@@ -119,19 +158,21 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 * 
 	 * @param pdp
 	 *            the pdp
-	 * @param patientUniqueId
-	 *            the patient unique id
-	 * @param recipientSubjectNPI
-	 *            the recipient subject npi
-	 * @param intermediarySubjectNPI
-	 *            the intermediary subject npi
+	 * @param xacmlRequest
+	 *            the xacml request
 	 * @return the list
+	 * @throws AuditException
+	 *             the audit exception
+	 * @throws NoPolicyFoundException
+	 *             the no policy found exception
+	 * @throws PolicyProviderException
+	 *             the policy provider exception
 	 */
-	public List<Evaluatable> deployPolicies(PDP pdp, String patientUniqueId,
-			String recipientSubjectNPI, String intermediarySubjectNPI) {
-		List<Evaluatable> deployedPolicies = getPolicies(patientUniqueId,
-				recipientSubjectNPI, intermediarySubjectNPI);
-		deployPolicies(pdp, deployedPolicies);
+	public List<Evaluatable> deployPolicies(PDP pdp, XacmlRequest xacmlRequest)
+			throws AuditException, NoPolicyFoundException,
+			PolicyProviderException {
+		List<Evaluatable> deployedPolicies = getPolicies(xacmlRequest);
+		deployPolicies(pdp, deployedPolicies, xacmlRequest, true);
 		return deployedPolicies;
 	}
 
@@ -142,11 +183,30 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 *            the pdp
 	 * @param policies
 	 *            the policies
+	 * @param xacmlRequest
+	 *            the xacml request
+	 * @param isAudited
+	 *            the is audited
+	 * @throws AuditException
+	 *             the audit exception
 	 */
-	public void deployPolicies(PDP pdp, List<Evaluatable> policies) {
-		PolicyRetrievalPoint repo = pdp.getPolicyRepository();
-		UnorderedPolicyRepository repository = (UnorderedPolicyRepository) repo;
-		repository.deploy(policies);
+	public void deployPolicies(PDP pdp, List<Evaluatable> policies,
+			XacmlRequest xacmlRequest, boolean isAudited) throws AuditException {
+		try {
+			PolicyRetrievalPoint repo = pdp.getPolicyRepository();
+			UnorderedPolicyRepository repository = (UnorderedPolicyRepository) repo;
+			repository.deploy(policies);
+			if (isAudited) {
+				for (Evaluatable policy : policies) {
+					auditPolicy(policy, xacmlRequest);
+				}
+			}
+		} catch (AuditException | WritingException | IOException
+				| DocumentAccessorException | DocumentXmlConverterException e) {
+			// TODO (BU): ADD ERROR LOG
+			undeployAllPolicies(pdp);
+			throw new AuditException(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -225,9 +285,11 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 */
 	@Override
 	public XacmlResponse evaluateRequest(PDP pdp, RequestType request,
-			List<Evaluatable> policies) {
-		LOGGER.info("evaluateRequest invoked");
-		return managePoliciesAndEvaluateRequest(pdp, request, policies);
+			List<Evaluatable> policies, XacmlRequest xacmlRequest)
+			throws AuditException {
+		logger.info("evaluateRequest invoked");
+		return managePoliciesAndEvaluateRequest(pdp, request, policies,
+				xacmlRequest);
 	}
 
 	/*
@@ -241,12 +303,12 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 */
 	@Override
 	public XacmlResponse evaluateRequest(PDP pdp, RequestType request,
-			String patientUniqueId, String recipientSubjectNPI,
-			String intermediarySubjectNPI) {
-		LOGGER.info("evaluateRequest invoked");
-		List<Evaluatable> deployedPolicies = deployPolicies(pdp,
-				patientUniqueId, recipientSubjectNPI, intermediarySubjectNPI);
-		return managePoliciesAndEvaluateRequest(pdp, request, deployedPolicies);
+			XacmlRequest xacmlRequest) throws AuditException,
+			NoPolicyFoundException, PolicyProviderException {
+		logger.info("evaluateRequest invoked");
+		List<Evaluatable> deployedPolicies = deployPolicies(pdp, xacmlRequest);
+		return managePoliciesAndEvaluateRequest(pdp, request, deployedPolicies,
+				xacmlRequest);
 	}
 
 	/*
@@ -259,11 +321,11 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 */
 	@Override
 	public XacmlResponse evaluateRequest(RequestType request,
-			String patientUniqueId, String recipientSubjectNPI,
-			String intermediarySubjectNPI) {
-		LOGGER.info("evaluateRequest invoked");
-		return managePoliciesAndEvaluateRequest(this.simplePDP, request,
-				patientUniqueId, recipientSubjectNPI, intermediarySubjectNPI);
+			XacmlRequest xacmlRequest) throws AuditException,
+			NoPolicyFoundException, PolicyProviderException {
+		logger.info("evaluateRequest invoked");
+		return managePoliciesAndEvaluateRequest(getSimplePDP(), request,
+				xacmlRequest);
 	}
 
 	/*
@@ -273,16 +335,16 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluateRequest(gov
 	 * .samhsa.acs.common.dto.XacmlRequest)
 	 */
-	public XacmlResponse evaluateRequest(XacmlRequest xacmlRequest) {
-		LOGGER.info("evaluateRequest invoked");
+	public XacmlResponse evaluateRequest(XacmlRequest xacmlRequest)
+			throws AuditException, NoPolicyFoundException,
+			PolicyProviderException {
+		logger.info("evaluateRequest invoked");
 		RequestType request = requestGenerator.generateRequest(
-				xacmlRequest.getRecepientSubjectNPI(),
+				xacmlRequest.getRecipientSubjectNPI(),
 				xacmlRequest.getIntermediarySubjectNPI(),
 				xacmlRequest.getPurposeOfUse(), xacmlRequest.getPatientId());
-		return managePoliciesAndEvaluateRequest(this.simplePDP, request,
-				xacmlRequest.getPatientUniqueId(),
-				xacmlRequest.getRecepientSubjectNPI(),
-				xacmlRequest.getIntermediarySubjectNPI());
+		return managePoliciesAndEvaluateRequest(getSimplePDP(), request,
+				xacmlRequest);
 	}
 
 	/*
@@ -294,10 +356,11 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 */
 	@Override
 	public XacmlResponse evaluateRequest(RequestType request,
-			List<Evaluatable> policies) {
-		LOGGER.info("evaluateRequest invoked");
-		return managePoliciesAndEvaluateRequest(this.simplePDP, request,
-				policies);
+			List<Evaluatable> policies, XacmlRequest xacmlRequest)
+			throws AuditException {
+		logger.info("evaluateRequest invoked");
+		return managePoliciesAndEvaluateRequest(getSimplePDP(), request,
+				policies, xacmlRequest);
 	}
 
 	/**
@@ -308,19 +371,21 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 *            the pdp
 	 * @param request
 	 *            the request
-	 * @param patientUniqueId
-	 *            the patient unique id
-	 * @param recipientSubjectNPI
-	 *            the recipient subject npi
-	 * @param intermediarySubjectNPI
-	 *            the intermediary subject npi
+	 * @param xacmlRequest
+	 *            the xacml request
 	 * @return the xacml response
+	 * @throws AuditException
+	 *             the audit exception
+	 * @throws NoPolicyFoundException
+	 *             the no policy found exception
+	 * @throws PolicyProviderException
+	 *             the policy provider exception
 	 */
 	private XacmlResponse managePoliciesAndEvaluateRequest(PDP pdp,
-			RequestType request, String patientUniqueId,
-			String recipientSubjectNPI, String intermediarySubjectNPI) {
-		deployPolicies(pdp, patientUniqueId, recipientSubjectNPI,
-				intermediarySubjectNPI);
+			RequestType request, XacmlRequest xacmlRequest)
+			throws AuditException, NoPolicyFoundException,
+			PolicyProviderException {
+		deployPolicies(pdp, xacmlRequest);
 		return managePoliciesAndEvaluateRequest(pdp, request);
 	}
 
@@ -335,11 +400,16 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 	 *            the request
 	 * @param deployedPolicies
 	 *            the deployed policies
+	 * @param xacmlRequest
+	 *            the xacml request
 	 * @return the xacml response
+	 * @throws AuditException
+	 *             the audit exception
 	 */
 	private XacmlResponse managePoliciesAndEvaluateRequest(PDP pdp,
-			RequestType request, List<Evaluatable> deployedPolicies) {
-		deployPolicies(pdp, deployedPolicies);
+			RequestType request, List<Evaluatable> deployedPolicies,
+			XacmlRequest xacmlRequest) throws AuditException {
+		deployPolicies(pdp, deployedPolicies, xacmlRequest, true);
 		XacmlResponse xacmlResponse = evaluateRequest(pdp, request);
 		undeployPolicies(pdp, deployedPolicies);
 		return xacmlResponse;
@@ -375,7 +445,7 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 
 		ResponseType response = simplePDP.evaluate(request);
 		for (ResultType r : response.getResults()) {
-			LOGGER.debug("PDP Decision: " + r.getDecision().toString());
+			logger.debug("PDP Decision: " + r.getDecision().toString());
 			xacmlResponse.setPdpDecision(r.getDecision().toString());
 
 			if (r.getObligations() != null) {
@@ -384,7 +454,7 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 					for (AttributeAssignmentType a : o
 							.getAttributeAssignments()) {
 						for (Object c : a.getContent()) {
-							LOGGER.debug("With Obligation: " + c);
+							logger.debug("With Obligation: " + c);
 							obligations.add(c.toString());
 						}
 					}
@@ -393,19 +463,24 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 			}
 		}
 
-		LOGGER.debug("xacmlResponse.pdpDecision: "
+		logger.debug("xacmlResponse.pdpDecision: "
 				+ xacmlResponse.getPdpDecision());
-		LOGGER.debug("xacmlResponse is ready!");
+		logger.debug("xacmlResponse is ready!");
 		return xacmlResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluatePolicyForTrying(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.acs.contexthandler.PolicyDecisionPoint#evaluatePolicyForTrying
+	 * (java.lang.String)
 	 */
 	@Override
-	public PdpRequestResponse evaluatePolicyForTrying(String xacmlPolicy, String purposeOfUse) {
+	public PdpRequestResponse evaluatePolicyForTrying(String xacmlPolicy,
+			String purposeOfUse) {
 		Assert.hasText(xacmlPolicy, "Xaml policy is not set");
-		
+
 		Node resourceNode = null;
 		NodeList senderNodeList = null;
 		NodeList recipientNodeList = null;
@@ -413,7 +488,7 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 		try {
 			// Setting up configuration in DocumentXmlConverter is important
 			DocumentXmlConverter documentXmlConverter = new DocumentXmlConverterImpl();
-			
+
 			Document xmlDoc = documentXmlConverter.loadDocument(xacmlPolicy);
 			XPath xPath = XPathFactory.newInstance().newXPath();
 
@@ -444,29 +519,32 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 				node.getParentNode().removeChild(node);
 			}
 
-			// Get the updated policy after removing environment:current-dateTime nodes
+			// Get the updated policy after removing
+			// environment:current-dateTime nodes
 			xacmlPolicy = documentXmlConverter.convertXmlDocToString(xmlDoc);
 
 		} catch (Exception e) {
-			LOGGER.error("Exception occured when trying to query and manipulate xaml policy string", e);
+			logger.error(
+					"Exception occured when trying to query and manipulate xaml policy string",
+					e);
 		}
 
-		// Create xacmlRequest 
+		// Create xacmlRequest
 		XacmlRequest xacmlRequest = new XacmlRequest();
-		
+
 		String resourceId = resourceNode.getTextContent();
 		xacmlRequest.setPatientId(resourceId);
 
 		String intermediarySubjectNPI = senderNodeList.item(0).getTextContent();
 		xacmlRequest.setIntermediarySubjectNPI(intermediarySubjectNPI);
 
-		String recepientSubjectNPI = recipientNodeList.item(0).getTextContent();
-		xacmlRequest.setRecepientSubjectNPI(recepientSubjectNPI);
+		String recipientSubjectNPI = recipientNodeList.item(0).getTextContent();
+		xacmlRequest.setRecipientSubjectNPI(recipientSubjectNPI);
 
 		xacmlRequest.setPurposeOfUse(purposeOfUse);
-		
+
 		RequestType request = requestGenerator.generateRequest(
-				xacmlRequest.getRecepientSubjectNPI(),
+				xacmlRequest.getRecipientSubjectNPI(),
 				xacmlRequest.getIntermediarySubjectNPI(),
 				xacmlRequest.getPurposeOfUse(), xacmlRequest.getPatientId());
 
@@ -476,22 +554,70 @@ public class PolicyDecisionPointImpl implements PolicyDecisionPoint {
 		try {
 			policy = PolicyMarshaller.unmarshal(source);
 		} catch (Exception e) {
-			LOGGER.error("Exception occured when trying to unmarshal xaml policy to be used by PDP engine", e);
+			logger.error(
+					"Exception occured when trying to unmarshal xaml policy to be used by PDP engine",
+					e);
 		}
 
 		List<Evaluatable> policies = new ArrayList<Evaluatable>();
 		policies.add(policy);
+		PDP pdp = getSimplePDP();
+		try {
+			deployPolicies(pdp, policies, xacmlRequest, false);
+		} catch (AuditException e) {
+			// it shouldn't throw AuditException when isAudited=false
+		}
 
-		deployPolicies(this.simplePDP, policies);
+		XacmlResponse xacmlResponse = managePoliciesAndEvaluateRequest(pdp,
+				request);
 
-		XacmlResponse xacmlResponse = managePoliciesAndEvaluateRequest(
-				this.simplePDP, request);
-		
 		PdpRequestResponse pdpRequestResponse = new PdpRequestResponse();
-		
+
 		pdpRequestResponse.setXacmlRequest(xacmlRequest);
 		pdpRequestResponse.setXacmlResponse(xacmlResponse);
 
 		return pdpRequestResponse;
+	}
+
+	/**
+	 * Audit policy.
+	 * 
+	 * @param policy
+	 *            the policy
+	 * @param xacmlRequest
+	 *            the xacml request
+	 * @throws WritingException
+	 *             the writing exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws DocumentAccessorException
+	 *             the document accessor exception
+	 * @throws AuditException
+	 *             the audit exception
+	 */
+	private void auditPolicy(Evaluatable policy, XacmlRequest xacmlRequest)
+			throws WritingException, IOException, DocumentAccessorException,
+			AuditException {
+		StringWriter writer = new StringWriter();
+		PolicyMarshaller.marshal(policy, writer);
+		Map<PredicateKey, String> predicateMap = auditService
+				.createPredicateMap();
+		String policyString = writer.toString();
+		writer.close();
+		NodeList policyIdNodeList = documentAccessor.getNodeList(
+				documentXmlConverter.loadDocument(policyString), "//@PolicyId");
+		Set<String> policyIdSet = null;
+		if (policyIdNodeList.getLength() > 0) {
+			policyIdSet = new HashSet<String>();
+			for (int i = 0; i < policyIdNodeList.getLength(); i++) {
+				policyIdSet.add(policyIdNodeList.item(i).getNodeValue());
+			}
+		}
+		predicateMap.put(XACML_POLICY, policyString);
+		if (policyIdSet != null) {
+			predicateMap.put(XACML_POLICY_ID, policyIdSet.toString());
+		}
+		auditService.audit(this, xacmlRequest.getMessageId(), DEPLOY_POLICY,
+				xacmlRequest.getPatientId(), predicateMap);
 	}
 }

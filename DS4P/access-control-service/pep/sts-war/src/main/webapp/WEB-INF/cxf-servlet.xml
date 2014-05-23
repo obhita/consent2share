@@ -20,11 +20,11 @@ http://www.springframework.org/schema/util
 http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
-	<cxf:bus>
+<!-- 	<cxf:bus>
 		<cxf:features>
 			<cxf:logging />
 		</cxf:features>
-	</cxf:bus>
+	</cxf:bus> -->
 
 	<util:properties id="serviceProviderAddresses"
 		location="/WEB-INF/classes/serviceProviderAddresses.properties" />

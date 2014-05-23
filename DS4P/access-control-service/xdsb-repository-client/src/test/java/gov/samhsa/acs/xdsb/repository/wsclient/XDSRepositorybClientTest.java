@@ -10,6 +10,7 @@ import ihe.iti.xds_b._2007.XDSRepository;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -27,6 +28,10 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+
 public class XDSRepositorybClientTest {
 
 	protected static Endpoint ep;
@@ -37,7 +42,12 @@ public class XDSRepositorybClientTest {
 	@BeforeClass
 	public static void setUp() {
 		try {
-			address = "http://localhost:12345/services/xdsrepositoryb";
+			Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
+	    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
+	    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+
+	        address = String.format("http://localhost:%s/services/xdsrepositoryb", portNumber);
+
 			ep = Endpoint.publish(address, new XdsRepositorybImpl());
 
 			XdsRepositorybImpl.returnedValueOfProvideAndRegisterDocumentSet = provideAndRegisterDocumentSet;
@@ -109,33 +119,33 @@ public class XDSRepositorybClientTest {
 	 * "http://192.168.223.134:8080/axis2/services/xdsrepositoryb"; final String
 	 * dotnetVmEndpoint =
 	 * "http://192.168.223.128:8080/xdsservice/xdsrepository";
-	 * 
+	 *
 	 * InputStream is = getClass().getClassLoader().getResourceAsStream(
 	 * "xdsbMetadata.xml");
-	 * 
+	 *
 	 * BufferedReader br = new BufferedReader(new InputStreamReader(is));
-	 * 
+	 *
 	 * StringBuilder metadataStringBuilder = new StringBuilder(); String line;
-	 * 
+	 *
 	 * try { while ((line = br.readLine()) != null) {
 	 * metadataStringBuilder.append(line); }
-	 * 
+	 *
 	 * br.close(); is.close(); } catch (IOException e) { // TODO Auto-generated
 	 * catch block e.printStackTrace(); }
-	 * 
+	 *
 	 * String submitObjectRequestXml = metadataStringBuilder.toString();
 	 * SubmitObjectsRequest submitObjectRequest = new SubmitObjectsRequest();
 	 * submitObjectRequest = unmarshallFromXml(SubmitObjectsRequest.class,
 	 * submitObjectRequestXml);
-	 * 
+	 *
 	 * Document document = new Document(); document.setId("Document_01");
 	 * document.setValue("xyz".getBytes());
-	 * 
+	 *
 	 * ProvideAndRegisterDocumentSetRequest request = new
 	 * ProvideAndRegisterDocumentSetRequest();
 	 * request.setSubmitObjectsRequest(submitObjectRequest);
 	 * request.getDocument().add(document);
-	 * 
+	 *
 	 * XDSRepositorybWebServiceClient wsc = new XDSRepositorybWebServiceClient(
 	 * dotnetVmEndpoint); RegistryResponseType response = wsc
 	 * .provideAndRegisterDocumentSetReponse(request); try {

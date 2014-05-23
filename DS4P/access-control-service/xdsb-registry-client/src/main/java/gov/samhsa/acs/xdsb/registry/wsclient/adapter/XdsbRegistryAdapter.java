@@ -26,12 +26,18 @@
 package gov.samhsa.acs.xdsb.registry.wsclient.adapter;
 
 import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.acs.common.log.AcsLogger;
+import gov.samhsa.acs.common.log.AcsLoggerFactory;
 import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
+import gov.samhsa.acs.common.tool.exception.DocumentAccessorException;
+import gov.samhsa.acs.common.tool.exception.DocumentXmlConverterException;
+import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentReference;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient;
+import gov.samhsa.acs.xdsb.registry.wsclient.exception.XdsbRegistryAdapterException;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest.DocumentRequest;
 
@@ -43,8 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
-
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.ResponseOptionType;
@@ -52,8 +56,6 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.AdhocQueryType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ValueListType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -65,7 +67,8 @@ import org.w3c.dom.NodeList;
 public class XdsbRegistryAdapter {
 
 	/** The logger. */
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final AcsLogger logger = AcsLoggerFactory
+			.getLogger(this.getClass());
 
 	// Services
 	/** The xdsb registry. */
@@ -186,20 +189,20 @@ public class XdsbRegistryAdapter {
 	 *            the xdsb document type
 	 * @param serviceTimeAware
 	 *            the service time aware
+	 * @param messageId
+	 *            the message id
 	 * @return the adhoc query response
-	 * @throws Exception
-	 *             the exception
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public AdhocQueryResponse registryStoredQuery(String patientId,
 			String domainId, String authorId,
-			XdsbDocumentType xdsbDocumentType, boolean serviceTimeAware)
-			throws Exception, Throwable {
+			XdsbDocumentType xdsbDocumentType, boolean serviceTimeAware,
+			String messageId) throws XdsbRegistryAdapterException {
 		String patientUniqueId = getPatientUniqueId(patientId, domainId);
 
 		return registryStoredQuery(patientUniqueId, authorId, xdsbDocumentType,
-				serviceTimeAware);
+				serviceTimeAware, messageId);
 	}
 
 	/**
@@ -213,21 +216,22 @@ public class XdsbRegistryAdapter {
 	 *            the xdsb document type
 	 * @param serviceTimeAware
 	 *            the service time aware
+	 * @param messageId
+	 *            the message id
 	 * @return the adhoc query response
-	 * @throws Exception
-	 *             the exception
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public AdhocQueryResponse registryStoredQuery(String patientUniqueId,
 			String authorNPI, XdsbDocumentType xdsbDocumentType,
-			boolean serviceTimeAware) throws Exception, Throwable {
+			boolean serviceTimeAware, String messageId)
+			throws XdsbRegistryAdapterException {
 		// Create a query request to search by patient unique id
 		AdhocQueryRequest registryStoredQuery = createRegistryStoredQueryByPatientId(
-				patientUniqueId, xdsbDocumentType, serviceTimeAware);
+				patientUniqueId, xdsbDocumentType, serviceTimeAware, messageId);
 
 		return registryStoredQueryFilterByAuthorNPI(registryStoredQuery,
-				authorNPI);
+				authorNPI, messageId);
 	}
 
 	/**
@@ -237,13 +241,21 @@ public class XdsbRegistryAdapter {
 	 *            the req
 	 * @param authorNPI
 	 *            the author npi
+	 * @param messageId
+	 *            the message id
 	 * @return the adhoc query response
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public AdhocQueryResponse registryStoredQuery(AdhocQueryRequest req,
-			String authorNPI) throws Throwable {
-		return registryStoredQueryFilterByAuthorNPI(req, authorNPI);
+			String authorNPI, String messageId)
+			throws XdsbRegistryAdapterException {
+		try {
+			return registryStoredQueryFilterByAuthorNPI(req, authorNPI,
+					messageId);
+		} catch (Throwable t) {
+			throw new XdsbRegistryAdapterException(t);
+		}
 	}
 
 	/**
@@ -253,23 +265,29 @@ public class XdsbRegistryAdapter {
 	 *            the submission set patient id
 	 * @param submissionSetAuthorPerson
 	 *            the submission set author person
+	 * @param messageId
+	 *            the message id
 	 * @return the list
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public List<String> findDeprecatedDocumentUniqueIds(
-			String submissionSetPatientId, String submissionSetAuthorPerson)
-			throws Throwable {
-		submissionSetPatientId = submissionSetPatientId.replaceAll("&(?!amp;)", "&amp;");
-		submissionSetAuthorPerson = submissionSetAuthorPerson.replaceAll("&(?!amp;)", "&amp;");
+			String submissionSetPatientId, String submissionSetAuthorPerson,
+			String messageId) throws XdsbRegistryAdapterException {
+		submissionSetPatientId = submissionSetPatientId.replaceAll("&(?!amp;)",
+				"&amp;");
+		submissionSetAuthorPerson = submissionSetAuthorPerson.replaceAll(
+				"&(?!amp;)", "&amp;");
 
 		List<String> deprecatedDocumentUniqueIds = new LinkedList<String>();
 		AdhocQueryResponse findSubmissionSetsResponse = findSubmissionSets(
 				submissionSetPatientId, submissionSetAuthorPerson);
 		List<String> submissionSetUniqueIds = extractSubmissionSetUniqueIds(findSubmissionSetsResponse);
 		for (String submissionSetUniqueId : submissionSetUniqueIds) {
-			AdhocQueryResponse getSubmissionSetAndContentsResponse = getSubmissionSetAndContents(submissionSetUniqueId);
-			String deprecatedDocumentUniqueId = extractDeprecatedDocumentUniqueId(getSubmissionSetAndContentsResponse);
+			AdhocQueryResponse getSubmissionSetAndContentsResponse = getSubmissionSetAndContents(
+					submissionSetUniqueId, messageId);
+			String deprecatedDocumentUniqueId = extractDeprecatedDocumentUniqueId(
+					getSubmissionSetAndContentsResponse, messageId);
 			if (deprecatedDocumentUniqueId != null) {
 				deprecatedDocumentUniqueIds.add(deprecatedDocumentUniqueId);
 			}
@@ -285,11 +303,12 @@ public class XdsbRegistryAdapter {
 	 * @param submissionSetAuthorPerson
 	 *            the submission set author person
 	 * @return the adhoc query response
-	 * @throws JAXBException
-	 *             the jAXB exception
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public AdhocQueryResponse findSubmissionSets(String submissionSetPatientId,
-			String submissionSetAuthorPerson) throws JAXBException {
+			String submissionSetAuthorPerson)
+			throws XdsbRegistryAdapterException {
 		Assert.notNull(submissionSetPatientId);
 		Assert.notNull(submissionSetAuthorPerson);
 
@@ -304,19 +323,23 @@ public class XdsbRegistryAdapter {
 	 * 
 	 * @param submissionSetUniqueId
 	 *            the submission set unique id
+	 * @param messageId
+	 *            the message id
 	 * @return the gets the submission set and contents
-	 * @throws JAXBException
-	 *             the jAXB exception
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public AdhocQueryResponse getSubmissionSetAndContents(
-			String submissionSetUniqueId) throws JAXBException {
+			String submissionSetUniqueId, String messageId)
+			throws XdsbRegistryAdapterException {
 		// Invoke this method for each submissionSetId at a time. This stored
 		// query doesn't support retrieval of multiple submission sets, do not
 		// try to implement it.
 
 		Assert.notNull(submissionSetUniqueId);
 
-		AdhocQueryRequest getSubmissionSetAndContentsRequest = createGetSubmissionSetAndContentsRequest(submissionSetUniqueId);
+		AdhocQueryRequest getSubmissionSetAndContentsRequest = createGetSubmissionSetAndContentsRequest(
+				submissionSetUniqueId, messageId);
 
 		return registryStoredQuery(getSubmissionSetAndContentsRequest);
 	}
@@ -327,22 +350,26 @@ public class XdsbRegistryAdapter {
 	 * @param response
 	 *            the response
 	 * @return the list
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public List<String> extractSubmissionSetUniqueIds(
-			AdhocQueryResponse response) throws Throwable {
-		List<String> submissionSetUniqueIdList = new LinkedList<String>();
-		String responseXml = this.marshaller.marshall(response);
-		Document responseDoc = this.documentXmlConverter
-				.loadDocument(responseXml);
-		String xPathExpr = "//rim:ExternalIdentifier[@identificationScheme='$']/@value";
-		NodeList nodeList = this.documentAccessor.getNodeList(responseDoc,
-				xPathExpr.replace("$", UUID_XDS_SUBMISSION_SET_UNIQUEID));
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			submissionSetUniqueIdList.add(nodeList.item(i).getNodeValue());
+			AdhocQueryResponse response) throws XdsbRegistryAdapterException {
+		try {
+			List<String> submissionSetUniqueIdList = new LinkedList<String>();
+			String responseXml = this.marshaller.marshall(response);
+			Document responseDoc = this.documentXmlConverter
+					.loadDocument(responseXml);
+			String xPathExpr = "//rim:ExternalIdentifier[@identificationScheme='$']/@value";
+			NodeList nodeList = this.documentAccessor.getNodeList(responseDoc,
+					xPathExpr.replace("$", UUID_XDS_SUBMISSION_SET_UNIQUEID));
+			for (int i = 0; i < nodeList.getLength(); i++) {
+				submissionSetUniqueIdList.add(nodeList.item(i).getNodeValue());
+			}
+			return submissionSetUniqueIdList;
+		} catch (SimpleMarshallerException | DocumentAccessorException e) {
+			throw new XdsbRegistryAdapterException(e);
 		}
-		return submissionSetUniqueIdList;
 	}
 
 	/**
@@ -350,32 +377,41 @@ public class XdsbRegistryAdapter {
 	 * 
 	 * @param response
 	 *            the response
+	 * @param messageId
+	 *            the message id
 	 * @return the string
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
-	public String extractDeprecatedDocumentUniqueId(AdhocQueryResponse response)
-			throws Throwable {
-		String responseXml = this.marshaller.marshall(response);
-		Document responseDoc = this.documentXmlConverter
-				.loadDocument(responseXml);
-		// Extract documentUniqueId if there is an association in the submission
-		// set with a NewStatus slot having SUBMISSION_SET_STATUS_DEPRECATED
-		// value. Return null, if there is not any.
-		StringBuilder builder = new StringBuilder();
-		builder.append("//rim:Association[descendant::rim:Slot[@name='NewStatus']][descendant::rim:Value[.='");
-		builder.append(SUBMISSION_SET_STATUS_DEPRECATED);
-		builder.append("']]/preceding-sibling::rim:ExtrinsicObject[@objectType='");
-		builder.append(UUID_XDS_DOCUMENTENTRY);
-		builder.append("']/descendant::rim:ExternalIdentifier[@identificationScheme='");
-		builder.append(UUID_XDS_DOCUMENTENTRY_UNIQUEID);
-		builder.append("']/@value");		
-		String xPathExpr = builder.toString();
-		Node node = this.documentAccessor.getNode(responseDoc, xPathExpr);
-		if (node == null) {
-			return null;
-		} else {
-			return node.getNodeValue();
+	public String extractDeprecatedDocumentUniqueId(
+			AdhocQueryResponse response, String messageId)
+			throws XdsbRegistryAdapterException {
+		try {
+			String responseXml = this.marshaller.marshall(response);
+			Document responseDoc = this.documentXmlConverter
+					.loadDocument(responseXml);
+			// Extract documentUniqueId if there is an association in the
+			// submission
+			// set with a NewStatus slot having SUBMISSION_SET_STATUS_DEPRECATED
+			// value. Return null, if there is not any.
+			StringBuilder builder = new StringBuilder();
+			builder.append("//rim:Association[descendant::rim:Slot[@name='NewStatus']][descendant::rim:Value[.='");
+			builder.append(SUBMISSION_SET_STATUS_DEPRECATED);
+			builder.append("']]/preceding-sibling::rim:ExtrinsicObject[@objectType='");
+			builder.append(UUID_XDS_DOCUMENTENTRY);
+			builder.append("']/descendant::rim:ExternalIdentifier[@identificationScheme='");
+			builder.append(UUID_XDS_DOCUMENTENTRY_UNIQUEID);
+			builder.append("']/@value");
+			String xPathExpr = builder.toString();
+			Node node = this.documentAccessor.getNode(responseDoc, xPathExpr);
+			if (node == null) {
+				return null;
+			} else {
+				return node.getNodeValue();
+			}
+		} catch (SimpleMarshallerException | DocumentAccessorException e) {
+			logger.error(messageId, e.getMessage());
+			throw new XdsbRegistryAdapterException(e.getMessage(), e);
 		}
 	}
 
@@ -461,75 +497,83 @@ public class XdsbRegistryAdapter {
 	 * @param adhocQueryResponse
 	 *            the adhoc query response
 	 * @return the retrieve document set request
-	 * @throws Exception
-	 *             the exception
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	public RetrieveDocumentSetRequest extractXdsbDocumentReferenceListAsRetrieveDocumentSetRequest(
-			AdhocQueryResponse adhocQueryResponse) throws Exception, Throwable {
-		String adhocQueryResponseXmlString = marshaller
-				.marshall(adhocQueryResponse);
-		Document doc = documentXmlConverter
-				.loadDocument(adhocQueryResponseXmlString);
+			AdhocQueryResponse adhocQueryResponse)
+			throws XdsbRegistryAdapterException {
+		String adhocQueryResponseXmlString;
+		try {
+			adhocQueryResponseXmlString = marshaller
+					.marshall(adhocQueryResponse);
+			Document doc = documentXmlConverter
+					.loadDocument(adhocQueryResponseXmlString);
 
-		// Scan the document ExtrinsicObject elements
-		NodeList extrinsicObjects = doc.getElementsByTagName("ExtrinsicObject");
+			// Scan the document ExtrinsicObject elements
+			NodeList extrinsicObjects = doc
+					.getElementsByTagName("ExtrinsicObject");
 
-		// Temporary storage for documentUniqueIds and repositryIds
-		Map<Integer, String> documentUniqueIdMap = new HashMap<Integer, String>();
-		Map<Integer, String> repositoryUniqueIdMap = new HashMap<Integer, String>();
+			// Temporary storage for documentUniqueIds and repositryIds
+			Map<Integer, String> documentUniqueIdMap = new HashMap<Integer, String>();
+			Map<Integer, String> repositoryUniqueIdMap = new HashMap<Integer, String>();
 
-		// For each ExtrinsicObject
-		for (int i = 0; i < extrinsicObjects.getLength(); i++) {
-			Node extrinsicObject = extrinsicObjects.item(i);
-			NodeList extrinsicObjectItems = extrinsicObject.getChildNodes();
+			// For each ExtrinsicObject
+			for (int i = 0; i < extrinsicObjects.getLength(); i++) {
+				Node extrinsicObject = extrinsicObjects.item(i);
+				NodeList extrinsicObjectItems = extrinsicObject.getChildNodes();
 
-			// For each element of ExtrinsicObject
-			for (int j = 0; j < extrinsicObjectItems.getLength(); j++) {
-				Node extrinsicObjectItem = extrinsicObjectItems.item(j);
+				// For each element of ExtrinsicObject
+				for (int j = 0; j < extrinsicObjectItems.getLength(); j++) {
+					Node extrinsicObjectItem = extrinsicObjectItems.item(j);
 
-				// If the element is ExternalIdentifier with
-				// a XDSDocumentEntry UniqueId
-				if ("ExternalIdentifier".equals(extrinsicObjectItem
-						.getNodeName())
-						&& UUID_XDS_DOCUMENTENTRY_UNIQUEID
-								.equals(extrinsicObjectItem.getAttributes()
-										.getNamedItem("identificationScheme")
-										.getNodeValue())) {
-					// Get the value of UniqueId and store in temporary map
-					documentUniqueIdMap.put(i, extrinsicObjectItem
-							.getAttributes().getNamedItem("value")
-							.getNodeValue());
-				}
+					// If the element is ExternalIdentifier with
+					// a XDSDocumentEntry UniqueId
+					if ("ExternalIdentifier".equals(extrinsicObjectItem
+							.getNodeName())
+							&& UUID_XDS_DOCUMENTENTRY_UNIQUEID
+									.equals(extrinsicObjectItem
+											.getAttributes()
+											.getNamedItem(
+													"identificationScheme")
+											.getNodeValue())) {
+						// Get the value of UniqueId and store in temporary map
+						documentUniqueIdMap.put(i, extrinsicObjectItem
+								.getAttributes().getNamedItem("value")
+								.getNodeValue());
+					}
 
-				// If the element is a Slot with repositoryUniqueId
-				if ("Slot".equals(extrinsicObjectItem.getNodeName())
-						&& "repositoryUniqueId".equals(extrinsicObjectItem
-								.getAttributes().getNamedItem("name")
-								.getNodeValue())) {
-					// Get the value of repositoryUniqueId and store in
-					// temporary map
-					repositoryUniqueIdMap.put(i, extrinsicObjectItem
-							.getChildNodes().item(0).getChildNodes().item(0)
-							.getTextContent());
+					// If the element is a Slot with repositoryUniqueId
+					if ("Slot".equals(extrinsicObjectItem.getNodeName())
+							&& "repositoryUniqueId".equals(extrinsicObjectItem
+									.getAttributes().getNamedItem("name")
+									.getNodeValue())) {
+						// Get the value of repositoryUniqueId and store in
+						// temporary map
+						repositoryUniqueIdMap.put(i, extrinsicObjectItem
+								.getChildNodes().item(0).getChildNodes()
+								.item(0).getTextContent());
+					}
 				}
 			}
-		}
 
-		// Combine the maps into a list of XdsbDocumentReference
-		Set<Integer> keys = documentUniqueIdMap.keySet();
-		RetrieveDocumentSetRequest retrieveDocumentSetRequest = new RetrieveDocumentSetRequest();
-		List<DocumentRequest> documentRequestList = retrieveDocumentSetRequest
-				.getDocumentRequest();
-		for (Integer key : keys) {
-			XdsbDocumentReference xdsbDocumentReference = new XdsbDocumentReference(
-					documentUniqueIdMap.get(key),
-					repositoryUniqueIdMap.get(key));
-			documentRequestList.add(xdsbDocumentReference);
-		}
+			// Combine the maps into a list of XdsbDocumentReference
+			Set<Integer> keys = documentUniqueIdMap.keySet();
+			RetrieveDocumentSetRequest retrieveDocumentSetRequest = new RetrieveDocumentSetRequest();
+			List<DocumentRequest> documentRequestList = retrieveDocumentSetRequest
+					.getDocumentRequest();
+			for (Integer key : keys) {
+				XdsbDocumentReference xdsbDocumentReference = new XdsbDocumentReference(
+						documentUniqueIdMap.get(key),
+						repositoryUniqueIdMap.get(key));
+				documentRequestList.add(xdsbDocumentReference);
+			}
 
-		return retrieveDocumentSetRequest;
+			return retrieveDocumentSetRequest;
+
+		} catch (SimpleMarshallerException | DocumentXmlConverterException e) {
+			throw new XdsbRegistryAdapterException(e);
+		}
 	}
 
 	/**
@@ -603,21 +647,26 @@ public class XdsbRegistryAdapter {
 	 * @param submissionSetAuthorPerson
 	 *            the submission set author person
 	 * @return the adhoc query request
-	 * @throws JAXBException
-	 *             the jAXB exception
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	AdhocQueryRequest createFindSubmissionSetsRequest(
 			String submissionSetPatientId, String submissionSetAuthorPerson)
-			throws JAXBException {
-		AdhocQueryRequest findSubmissionSetsRequest = this.marshaller
-				.unmarshallFromXml(
-						AdhocQueryRequest.class,
-						STORED_QUERY_FIND_SUBMISSION_SETS.replace(
-								PARAM_XDS_SUBMISSION_SET_PATIENT_ID,
-								submissionSetPatientId).replace(
-								PARAM_XDS_SUBMISSION_SET_AUTHOR_PERSON,
-								submissionSetAuthorPerson));
-		return findSubmissionSetsRequest;
+			throws XdsbRegistryAdapterException {
+		try {
+			AdhocQueryRequest findSubmissionSetsRequest = this.marshaller
+					.unmarshallFromXml(
+							AdhocQueryRequest.class,
+							STORED_QUERY_FIND_SUBMISSION_SETS.replace(
+									PARAM_XDS_SUBMISSION_SET_PATIENT_ID,
+									submissionSetPatientId).replace(
+									PARAM_XDS_SUBMISSION_SET_AUTHOR_PERSON,
+									submissionSetAuthorPerson));
+
+			return findSubmissionSetsRequest;
+		} catch (SimpleMarshallerException e) {
+			throw new XdsbRegistryAdapterException(e);
+		}
 	}
 
 	/**
@@ -625,18 +674,27 @@ public class XdsbRegistryAdapter {
 	 * 
 	 * @param submissionSetUniqueId
 	 *            the submission set unique id
+	 * @param messageId
+	 *            the message id
 	 * @return the adhoc query request
-	 * @throws JAXBException
-	 *             the jAXB exception
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	AdhocQueryRequest createGetSubmissionSetAndContentsRequest(
-			String submissionSetUniqueId) throws JAXBException {
-		AdhocQueryRequest getSubmissionSetAndContentsRequest = this.marshaller
-				.unmarshallFromXml(AdhocQueryRequest.class,
-						STORED_QUERY_GET_SUBMISSION_SET_AND_CONTENTS.replace(
-								PARAM_XDS_SUBMISSION_SET_UNIQUEID,
-								submissionSetUniqueId));
-		return getSubmissionSetAndContentsRequest;
+			String submissionSetUniqueId, String messageId)
+			throws XdsbRegistryAdapterException {
+		try {
+			AdhocQueryRequest getSubmissionSetAndContentsRequest = this.marshaller
+					.unmarshallFromXml(AdhocQueryRequest.class,
+							STORED_QUERY_GET_SUBMISSION_SET_AND_CONTENTS
+									.replace(PARAM_XDS_SUBMISSION_SET_UNIQUEID,
+											submissionSetUniqueId));
+
+			return getSubmissionSetAndContentsRequest;
+		} catch (SimpleMarshallerException e) {
+			logger.error(messageId, e.getMessage());
+			throw new XdsbRegistryAdapterException(e);
+		}
 	}
 
 	/**
@@ -648,11 +706,13 @@ public class XdsbRegistryAdapter {
 	 *            the xdsb document type
 	 * @param serviceTimeAware
 	 *            the service time aware
+	 * @param messageId
+	 *            the message id
 	 * @return the adhoc query request
 	 */
 	AdhocQueryRequest createRegistryStoredQueryByPatientId(
 			String patientUniqueId, XdsbDocumentType xdsbDocumentType,
-			boolean serviceTimeAware) {
+			boolean serviceTimeAware, String messageId) {
 		// Create registryStoredQuery
 		AdhocQueryRequest registryStoredQuery = new AdhocQueryRequest();
 		// Set response option to return all metadata of the documents in the
@@ -675,7 +735,7 @@ public class XdsbRegistryAdapter {
 
 		// add format code (will only return document references for the given
 		// supported document type)
-		addFormatCode(adhocQueryType, xdsbDocumentType);
+		addFormatCode(adhocQueryType, xdsbDocumentType, messageId);
 
 		if (serviceTimeAware) {
 			// add service time constraint (will only return the document
@@ -759,9 +819,11 @@ public class XdsbRegistryAdapter {
 	 *            the adhoc query type
 	 * @param xdsbDocumentType
 	 *            the xdsb document type
+	 * @param messageId
+	 *            the message id
 	 */
 	void addFormatCode(AdhocQueryType adhocQueryType,
-			XdsbDocumentType xdsbDocumentType) {
+			XdsbDocumentType xdsbDocumentType, String messageId) {
 		SlotType1 formatCodeSlotType = new SlotType1();
 		formatCodeSlotType.setName(SLOT_NAME_XDS_DOCUMENT_ENTRY_FORMAT_CODE);
 		ValueListType formatCodeValueListType = new ValueListType();
@@ -772,7 +834,7 @@ public class XdsbRegistryAdapter {
 		} else if (xdsbDocumentType.equals(XdsbDocumentType.PRIVACY_CONSENT)) {
 			formatCodeValueListType.getValue().add(FORMAT_CODE_PRIVACY_CONSENT);
 		} else {
-			logger.error("Unsupported XDS.b document format code");
+			logger.error(messageId, "Unsupported XDS.b document format code");
 			throw new DS4PException("Unsupported XDS.b document format code");
 		}
 
@@ -813,20 +875,27 @@ public class XdsbRegistryAdapter {
 	 *            the req
 	 * @param authorNPI
 	 *            the author npi
+	 * @param messageId
+	 *            the message id
 	 * @return the adhoc query response
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRegistryAdapterException
+	 *             the xdsb registry adapter exception
 	 */
 	private AdhocQueryResponse registryStoredQueryFilterByAuthorNPI(
-			AdhocQueryRequest req, String authorNPI) throws Throwable {
-		// Query Response
-		AdhocQueryResponse adhocQueryResponse = registryStoredQuery(req);
-		if (authorNPI != null && !"".equals(authorNPI)) {
-			adhocQueryResponse = responseFilter.filterByAuthor(
-					adhocQueryResponse, authorNPI);
+			AdhocQueryRequest req, String authorNPI, String messageId)
+			throws XdsbRegistryAdapterException {
+		try {
+			// Query Response
+			AdhocQueryResponse adhocQueryResponse = registryStoredQuery(req);
+			if (authorNPI != null && !"".equals(authorNPI)) {
+				adhocQueryResponse = responseFilter.filterByAuthor(
+						adhocQueryResponse, authorNPI);
+			}
+			logger.debug(messageId, marshaller.marshall(adhocQueryResponse));
+			return adhocQueryResponse;
+		} catch (SimpleMarshallerException e) {
+			throw new XdsbRegistryAdapterException(e);
 		}
-		logger.debug(marshaller.marshall(adhocQueryResponse));
-		return adhocQueryResponse;
 	}
 
 	/**

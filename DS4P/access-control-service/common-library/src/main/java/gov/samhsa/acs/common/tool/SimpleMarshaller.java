@@ -25,7 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.acs.common.tool;
 
-import javax.xml.bind.JAXBException;
+import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
 
 /**
  * The Interface SimpleMarshaller.
@@ -42,11 +42,11 @@ public interface SimpleMarshaller {
 	 * @param xml
 	 *            the xml
 	 * @return the t
-	 * @throws JAXBException
-	 *             the jAXB exception
+	 * @throws SimpleMarshallerException
+	 *             the simple marshaller exception
 	 */
 	public abstract <T> T unmarshallFromXml(Class<T> clazz, String xml)
-			throws JAXBException;
+			throws SimpleMarshallerException;
 
 	/**
 	 * Marshall from object to xml string.
@@ -54,9 +54,10 @@ public interface SimpleMarshaller {
 	 * @param obj
 	 *            the obj
 	 * @return the string
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws SimpleMarshallerException
+	 *             the simple marshaller exception
 	 */
-	public abstract String marshall(Object obj) throws Throwable;
+	public abstract String marshall(Object obj)
+			throws SimpleMarshallerException;
 
 }

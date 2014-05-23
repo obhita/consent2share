@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gov.samhsa.acs.common.validation.XmlValidation;
+import gov.samhsa.consent2share.infrastructure.eventlistener.EventService;
 import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.ClamAVService;
@@ -63,6 +64,9 @@ public class ClinicalDocumentControllerTest {
 	@Mock
 	XmlValidation xmlValidator;
 	
+	@Mock
+	EventService eventService;
+	
 	ClinicalDocumentController sut;
 	
 	ClinicalDocumentController clinicalDocumentController;
@@ -71,7 +75,7 @@ public class ClinicalDocumentControllerTest {
 
 	@Before
 	public void before() throws AccessControlException {
-		clinicalDocumentController=new ClinicalDocumentController(clinicalDocumentService, patientService, clinicalDocumentTypeCodeService, userContext, accessReferenceMapper, clamAVUtil, recaptchaUtil, xmlValidator);
+		clinicalDocumentController=new ClinicalDocumentController(clinicalDocumentService, patientService, clinicalDocumentTypeCodeService, userContext, accessReferenceMapper, clamAVUtil, recaptchaUtil, eventService, xmlValidator);
 		sut=spy(clinicalDocumentController);
 		mockMvc = MockMvcBuilders.standaloneSetup(
 				this.sut).build();
@@ -196,7 +200,9 @@ public class ClinicalDocumentControllerTest {
 		mockMvc.perform(fileUpload("/patients/clinicaldocuments.html").file(file)
 				.param("name", "mocked_name")
 				.param("description", "mocked_description")
-				.param("documentType", "mocked_type"))
+				.param("documentType", "mocked_type")
+				.param("recaptcha_challenge_field", "recaptcha_challenge_field")
+				.param("recaptcha_response_field", "recaptcha_response_field"))
 			.andExpect(view().name("redirect:/patients/clinicaldocuments.html"));
 	}
 	

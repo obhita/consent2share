@@ -46,9 +46,11 @@ public class PolicyIdDtoRowMapper implements RowMapper<PolicyIdDto> {
 		PolicyIdDto policyIdDto = new PolicyIdDto();
 		long consentId = rs.getLong("consent.id");
 		String policyId = rs.getString("consent.consent_reference_id");
-		String patientId = rs.getString("patient.enterprise_identifier");
+		String patientEid = rs.getString("patient.enterprise_identifier");
+		long patientId = rs.getLong("consent.patient");
 		policyIdDto.setConsentId(consentId);
 		policyIdDto.setPolicyId(policyId);
+		policyIdDto.setPatientEid(patientEid);
 		policyIdDto.setPatientId(patientId);
 		return policyIdDto;
 	}

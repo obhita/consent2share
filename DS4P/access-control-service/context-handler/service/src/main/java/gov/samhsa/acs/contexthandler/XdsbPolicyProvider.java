@@ -25,8 +25,11 @@
  ******************************************************************************/
 package gov.samhsa.acs.contexthandler;
 
-import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.acs.common.dto.XacmlRequest;
+import gov.samhsa.acs.common.log.AcsLogger;
+import gov.samhsa.acs.common.log.AcsLoggerFactory;
 import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
+import gov.samhsa.acs.contexthandler.exception.PolicyProviderException;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.registry.wsclient.adapter.XdsbRegistryAdapter;
 import gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter;
@@ -44,8 +47,6 @@ import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import org.herasaf.xacml.core.SyntaxException;
 import org.herasaf.xacml.core.policy.Evaluatable;
 import org.herasaf.xacml.core.policy.PolicyMarshaller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The Class XdsbPolicyProvider.
@@ -59,7 +60,8 @@ public class XdsbPolicyProvider implements PolicyProvider {
 	String urnPolicyCombiningAlgorithm;
 
 	/** The logger. */
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final AcsLogger logger = AcsLoggerFactory
+			.getLogger(this.getClass());
 
 	/** The xdsb registry. */
 	private XdsbRegistryAdapter xdsbRegistry;
@@ -124,15 +126,21 @@ public class XdsbPolicyProvider implements PolicyProvider {
 	 * (java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public List<Evaluatable> getPolicies(String patientUniqueId,
-			String recipientSubjectNPI, String intermediarySubjectNPI) {
+	public List<Evaluatable> getPolicies(XacmlRequest xacmlRequest)
+			throws NoPolicyFoundException, PolicyProviderException {
+		final String patientUniqueId = xacmlRequest.getPatientUniqueId();
+		final String recipientSubjectNPI = xacmlRequest
+				.getRecipientSubjectNPI();
+		final String intermediarySubjectNPI = xacmlRequest
+				.getIntermediarySubjectNPI();
+		final String messageId = xacmlRequest.getMessageId();
 		List<Evaluatable> policies = new LinkedList<Evaluatable>();
 		List<String> policiesString = new LinkedList<String>();
 		try {
 			// Retrieve policy documents
 			AdhocQueryResponse response = xdsbRegistry.registryStoredQuery(
 					patientUniqueId, null, XdsbDocumentType.PRIVACY_CONSENT,
-					true);
+					true, messageId);
 
 			// Extract doc.request from query response
 			RetrieveDocumentSetRequest retrieveDocumentSetRequest = xdsbRegistry
@@ -141,11 +149,14 @@ public class XdsbPolicyProvider implements PolicyProvider {
 			// If no policies at all, throw NoPolicyFoundException to be caught
 			// at PolicyEnforcementPointImpl
 			StringBuilder noConsentsFoundErrorStringBuilder = new StringBuilder();
-			noConsentsFoundErrorStringBuilder.append("No consents found for patient:");
+			noConsentsFoundErrorStringBuilder
+					.append("No consents found for patient ");
 			noConsentsFoundErrorStringBuilder.append(patientUniqueId);
-			noConsentsFoundErrorStringBuilder.append(" in XDS.b repository.");
+			noConsentsFoundErrorStringBuilder.append(".");
+			final String errMsg = noConsentsFoundErrorStringBuilder.toString();
 			if (retrieveDocumentSetRequest.getDocumentRequest().size() <= 0) {
-				throw new NoPolicyFoundException(noConsentsFoundErrorStringBuilder.toString());
+				logger.error(xacmlRequest.getMessageId(), errMsg);
+				throw new NoPolicyFoundException(errMsg);
 			}
 
 			// Retrieve all policies
@@ -155,7 +166,7 @@ public class XdsbPolicyProvider implements PolicyProvider {
 			// Retrieve deprecated documentUniqueIds
 			List<String> deprecatedDocumentUniqueIds = this.xdsbRegistry
 					.findDeprecatedDocumentUniqueIds(patientUniqueId,
-							patientUniqueId);
+							patientUniqueId, messageId);
 
 			// Add policy documents to a string list (if they are not
 			// deprecated)
@@ -180,7 +191,8 @@ public class XdsbPolicyProvider implements PolicyProvider {
 			// NoPolicyFoundException to be caught at
 			// PolicyEnforcementPointImpl
 			if (policiesString.size() <= 0) {
-				throw new NoPolicyFoundException(noConsentsFoundErrorStringBuilder.toString());
+				throw new NoPolicyFoundException(
+						noConsentsFoundErrorStringBuilder.toString());
 			}
 
 			// Wrap policies in a policy set
@@ -193,11 +205,11 @@ public class XdsbPolicyProvider implements PolicyProvider {
 		} catch (NoPolicyFoundException e) {
 			// Log the exception, but throw it again to be caught at
 			// PolicyEnforcementPointImpl
-			logger.error(e.getMessage(), e);
+			logger.info(messageId, e.getMessage());
 			throw e;
 		} catch (Throwable t) {
-			logger.error(t.getMessage(), t);
-			throw new DS4PException(
+			logger.error(messageId, t.getMessage(), t);
+			throw new PolicyProviderException(
 					"Consent files cannot be queried/retrieved from XDS.b");
 		}
 		return policies;

@@ -35,10 +35,12 @@ import gov.samhsa.consent2share.infrastructure.CodedConceptLookupService;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.HashMapResultToProviderDtoConverter;
 import gov.samhsa.consent2share.infrastructure.PixQueryService;
+import gov.samhsa.consent2share.infrastructure.eventlistener.EventService;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticationFailedException;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
+import gov.samhsa.consent2share.infrastructure.securityevent.FileDownloadedEvent;
 import gov.samhsa.consent2share.service.admin.AdminService;
 import gov.samhsa.consent2share.service.audit.AdminAuditService;
 import gov.samhsa.consent2share.service.consent.ConsentHelper;
@@ -121,6 +123,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 
 /**
  * The Class AdminController.
@@ -219,6 +223,9 @@ public class AdminController extends AbstractController {
 	/** The consent helper. */
 	@Autowired
 	private ConsentHelper consentHelper;
+	
+	@Autowired
+	private EventService eventService;
 
 	// @Autowired
 	// StaffIndividualProviderRepository staffIndividualProviderRepository;
@@ -229,6 +236,10 @@ public class AdminController extends AbstractController {
 	/** The PIX Query Service. */
 	@Autowired
 	private PixQueryService pixQueryService;
+	
+	/** The user context. */
+	@Autowired
+	private UserContext userContext;
 
 	@Autowired
 	HashMapResultToProviderDtoConverter hashMapResultToProviderDtoConverter;
@@ -286,7 +297,8 @@ public class AdminController extends AbstractController {
 			@RequestParam(value = "id", required = false, defaultValue = "-1") long patientId,
 			@RequestParam(value = "username", required = false) String userName,
 			@RequestParam(value = "notify", required = false) String notify,
-			@RequestParam(value = "status", required = false) String status) {
+			@RequestParam(value = "status", required = false) String status,
+			@RequestParam(value = "duplicateconsent", required = false) String duplicateConsent) {
 		PatientProfileDto patientProfileDto;
 		List<ConsentListDto> consentListDto;
 		List<SystemNotificationDto> systemNotificationDtos = null;
@@ -297,6 +309,10 @@ public class AdminController extends AbstractController {
 					.findAllConsentsDtoByPatient(patientId);
 			patientConnectionDto=patientService.findPatientConnectionById(patientId);
 			systemNotificationDtos=systemNotificationService.findAllSystemNotificationDtosByPatient(patientId);
+			
+			if(duplicateConsent != null){
+				model.addAttribute("duplicate_consent_id", duplicateConsent);
+			}
 			
 		} else if (userName != null) {
 			patientProfileDto = patientService.findByUsername(userName);
@@ -769,6 +785,7 @@ public class AdminController extends AbstractController {
 			IOUtils.copy(new ByteArrayInputStream(pdfDto.getContent()), out);
 			out.flush();
 			out.close();
+			eventService.raiseSecurityEvent(new FileDownloadedEvent(request.getRemoteAddr(),"Admin_User_"+userContext.getCurrentUser().getUsername(),"Consent_"+consentId));
 
 		} catch (IOException e) {
 			logger.warn("Error while reading pdf file.");
@@ -1167,6 +1184,10 @@ public class AdminController extends AbstractController {
 	public HashMap<String, String> deserializeResult(String providerDtoJSON) {
 		return new JSONDeserializer<HashMap<String, String>>()
 				.deserialize(providerDtoJSON);
+	}
+	
+	String getRemoteAddress(HttpServletRequest request) {
+		return request.getRemoteAddr();
 	}
 
 }

@@ -10,6 +10,7 @@ import gov.samhsa.consent2share.domain.valueset.ConceptCodeValueSetRepository;
 import gov.samhsa.consent2share.domain.valueset.ValueSetRepository;
 import gov.samhsa.consent2share.service.dto.ValueSetLookUpDto;
 import gov.samhsa.consent2share.service.dto.ValueSetQueryDto;
+import gov.samhsa.consent2share.service.dto.ValueSetQueryListDto;
 
 import java.util.HashSet;
 import java.util.List;
@@ -110,6 +111,22 @@ public class ValueSetLookupServiceImpl implements ValueSetLookupService {
 		valueSetQueryDto.setVsCategoryCodes(ValueSetCategoriesInSet(code, codeSystemOid));
 		
 		return valueSetQueryDto;
+	}
+
+
+	@Override
+	public ValueSetQueryListDto RestfulValueSetCategories(
+			ValueSetQueryListDto valueSetQueryListDtos)
+			throws CodeSystemVersionNotFoundException,
+			ConceptCodeNotFoundException, ValueSetNotFoundException {
+		Set<ValueSetQueryDto> valueSetQueryDtos = valueSetQueryListDtos.getValueSetQueryDtos();
+		
+		for(ValueSetQueryDto valueSetQueryDto : valueSetQueryDtos){
+			valueSetQueryDto.setVsCategoryCodes(ValueSetCategoriesInSet(valueSetQueryDto.getConceptCode(), valueSetQueryDto.getCodeSystemOid()));
+			LOGGER.debug("ValueSetQueryDto : " + valueSetQueryDto);
+		}
+		
+		return valueSetQueryListDtos;
 	}
 	
 	

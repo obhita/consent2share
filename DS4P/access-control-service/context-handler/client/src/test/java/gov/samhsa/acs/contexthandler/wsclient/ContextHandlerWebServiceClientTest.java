@@ -15,6 +15,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -32,19 +33,28 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+
 public class ContextHandlerWebServiceClientTest {
 
 	protected static Endpoint ep;
 	protected static String address;
-	
+
 	private static Return returnedValueOfEnforcePolicy;
 
 	@BeforeClass
 	public static void setUp() {
 		try {
-			address = "http://localhost:12345/services/DS4PContextHandler";
+			Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
+	    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
+	    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+
+	        address = String.format("http://localhost:%s/services/DS4PContextHandler", portNumber);
+
 			ep = Endpoint.publish(address, new DS4PContextHandlerImpl());
-			
+
 			returnedValueOfEnforcePolicy = new Return ();
 			returnedValueOfEnforcePolicy.setPdpDecision("Permit");
 			returnedValueOfEnforcePolicy.setPurposeOfUse("TREAT");
@@ -56,7 +66,7 @@ public class ContextHandlerWebServiceClientTest {
 			returnedValueOfEnforcePolicy.setPdpResponse("");
 			returnedValueOfEnforcePolicy.setRequestTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar(2008,10,1)));
 			returnedValueOfEnforcePolicy.setResponseTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar(2008,10,1)));
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,11 +85,11 @@ public class ContextHandlerWebServiceClientTest {
 	// Test if the stub web service activate properly
 	@Test
 	public void testStubWebServiceWorks() {
-		
+
 		final EnforcePolicy.Xspasubject xspasubject = new EnforcePolicy.Xspasubject();
-		final EnforcePolicy.Xsparesource xsparesource = new EnforcePolicy.Xsparesource();		
-		
-		DS4PContextHandlerImpl.returnedValueOfEnforcePolicy = returnedValueOfEnforcePolicy;		
+		final EnforcePolicy.Xsparesource xsparesource = new EnforcePolicy.Xsparesource();
+
+		DS4PContextHandlerImpl.returnedValueOfEnforcePolicy = returnedValueOfEnforcePolicy;
 		Return resp = createPort().enforcePolicy(xspasubject, xsparesource);
 		validateResponse(resp);
 	}
@@ -87,11 +97,11 @@ public class ContextHandlerWebServiceClientTest {
 	// Test if the SOAP client calling the stub web service correctly?
 	@Test
 	public void testWSClientSOAPCallWorks() {
-		
+
 		final EnforcePolicy.Xspasubject xspasubject = new EnforcePolicy.Xspasubject();
-		final EnforcePolicy.Xsparesource xsparesource = new EnforcePolicy.Xsparesource();		
-		
-		DS4PContextHandlerImpl.returnedValueOfEnforcePolicy = returnedValueOfEnforcePolicy;		
+		final EnforcePolicy.Xsparesource xsparesource = new EnforcePolicy.Xsparesource();
+
+		DS4PContextHandlerImpl.returnedValueOfEnforcePolicy = returnedValueOfEnforcePolicy;
 
 		ContextHandlerWebServiceClient wsc = new ContextHandlerWebServiceClient(address);
 		Return resp = wsc.enforcePolicy(xspasubject, xsparesource);
@@ -103,7 +113,7 @@ public class ContextHandlerWebServiceClientTest {
 		Assert.assertEquals("Permit", returnedValueOfEnforcePolicy.getPdpDecision(), resp.getPdpDecision());
 	}
 
-	private DS4PContextHandler createPort() {		
+	private DS4PContextHandler createPort() {
 		final URL WSDL_LOCATION = ClassLoader.getSystemResource("DS4PContextHandler.wsdl");
 		final QName SERVICE = new QName("http://ws.ds4p.ehtac.va.gov/",
 				"DS4PContextHandler");

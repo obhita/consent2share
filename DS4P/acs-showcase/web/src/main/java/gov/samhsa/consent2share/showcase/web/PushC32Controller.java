@@ -1,6 +1,7 @@
 package gov.samhsa.consent2share.showcase.web;
 
-import gov.samhsa.acs.pep.wsclient.WSClient;
+import gov.samhsa.acs.pep.wsclient.PepWebServiceClient;
+import gov.samhsa.acs.pep.security.CredentialProviderImpl;
 import gov.samhsa.consent2share.c32.C32Parser;
 import gov.samhsa.consent2share.showcase.infrastructure.C32Getter;
 import gov.samhsa.consent2share.showcase.service.EhrNumOneDto;
@@ -76,9 +77,7 @@ public class PushC32Controller {
 		directEmailSendRequest.setC32(segmentedC32Xml);
 
 		mailService = new MailServiceImpl();
-		WSClient client = new WSClient(endPointAddress);
-		// WSClient client = new WSClient(endPointAddress, new
-		// CredentialProvider());
+		PepWebServiceClient client = new PepWebServiceClient(endPointAddress, new CredentialProviderImpl());
 
 		DirectEmailSendResponse response = client
 				.directEmailSend(directEmailSendRequest);

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>access-control-service</artifactId>
-		<version>0.5.0-SNAPSHOT</version>
+		<version>0.6.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>common-library</artifactId>
 
@@ -37,7 +37,16 @@
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 		</dependency>
-
+		<dependency>
+		    <groupId>commons-beanutils</groupId>
+		    <artifactId>commons-beanutils</artifactId>
+		    <exclusions>
+		    	<exclusion>
+		    		<artifactId>commons-logging</artifactId>
+		    		<groupId>commons-logging</groupId>
+		    	</exclusion>
+		    </exclusions>		    
+		</dependency>
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
@@ -98,6 +107,8 @@
 							<exclude>gov/samhsa/acs/common/validation/exception/*.class</exclude>
 							<exclude>gov/samhsa/acs/common/bean/XacmlResult.class</exclude>
 							<exclude>gov/samhsa/acs/common/validation/LSInputImpl.class</exclude>
+							<exclude>gov/samhsa/acs/common/log/*.class</exclude>
+							<exclude>gov/samhsa/acs/common/tool/exception/*.class</exclude>							
 <!-- 							The following classes are excluded because they are never referenced. -->
 							<exclude>gov/samhsa/acs/common/util/DecryptTool.class</exclude>
 <!-- 							The following class is excluded because it seems like a temporary solution and it's only used in test case. -->

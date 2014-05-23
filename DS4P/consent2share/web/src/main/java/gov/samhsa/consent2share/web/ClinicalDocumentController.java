@@ -28,11 +28,15 @@ package gov.samhsa.consent2share.web;
 import gov.samhsa.acs.common.validation.XmlValidation;
 import gov.samhsa.acs.common.validation.exception.InvalidXmlDocumentException;
 import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
+import gov.samhsa.consent2share.infrastructure.eventlistener.EventService;
 import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.ClamAVService;
 import gov.samhsa.consent2share.infrastructure.security.RecaptchaService;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
+import gov.samhsa.consent2share.infrastructure.securityevent.FileDownloadedEvent;
+import gov.samhsa.consent2share.infrastructure.securityevent.FileUploadedEvent;
+import gov.samhsa.consent2share.infrastructure.securityevent.MaliciousFileDetectedEvent;
 import gov.samhsa.consent2share.service.clinicaldata.ClinicalDocumentService;
 import gov.samhsa.consent2share.service.dto.ClinicalDocumentDto;
 import gov.samhsa.consent2share.service.dto.LookupDto;
@@ -102,6 +106,9 @@ public class ClinicalDocumentController implements InitializingBean
 	@Autowired
 	RecaptchaService recaptchaUtil;
 	
+	@Autowired
+	EventService eventService;
+	
 	/** The xml validator. */
 	private XmlValidation xmlValidator;
 
@@ -167,12 +174,17 @@ public class ClinicalDocumentController implements InitializingBean
             @RequestParam("name") String documentName,
             @RequestParam("description") String description,
             @RequestParam("documentType") String documentTypeCode) {
-		if(scanMultipartFile(file)!=true)
+		if(scanMultipartFile(file)!=true) {
+			eventService.raiseSecurityEvent(new MaliciousFileDetectedEvent(request.getRemoteAddr(),
+					userContext.getCurrentUser().getUsername(),documentName));
 			return "redirect:/patients/clinicaldocuments.html?notify=virus_detected";
+		}
 		if(clinicalDocumentService.isDocumentOversized(file))
 			return "redirect:/patients/clinicaldocuments.html?notify=size_over_limits";
 		if(clinicalDocumentService.isDocumentExtensionPermitted(file)==false)
 			return "redirect:/patients/clinicaldocuments.html?notify=extension_not_permitted";
+		if(request.getParameter("recaptcha_challenge_field")==null)
+			return "redirect:/patients/clinicaldocuments.html?notify=wrong_captcha";
 		if(recaptchaUtil.checkAnswer(request.getRemoteAddr(), 
 				request.getParameter("recaptcha_challenge_field"), 
 				request.getParameter("recaptcha_response_field"))==false)
@@ -200,6 +212,7 @@ public class ClinicalDocumentController implements InitializingBean
 				clinicalDocumentDto.setClinicalDocumentTypeCode(clinicalDocumentTypeCode);
 				
 				clinicalDocumentService.saveClinicalDocument(clinicalDocumentDto);
+				eventService.raiseSecurityEvent(new FileUploadedEvent(request.getRemoteAddr(),username,documentName));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -230,6 +243,7 @@ public class ClinicalDocumentController implements InitializingBean
 	            IOUtils.copy(new ByteArrayInputStream(clinicalDocumentDto.getContent()), out);
 	            out.flush();
 	            out.close();
+	            eventService.raiseSecurityEvent(new FileDownloadedEvent(request.getRemoteAddr(),userContext.getCurrentUser().getUsername(),"Clinical_Document_"+directDocumentId));
 	         
 	        } catch (IOException e) {
 	            e.printStackTrace();
@@ -275,14 +289,16 @@ public class ClinicalDocumentController implements InitializingBean
 		this.xmlValidator=new XmlValidation(this.getClass().getClassLoader().getResourceAsStream(C32_CDA_XSD_PATH + C32_CDA_XSD_NAME),C32_CDA_XSD_PATH);
 	}
 
-	ClinicalDocumentController(
+	
+    
+	public ClinicalDocumentController(
 			ClinicalDocumentService clinicalDocumentService,
 			PatientService patientService,
 			ClinicalDocumentTypeCodeService clinicalDocumentTypeCodeService,
 			UserContext userContext,
 			AccessReferenceMapper accessReferenceMapper,
 			ClamAVService clamAVUtil, RecaptchaService recaptchaUtil,
-			XmlValidation xmlValidator) {
+			EventService eventService, XmlValidation xmlValidator) {
 		super();
 		this.clinicalDocumentService = clinicalDocumentService;
 		this.patientService = patientService;
@@ -291,9 +307,10 @@ public class ClinicalDocumentController implements InitializingBean
 		this.accessReferenceMapper = accessReferenceMapper;
 		this.clamAVUtil = clamAVUtil;
 		this.recaptchaUtil = recaptchaUtil;
+		this.eventService = eventService;
 		this.xmlValidator = xmlValidator;
 	}
-	
+
 	@SuppressWarnings("unused")
 	private ClinicalDocumentController() {
 	}

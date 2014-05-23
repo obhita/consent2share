@@ -36,6 +36,7 @@ import gov.samhsa.consent2share.domain.patient.Patient;
 import gov.samhsa.consent2share.domain.patient.PatientRepository;
 import gov.samhsa.consent2share.domain.reference.AdministrativeGenderCodeRepository;
 import gov.samhsa.consent2share.infrastructure.EmailType;
+import gov.samhsa.consent2share.infrastructure.eventlistener.EventService;
 import gov.samhsa.consent2share.infrastructure.security.EmailAddressNotExistException;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.infrastructure.security.UsernameNotExistException;
@@ -93,7 +94,7 @@ public class AccountServiceImpl implements AccountService {
 	
 	/** The users repository. */
 	private UsersRepository usersRepository;
-
+	
 	/**
 	 * Instantiates a new account service impl.
 	 *
@@ -162,7 +163,7 @@ public class AccountServiceImpl implements AccountService {
 
 		userContext.setCurrentUser(signupDto.getUsername());
 		
-		String token = createEmailToken(signupDto.getUsername(), signupDto.getEmail());	
+		String token = createEmailToken(signupDto.getUsername(), signupDto.getEmail());
 		
 		emailSender.sendMessage(
 				signupDto.getFirstName() + " " + signupDto.getLastName(),

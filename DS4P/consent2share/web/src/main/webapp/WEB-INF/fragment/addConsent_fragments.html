@@ -180,20 +180,6 @@
 																	</div>
 																</div>
 															</div>
-
-															<!-- editing existing consent -->
-															<!-- 																<div th:if="${!addConsent}"> -->
-															<!-- 																	<div th:each="individualProvider:${individualProvidersDto}"> -->
-															<!-- 														        		<label for="inidividualProvider" th:for="'from'+${individualProvider.npi}" class="checkbox"> -->
-															<!-- 																		<input class="toDiscloseList" id="inidividualProvider" th:field="*{providersPermittedToDiscloseNpi}" th:id="${individualProvider.npi}" value="1234567890" th:value="${individualProvider.npi}" type="checkbox" name="individualConsentAuthorizedFrom" style="float: none;"/><span th:text="${individualProvider.lastName+', '+individualProvider.firstName}"> Doe, John</span> -->
-															<!-- 																		</label> -->
-															<!-- 																	</div> -->
-															<!-- 																	<div th:each="organizationalProvider:${organizationalProvidersDto}"> -->
-															<!-- 														        		<label for="organizationalProvider" th:for="'from'+${organizationalProvider.npi}" class="checkbox"> -->
-															<!-- 																		<input class="toDiscloseList" id="organizationalProvider" th:field="*{organizationalProvidersPermittedToDiscloseNpi}" th:id="${organizationalProvider.npi}" value="1234567890" th:value="${organizationalProvider.npi}" type="checkbox" name="organizationalConsentAuthorizedFrom"  style="float: none;"/><span th:text="${organizationalProvider.orgName}"> Doe, John</span> -->
-															<!-- 																		</label> -->
-															<!-- 																	</div> -->
-															<!-- 																</div> -->
 														</div>
 														<!-- <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save changes</button> -->
 														<span class="btn-left-align" style="margin-left: 14px;"><button
@@ -475,7 +461,7 @@
 							<!-- end ADD PROVIDER Search modal -->
 							
 							<!-- Provider Search modal -->                        		
-										                           		<div id="provider_search_modal" class="modal fade">
+										                           		<div th:if="${isProviderAdminUser eq false}" id="provider_search_modal" class="modal fade">
 										                           			<div class="modal-dialog">
 																      			<div class="modal-content">
 																        			<div class="modal-header">
@@ -509,11 +495,11 @@
 								style="vertical-align: top;">
 								<div id="consent-arrow" class="fa fa-arrow-right"></div>
 							</div>
-
-
-							<a href="#disclose-modal" role="button"
+							
+							
+							<a href="#disclose-modal" role="button" data-toggle="modal"
 								class="consent-disclose-box"
-								data-edit-button="#edit1,#content1" data-toggle="modal">
+								data-edit-button="#edit1,#content1">
 								<div id="consent-to" class="summary-border">
 									<div class="form-inline">
 										<p>
@@ -524,6 +510,8 @@
 									</div>
 								</div>
 							</a>
+							
+							
 							<!-- DISCLOSE MODAL-START -->
 							<div id="disclose-modal" class="modal fade" tabindex="-1"
 								role="dialog" aria-labelledby="disclose-modal"
@@ -659,6 +647,153 @@
 								</div>
 							</div>
 							<!-- DISCLOSE MODAL - END -->
+							
+							<div th:if="${isProviderAdminUser eq true}" class="wizard" id="add_disclose_provider_wiz" data-title="Disclosure">
+								<div class="wizard-card" data-cardname="card_search_for_prov_1" data-validate="validProviderSearchForm">
+    								<h3>Search For Providers</h3>
+    								<div id="page-subcontent-holder" role="main" class="col-md-10 col-sm-9">
+								                <div class="row">
+								                    <!-- !SECTION: Provider Lookup -->
+								                    <div>										                 
+											            <section class="">
+											                 <fieldset> 
+												                    <div class="required-info-group">
+																	<div class="form-group top-margin10">					
+													                    <div class="panel-group" id="accordion3">
+														                    <div class="panel panel-default" >
+															                    <div class="panel-heading" >
+								  									                <div class="panel-title accordion-header-style" >    
+																	                	<a id="expand1" class="collapsed"  data-toggle="collapse" data-parent="#accordion3" href="#accord3_collapseOne">
+																	                		<span id="expandTriangle1">&#x25B6;</span> Search by: Provider location
+																                    	</a>
+																					</div>
+																				</div>						            	 
+																					<div id="accord3_collapseOne" class="panel-collapse collapse">
+																					
+																				      <div class="panel-body"> 
+																				        <div>
+																					        <div class="alert alert-warning">
+																					        	<button type="button" class="close" data-dismiss="alert">&times;</button>
+																					         	<span>Enter the provider State, City or Zip Code to search</span>
+																						    </div>
+																					        <form>
+																								<div class="control-group" >
+																								
+																								<div style="margin-left:0px; padding: 10px 15px;" class="username-container">
+																		                            <label for="state">State</label> 
+																									<select id="state_name"  class="form-control">
+																									<option selected="selected" value="">--- Please Select ---</option>
+																									<option th:each="addressState : ${stateCodes}" th:value="${addressState.code}" th:text="${addressState.displayName}">Alabama</option>
+																									</select>	
+																		                            
+																		                            <label for="city_name">City <span style="font-size: small; color: #8a8a8a;"><em>(not required)</em></span></label>
+																		                            <input id="city_name" name="cityname" type="text" class="form-control" /> 
+																									<span id="city_client_error_text" class="required-text" style="display: none;">The length of city name cannot be less than 3.</span>
+																		                       						                            
+																								</div>
+								
+								
+								
+																									<p style="font-weight:600; margin:5px 0 8px 20px;">OR</p>
+																									<label for="zip_code">Zip Code</label>
+																									<input id="zip_code" name="zipcode" type="text" class="form-control"/>
+																									<span id="zip_client_error_text" class="required-text" style="display: none;">Please provide a valid zip code.</span>
+																		                       </div>
+																		                       <button type="button" class="btn btn-default " style="margin: 10px 10px 0 0;" onclick="clearLocation()">Clear</button>
+																		                       
+																							</form>												     	
+																					        </div>
+																				        </div>
+																				    </div>
+															                    
+													                        </div>    
+														                    <div class="panel panel-default" >
+															                    <div class="panel-heading">
+																	                <div class="panel-title accordion-header-style">
+																	                	<a id="expand2" class="collapsed" data-toggle="collapse" data-parent="#accordion3" href="#accord3_collapseTwo" >
+																		                	<span id="expandTriangle2">&#x25B6;</span> Search by: Provider name and other criteria
+																	                    </a>
+																	               </div>
+																               </div>
+								
+																                    <div id="accord3_collapseTwo" class="panel-collapse collapse">
+																				      <div class="panel-body">
+																				        <div>
+																					        <div class="alert alert-warning">
+																					        	<button type="button" class="close" data-dismiss="alert">&times;</button>
+																					         	<span>Enter Last Name/Facility, Phone, or Specialty.</span>
+																						    </div>
+													        				                <div class="control-group">
+																								<label for="last_name">Last Name / Facility Name</label>
+																	                            <input id="last_name" name="lastname" type="text" class="form-control"/>
+																								<span id="lname_client_error_text" class="required-text" style="display: none;">Please provide a valid last name.</span>
+																	                                   		
+																								<label for="first_name">First Name</label>
+																	                            <input id="first_name" name="firstname" type="text" class="form-control"/>       		
+																								<span id="fname_client_error_text" class="required-text" style="display: none;">Please provide a valid first name.</span>
+																								
+																								<label for="gender">Gender</label>
+																								<select id="gender" class="form-control">
+																								<option selected="selected" value="">--- Please Select ---</option>
+																								<option th:each="gender : ${administrativeGenderCodes}" th:value="${gender.code}" th:text="${gender.displayName}">F</option>
+																								</select>
+																								
+								<!-- 																<label for="gender">Gender</label> -->
+								<!-- 									                            <input id="gender" name="gender" type="text" class="form-control"/>       		 -->
+																								<label for="specialty">Specialty</label>
+																	                            <input id="specialty" name="specialty" type="text" class="form-control"/>       		
+																								<label for="phone">Phone</label>
+																	  							<div class="form-group">
+																	  							<input style="width:3em" maxlength="3" id="phone1" name="phone" type="text" class="form-control force-inline"/>
+																	                            <input style="width:3em" maxlength="3" id="phone2" size="3" name="phone" type="text" class="form-control force-inline"/>
+																	                            <input style="width:4em" maxlength="4" id="phone3" size="4" name="phone" type="text" class="form-control force-inline"/>       		
+																								</div>
+																								<span id="phone_client_error_text" class="required-text" style="display: none;">Please provide a valid phone number.</span>
+																	                       </div>
+																	                       <button type="button" class="btn btn-default" style="margin: 10px 10px 0 0;" onclick="clearName()">Clear</button>		
+																                       </div>
+																				      </div>
+																				    </div>
+															                    
+														                    </div> 
+																		</div>
+																		<span id="empty_client_error_text" class="required-text" style="display: none;">Please input at least one search criteria.</span>
+																	</div>
+																	</div>
+															</fieldset>                     
+													<!-- !Search Results  -->
+								                        </section>
+								                    </div><!-- end box col-md-9 -->
+								                </div><!-- end row -->
+								        </div><!-- end col-md-10-->
+
+								</div>
+								
+								
+								
+								
+								<div class="wizard-card" data-cardname="card_search_results">
+									<h3>Search Results</h3>
+									<div>
+										<div id="Pagination" class="pagination" style="display: none;"> </div> 
+		
+				                        <div class="control-group">
+										<!-- Results -->	
+				                        <div class="controls col-sm-12 no-pad">
+				                        	<p id="noResult" style="display: none;">Sorry, no results found.</p>
+				                        	<p id="noResponse" style="display: none;">Sorry, no response received from provider web service. Please try again.</p>
+				                            <div id="resultList" hidden="true">
+				                            		<dt>Search Results</dt>
+				                            </div>
+				                        </div>
+				                        <!-- Buttons -->	
+				                        <div class="search-loading hide"></div>
+				                        </div>
+			                        </div>
+		                        </div>
+								
+							</div>
+							
 
 						</section>
 						<div class="clearfix"></div>
@@ -1299,10 +1434,7 @@
 														th:text="#{start}">Consent Start</span></label>
 													<div class="input-group datepicker"
 														data-date-format="mm/dd/yyyy">
-														<span th:if="${addConsent}"> <input
-															class="datepicker" id="date-picker-start"
-															name="consentStart" style="z-index: 100;" value="" />
-														</span> <span th:unless="${addConsent}"> <input
+														<span> <input
 															class="datepicker" id="date-picker-start"
 															name="consentStart" style="z-index: 100;"
 															th:value="${consentDto.consentStart}" />
@@ -1320,10 +1452,7 @@
 														th:text="#{end}">Consent End</span></label>
 													<div class="input-group datepicker date"
 														data-date-format="mm/dd/yyyy">
-														<span th:if="${addConsent}"> <input
-															class="datepicker" id="date-picker-end"
-															name="consentEnd" style="z-index: 100;" value="" />
-														</span> <span th:unless="${addConsent}"> <input
+														<span> <input
 															class="datepicker" id="date-picker-end"
 															name="consentEnd" style="z-index: 100;"
 															th:value="${consentDto.consentEnd}" />
@@ -1371,7 +1500,7 @@
 							  <div class="modal-dialog">
 							    <div class="modal-content">
 							      <div class="modal-header">
-							        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
 							        <h4 class="modal-title" id="consentValidationLabel">Please review results below.</h4>
 							      </div>
 							      <div class="modal-body">

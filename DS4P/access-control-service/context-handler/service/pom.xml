@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>context-handler</artifactId>
-		<version>0.5.0-SNAPSHOT</version>
+		<version>0.6.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>context-handler-service</artifactId>
@@ -18,6 +18,11 @@
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>common-library</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>audit-service</artifactId>
+		</dependency>		
 
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
@@ -108,6 +113,7 @@
 					<instrumentation>
 						<excludes>
 							<exclude>gov/va/ehtac/ds4p/ws/*.class</exclude>
+							<exclude>gov/samhsa/acs/contexthandler/exception/*.class</exclude>
 						</excludes>
 						<ignoreMethodAnnotation>gov.samhsa.acs.common.cobertura.CoverageIgnore</ignoreMethodAnnotation>
 					</instrumentation>

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>consent2share</artifactId>
-		<version>0.5.0-SNAPSHOT</version>
+		<version>0.6.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>consent2share-web</artifactId>
@@ -347,6 +347,38 @@
 
 	<build>
 		<finalName>consent2share</finalName>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/Consent2share_PCM/logback-audit.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
 	</build>
 
 	<profiles>
@@ -453,11 +485,11 @@
 							<url>${maven.database.url}</url>
 							<username>${maven.database.username}</username>
 							<password>${maven.database.password}</password>
-							<!-- You can comment out username/password configurations and have 
+							<!-- You can comment out username/password configurations and have
 								maven to look them up in your settings.xml using ${settingsKey} -->
 							<settingsKey>sensibleKey</settingsKey>
-							<!-- sql-maven-plugin which skip the execution for projects of packaging 
-								type 'pom' as default behaviour. It is same a few plugins like the source 
+							<!-- sql-maven-plugin which skip the execution for projects of packaging
+								type 'pom' as default behaviour. It is same a few plugins like the source
 								and javadoc plugin (amongst others) -->
 							<forceMojoExecution>true</forceMojoExecution>
 						</configuration>
@@ -561,7 +593,7 @@
 							<useTestClasspath>true</useTestClasspath>
 						</configuration>
 						<executions>
-							<!-- At pre-integration-test phase, run the war in an embedded Tomcat 
+							<!-- At pre-integration-test phase, run the war in an embedded Tomcat
 								server. -->
 							<execution>
 								<id>start-tomcat</id>

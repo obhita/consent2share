@@ -2,6 +2,7 @@ package gov.samhsa.acs.documentsegmentation.ws;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
 import gov.samhsa.acs.documentsegmentation.DocumentSegmentation;
 import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
@@ -14,9 +15,11 @@ import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentRespo
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.junit.Assert;
 
@@ -25,6 +28,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.audit.AuditException;
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 public class DocumentSegmentationImplEndpointTest {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -36,6 +45,7 @@ public class DocumentSegmentationImplEndpointTest {
 	private static QName serviceName;
 
 	private static DocumentSegmentation documentSegmentationMock = mock(DocumentSegmentation.class);
+	private static XacmlRequest xacmlRequestMock = mock(XacmlRequest.class);
 
 	static {
 		serviceName = new QName(
@@ -45,7 +55,12 @@ public class DocumentSegmentationImplEndpointTest {
 
 	@Before
 	public void setUp() throws Exception {
-		address = "http://localhost:12345/services/DocumentSegmentationService";
+		Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
+    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
+    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+
+        address = String.format("http://localhost:%s/services/DocumentSegmentationService", portNumber);
+        
 		wsdlURL = new URL(address + "?wsdl");
 		segmentDocumentResponse = new SegmentDocumentResponse();
 
@@ -66,9 +81,9 @@ public class DocumentSegmentationImplEndpointTest {
 		}
 	}
 
-	@Test
+	@Test(expected = SOAPFaultException.class)
 	public void processDocumentWorksWithGeneratedServiceAndSei()
-			throws MalformedURLException, InvalidOriginalClinicalDocumentException, InvalidSegmentedClinicalDocumentException, XmlDocumentReadFailureException {
+			throws MalformedURLException, InvalidOriginalClinicalDocumentException, InvalidSegmentedClinicalDocumentException, XmlDocumentReadFailureException, AuditException {
 		DocumentSegmentationService service = new DocumentSegmentationService(
 				wsdlURL, serviceName);
 		DocumentSegmentationServicePortType port = service
@@ -77,7 +92,7 @@ public class DocumentSegmentationImplEndpointTest {
 
 		when(
 				documentSegmentationMock.segmentDocument(null, null, false,
-						false, null, null, null)).thenReturn(
+						false, null, null, null,xacmlRequestMock, false)).thenReturn(
 				segmentDocumentResponse);
 
 		SegmentDocumentResponse response = port.segmentDocument(request);

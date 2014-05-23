@@ -203,31 +203,30 @@ function setupPage(addConsent_tmp, isProviderAdminUser_tmp, specMedSetObj_tmp) {
 
 	
 	$("body").removeClass('fouc_loading');
-
-	
-	$("ul#pulldown_menu").sidebar({
-		position:"top",
-		open:"click",
-		close:"click",
-		//labelText:"GUIDE",
-		callback: {
-        	item : {
-            	enter : function(){},
-                leave : function(){}
-        	},
-        	sidebar : {
-            	open : function(){},
-                close : function(){}
-        	}	
-    	},
-    	inject : $("<div><span>GUIDE</span></div>")
-	});
-
-
-	$("div.sidebar-container").addClass("guide-pulldown-tab");
-	$("div.sidebar-inject.top > span").addClass("sidebar-label");
 	
 	if(!isProviderAdminUser){
+		$("ul#pulldown_menu").sidebar({
+			position:"top",
+			open:"click",
+			close:"click",
+			//labelText:"GUIDE",
+			callback: {
+	        	item : {
+	            	enter : function(){},
+	                leave : function(){}
+	        	},
+	        	sidebar : {
+	            	open : function(){},
+	                close : function(){}
+	        	}	
+	    	},
+	    	inject : $("<div><span>GUIDE</span></div>")
+		});
+
+
+		$("div.sidebar-container").addClass("guide-pulldown-tab");
+		$("div.sidebar-inject.top > span").addClass("sidebar-label");
+		
 		$('#tourtest').joyride({
 		    tipContainer: '#consent-add-main',
 		    heightPadding: $('footer').outerHeight() + 10,
@@ -421,29 +420,32 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 				lastProviderState={};
 				
 				/********* Initialize Date Picker **********/
-				var dateTemp;
-				var startDate;
-				var endDate;
+				var dateStartTemp = new Date();
+				var dateEndTemp = new Date();
+				var startDate = new Date();
+				var endDate = new Date();
 				
-				if (addConsent === true) {				
-			        dateTemp = new Date();
-			        startDate = new Date(dateTemp.getFullYear(), dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
-			        endDate=new Date(dateTemp.getFullYear()+1, dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
-			        
-			        // set end date as a day minus 1 year
-			        endDate.setDate(endDate.getDate() - 1);
-				} else {
-					dateTemp = new Date($('#date-picker-start').attr('value'));
-					startDate = new Date(dateTemp.getFullYear(), dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
-					dateTemp = new Date($('#date-picker-end').attr('value'));
-					endDate =new Date(dateTemp.getFullYear(), dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
-					
-					var intAryLength = $(specMedSet).length;
-					
-					for(var i = 0; i < intAryLength; i++){
-						initSpecMedInfoArray(specMedSet[i]);
-					}
+				if(isProviderAdminUser !== true){
+					dateStartTemp = new Date($('#date-picker-start').attr('value'));
+					dateEndTemp = new Date($('#date-picker-end').attr('value'));
 				}
+				
+				startDate = new Date(dateStartTemp.getFullYear(), dateStartTemp.getMonth(), dateStartTemp.getDate(), 0, 0, 0, 0);
+				endDate = new Date(dateEndTemp.getFullYear(), dateEndTemp.getMonth(), dateEndTemp.getDate(), 0, 0, 0, 0);
+				
+				if(isProviderAdminUser === true){
+					// set end date as plus 1 year
+					endDate.setFullYear(endDate.getFullYear()+1, endDate.getMonth(), endDate.getDate());
+					// set end date as a day minus 1 year
+					endDate.setDate(endDate.getDate() - 1);
+				}
+				
+				var intAryLength = $(specMedSet).length;
+				
+				for(var i = 0; i < intAryLength; i++){
+					initSpecMedInfoArray(specMedSet[i]);
+				}
+				
 				
 		        $('#date-picker-start').datepicker('setValue',startDate);
 		        $('#date-picker-start').attr('value',$('#date-picker-start').attr('value'));
@@ -452,7 +454,24 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 			    $('#date-picker-end').attr('value',$('#date-picker-end').attr('value'));
 			    
 			    /********* End Inititialize Date Picker **********/
+				
+			    loadAllPurposeofshareform();
+			    
+			    // disable providers in made to list that are checked in to disclose list
+				$(".isMadeToList").each(function(){
+					var providerId=$(this).attr("id").substr(2,$(this).attr("id").length-2);
+					if($("#from"+providerId).prop('checked')==true){
+						toggleToProviderDisabled(providerId);
+					}
+				}); 
 				 
+				// disable providers in to disclose list that are checked in to made list
+				$(".toDiscloseList").each(function(){
+					var providerId=$(this).attr("id").substr(4,$(this).attr("id").length-4);
+					if($("#to"+providerId).prop('checked')==true){
+						toggleFromProviderDisabled(providerId);
+					}
+				});
 			    
 			    //Check if adding or editing consent
 			    if (addConsent === true) {
@@ -463,26 +482,8 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 					//EDITING CONSENT:
 					
 					loadAllSharePreferences();
-					loadAllPurposeofshareform();
 					loadAllLastSpecificMedicalInfoState();
 					
-					// disable providers in made to list that are checked in to disclose list
-					$(".isMadeToList").each(function(){
-						var providerId=$(this).attr("id").substr(2,$(this).attr("id").length-2);
-						if($("#from"+providerId).prop('checked')==true){
-							toggleToProviderDisabled(providerId);
-						}
-					}); 
-					 
-					// disable providers in to disclose list that are checked in to made list
-					$(".toDiscloseList").each(function(){
-						var providerId=$(this).attr("id").substr(4,$(this).attr("id").length-4);
-						if($("#to"+providerId).prop('checked')==true){
-							toggleFromProviderDisabled(providerId);
-						}
-					});
-					
-					 
 					if (areAllInfoUnSelected()) {
 						$("#allInfo").iCheck("check");
 						$("#edit1").hide();
@@ -533,7 +534,8 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 							}
 						});
 					}
-					 
+					
+					//FIXME (MH): REMOVE THE FOLLOWING IF/ELSE CODE BLOCK AS IT IS OBSOLETE
 					if (areAllPurposesUnselected()) {
 						$("#allPurposes").iCheck("check");
 					}
@@ -541,17 +543,17 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 						$("#selectPurposes").iCheck("check");
 					}
 				}
-				 
+			    
 				// check all only if page is add consent (not edit)
-				if (addConsent == true) {
-					uncheckAllSharePreferences(loadAllSharePreferences);
-					checkRecommendedPurposeofsharing(loadAllPurposeofshareform);
-				}
-				else {
+				if (addConsent === false) {
 					loadAllSharePreferences();
-					loadAllPurposeofshareform();
+				}else{
+					if(isProviderAdminUser === true){
+						checkRecommendedPurposeofsharing();
+					}
 				}
 				
+				loadAllPurposeofshareform();
 				loadAllProviders();
 				
 				reAppendMediInfoBadges();
@@ -636,20 +638,7 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 						});
 						
 						$('#formToBeSubmitted').submit();
-
-						//#ISSUE 138 Fix Start
-						// Loop through all forms and reset the checked values by its id or class attributes
-						$("form").each(function(e){
-							//var idN = this.id;
-							//var classN =  $(this).attr('class');							
-							if( $(this).attr('id') !== undefined ) {
-								clearConsent('#idN');														
-							}
-							if( $(this).attr('class') !== undefined ) {
-								clearConsent('.classN');									
-							}	
-						});	
-						//#ISSUE 138 Fix End						
+						
 					}else{
 						$('div.navbar-inner-header').after("<div class='validation-alert'><span><div class='alert alert-danger rounded'><button type='button' class='close' data-dismiss='alert'>&times;</button>You must add provider(s).</div></span></div>");
 					}
@@ -686,9 +675,9 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 				        },
 				        error: function(jqXHR, textStatus, errorThrown) 
 				        {
-				        	
 				        	//TODO (MH): Handle different error types from controller
-				        	populateModalData(jqXHR.responseText);
+				        	resetFormToBeSubmitted();
+				        	populateModalData(jqXHR.responseText, isProviderAdminUser);
 				        	$('div#consent_validation_modal').modal();
 				        }
 				    });
@@ -1003,6 +992,15 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 					return rawString;
 				}
 				
+				function checkRecommendedPurposeofsharing(callback){
+					$("#TREAT").iCheck('check');
+					$("#ETREAT").iCheck('check');
+					$("#CAREMGT").iCheck('check');
+					if(typeof callback === 'function'){
+						callback();
+					}
+				}
+				
 				function loadAllSharePreferences(){
 					$(".inputform input").each(function(){
 						if($(this).prop("id")!=null)
@@ -1049,14 +1047,6 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 						$("#entry"+entryId).remove();
 					});
 					
-				}
-				
-				function checkRecommendedPurposeofsharing(callback){
-					$("#TREAT").iCheck('check');
-					$("#ETREAT").iCheck('check');
-					$("#CAREMGT").iCheck('check');
-					if(typeof callback === 'function')
-						callback();
 				}
 				
 				function uncheckAllMedicalInfo(callback){
@@ -1224,6 +1214,10 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
  * GLOBAL SCOPE FUNCTIONS
 ***********************************************************************************/
 
+function resetFormToBeSubmitted(){
+	$("form#formToBeSubmitted > input:not(input[name='_csrf'], input#patientUsername, input#patientId, input#consentId)").remove();
+}
+
 function loadAllProviders(){
 	$(".inputformPerson input.toDiscloseList").each(function(){
 		if($(this).prop("id")!=null)
@@ -1351,7 +1345,7 @@ function clearConsent(form){
 	
 }
 //#ISSUE 138 Fix End
-function populateModalData(jsonObj) {
+function populateModalData(jsonObj, isProviderAdminUser) {
 	//TODO (MH): Add try/catch block for JSON.parse
 	var validationDataObj = JSON.parse(jsonObj);
 	
@@ -1421,25 +1415,12 @@ function populateModalData(jsonObj) {
 	//Bind new click event handler to "View Existing Consent" button
 	$('div#pnl_existing_consent button#btn_view_existing_consent').on("click", function(e){
 		e.preventDefault();
-		window.location.href="listConsents.html?duplicateconsent=" + existing_consent_id + "#jump_consent_" + existing_consent_id;
+		
+		if(isProviderAdminUser === true){
+			var patientId = $('input#patientId').val();
+			window.location.href="adminPatientView.html?duplicateconsent=" + existing_consent_id + "&id=" + patientId;
+		}else{
+			window.location.href="listConsents.html?duplicateconsent=" + existing_consent_id + "#jump_consent_" + existing_consent_id;
+		}
 	});
-}
-
-/**
- * Convert array into a string of HTML code defining an unordered list
- * 
- * @param {array} in_array - array to convert
- * @returns {String} out_string - returned string
- */
-function arrayToUlString(in_array){
-	var ary_len = in_array.length;
-	var out_string = "<ul>";
-	
-	for(var i = 0; i < ary_len; i++){
-		out_string = out_string.concat("<li>" + in_array[i] + "</li>");
-	}
-	
-	out_string = out_string.concat("</ul>");
-	
-	return out_string;
 }

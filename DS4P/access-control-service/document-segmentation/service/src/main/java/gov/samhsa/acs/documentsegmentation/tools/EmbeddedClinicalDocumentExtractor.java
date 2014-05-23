@@ -25,6 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.tools;
 
+import gov.samhsa.acs.documentsegmentation.tools.exception.DocumentSegmentationException;
+
 /**
  * The Interface EmbeddedClinicalDocumentExtractor.
  */
@@ -36,10 +38,10 @@ public interface EmbeddedClinicalDocumentExtractor {
 	 * @param factModel
 	 *            the fact model
 	 * @return the string
-	 * @throws Exception
-	 *             the exception
+	 * @throws DocumentSegmentationException
+	 *             the document segmentation exception
 	 */
 	public abstract String extractClinicalDocumentFromFactModel(String factModel)
-			throws Exception;
+			throws DocumentSegmentationException;
 
 }

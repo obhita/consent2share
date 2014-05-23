@@ -35,7 +35,9 @@ import gov.samhsa.ds4ppilot.schema.pep.RegisteryStoredQueryResponse;
 import gov.samhsa.ds4ppilot.schema.pep.RetrieveDocumentSetRequest;
 import gov.samhsa.ds4ppilot.schema.pep.RetrieveDocumentSetResponse;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -45,6 +47,9 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 public class FilterC32WebServiceClientTest {
 
@@ -63,8 +68,13 @@ public class FilterC32WebServiceClientTest {
 	private final String wsdlFileName = "FilterC32Service.wsdl";
 
 	@BeforeClass
-	public static void setUp() {
-		address = "http://localhost:12345/services/FilterC32Service";
+	public static void setUp() throws Throwable {
+		Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
+    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
+    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+
+        address = String.format("http://localhost:%s/Pep/services/FilterC32Service", portNumber);
+        
 		ep = Endpoint.publish(address, new FilterC32ServicePortTypeImpl());
 		
 		FilterC32ServicePortTypeImpl.returnedValueOfRetrieveDocumentSet = returnedValueOfRetrieveDocumentSet;

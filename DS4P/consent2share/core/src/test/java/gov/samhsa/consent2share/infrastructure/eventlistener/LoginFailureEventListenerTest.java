@@ -15,6 +15,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
+
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -22,6 +24,9 @@ public class LoginFailureEventListenerTest {
 	
 	@Mock
 	UsersRepository usersRepository;
+	
+	@Mock
+	EventService eventService;
 	
 	@InjectMocks
 	LoginFailureEventListener loginFailureEventListener=new LoginFailureEventListener((short)3);
@@ -32,8 +37,11 @@ public class LoginFailureEventListenerTest {
 	public void testHandle_when_account_is_not_locked() {
 		AuthenticationFailureBadCredentialsEvent loginFailureEvent=mock(AuthenticationFailureBadCredentialsEvent.class);
 		Authentication authentication=mock(Authentication.class);
+		WebAuthenticationDetails webAuthenticationDetails=mock(WebAuthenticationDetails.class);
 		Object name=new String(username);
 		when(loginFailureEvent.getAuthentication()).thenReturn(authentication);
+		when(authentication.getDetails()).thenReturn(webAuthenticationDetails);
+		when(webAuthenticationDetails.getRemoteAddress()).thenReturn("127.0.0.1");
 		when(authentication.getPrincipal()).thenReturn(name);
 		Users user=mock(Users.class);
 		when(user.getFailedLoginAttempts()).thenReturn(0);
@@ -46,9 +54,12 @@ public class LoginFailureEventListenerTest {
 	public void testHandle_when_account_is_locked() {
 		AuthenticationFailureBadCredentialsEvent loginFailureEvent=mock(AuthenticationFailureBadCredentialsEvent.class);
 		Authentication authentication=mock(Authentication.class);
+		WebAuthenticationDetails webAuthenticationDetails=mock(WebAuthenticationDetails.class);
 		Object name=new String(username);
 		when(loginFailureEvent.getAuthentication()).thenReturn(authentication);
 		when(authentication.getPrincipal()).thenReturn(name);
+		when(authentication.getDetails()).thenReturn(webAuthenticationDetails);
+		when(webAuthenticationDetails.getRemoteAddress()).thenReturn("127.0.0.1");
 		Users user=mock(Users.class);
 		when(user.getFailedLoginAttempts()).thenReturn(3);
 		when(usersRepository.loadUserByUsername(username)).thenReturn(user);

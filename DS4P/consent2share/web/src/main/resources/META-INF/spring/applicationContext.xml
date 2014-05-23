@@ -39,7 +39,13 @@
 			type="annotation" />
 	</context:component-scan>
 
-
+	<!-- Logback Audit Service -->
+	<bean name="logbackAuditServiceImpl" class="gov.samhsa.acs.audit.AuditServiceImpl"
+		scope="singleton" init-method="init" destroy-method="destroy">
+		<constructor-arg value="Consent2share_PCM" />
+	</bean>
+	<!-- Logback Audit Service Ends -->
+	
 	<bean class="org.springframework.mail.javamail.JavaMailSenderImpl"
 		id="mailSender">
 		<property name="host" value="${email.host}" />
@@ -139,9 +145,11 @@
 	<bean id="hl7v3TransformerImpl" class="gov.samhsa.consent2share.hl7.Hl7v3TransformerImpl"
 		scope="prototype" />
 	<!-- PIX Manager (PixQueryService dependencies) -->
-	<bean id="pixManagerServiceImpl" class="gov.samhsa.consent2share.pixclient.service.PixManagerServiceImpl"
+	<bean id="pixManagerServiceImpl"
+		class="gov.samhsa.consent2share.pixclient.service.PixManagerServiceImpl"
 		scope="singleton">
-		<constructor-arg index="0" value="${openEMPIWebServiceEndpointAddress}" />
+		<constructor-arg index="0"
+			value="${openEMPIWebServiceEndpointAddress}" />
 	</bean>
 	<bean id="pixManagerConstants"
 		class="gov.samhsa.consent2share.pixclient.util.PixManagerConstants"
@@ -153,10 +161,9 @@
 		class="gov.samhsa.consent2share.pixclient.util.PixManagerRequestXMLToJava"
 		scope="prototype" autowire="constructor">
 	</bean>
-	
 
-	<bean id="accessDeniedHandler" 
-		class="gov.samhsa.consent2share.web.CustomAccessDeniedHandler">
+
+	<bean id="accessDeniedHandler" class="gov.samhsa.consent2share.web.CustomAccessDeniedHandler">
 		<property name="accessDeniedUrl" value="views/dataAccessFailure.html" />
 	</bean>
 	<!-- ACS Beans End -->

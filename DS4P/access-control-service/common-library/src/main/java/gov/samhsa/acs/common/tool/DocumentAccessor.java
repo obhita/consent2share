@@ -25,9 +25,10 @@
  ******************************************************************************/
 package gov.samhsa.acs.common.tool;
 
+import gov.samhsa.acs.common.tool.exception.DocumentAccessorException;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,11 +48,11 @@ public interface DocumentAccessor {
 	 * @param xPathExpr
 	 *            the x path expr
 	 * @return the element
-	 * @throws XPathExpressionException
-	 *             the x path expression exception
+	 * @throws DocumentAccessorException
+	 *             the document accessor exception
 	 */
 	public abstract Element getElement(Document xmlDocument, String xPathExpr)
-			throws XPathExpressionException;
+			throws DocumentAccessorException;
 
 	/**
 	 * Gets the node.
@@ -61,11 +62,11 @@ public interface DocumentAccessor {
 	 * @param xPathExpr
 	 *            the x path expr
 	 * @return the node
-	 * @throws XPathExpressionException
-	 *             the x path expression exception
+	 * @throws DocumentAccessorException
+	 *             the document accessor exception
 	 */
 	public abstract Node getNode(Document xmlDocument, String xPathExpr)
-			throws XPathExpressionException;
+			throws DocumentAccessorException;
 
 	/**
 	 * Gets the node list.
@@ -75,25 +76,29 @@ public interface DocumentAccessor {
 	 * @param xPathExpr
 	 *            the x path expr
 	 * @return the node list
-	 * @throws XPathExpressionException
-	 *             the x path expression exception
+	 * @throws DocumentAccessorException
+	 *             the document accessor exception
 	 */
 	public abstract NodeList getNodeList(Document xmlDocument, String xPathExpr)
-			throws XPathExpressionException;
-	
-	
+			throws DocumentAccessorException;
+
 	/**
 	 * Gets the node list.
 	 * 
-	 * @param xmlDocument
-	 *            the xml document
-	 * @param xPathExpr
-	 *            the x path expr
+	 * @param <ProcessingInstructionImpl>
+	 *            the generic type
+	 * @param doc
+	 *            the doc
+	 * @param xslHref
+	 *            the xsl href
 	 * @return the node list
-	 * @throws XPathExpressionException
-	 *             the x path expression exception
-	 */	
-	public <ProcessingInstructionImpl> Document addingStylesheet( Document doc,String xslHref) 
-			throws TransformerConfigurationException, ParserConfigurationException	;
-	
+	 * @throws TransformerConfigurationException
+	 *             the transformer configuration exception
+	 * @throws ParserConfigurationException
+	 *             the parser configuration exception
+	 */
+	public <ProcessingInstructionImpl> Document addingStylesheet(Document doc,
+			String xslHref) throws TransformerConfigurationException,
+			ParserConfigurationException;
+
 }

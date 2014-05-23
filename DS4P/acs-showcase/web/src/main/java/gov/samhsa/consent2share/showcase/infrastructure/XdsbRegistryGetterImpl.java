@@ -57,6 +57,7 @@ public class XdsbRegistryGetterImpl implements XdsbRegistryGetter {
 	private SimpleMarshaller marshaller;
 
 	/** The xdsb registry web service client. */
+	@Autowired
 	private XdsbRegistryWebServiceClient xdsbRegistryWebServiceClient;
 
 	/**
@@ -69,8 +70,6 @@ public class XdsbRegistryGetterImpl implements XdsbRegistryGetter {
 	public XdsbRegistryGetterImpl(
 			@Value("${xdsbRegistryEndpointAddress}") String endpointAddress) {
 		this.endpointAddress = endpointAddress;
-		xdsbRegistryWebServiceClient = new XdsbRegistryWebServiceClient(
-				this.endpointAddress);
 	}
 
 	/*

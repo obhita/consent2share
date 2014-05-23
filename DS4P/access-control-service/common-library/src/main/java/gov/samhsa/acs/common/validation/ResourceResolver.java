@@ -69,7 +69,7 @@ public class ResourceResolver implements LSResourceResolver {
 		builder.append("This LSResourceResolver implementation assumes that all XSD files have a unique name. ");
 		builder.append("If you have some XSD files with same name but different content (at different paths) in your schema structure, ");
 		builder.append("this resolver will fail to include the other XSD files except the first one found.");
-		logger.warn(builder.toString());
+		logger.debug(builder.toString());
 	}
 
 	/* (non-Javadoc)

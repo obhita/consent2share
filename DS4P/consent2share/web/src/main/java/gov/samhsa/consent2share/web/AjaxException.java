@@ -16,16 +16,6 @@ public final class AjaxException extends RuntimeException {
 	
 	
 	
-	
-	/**
-	 * Default Constructor
-	 */
-	public AjaxException() {
-		super();
-		this.httpStatus = HttpStatus.OK;
-		this.setErrorMessage(null);
-	}
-	
 	/**
 	 * Constructor passing in an HttpStatus
 	 * 

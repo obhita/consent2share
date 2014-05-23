@@ -97,7 +97,6 @@ public class ConceptCodeController extends AbstractNodeController {
     public String showCreateConceptCodeForm(Model model,
     			@RequestParam(value = "panelState", required = false, defaultValue = "") String panelState){
     	
-    	List<ConceptCodeDto> conceptCodes = null;
     	ConceptCodeVSCSDto conceptCodeVSCSDto = null;
     	
     	List<CodeSystemDto> codeSystems = null;
@@ -105,7 +104,6 @@ public class ConceptCodeController extends AbstractNodeController {
     	
         LOGGER.debug("Rendering Concept Code list page");
         try {
-        	conceptCodes = conceptCodeService.findAll();
         	conceptCodeVSCSDto = conceptCodeService.create();
         	codeSystems = codeSystemService.findAll();
         	valueSets = valueSetService.findAll();
@@ -123,9 +121,7 @@ public class ConceptCodeController extends AbstractNodeController {
 			model.addAttribute("panelState", "addnew");
 		}
         
-        model.addAttribute(MODEL_ATTRIBUTE_CONCEPTCODEDTOS, conceptCodes);
         model.addAttribute(MODEL_ATTIRUTE_CONCEPTCODEVSCSDTO, conceptCodeVSCSDto);
-		//model.addAttribute(MODEL_ATTIRUTE_CONCEPTCODEDTO, conceptCodeDto);
         model.addAttribute(MODEL_ATTIRUTE_CODESYSTEMS, codeSystems);
         model.addAttribute(MODEL_ATTIRUTE_VALSETNAMES, valueSets);
         return CONCEPTCODE_LIST_VIEW;
@@ -333,9 +329,16 @@ public class ConceptCodeController extends AbstractNodeController {
         this.conceptCodeService = conceptCodeService;
     }
     
+    /**
+     * Search for concept code via AJAX call
+     * 
+     * @param searchCategory
+     * @param searchTerm
+     * @return conceptCodes
+     */
 	@RequestMapping("/conceptCode/ajaxSearchConceptCode")
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody List<ConceptCodeDto> searchValueSet(
+	public @ResponseBody List<ConceptCodeDto> searchConceptCode(
 			@RequestParam(value ="searchCategory",required = true) String searchCategory, 
 			@RequestParam(value ="searchTerm",required = true) String searchTerm) {
 		
@@ -349,6 +352,29 @@ public class ConceptCodeController extends AbstractNodeController {
 		}catch(IllegalArgumentException e){
 			conceptCodes = null;
 			throw new AjaxException(HttpStatus.BAD_REQUEST, "Unable to perform search because the request parameters contained invalid data.");
+		}catch(Exception e){
+			conceptCodes = null;
+			LOGGER.warn("An exception was caught in search ConceptCode.");
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+		}
+		
+		return conceptCodes;
+	}
+	
+	
+	/**
+	 * Get all concept codes via AJAX
+	 * 
+	 * @return conceptCodes
+	 */
+	@RequestMapping("/conceptCode/ajaxGetAllConceptCodes")
+	@ResponseStatus(HttpStatus.OK)
+	public @ResponseBody List<ConceptCodeDto> getAllConceptCodes() {
+		
+		List<ConceptCodeDto> conceptCodes = null;
+		
+		try{
+			conceptCodes = conceptCodeService.findAll();
 		}catch(Exception e){
 			conceptCodes = null;
 			LOGGER.warn("An exception was caught in search ConceptCode.");

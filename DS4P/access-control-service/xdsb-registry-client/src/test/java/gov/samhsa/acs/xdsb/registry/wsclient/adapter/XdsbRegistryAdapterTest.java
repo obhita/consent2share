@@ -16,6 +16,7 @@ import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentReference;
 import gov.samhsa.acs.xdsb.common.XdsbDocumentType;
 import gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient;
+import gov.samhsa.acs.xdsb.registry.wsclient.exception.XdsbRegistryAdapterException;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequest;
 
 import java.io.IOException;
@@ -111,14 +112,14 @@ public class XdsbRegistryAdapterTest {
 		when(
 				xdsbRegistryAdapterSpy.createRegistryStoredQueryByPatientId(
 						patientUniqueId, XDSB_DOCUMENT_TYPE_CLINICAL_DOCUMENT,
-						false)).thenReturn(adhocQueryRequest);
+						false, "")).thenReturn(adhocQueryRequest);
 		when(xdsbRegistryMock.registryStoredQuery(adhocQueryRequest))
 				.thenReturn(adhocQueryResponse);
 
 		// Act
 		AdhocQueryResponse actualResponse = xdsbRegistryAdapterSpy
 				.registryStoredQuery(patientUniqueId, null,
-						XDSB_DOCUMENT_TYPE_CLINICAL_DOCUMENT, false);
+						XDSB_DOCUMENT_TYPE_CLINICAL_DOCUMENT, false, "");
 
 		// Assert
 		assertEquals(adhocQueryResponse, actualResponse);
@@ -134,14 +135,14 @@ public class XdsbRegistryAdapterTest {
 		when(
 				xdsbRegistryAdapterSpy.createRegistryStoredQueryByPatientId(
 						patientUniqueId, XDSB_DOCUMENT_TYPE_PRIVACY_CONSENT,
-						true)).thenReturn(adhocQueryRequest);
+						true, "")).thenReturn(adhocQueryRequest);
 		when(xdsbRegistryMock.registryStoredQuery(adhocQueryRequest))
 				.thenReturn(adhocQueryResponse);
 
 		// Act
 		AdhocQueryResponse actualResponse = xdsbRegistryAdapterSpy
 				.registryStoredQuery(patientUniqueId, null,
-						XDSB_DOCUMENT_TYPE_PRIVACY_CONSENT, true);
+						XDSB_DOCUMENT_TYPE_PRIVACY_CONSENT, true, "");
 
 		// Assert
 		assertEquals(adhocQueryResponse, actualResponse);
@@ -218,7 +219,7 @@ public class XdsbRegistryAdapterTest {
 
 		// Act
 		xdsbRegistryAdapterSpy.addFormatCode(adhocQueryType,
-				XDSB_DOCUMENT_TYPE_CLINICAL_DOCUMENT);
+				XDSB_DOCUMENT_TYPE_CLINICAL_DOCUMENT, "");
 		List<SlotType1> slotList = adhocQueryType.getSlot();
 		for (SlotType1 slot : slotList) {
 			List<String> values = slot.getValueList().getValue();
@@ -241,7 +242,7 @@ public class XdsbRegistryAdapterTest {
 
 		// Act
 		xdsbRegistryAdapterSpy.addFormatCode(adhocQueryType,
-				XDSB_DOCUMENT_TYPE_PRIVACY_CONSENT);
+				XDSB_DOCUMENT_TYPE_PRIVACY_CONSENT, "");
 		List<SlotType1> slotList = adhocQueryType.getSlot();
 		for (SlotType1 slot : slotList) {
 			List<String> values = slot.getValueList().getValue();
@@ -370,6 +371,7 @@ public class XdsbRegistryAdapterTest {
 		String patientIdMock = "patientIdMock";
 		String domainIdMock = "domainIdMock";
 		String authorIdMock = "authorIdMock";
+		String messageIdMock = "messageIdMock";
 		XdsbDocumentType xdsbDocumentTypeMock = XdsbDocumentType.CLINICAL_DOCUMENT;
 		boolean serviceTimeAwareMock = false;
 		AdhocQueryResponse responseMock = new AdhocQueryResponse();
@@ -382,7 +384,7 @@ public class XdsbRegistryAdapterTest {
 		// Act
 		AdhocQueryResponse actualResponse = xdsbRegistryAdapterSpy
 				.registryStoredQuery(patientIdMock, domainIdMock, authorIdMock,
-						xdsbDocumentTypeMock, serviceTimeAwareMock);
+						xdsbDocumentTypeMock, serviceTimeAwareMock, messageIdMock);
 
 		// Assert
 		assertEquals(filteredResponseMock, actualResponse);
@@ -415,7 +417,7 @@ public class XdsbRegistryAdapterTest {
 						findSubmissionSetsResponseMock);
 		when(
 				xdsbRegistryAdapterSpy
-						.createGetSubmissionSetAndContentsRequest(extractSubmissionSetUniqueIdMock))
+						.createGetSubmissionSetAndContentsRequest(extractSubmissionSetUniqueIdMock, ""))
 				.thenReturn(getSubmissionSetAndContentsRequestMock);
 		when(
 				xdsbRegistryMock
@@ -423,19 +425,19 @@ public class XdsbRegistryAdapterTest {
 				.thenReturn(getSubmissionSetAndContentsResponseMock);
 		doReturn(deprecatedDocumentUniqueIdMock).when(xdsbRegistryAdapterSpy)
 				.extractDeprecatedDocumentUniqueId(
-						getSubmissionSetAndContentsResponseMock);
+						getSubmissionSetAndContentsResponseMock, "");
 
 		// Act
 		List<String> result = xdsbRegistryAdapterSpy
 				.findDeprecatedDocumentUniqueIds(submissionSetPatientIdMock,
-						submissionSetAuthorPersonMock);
+						submissionSetAuthorPersonMock, "");
 
 		// Assert
 		assertTrue(result.contains(deprecatedDocumentUniqueIdMock));
 	}
 
 	@Test
-	public void testFindSubmissionSets() throws JAXBException {
+	public void testFindSubmissionSets() throws JAXBException, XdsbRegistryAdapterException {
 		// Arrange
 		String submissionSetPatientIdMock = "submissionSetPatientIdMock";
 		String submissionSetAuthorPersonMock = "submissionSetAuthorPersonMock";
@@ -461,14 +463,14 @@ public class XdsbRegistryAdapterTest {
 	}
 
 	@Test
-	public void testGetSubmissionSetAndContents() throws JAXBException {
+	public void testGetSubmissionSetAndContents() throws JAXBException, XdsbRegistryAdapterException {
 		// Arrange
 		String submissionSetPatientIdMock = "submissionSetPatientIdMock";
 		AdhocQueryRequest getSubmissionSetAndContentsRequestMock = mock(AdhocQueryRequest.class);
 		AdhocQueryResponse getSubmissionSetAndContentsResponseMock = mock(AdhocQueryResponse.class);
 		when(
 				xdsbRegistryAdapterSpy
-						.createGetSubmissionSetAndContentsRequest(submissionSetPatientIdMock))
+						.createGetSubmissionSetAndContentsRequest(submissionSetPatientIdMock, ""))
 				.thenReturn(getSubmissionSetAndContentsRequestMock);
 		when(
 				xdsbRegistryMock
@@ -477,7 +479,7 @@ public class XdsbRegistryAdapterTest {
 
 		// Act
 		AdhocQueryResponse actualResponse = xdsbRegistryAdapterSpy
-				.getSubmissionSetAndContents(submissionSetPatientIdMock);
+				.getSubmissionSetAndContents(submissionSetPatientIdMock, "");
 
 		// Assert
 		assertEquals(getSubmissionSetAndContentsResponseMock, actualResponse);
@@ -526,7 +528,7 @@ public class XdsbRegistryAdapterTest {
 
 		// Act
 		String deprecatedDocumentUniqueId = xdsbRegistryAdapterSpy
-				.extractDeprecatedDocumentUniqueId(responseMock);
+				.extractDeprecatedDocumentUniqueId(responseMock, "");
 
 		// Assert
 		assertEquals(nodeValueMock, deprecatedDocumentUniqueId);

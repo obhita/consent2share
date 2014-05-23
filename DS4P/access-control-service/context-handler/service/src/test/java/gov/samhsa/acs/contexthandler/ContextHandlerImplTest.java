@@ -8,6 +8,8 @@ import gov.samhsa.acs.common.dto.XacmlResponse;
 import gov.samhsa.acs.contexthandler.ContextHandler;
 import gov.samhsa.acs.contexthandler.ContextHandlerImpl;
 import gov.samhsa.acs.contexthandler.PolicyDecisionPoint;
+import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
+import gov.samhsa.acs.contexthandler.exception.PolicyProviderException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import ch.qos.logback.audit.AuditException;
 import static org.mockito.Mockito.*;
 
 public class ContextHandlerImplTest {
@@ -57,7 +61,7 @@ public class ContextHandlerImplTest {
 		xacmlRequestValid = new XacmlRequest();
 		xacmlRequestValid
 				.setIntermediarySubjectNPI(INTERMEDIARY_SUBJECT_NPI_VALID);
-		xacmlRequestValid.setRecepientSubjectNPI(RECEPIENT_SUBJECT_NPI_VALID);
+		xacmlRequestValid.setRecipientSubjectNPI(RECEPIENT_SUBJECT_NPI_VALID);
 		xacmlRequestValid.setPurposeOfUse(PURPOSE_OF_USE_VALID);
 		xacmlRequestValid.setPatientId(RESOURCE_ID_VALID);
 		xacmlRequestValid.setPatientUniqueId(RESOURCE_ID_VALID);
@@ -67,7 +71,7 @@ public class ContextHandlerImplTest {
 		xacmlRequestInvalidByIntNPI.setIntermediarySubjectNPI(INVALID_INPUT);
 
 		xacmlRequestInvalidByRecNPI = clone(xacmlRequestValid);
-		xacmlRequestInvalidByRecNPI.setRecepientSubjectNPI(INVALID_INPUT);
+		xacmlRequestInvalidByRecNPI.setRecipientSubjectNPI(INVALID_INPUT);
 
 		xacmlRequestInvalidByPurpose = clone(xacmlRequestValid);
 		xacmlRequestInvalidByPurpose.setPurposeOfUse(INVALID_INPUT);
@@ -100,9 +104,12 @@ public class ContextHandlerImplTest {
 	 * Test method for
 	 * {@link gov.samhsa.acs.contexthandler.ContextHandlerImpl#enforcePolicy(gov.samhsa.acs.common.dto.XacmlRequest)}
 	 * .
+	 * @throws AuditException 
+	 * @throws NoPolicyFoundException 
+	 * @throws PolicyProviderException 
 	 */
 	@Test
-	public final void testEnforcePolicyXacmlRequest_Permit() {
+	public final void testEnforcePolicyXacmlRequest_Permit() throws AuditException, NoPolicyFoundException, PolicyProviderException {
 
 		// Arrange
 		when(policyDesicionPointMock.evaluateRequest(xacmlRequestValid))
@@ -119,9 +126,12 @@ public class ContextHandlerImplTest {
 	 * Test method for
 	 * {@link gov.samhsa.acs.contexthandler.ContextHandlerImpl#enforcePolicy(gov.samhsa.acs.common.dto.XacmlRequest)}
 	 * .
+	 * @throws AuditException 
+	 * @throws NoPolicyFoundException 
+	 * @throws PolicyProviderException 
 	 */
 	@Test
-	public final void testEnforcePolicyXacmlRequest_DenyByIntNPI() {
+	public final void testEnforcePolicyXacmlRequest_DenyByIntNPI() throws AuditException, NoPolicyFoundException, PolicyProviderException {
 
 		// Arrange
 		when(
@@ -141,9 +151,12 @@ public class ContextHandlerImplTest {
 	 * Test method for
 	 * {@link gov.samhsa.acs.contexthandler.ContextHandlerImpl#enforcePolicy(gov.samhsa.acs.common.dto.XacmlRequest)}
 	 * .
+	 * @throws AuditException 
+	 * @throws NoPolicyFoundException 
+	 * @throws PolicyProviderException 
 	 */
 	@Test
-	public final void testEnforcePolicyXacmlRequest_DenyByPurpose() {
+	public final void testEnforcePolicyXacmlRequest_DenyByPurpose() throws AuditException, NoPolicyFoundException, PolicyProviderException {
 
 		// Arrange
 		when(
@@ -163,9 +176,12 @@ public class ContextHandlerImplTest {
 	 * Test method for
 	 * {@link gov.samhsa.acs.contexthandler.ContextHandlerImpl#enforcePolicy(gov.samhsa.acs.common.dto.XacmlRequest)}
 	 * .
+	 * @throws AuditException 
+	 * @throws NoPolicyFoundException 
+	 * @throws PolicyProviderException 
 	 */
 	@Test
-	public final void testEnforcePolicyXacmlRequest_DenyByRecNPI() {
+	public final void testEnforcePolicyXacmlRequest_DenyByRecNPI() throws AuditException, NoPolicyFoundException, PolicyProviderException {
 
 		// Arrange
 		when(
@@ -185,9 +201,12 @@ public class ContextHandlerImplTest {
 	 * Test method for
 	 * {@link gov.samhsa.acs.contexthandler.ContextHandlerImpl#enforcePolicy(gov.samhsa.acs.common.dto.XacmlRequest)}
 	 * .
+	 * @throws AuditException 
+	 * @throws NoPolicyFoundException 
+	 * @throws PolicyProviderException 
 	 */
 	@Test
-	public final void testEnforcePolicyXacmlRequest_DenyByResource() {
+	public final void testEnforcePolicyXacmlRequest_DenyByResource() throws AuditException, NoPolicyFoundException, PolicyProviderException {
 
 		// Arrange
 		when(
@@ -243,7 +262,7 @@ public class ContextHandlerImplTest {
 	private XacmlRequest clone(XacmlRequest req) {
 		XacmlRequest newReq = new XacmlRequest();
 		newReq.setIntermediarySubjectNPI(req.getIntermediarySubjectNPI());
-		newReq.setRecepientSubjectNPI(req.getRecepientSubjectNPI());
+		newReq.setRecipientSubjectNPI(req.getRecipientSubjectNPI());
 		newReq.setPurposeOfUse(req.getPurposeOfUse());
 		newReq.setPatientId(req.getPatientId());
 		newReq.setPatientUniqueId(req.getPatientUniqueId());

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>brms</artifactId>
-		<version>0.5.0-SNAPSHOT</version>
+		<version>0.6.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>brms-service</artifactId>
@@ -59,7 +59,7 @@
 
 		<!-- Testing -->
 
-		<!-- Web stack-specific dependencies that are internally needed by the 
+		<!-- Web stack-specific dependencies that are internally needed by the
 			Endpoint object as it exposes a web service -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
@@ -73,7 +73,7 @@
 			<artifactId>slf4j-simple</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>gov.samhsa.consent2share</groupId>
 			<artifactId>common-unit</artifactId>
@@ -84,6 +84,23 @@
 
 	<build>
 		<finalName>brms-service</finalName>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
 
 		<plugins>
 			<plugin>
@@ -131,7 +148,7 @@
 						<format>xml</format>
 					</formats>
 				</configuration>
-			</plugin>			
+			</plugin>
 		</plugins>
 
 	</build>

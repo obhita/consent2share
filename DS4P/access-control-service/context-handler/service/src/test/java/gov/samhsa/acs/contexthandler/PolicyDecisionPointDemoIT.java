@@ -1,7 +1,15 @@
 package gov.samhsa.acs.contexthandler;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Matchers.*;
+import gov.samhsa.acs.audit.AuditService;
+import gov.samhsa.acs.audit.AuditVerb;
+import gov.samhsa.acs.audit.PredicateKey;
+import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
+import gov.samhsa.acs.common.tool.DocumentAccessor;
+import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.contexthandler.PolicyDecisionPoint;
 import gov.samhsa.acs.contexthandler.PolicyDecisionPointImpl;
 import gov.samhsa.acs.contexthandler.PolicyProvider;
@@ -27,6 +35,8 @@ import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.audit.AuditException;
+
 public class PolicyDecisionPointDemoIT {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PolicyDecisionPointDemoIT.class);
@@ -41,11 +51,19 @@ public class PolicyDecisionPointDemoIT {
 	private PolicyProvider dataMock;
 	@Mock
 	private RequestGenerator requestGeneratorMock;
+	@Mock
+	private AuditService auditServiceMock;
+	@Mock
+	private DocumentXmlConverter documentXmlConverterMock;
+	@Mock
+	private DocumentAccessor documentAccessorMock;
 
 	@Before
 	public void setUp() throws Exception {
 		simplePDP = SimplePDPFactory.getSimplePDP();
-		pdp = new PolicyDecisionPointImpl(dataMock,requestGeneratorMock);
+		pdp = new PolicyDecisionPointImpl(dataMock,requestGeneratorMock, documentAccessorMock, documentXmlConverterMock, auditServiceMock);
+		
+		doNothing().when(auditServiceMock).audit(anyObject(), anyString(), isA(AuditVerb.class), anyString(), anyMapOf(PredicateKey.class, String.class));
 
 		try {
 			InputStream is = new FileInputStream(policyFile);
@@ -103,8 +121,9 @@ public class PolicyDecisionPointDemoIT {
 	}
 
 	@Test
-	public void test() {
-		XacmlResponse response = pdp.evaluateRequest(simplePDP,request,policies);
+	public void test() throws AuditException {
+		XacmlRequest xacmlRequest = new XacmlRequest();
+		XacmlResponse response = pdp.evaluateRequest(simplePDP,request,policies, xacmlRequest);
 		printPolicy();
 		printRequest();
 		System.out.println("");

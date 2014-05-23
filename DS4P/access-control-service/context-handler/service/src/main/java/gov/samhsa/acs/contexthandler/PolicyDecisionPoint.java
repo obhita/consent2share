@@ -28,12 +28,16 @@ package gov.samhsa.acs.contexthandler;
 import gov.samhsa.acs.common.dto.PdpRequestResponse;
 import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.dto.XacmlResponse;
+import gov.samhsa.acs.contexthandler.exception.NoPolicyFoundException;
+import gov.samhsa.acs.contexthandler.exception.PolicyProviderException;
 
 import java.util.List;
 
 import org.herasaf.xacml.core.api.PDP;
 import org.herasaf.xacml.core.context.impl.RequestType;
 import org.herasaf.xacml.core.policy.Evaluatable;
+
+import ch.qos.logback.audit.AuditException;
 
 /**
  * The Interface PolicyDecisionPoint.
@@ -50,10 +54,15 @@ public interface PolicyDecisionPoint {
 	 *            the request
 	 * @param policies
 	 *            the policies
+	 * @param xacmlRequest
+	 *            the xacml request
 	 * @return the xacml response
+	 * @throws AuditException
+	 *             the audit exception
 	 */
 	public XacmlResponse evaluateRequest(PDP pdp, RequestType request,
-			List<Evaluatable> policies);
+			List<Evaluatable> policies, XacmlRequest xacmlRequest)
+			throws AuditException;
 
 	/**
 	 * Evaluate the request using the simplePDP and retrieve the response from
@@ -63,17 +72,19 @@ public interface PolicyDecisionPoint {
 	 *            the pdp
 	 * @param request
 	 *            the request
-	 * @param patientUniqueId
-	 *            the patient unique id
-	 * @param recipientSubjectNPI
-	 *            the recipient subject npi
-	 * @param intermediarySubjectNPI
-	 *            the intermediary subject npi
+	 * @param xacmlRequest
+	 *            the xacml request
 	 * @return the xacml response
+	 * @throws AuditException
+	 *             the audit exception
+	 * @throws NoPolicyFoundException
+	 *             the no policy found exception
+	 * @throws PolicyProviderException
+	 *             the policy provider exception
 	 */
 	public XacmlResponse evaluateRequest(PDP pdp, RequestType request,
-			String patientUniqueId, String recipientSubjectNPI,
-			String intermediarySubjectNPI);
+			XacmlRequest xacmlRequest) throws AuditException,
+			NoPolicyFoundException, PolicyProviderException;
 
 	/**
 	 * Evaluate the request using the simplePDP and retrieve the response from
@@ -81,17 +92,19 @@ public interface PolicyDecisionPoint {
 	 * 
 	 * @param request
 	 *            the request
-	 * @param patientUniqueId
-	 *            the patient unique id
-	 * @param recipientSubjectNPI
-	 *            the recipient subject npi
-	 * @param intermediarySubjectNPI
-	 *            the intermediary subject npi
+	 * @param xacmlRequest
+	 *            the xacml request
 	 * @return the xacml response
+	 * @throws AuditException
+	 *             the audit exception
+	 * @throws NoPolicyFoundException
+	 *             the no policy found exception
+	 * @throws PolicyProviderException
+	 *             the policy provider exception
 	 */
 	public XacmlResponse evaluateRequest(RequestType request,
-			String patientUniqueId, String recipientSubjectNPI,
-			String intermediarySubjectNPI);
+			XacmlRequest xacmlRequest) throws AuditException,
+			NoPolicyFoundException, PolicyProviderException;
 
 	/**
 	 * Evaluate the request using the simplePDP and retrieve the response from
@@ -100,8 +113,16 @@ public interface PolicyDecisionPoint {
 	 * @param xacmlRequest
 	 *            the xacml request
 	 * @return the xacml response
+	 * @throws AuditException
+	 *             the audit exception
+	 * @throws NoPolicyFoundException
+	 *             the no policy found exception
+	 * @throws PolicyProviderException
+	 *             the policy provider exception
 	 */
-	public XacmlResponse evaluateRequest(XacmlRequest xacmlRequest);
+	public XacmlResponse evaluateRequest(XacmlRequest xacmlRequest)
+			throws AuditException, NoPolicyFoundException,
+			PolicyProviderException;
 
 	/**
 	 * Evaluate the request using the simplePDP and retrieve the response from
@@ -111,10 +132,25 @@ public interface PolicyDecisionPoint {
 	 *            the request
 	 * @param policies
 	 *            the policies
+	 * @param xacmlRequest
+	 *            the xacml request
 	 * @return the xacml response
+	 * @throws AuditException
+	 *             the audit exception
 	 */
 	public XacmlResponse evaluateRequest(RequestType request,
-			List<Evaluatable> policies);
-	
-	public PdpRequestResponse evaluatePolicyForTrying(String xacmlPolicy, String purposeOfUse);
+			List<Evaluatable> policies, XacmlRequest xacmlRequest)
+			throws AuditException;
+
+	/**
+	 * Evaluate policy for trying.
+	 * 
+	 * @param xacmlPolicy
+	 *            the xacml policy
+	 * @param purposeOfUse
+	 *            the purpose of use
+	 * @return the pdp request response
+	 */
+	public PdpRequestResponse evaluatePolicyForTrying(String xacmlPolicy,
+			String purposeOfUse);
 }

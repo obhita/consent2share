@@ -1,0 +1,6 @@
+<auditor>
+    <appender name="server" class="ch.qos.logback.audit.client.net.SocketAuditAppender">
+        <remoteHost>${maven.auditService.host}</remoteHost>
+        <port>${maven.auditService.port}</port>
+    </appender>
+</auditor>

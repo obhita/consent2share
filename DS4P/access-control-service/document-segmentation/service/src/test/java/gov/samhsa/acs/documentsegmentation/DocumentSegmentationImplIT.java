@@ -4,6 +4,7 @@ import gov.samhsa.acs.brms.RuleExecutionServiceImpl;
 import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.brms.guvnor.GuvnorServiceImpl;
+import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.tool.DocumentAccessorImpl;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
@@ -11,8 +12,6 @@ import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
 import gov.samhsa.acs.common.util.EncryptTool;
 import gov.samhsa.acs.common.util.FileHelper;
 import gov.samhsa.acs.common.validation.exception.XmlDocumentReadFailureException;
-import gov.samhsa.acs.documentsegmentation.DocumentSegmentationImpl;
-import gov.samhsa.acs.documentsegmentation.audit.AuditServiceImpl;
 import gov.samhsa.acs.documentsegmentation.exception.InvalidOriginalClinicalDocumentException;
 import gov.samhsa.acs.documentsegmentation.exception.InvalidSegmentedClinicalDocumentException;
 import gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl;
@@ -48,6 +47,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ch.qos.logback.audit.AuditException;
+
 public class DocumentSegmentationImplIT {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -62,6 +63,7 @@ public class DocumentSegmentationImplIT {
 	private static String xdsDocumentEntryUniqueId;
 	private static XacmlResult xacmlResultObject;
 	private static String endpointAddressGuvnorService;
+	private static XacmlRequest xacmlRequest;
 
 	private static RuleExecutionServiceImpl ruleExecutionService;
 	private static SimpleMarshallerImpl marshaller;
@@ -81,6 +83,7 @@ public class DocumentSegmentationImplIT {
 
 	@Before
 	public void setUp() throws IOException {
+		xacmlRequest = new XacmlRequest();
 		fileReader = new FileReaderImpl();
 		
 		documentXmlConverter = new DocumentXmlConverterImpl();
@@ -121,18 +124,17 @@ public class DocumentSegmentationImplIT {
 
 	// Integration test
 	@Test
-	public void testSegmentDocument_Segment_Document() throws InvalidOriginalClinicalDocumentException, InvalidSegmentedClinicalDocumentException, XmlDocumentReadFailureException {
+	public void testSegmentDocument_Segment_Document() throws InvalidOriginalClinicalDocumentException, InvalidSegmentedClinicalDocumentException, XmlDocumentReadFailureException, AuditException {
 
 		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
-				ruleExecutionService, new AuditServiceImpl(
-						endpointAddressForAuditServcie), documentEditor,
+				ruleExecutionService, null, documentEditor,
 				marshaller, documentEncrypter, documentRedactor,
 				documentMasker, documentTagger, documentFactModelExtractor,
 				embeddedClinicalDocumentExtractor, new ValueSetServiceImplMock(fileReader), additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
 		SegmentDocumentResponse result = documentSegmentation.segmentDocument(
 				c32Document.toString(), xacmlResult, false, true,
 				senderEmailAddress, recipientEmailAddress,
-				xdsDocumentEntryUniqueId);
+				xdsDocumentEntryUniqueId, xacmlRequest, false);
 
 		Assert.assertNotNull(result);
 	}
@@ -154,7 +156,7 @@ public class DocumentSegmentationImplIT {
 					.unmarshal(input);
 
 			document = documentRedactor.redactDocument(c32Document,
-					ruleExecutionContainer, xacmlResultObject, null);
+					ruleExecutionContainer, xacmlResultObject, null).getRedactedDocument();
 
 			Document processedDoc = documentXmlConverter.loadDocument(document);
 			FileHelper

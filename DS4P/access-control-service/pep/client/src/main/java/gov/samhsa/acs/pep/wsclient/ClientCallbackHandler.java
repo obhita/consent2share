@@ -11,6 +11,13 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.ws.security.WSPasswordCallback;
 
 public class ClientCallbackHandler implements CallbackHandler {
+	
+	private CredentialProvider credentialProvider;
+	
+	public ClientCallbackHandler(CredentialProvider credentialProvider) {
+		this.credentialProvider = credentialProvider;
+	}
+	
     public void handle(Callback[] callbacks) throws IOException,
             UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
@@ -24,8 +31,8 @@ public class ClientCallbackHandler implements CallbackHandler {
                     }
                 } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN) {
                     // UsernameToken auth only
-                    if (CredentialProvider.getUser().equals(pc.getIdentifier())) {
-                        pc.setPassword(CredentialProvider.getPassword());
+                    if (credentialProvider.getUsername().equals(pc.getIdentifier())) {
+                        pc.setPassword(credentialProvider.getPassword());
                     }
                 }
             }

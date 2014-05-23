@@ -311,41 +311,14 @@
                        <tbody class="hidden">
 		                      <tr>
 		                      		<td></td>
-		          		 			<td><b>Code</b></td>
-		          		 			<td style="width: 30%;"><b>Name</b></td>		               		 		
-		               				<td><b>ValueSet Name  </b></td>
-		               				<td><b>CodeSystem Name : Version Name</b></td>
-								</tr>
-
-			              	<tr th:each="conceptCodeDto : ${conceptCodeDtos}" class="conceptcode-record" th:attr="data-conceptcode-id=${conceptCodeDto.id},
-			              	data-conceptcode-code=${conceptCodeDto.code},data-conceptcode-name=${conceptCodeDto.name},data-conceptcode-cs-name=${conceptCodeDto.codeSystemName},
-			              	data-conceptcode-cs-vs-name=${conceptCodeDto.codeSystemVersionName}">
-			              	 	 <td>
-			              	 	 	<span th:if="${conceptCodeDto.deletable}">
-										<span class="delete-record-trigger btn btn-danger btn-xs">
-											<span class="fa fa-minus fa-white"></span>
-										</span>
-									</span>
-			   		 			 </td>
-			   		 			 <td>
-									<a th:href="@{'conceptCode/edit/'+ ${conceptCodeDto.id}}">
-										<span th:text="${conceptCodeDto.code}"></span>
-									</a>
-			   		 			 </td>
-			              		 <td th:text="${conceptCodeDto.name}">Name</td>			              		
-			              		 <td>
-			              		 	<div th:each="valueSetCode : ${conceptCodeDto.valueSetMap}" class="conceptcode-valset-record"
-			              	 	 			th:id="'conceptcode_valset_data_'+${conceptCodeDto.id}+'_'+${valueSetCode.key}"
-			              	 	 			th:attr="data-conceptcode-valset-key=${valueSetCode.key},data-conceptcode-valset-name=${valueSetCode.value}">
-			              		 	 <span th:text=" ${valueSetCode.value}"></span>
-				              		 	 
-			              		 	 </div>
-			              		 </td>
-			              		 <td th:text=" ${conceptCodeDto.codeSystemName} + '    :   ' + ${conceptCodeDto.codeSystemVersionName} ">Code System Name </td>
-						</tr>
-			         </tbody>
-                </table>
-              </section>
+		          		 			<td class="bold">Code</td>
+		          		 			<td class="bold" style="width: 30%;">Name</td>		               		 		
+		               				<td class="bold">ValueSet Name</td>
+		               				<td class="bold">CodeSystem Name : Version Name</td>
+							  </tr>
+			           </tbody>
+                	</table>
+              	</section>
 			</div>
 			
 			<div id="conceptcode_pagination_holder" class="sysAdmin_pagination" th:include="fragment/sysadmin_fragments :: pagination_fragment">

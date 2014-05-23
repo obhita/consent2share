@@ -26,6 +26,7 @@
 package gov.samhsa.acs.pep.xdsbregistry;
 
 import gov.samhsa.acs.common.exception.DS4PException;
+import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
@@ -36,15 +37,18 @@ import org.hl7.v3.PRPAIN201302UV02;
 public class XdsbRegistryImpl implements XdsbRegistry {
 
 	private final String endpointAddress;
+	
+	private SimpleMarshaller marshaller;
 
-	public XdsbRegistryImpl(String endpointAddress) {
+	public XdsbRegistryImpl(String endpointAddress, SimpleMarshaller marshaller) {
 		this.endpointAddress = endpointAddress;
+		this.marshaller = marshaller;
 	}
 
 	@Override
 	public AdhocQueryResponse registryStoredQuery(AdhocQueryRequest input) {
 		XdsbRegistryWebServiceClient client = new XdsbRegistryWebServiceClient(
-				endpointAddress);
+				endpointAddress, marshaller);
 		AdhocQueryResponse result = client.registryStoredQuery(input);
 		return result;
 	}
@@ -52,7 +56,7 @@ public class XdsbRegistryImpl implements XdsbRegistry {
 	@Override
 	public String addPatientRegistryRecord(PRPAIN201301UV02 input) {
 		XdsbRegistryWebServiceClient client = new XdsbRegistryWebServiceClient(
-				endpointAddress);
+				endpointAddress, marshaller);
 		String result = null;
 		try {
 			result = client.addPatientRegistryRecord(input);
@@ -65,7 +69,7 @@ public class XdsbRegistryImpl implements XdsbRegistry {
 	@Override
 	public String revisePatientRegistryRecord(PRPAIN201302UV02 input) {
 		XdsbRegistryWebServiceClient client = new XdsbRegistryWebServiceClient(
-				endpointAddress);
+				endpointAddress, marshaller);
 		String result = null;
 		try {
 			result = client.revisePatientRegistryRecord(input);

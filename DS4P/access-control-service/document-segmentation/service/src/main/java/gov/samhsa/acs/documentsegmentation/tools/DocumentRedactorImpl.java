@@ -34,7 +34,9 @@ import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
 import gov.samhsa.acs.documentsegmentation.tools.dto.RedactList;
+import gov.samhsa.acs.documentsegmentation.tools.dto.RedactedDocument;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -107,13 +109,15 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 	 * gov.samhsa.acs.brms.domain.FactModel)
 	 */
 	@Override
-	public String redactDocument(String document,
+	public RedactedDocument redactDocument(String document,
 			RuleExecutionContainer ruleExecutionContainer,
 			XacmlResult xacmlResult, FactModel factModel) {
 
 		Document xmlDocument = null;
 		List<Node> redactNodeList = new LinkedList<Node>();
 		RedactList redactList = new RedactList();
+		Set<String> redactSectionSet = new HashSet<String>();
+		Set<String> redactCategorySet = new HashSet<String>();
 
 		try {
 			xmlDocument = documentXmlConverter.loadDocument(document);
@@ -121,15 +125,20 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 			// If there is any section with a code exists in pdp obligations,
 			// add that section to redactNodeList.
 			for (String sectionCode : xacmlResult.getPdpObligations()) {
-				addNodesToList(xmlDocument, redactNodeList, redactList,
-						XPATH_SECTION, sectionCode, "");
+				int added = addNodesToList(xmlDocument, redactNodeList,
+						redactList, XPATH_SECTION, sectionCode, "");
+				if (added > 0) {
+					redactSectionSet.add(sectionCode);
+				}
 			}
 
 			// For each clinical fact
 			for (ClinicalFact fact : factModel.getClinicalFactList()) {
+				String foundCategory = null;
 				// If there is at least one value set category in obligations
-				if (containsAny(xacmlResult.getPdpObligations(),
-						fact.getValueSetCategories())) {
+				if ((foundCategory = containsAny(
+						xacmlResult.getPdpObligations(),
+						fact.getValueSetCategories())) != null) {
 					// Search and add the entry to redactNodeList
 					addNodesToList(xmlDocument, redactNodeList, redactList,
 							XPATH_ENTRY, fact.getEntry(), "");
@@ -141,6 +150,7 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 					addNodesToList(xmlDocument, redactNodeList, redactList,
 							XPATH_HUMAN_READABLE_TEXT_NODE, fact.getEntry(),
 							fact.getCode().toLowerCase());
+					redactCategorySet.add(foundCategory);
 				}
 			}
 
@@ -171,7 +181,8 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 			logger.error(e.getMessage(), e);
 			throw new DS4PException(e.toString(), e);
 		}
-		return document;
+		return new RedactedDocument(document, redactSectionSet,
+				redactCategorySet);
 	}
 
 	/*
@@ -228,12 +239,14 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 	 *            the value1
 	 * @param value2
 	 *            the value2
+	 * @return the int number of added nodes
 	 * @throws XPathExpressionException
 	 *             the x path expression exception
 	 */
-	private void addNodesToList(Document xmlDocument, List<Node> listOfNodes,
+	private int addNodesToList(Document xmlDocument, List<Node> listOfNodes,
 			RedactList redactList, String xPathExpr, String value1,
 			String value2) throws XPathExpressionException {
+		int added = 0;
 		NodeList nodeList = documentAccessor.getNodeList(xmlDocument, xPathExpr
 				.replace("%1", value1).replace("%2", value2));
 		if (nodeList != null) {
@@ -242,8 +255,10 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 				// can be ignored during tagging
 				redactList.getRedactList().add(value1);
 				listOfNodes.add(nodeList.item(i));
+				added++;
 			}
 		}
+		return added;
 	}
 
 	/**
@@ -277,16 +292,15 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 	 *            the categories
 	 * @return true, if successful
 	 */
-	private boolean containsAny(List<String> obligations,
-			Set<String> categories) {
-		if(obligations != null && categories != null){		
+	private String containsAny(List<String> obligations, Set<String> categories) {
+		if (obligations != null && categories != null) {
 			for (String category : categories) {
 				if (obligations.contains(category)) {
-					return true;
+					return category;
 				}
 			}
 		}
-		return false;
+		return null;
 	}
 
 	/**

@@ -17,6 +17,8 @@ public class PepNamespaceContextTest {
 	public static final String QUERY_URI = "urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0";
 	public static final String IHE_ITI_XDSB_2007_PREFIX = "xdsb";
 	public static final String IHE_ITI_XDSB_2007_URI= "urn:ihe:iti:xds-b:2007";
+	public static final String XACML_2_PREFIX = "xacml2";
+	public static final String XACML_2_URI = "urn:oasis:names:tc:xacml:2.0:policy:schema:os";
 	
 	private static PepNamespaceContext ctx;
 
@@ -37,6 +39,7 @@ public class PepNamespaceContextTest {
 		assertEquals(RIM_URI,ctx.getNamespaceURI(RIM_PREFIX));
 		assertEquals(QUERY_URI,ctx.getNamespaceURI(QUERY_PREFIX));
 		assertEquals(IHE_ITI_XDSB_2007_URI,ctx.getNamespaceURI(IHE_ITI_XDSB_2007_PREFIX));
+		assertEquals(XACML_2_URI,ctx.getNamespaceURI(XACML_2_PREFIX));
 		assertNull(ctx.getNamespaceURI("NOT_A_URI"));
 	}
 

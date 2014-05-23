@@ -25,9 +25,13 @@
  ******************************************************************************/
 package gov.samhsa.acs.xdsb.repository.wsclient.adapter;
 
+import gov.samhsa.acs.common.log.Loggable;
 import gov.samhsa.acs.common.namespace.PepNamespaceContext;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
+import gov.samhsa.acs.common.tool.exception.DocumentXmlConverterException;
 import gov.samhsa.acs.xdsb.common.XdsbErrorFactory;
+import gov.samhsa.acs.xdsb.repository.wsclient.exception.NoDocumentFoundException;
+import gov.samhsa.acs.xdsb.repository.wsclient.exception.XdsbRepositoryAdapterException;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponse.DocumentResponse;
 
@@ -38,6 +42,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -52,6 +58,10 @@ public class RetrieveDocumentSetResponseFilter {
 	/** The xdsb error factory. */
 	private XdsbErrorFactory xdsbErrorFactory;
 
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	
+	
 	/**
 	 * Instantiates a new retrieve document set response filter.
 	 */
@@ -84,29 +94,42 @@ public class RetrieveDocumentSetResponseFilter {
 	 * @param authorNPI
 	 *            the author npi
 	 * @return the retrieve document set response
-	 * @throws Throwable
-	 *             the throwable
+	 * @throws XdsbRepositoryAdapterException
+	 *             the xdsb repository adapter exception
 	 */
+	@Loggable
 	public RetrieveDocumentSetResponse filterByPatientAndAuthor(
 			RetrieveDocumentSetResponse response, String patientId,
-			String authorNPI) throws Throwable {
+			String authorNPI) throws XdsbRepositoryAdapterException {
 		LinkedList<DocumentResponse> removeList = new LinkedList<DocumentResponse>();
 		for (DocumentResponse docResponse : response.getDocumentResponse()) {
-			String docString = new String(docResponse.getDocument());
+			try {
+				String docString = new String(docResponse.getDocument());
 
-			String xPathExpr = "//hl7:recordTarget/child::hl7:patientRole/child::hl7:id";
-			String attributeName = "extension";
-			String docPatientId = getAttributeValue(docString, xPathExpr,
-					attributeName);
+				String xPathExpr = "//hl7:recordTarget/child::hl7:patientRole/child::hl7:id";
+				String attributeName = "extension";
+				
 
-			xPathExpr = "//hl7:author/child::hl7:assignedAuthor/child::hl7:id";
-			attributeName = "extension";
-			String docAuthorNPI = getAttributeValue(docString, xPathExpr,
-					attributeName);
+				String xPathExpr2 = "//hl7:author/child::hl7:assignedAuthor/child::hl7:id";
+				String attributeName2 = "extension";
+				
+				String docPatientId = getAttributeValue(docString, xPathExpr,
+						attributeName);
 
-			if (!patientId.equals(docPatientId)
-					|| !authorNPI.equals(docAuthorNPI)) {
-				removeList.add(docResponse);
+				String docAuthorNPI = getAttributeValue(docString, xPathExpr2,
+						attributeName2);
+
+				if (!patientId.equals(docPatientId)
+						|| !authorNPI.equals(docAuthorNPI)) {
+					removeList.add(docResponse);
+				}
+			} catch(NoDocumentFoundException ndf){
+				logger.error(ndf.getMessage() + patientId);
+				response = xdsbErrorFactory.noClinicalDocumentFound(
+						 patientId, authorNPI);			
+			} catch (DocumentXmlConverterException | XPathExpressionException e) {
+				logger.error(e.getMessage());
+				throw new XdsbRepositoryAdapterException(e);
 			}
 		}
 		if (removeList.size() > 0) {
@@ -128,19 +151,22 @@ public class RetrieveDocumentSetResponseFilter {
 	 * @param attributeName
 	 *            the attribute name
 	 * @return the attribute value
-	 * @throws Exception
-	 *             the exception
+	 * @throws DocumentXmlConverterException
+	 *             the document xml converter exception
 	 * @throws XPathExpressionException
 	 *             the x path expression exception
 	 */
-	private String getAttributeValue(String docString, String xPathExpr,
-			String attributeName) throws Exception, XPathExpressionException {
+	 String getAttributeValue(String docString, String xPathExpr,
+			String attributeName) throws DocumentXmlConverterException,
+			XPathExpressionException,NoDocumentFoundException {
 		Document doc = converter.loadDocument(docString);
 		// Create XPath instance
 		XPathFactory xpathFact = XPathFactory.newInstance();
 		XPath xpath = xpathFact.newXPath();
 		xpath.setNamespaceContext(new PepNamespaceContext());
 		Node node = (Node) xpath.evaluate(xPathExpr, doc, XPathConstants.NODE);
+		if(null == node)
+			throw new NoDocumentFoundException("Requested Document is not a valid C32(Clinic Personal Health Record Extract) For the Patient : ");
 		return node.getAttributes().getNamedItem(attributeName).getNodeValue();
 	}
 }
