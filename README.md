@@ -1,5 +1,5 @@
 # Consent2Share #
-=============
+
 ## About Consent2Share ##
 
 Consent2Share is an open source software application sponsored by the U.S. Substance Abuse and Mental Health Administration (SAMHSA) which is designed to support Behavioral Health’s integration with Health Information Exchanges (HIE).  Behavioral Healthcare includes Substance Abuse and Mental Health treatment and providers in these domains of care face special privacy regulations which can make the exchange of health care information with other providers more difficult than in other areas of healthcare.
