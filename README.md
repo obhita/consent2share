@@ -1,6 +1,6 @@
-Consent2Share
+# Consent2Share #
 =============
-<b>About Consent2Share</b>
+## About Consent2Share ##
 
 Consent2Share is an open source software application sponsored by the U.S. Substance Abuse and Mental Health Administration (SAMHSA) which is designed to support Behavioral Health’s integration with Health Information Exchanges (HIE).  Behavioral Healthcare includes Substance Abuse and Mental Health treatment and providers in these domains of care face special privacy regulations which can make the exchange of health care information with other providers more difficult than in other areas of healthcare.
 
@@ -20,4 +20,7 @@ The C2S Patient Consent Management system is a Consent2Share Patient Consent Man
 
 The C2S Access Control Serves components are a set of integrated applications which are designed to integrate with Electronic Health Records systems (EHRs) and HIEs and provide privacy policy configuration, management, decision making and policy enforcement.
 
-=========
+## Project Site ##
+
+Click [here](http://obhita.github.io/Consent2Share/ "Consent2Share Project Site") to go to Consent2Share project site to watch demos to learn more about this project.
+
