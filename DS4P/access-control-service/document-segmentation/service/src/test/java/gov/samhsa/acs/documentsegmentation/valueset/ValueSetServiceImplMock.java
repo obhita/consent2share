@@ -2,12 +2,17 @@ package gov.samhsa.acs.documentsegmentation.valueset;
 
 import gov.samhsa.acs.common.tool.FileReader;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
+import gov.samhsa.acs.documentsegmentation.valueset.dto.CodeAndCodeSystemSetDto;
+import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryDto;
 import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryListDto;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -37,15 +42,6 @@ public class ValueSetServiceImplMock implements ValueSetService {
 	 */
 	@Override
 	public Set<String> lookupValueSetCategories(String code, String codeSystem) {
-		if(conceptCodeList == null){
-			try {
-				init();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
 		Set<String> categories = new HashSet<String>();
 		for (ConceptCode conceptCode : conceptCodeList) {
 			if (isEqual(conceptCode, code, codeSystem)) {
@@ -56,6 +52,20 @@ public class ValueSetServiceImplMock implements ValueSetService {
 			}
 		}
 		return categories;
+	}
+	
+	@Override
+	public List<Map<String, Object>> lookupValuesetCategoriesOfMultipleCodeAndCodeSystemSet(
+			List<CodeAndCodeSystemSetDto> codeAndCodeSystemSetDtoList) {
+		List<Map<String, Object>> valueSetQueryDtoList=new ArrayList<Map<String, Object>>();
+		for(CodeAndCodeSystemSetDto codeAndCodeSystemSetDto:codeAndCodeSystemSetDtoList) {
+			Map<String, Object> valueSetMap=new HashMap<String, Object>();
+			valueSetMap.put("conceptCode", codeAndCodeSystemSetDto.getConceptCode());
+			valueSetMap.put("codeSystemOid", codeAndCodeSystemSetDto.getCodeSystemOid());
+			valueSetMap.put("vsCategoryCodes", null);
+			valueSetQueryDtoList.add(valueSetMap);
+		}
+		return valueSetQueryDtoList;
 	}
 	
 	@Override
@@ -105,4 +115,5 @@ public class ValueSetServiceImplMock implements ValueSetService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }

@@ -38,10 +38,10 @@ public interface ProviderSearchLookupService {
 	void setProviderSearchURL(String providerSearchURL);
 	
 	String providerSearch(
-			String usstate,String city,String zipcode,String gender,String specialty,String phone,String firstname,String lastname);
+			String usstate,String city,String zipcode,String gender,String specialty,String phone,String firstname,String lastname, int pageNumber);
 
 	
-	String generateProviderSearchURL(String usstate,String city,String zipcode,String gender,String specialty,String phone,String firstname,String lastname);
+	String generateProviderSearchURL(String usstate,String city,String zipcode,String gender,String specialty,String phone,String firstname,String lastname, int pageNumber);
 	
 	String callProviderSearch(String query);
 	

@@ -1,3 +1,8 @@
+var vs_paginationInfo = {
+};
+
+var pagedUrl;
+
 var valueSetListDataStore = (function() {
 	var ary_valueSetList = new Array();
 	
@@ -92,6 +97,7 @@ var filteredValueSetListIndex = (function(){
 })();
 
 $(document).ready(function(){
+	var pageLength = 20;
 	var divPanelState = $('div#div_panelStateInfo').data('panel-state');
 	
 	if(divPanelState == "resetoptions"){
@@ -131,15 +137,23 @@ $(document).ready(function(){
 		
 		if(clickedParent.hasClass("pagination-page")){
 			var target_pagenum = clickedIcon.data("pagenum"); 
+			loadPageValueSets(target_pagenum - 1);
 			gotoTargetPage(target_pagenum);
 		}else if((clickedParent.is("#pagination_next")) && (clickedParent.hasClass("disabled") === false)){
+			loadPageValueSets(getCurrentPagenum());
 			gotoNextPage();
 		}else if((clickedParent.is("#pagination_prev")) && (clickedParent.hasClass("disabled") === false)){
+			loadPageValueSets(getCurrentPagenum() - 2);
 			gotoPrevPage();
 		}else if((clickedParent.is("#pagination_first")) && (clickedParent.hasClass("disabled") === false)){
+			loadPageValueSets(0);
 			jumpToFirstPagegroup();
+			gotoFirstPage();
 		}else if((clickedParent.is("#pagination_last")) && (clickedParent.hasClass("disabled") === false)){
+			var numResults = $("#pagination_numresults").text();
+			loadPageValueSets(Math.ceil(numResults/pageLength) - 1);
 			jumpToLastPagegroup();
+			gotoLastPage();
 		}
 	});
 	
@@ -161,34 +175,42 @@ $(document).ready(function(){
 						window.alert("ERROR: Unable to delete value-set - " + e.responseText);
 					}
 			});
+			
+			// TODO:
+			rebuildPagination(vs_paginationInfo.totalPages);
+			loadPageValueSets(getPageToLoadAfterDelete());
+			setNumResultsDisplay(vs_paginationInfo.totalNumberOfValueSets - 1);
 		}
 	});
 	
 	$('select#select_filter_on_category').change(function(evt){
-		var selCatCode = $(this).val();
+		filterWithPagination();
+		setHeaderForFilter();
 		
-		//Hide table while rebuilding
-		hideTable();
-		
-		//Reset filter array
-		resetFilterArray();
-		
-		if(selCatCode != ""){
-			//Filter array
-			filterCatCode(selCatCode);
-			
-			//Change table header text
-			setHeaderForFilter();
-		}else{
-			//Change table header text
-			setHeaderForNoFilter();
-		}
-		
-		//Clear and rebuild table
-		initTableFromAry();
-		
-		//Show table once rebuild complete
-		showTable();
+//		var selCatCode = $(this).val();
+//		
+//		//Hide table while rebuilding
+//		hideTable();
+//		
+//		//Reset filter array
+//		resetFilterArray();
+//		
+//		if(selCatCode != ""){
+//			//Filter array
+//			filterCatCode(selCatCode);
+//			
+//			//Change table header text
+//			setHeaderForFilter();
+//		}else{
+//			//Change table header text
+//			setHeaderForNoFilter();
+//		}
+//		
+//		//Clear and rebuild table
+//		initTableFromAry();
+//		
+//		//Show table once rebuild complete
+//		showTable();
 	});
 	
 	$('#btn_search_valset_reset').click(function(e){
@@ -202,46 +224,51 @@ $(document).ready(function(){
 		var in_searchParam = $('input#txt_search_valset_name').val();
 		
 		if(in_searchParam.length > 0){
-			var responseObj = {};
+			var valueSetCategorySelected = ($('select#select_filter_on_category').val() != "" ? $('select#select_filter_on_category').val() : "empty");
+
+			pagedUrl = "valueSet/ajaxSearchValueSet/pageNumber/pageNumberPlaceHolder/searchCategory/name/searchTerm/"+in_searchParam+"/valueSetCategory/"+valueSetCategorySelected;
 			
-			$.ajax({url: "valueSet/ajaxSearchValueSet",
+			$.ajax({url: "valueSet/ajaxSearchValueSet/pageNumber/0/searchCategory/name/searchTerm/"+in_searchParam+"/valueSetCategory/"+valueSetCategorySelected,
 					method: "GET",
 					data: {searchCategory: "name",
 						   searchTerm: in_searchParam},
 					success: function(response){
-						responseObj = response;
+						var totalNumberOfValueSets = response.totalNumberOfValueSets;
+						var totalPages = response.totalPages;
+						var valueSets = response.valueSets;
+						var numberOfElements = response.numberOfElements;
 						
-						var responseLength = responseObj.length;
+						setPaginationInfo(totalNumberOfValueSets, totalPages, valueSets, numberOfElements);
 						
-						if(responseLength > 0){
-							valueSetListDataStore.emptyValSetArray();
+						clearTable();
+						
+						if(totalNumberOfValueSets > 0){
 							
-							for(var i = 0; i < responseLength; i++){
-								var in_valset_id = responseObj[i].id;
-								var in_valset_code = responseObj[i].code;
-								var in_valset_name = responseObj[i].name;
-								var in_valset_cat_code = responseObj[i].valueSetCatCode;
-								var in_valset_cat_name = responseObj[i].valueSetCatName;
+							for(var i = 0; i < numberOfElements; i++){
 								
-								valueSetListDataStore.pushValSet(in_valset_id, in_valset_code, in_valset_name, in_valset_cat_code, in_valset_cat_name);
+								var temp_valset_id = valueSets[i].id;
+								var temp_valset_code = valueSets[i].code;
+								var temp_valset_name = valueSets[i].name;
+								var temp_valset_cat_code = valueSets[i].valueSetCatCode;
+								var temp_valset_cat_name = valueSets[i].valueSetCatName;
+								
+								insertTableRow(temp_valset_id, temp_valset_code, temp_valset_name, temp_valset_cat_code, temp_valset_cat_name);
 							}
-							
-							resetSelectFilterOnCategory();
+						
 							clearSearchValsetCodeInput();
 							
 							//Change table header text
 							setHeaderForSearchName();
 							
-							//Reset Filter
-							resetFilterArray();
-							
-							initTableFromAry();
+							rebuildPagination(totalPages);
+							setNumResultsDisplay(totalNumberOfValueSets);
 						}else{
 							window.alert("No results found");
+							hidePaginationHolder();
 						}
 					},
 					error: function(e){
-						window.alert("ERROR - An error occured while search for value set name: " + e.responseText);
+						window.alert("ERROR - An error occured while search for value set code: " + e.responseText);
 					}
 			});
 		}
@@ -254,42 +281,47 @@ $(document).ready(function(){
 		var in_searchParam = $('input#txt_search_valset_code').val();
 		
 		if(in_searchParam.length > 0){
-			var responseObj = {};
+			var valueSetCategorySelected = ($('select#select_filter_on_category').val() != "" ? $('select#select_filter_on_category').val() : "empty");
+
+			pagedUrl = "valueSet/ajaxSearchValueSet/pageNumber/pageNumberPlaceHolder/searchCategory/code/searchTerm/"+in_searchParam+"/valueSetCategory/"+valueSetCategorySelected;
 			
-			$.ajax({url: "valueSet/ajaxSearchValueSet",
+			$.ajax({url: "valueSet/ajaxSearchValueSet/pageNumber/0/searchCategory/code/searchTerm/"+in_searchParam+"/valueSetCategory/"+valueSetCategorySelected,
 					method: "GET",
 					data: {searchCategory: "code",
 						   searchTerm: in_searchParam},
 					success: function(response){
-						responseObj = response;
+						var totalNumberOfValueSets = response.totalNumberOfValueSets;
+						var totalPages = response.totalPages;
+						var valueSets = response.valueSets;
+						var numberOfElements = response.numberOfElements;
 						
-						var responseLength = responseObj.length;
+						setPaginationInfo(totalNumberOfValueSets, totalPages, valueSets, numberOfElements);
 						
-						if(responseLength > 0){
-							valueSetListDataStore.emptyValSetArray();
+						clearTable();
+						
+						if(totalNumberOfValueSets > 0){
 							
-							for(var i = 0; i < responseLength; i++){
-								var in_valset_id = responseObj[i].id;
-								var in_valset_code = responseObj[i].code;
-								var in_valset_name = responseObj[i].name;
-								var in_valset_cat_code = responseObj[i].valueSetCatCode;
-								var in_valset_cat_name = responseObj[i].valueSetCatName;
+							for(var i = 0; i < numberOfElements; i++){
 								
-								valueSetListDataStore.pushValSet(in_valset_id, in_valset_code, in_valset_name, in_valset_cat_code, in_valset_cat_name);
+								var temp_valset_id = valueSets[i].id;
+								var temp_valset_code = valueSets[i].code;
+								var temp_valset_name = valueSets[i].name;
+								var temp_valset_cat_code = valueSets[i].valueSetCatCode;
+								var temp_valset_cat_name = valueSets[i].valueSetCatName;
+								
+								insertTableRow(temp_valset_id, temp_valset_code, temp_valset_name, temp_valset_cat_code, temp_valset_cat_name);
 							}
-							
-							resetSelectFilterOnCategory();
+						
 							clearSearchValsetNameInput();
 							
 							//Change table header text
 							setHeaderForSearchCode();
 							
-							//Reset Filter
-							resetFilterArray();
-							
-							initTableFromAry();
+							rebuildPagination(totalPages);
+							setNumResultsDisplay(totalNumberOfValueSets);
 						}else{
 							window.alert("No results found");
+							hidePaginationHolder();
 						}
 					},
 					error: function(e){
@@ -316,17 +348,35 @@ $(document).ready(function(){
 		  errorClass: 'valueSetErrMsg'
 		});
 	
-	resetFilterArray();
-	initTableFromAry();
+	//resetFilterArray();
+	//initTableFromAry();
+
+	rebuildPagination($('#paginationMapInfo').attr('data-totalpages'));
+	setNumResultsDisplay($('#paginationMapInfo').attr('data-totalnumberofvaluesets'));
+	pagedUrl = "valueSet/ajaxGetPagedValueSets/pageNumber/pageNumberPlaceHolder";
+	
+	setPaginationInfo($('#paginationMapInfo').attr('data-totalnumberofvaluesets'), $('#paginationMapInfo').attr('data-totalpages'),
+			"", $('#paginationMapInfo').attr('data-numberofelements'));
+	
 });
 
+function getPageToLoadAfterDelete() {
+	if (getCurrentPagenum() === 1) {
+		return 0;
+	} else if (vs_paginationInfo.numberOfElements === 1) {
+		return getCurrentPagenum() - 2;
+	} else {
+		return getCurrentPagenum() - 1;
+	}
+
+}
+
 /**
- * Initialize HTML table rows on initial page load & when filter/search changes
+ * Initialize HTML table rows on initial page load & when filter/search changes  valueSetsPagedMap
  */
 function initTableFromAry(){
-	setPaginationActiveClass(1);
-	var num_pages = rebuildTableFromAry();
-	rebuildPagination(num_pages);
+//	setPaginationActiveClass(1);
+//	//rebuildTableFromAry();
 }
 
 /**
@@ -334,71 +384,58 @@ function initTableFromAry(){
  * 
  * @returns {integer} num_pages - the number of pages to show in the pagination control
  */
-function rebuildTableFromAry(){
-	//Set page_len to equal number of results to show per page
-	//TODO (MH): Change this number to use a value read from a properties file
-	var page_len = 20;
-	
-	var ary_len = filteredValueSetListIndex.getArySize();
-	
-	clearTable();
-	
-	if(ary_len > 0){
-		var current_pagenum = getCurrentPagenum();
-		
-		var current_page_first_record_index = page_len * (current_pagenum - 1);
-		var current_page_last_record_index = current_page_first_record_index + (page_len - 1);
-		
-		//Handle case where number of records on current page is less than the default page length
-		if(current_page_last_record_index >= ary_len){
-			current_page_last_record_index = ary_len - 1;
-		}
-		
-		//Sanity Check
-		if(current_page_first_record_index > current_page_last_record_index){
-			//TODO (MH): Catch this error in code that calls this function
-			throw new RangeError(current_page_first_record_index + " > " + current_page_last_record_index);
-		}
-		
-		//Sanity Check
-		if(current_page_first_record_index < 0){
-			//TODO (MH): Catch this error in code that calls this function
-			throw new RangeError();
-		}
-		
-		//Sanity Check
-		if(current_page_last_record_index < 0){
-			//TODO (MH): Catch this error in code that calls this function
-			throw new RangeError();
-		}
-		
-		for(var i = current_page_first_record_index; i <= current_page_last_record_index; i++){
-			var curRecIndex = filteredValueSetListIndex.getValSetIndex(i);
-			
-			var curRecord = valueSetListDataStore.getValSetByIndex(curRecIndex);
-			
-			var temp_valset_id = curRecord["valset_id"];
-			var temp_valset_code = curRecord["valset_code"];
-			var temp_valset_name = curRecord["valset_name"];
-			var temp_valset_cat_code = curRecord["valset_cat_code"];
-			var temp_valset_cat_name = curRecord["valset_cat_name"];
-			
-			insertTableRow(temp_valset_id, temp_valset_code, temp_valset_name, temp_valset_cat_code, temp_valset_cat_name);
-		}
-		
-		//Calculate the number of pages for pagination to return from function
-		var num_pages = Math.ceil(ary_len / page_len);
-		
-		setNumResultsDisplay(ary_len);
-		
-		//Return the calculated number of pages for pagination
-		return num_pages;
-	}else{
-		setNumResultsDisplay(0);
-		//Return the number of pages for pagination as 1
-		return 1;
-	}
-}
+//function rebuildTableFromAry(){
+//	//Set page_len to equal number of results to show per page
+//	//TODO (MH): Change this number to use a value read from a properties file
+//	var page_len = 20;
+//	
+//	//var ary_len = filteredValueSetListIndex.getArySize();
+//	var ary_len = $('#paginationMapInfo').attr('data-totalNumberOfValueSets');
+//	
+//	clearTable();
+//	
+//	if(ary_len > 0){
+//		var current_pagenum = getCurrentPagenum();
+//		
+//		var current_page_first_record_index = page_len * (current_pagenum - 1);
+//		var current_page_last_record_index = current_page_first_record_index + (page_len - 1);
+//		
+//		//Handle case where number of records on current page is less than the default page length
+//		if(current_page_last_record_index >= ary_len){
+//			current_page_last_record_index = ary_len - 1;
+//		}
+//		
+//		//Sanity Check
+//		if(current_page_first_record_index > current_page_last_record_index){
+//			//TODO (MH): Catch this error in code that calls this function
+//			throw new RangeError(current_page_first_record_index + " > " + current_page_last_record_index);
+//		}
+//		
+//		//Sanity Check
+//		if(current_page_first_record_index < 0){
+//			//TODO (MH): Catch this error in code that calls this function
+//			throw new RangeError();
+//		}
+//		
+//		//Sanity Check
+//		if(current_page_last_record_index < 0){
+//			//TODO (MH): Catch this error in code that calls this function
+//			throw new RangeError();
+//		}
+//		
+//		//Calculate the number of pages for pagination to return from function
+//		var num_pages = Math.ceil(ary_len / page_len);
+//		
+//		setNumResultsDisplay(ary_len);
+//		
+//		//Return the calculated number of pages for pagination
+//		return num_pages;
+//	}else{
+//		setNumResultsDisplay(0);
+//		//Return the number of pages for pagination as 1
+//		return 1;
+//	}
+//}
 
 /**
  * Insert table row into HTML DOM
@@ -424,6 +461,58 @@ function insertTableRow(temp_valset_id, temp_valset_code, temp_valset_name, temp
 			"<td>" + temp_valset_name + "</td>" +
 			"<td>" + temp_valset_cat_name + "</td>" +
 		"</tr>");
+}
+
+// load paged value sets
+function loadPageValueSets(pageNumber){
+	// replace placeholder with page number
+	pagedUrl = pagedUrl.replace("pageNumberPlaceHolder", pageNumber);
+
+	$.ajax({url: pagedUrl,
+		    success: function(response){
+
+				var totalNumberOfValueSets = response.totalNumberOfValueSets;
+				var totalPages = response.totalPages;
+				var valueSets = response.valueSets;
+				var numberOfElements = response.numberOfElements;
+				
+				setPaginationInfo(totalNumberOfValueSets, totalPages, valueSets, numberOfElements);
+				
+				clearTable();
+				
+				if(totalNumberOfValueSets > 0){
+					
+					for(var i = 0; i < numberOfElements; i++){
+						
+						var temp_valset_id = valueSets[i].id;
+						var temp_valset_code = valueSets[i].code;
+						var temp_valset_name = valueSets[i].name;
+						var temp_valset_cat_code = valueSets[i].valueSetCatCode;
+						var temp_valset_cat_name = valueSets[i].valueSetCatName;
+
+						insertTableRow(temp_valset_id, temp_valset_code, temp_valset_name, temp_valset_cat_code, temp_valset_cat_name);
+					}
+				}
+				else{
+					window.alert("No results found");
+				}
+				// set back page number placeholder for next call 
+				pagedUrl = pagedUrl.replace("pageNumber/"+pageNumber, "pageNumber/pageNumberPlaceHolder");
+		    },
+		    error: function(err){
+		    	window.alert("ERROR: " + err.responseText);}
+		    }
+	);
+}
+
+/**
+ * Holds pagination information
+ */
+function setPaginationInfo(totalNumberOfValueSets, totalPages, valueSets, numberOfElements) {
+	vs_paginationInfo.totalNumberOfValueSets = totalNumberOfValueSets;
+	vs_paginationInfo.totalPages = totalPages;
+	vs_paginationInfo.valueSets = valueSets;
+	vs_paginationInfo.numberOfElements = numberOfElements;
 }
 
 /**
@@ -578,6 +667,62 @@ function setNumResultsDisplay(num_results){
 	}
 }
 
+function filterWithPagination() {
+	var in_searchParam = "empty";
+	var searchCategory = "name";
+	if ($('input#txt_search_valset_code').val() != "") {
+		in_searchParam = $('input#txt_search_valset_code').val();
+		searchCategory = "code";
+	} else if ($('input#txt_search_valset_name').val()) {
+		in_searchParam = $('input#txt_search_valset_name').val();
+	}
+	
+	if(in_searchParam.length > 0){
+		var valueSetSelected = ($('select#select_filter_on_category').val() != "" ? $('select#select_filter_on_category').val() : "empty");
+		pagedUrl = "valueSet/ajaxSearchValueSet/pageNumber/pageNumberPlaceHolder/searchCategory/"+searchCategory+"/searchTerm/"+in_searchParam+"/valueSetCategory/"+valueSetSelected;
+		
+		$.ajax({url: "valueSet/ajaxSearchValueSet/pageNumber/0/searchCategory/"+searchCategory+"/searchTerm/"+in_searchParam+"/valueSetCategory/"+valueSetSelected,
+
+			method: "GET",
+			success: function(response){
+
+				var totalNumberOfValueSets = response.totalNumberOfValueSets;
+				var totalPages = response.totalPages;
+				var valueSets = response.valueSets;
+				var numberOfElements = response.numberOfElements;
+				
+				clearTable();
+				
+				if(totalNumberOfValueSets > 0){
+					
+					for(var i = 0; i < numberOfElements; i++){
+						
+						var temp_valset_id = valueSets[i].id;
+						var temp_valset_code = valueSets[i].code;
+						var temp_valset_name = valueSets[i].name;
+						var temp_valset_cat_code = valueSets[i].valueSetCatCode;
+						var temp_valset_cat_name = valueSets[i].valueSetCatName;
+
+						insertTableRow(temp_valset_id, temp_valset_code, temp_valset_name, temp_valset_cat_code, temp_valset_cat_name);
+					}
+					
+					//Change table header text
+					setHeaderForFilter();
+					
+					rebuildPagination(totalPages);
+					setNumResultsDisplay(totalNumberOfValueSets);
+				}else{
+					setNumResultsDisplay(totalNumberOfValueSets);
+					window.alert("No results found");
+				}
+			},
+			error: function(e){
+				window.alert("ERROR - An error occured while search for value set by code: " + e.responseText);
+			}
+	});
+	}
+}
+
 /**
  * Rebuild the pagination icons with the specified number of pages
  * 
@@ -700,7 +845,7 @@ function gotoTargetPage(in_targetPage){
 			disablePrevPageIcon();
 		}
 		
-		rebuildTableFromAry();
+		//rebuildTableFromAry();
 	}
 }
 

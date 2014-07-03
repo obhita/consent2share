@@ -12,6 +12,7 @@ import gov.samhsa.consent2share.service.valueset.ValueSetNotFoundException;
 import gov.samhsa.consent2share.service.valueset.ValueSetService;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -115,7 +116,7 @@ public class ValueSetController extends AbstractNodeController {
 
 		LOGGER.debug("Rendering Value Set  list page");
 
-		List<ValueSetDto> valueSets = valueSetService.findAll();
+		Map<String, Object> valueSetsPagedMap = valueSetService.findAll(0);
 		List<ValueSetCategoryDto> valueSetCategories = valueSetCategoryService.findAll();
 		
 		if(panelState.equals("resetoptions")){
@@ -125,10 +126,25 @@ public class ValueSetController extends AbstractNodeController {
 		}
 
 		model.addAttribute(MODEL_ATTRIBUTE_VALUESETCATEGORYDTOS, valueSetCategories);
-		model.addAttribute(MODEL_ATTRIBUTE_VALUESETDTOS, valueSets);
+		model.addAttribute("valueSetsPagedMap", valueSetsPagedMap);
 		return VALUESET_LIST_VIEW;
 	}
 
+	@RequestMapping("/valueSet/ajaxGetPagedValueSets/pageNumber/{pageNumber}")
+	@ResponseStatus(HttpStatus.OK)
+	public @ResponseBody Map<String, Object> getAllConceptCodes(@PathVariable("pageNumber") String pageNumber) {
+		Map<String, Object> valueSetsMap = null;
+		
+		try{
+			valueSetsMap = valueSetService.findAll(Integer.parseInt(pageNumber));
+		}catch(Exception e){
+			LOGGER.warn("An exception was caught in search ValueSet.");
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+		}
+		
+		return valueSetsMap;
+	}
+	
 	/**
 	 * Processes the submissions of create valueSet form.
 	 *
@@ -384,29 +400,44 @@ public class ValueSetController extends AbstractNodeController {
 	 * @param searchTerm the search term
 	 * @return the list
 	 */
-	@RequestMapping("/valueSet/ajaxSearchValueSet")
+	@RequestMapping("/valueSet/ajaxSearchValueSet/pageNumber/{pageNumber}/searchCategory/{searchCategory}/searchTerm/{searchTerm}/valueSetCategory/{valueSetCategory}")	
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody List<ValueSetDto> searchValueSet(
-			@RequestParam(value ="searchCategory",required = true) String searchCategory, 
-			@RequestParam(value ="searchTerm",required = true) String searchTerm) {
+	public @ResponseBody Map<String, Object> searchValueSet(
+			@PathVariable("searchCategory") String searchCategory, 
+			@PathVariable("searchTerm") String searchTerm,
+			@PathVariable("valueSetCategory") String valueSetCategory,
+			@PathVariable("pageNumber") String pageNumber) {
 		
-		List<ValueSetDto> valueSets = null;
+		valueSetCategory = validateEmptyFilterParams(valueSetCategory);
+		searchTerm = validateEmptyFilterParams(searchTerm);
+		
+		Map<String, Object> valueSetsPagedMap = null;
 		
 		try{
 			if(searchCategory.equals("code"))
-				valueSets = valueSetService.findAllByCode(searchTerm);
+				valueSetsPagedMap = valueSetService.findAllByCode(searchTerm, valueSetCategory, Integer.parseInt(pageNumber));
 			else  if(searchCategory.equals("name"))
-				valueSets = valueSetService.findAllByName(searchTerm);
+				valueSetsPagedMap = valueSetService.findAllByName(searchTerm, valueSetCategory, Integer.parseInt(pageNumber));
 		}catch(IllegalArgumentException e){
-			valueSets = null;
+			valueSetsPagedMap = null;
 			throw new AjaxException(HttpStatus.BAD_REQUEST, "Unable to perform search because the request parameters contained invalid data.");
 		}catch(Exception e){
-			valueSets = null;
+			valueSetsPagedMap = null;
 			LOGGER.warn("An exception was caught in search ValueSet.");
 			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
 		}
 		
-		return valueSets;
+		return valueSetsPagedMap;
+	}
+	
+	/**
+	 * Validate empty filter params.
+	 *
+	 * @param param the param
+	 * @return the string
+	 */
+	private String validateEmptyFilterParams(String param) {
+		return param.replace("empty", "");
 	}
 	
 }

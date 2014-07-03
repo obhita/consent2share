@@ -25,11 +25,14 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.valueset;
 
+import gov.samhsa.acs.documentsegmentation.valueset.dto.CodeAndCodeSystemSetDto;
 import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryDto;
 import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryListDto;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,12 +52,14 @@ public class ValueSetServiceImpl implements ValueSetService {
 
 	/** The Constant PARAM_CODE_SYSTEM. */
 	public static final String PARAM_CODE_SYSTEM = "codeSystemOid";
+	public static final String PARAM_CODE_AND_CODESYSTEM_PAIR = "code:codeSystemOid";
 
 	/** The endpoint address. */
 	private String endpointAddress;
 
-	/** The rest url. */
-	private String restUrl;
+	private String singleCodeRestUrl;
+	
+	private String multipleCodeRestUrl;
 
 	/** The self signed ssl helper. */
 	private SelfSignedSSLHelper selfSignedSSLHelper;
@@ -75,7 +80,8 @@ public class ValueSetServiceImpl implements ValueSetService {
 	public ValueSetServiceImpl(String endpointAddress) {
 		super();
 		this.endpointAddress = endpointAddress;
-		this.restUrl = null;
+		this.singleCodeRestUrl = null;
+		this.multipleCodeRestUrl = null;
 		this.selfSignedSSLHelper = null;
 	}
 
@@ -91,7 +97,7 @@ public class ValueSetServiceImpl implements ValueSetService {
 			SelfSignedSSLHelper selfSignedSSLHelper) {
 		super();
 		this.endpointAddress = endpointAddress;
-		this.restUrl = null;
+		this.singleCodeRestUrl = null;
 		this.selfSignedSSLHelper = selfSignedSSLHelper;
 
 		if (selfSignedSSLHelper != null) {
@@ -107,7 +113,7 @@ public class ValueSetServiceImpl implements ValueSetService {
 	 */
 	@Override
 	public Set<String> lookupValueSetCategories(String code, String codeSystem) {
-		if (restUrl == null) {
+		if (singleCodeRestUrl == null) {
 			initRestUrl();
 		}
 
@@ -119,12 +125,35 @@ public class ValueSetServiceImpl implements ValueSetService {
 			selfSignedSSLHelper.trustSelfSignedSSL();
 		}*/
 
-		ValueSetQueryDto resp = restTemplate.getForObject(restUrl,
+		ValueSetQueryDto resp = restTemplate.getForObject(singleCodeRestUrl,
 				ValueSetQueryDto.class, parameterMap);
 
 		return resp.getVsCategoryCodes();
 	}
 	
+	@Override
+	public List<Map<String, Object>> lookupValuesetCategoriesOfMultipleCodeAndCodeSystemSet(List<CodeAndCodeSystemSetDto> codeAndCodeSystemSetDtoList){
+		String restURL=createMultipleCodeRestUrl(codeAndCodeSystemSetDtoList);
+		RestTemplate restTemplate = configureRestTemplate();
+		List<Map<String, Object>> resp = restTemplate.getForObject(restURL,List.class);
+		return resp;
+	}
+	
+	private String createMultipleCodeRestUrl(List<CodeAndCodeSystemSetDto> codeAndCodeSystemSetDtoList) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(endpointAddress+"/multipleValueset");
+		builder.append("?");
+		Iterator<CodeAndCodeSystemSetDto> iterator=codeAndCodeSystemSetDtoList.iterator();
+		while (iterator.hasNext()) {
+			CodeAndCodeSystemSetDto codeAndCodeSystemSetDto=iterator.next();
+			builder.append("code:codeSystemOid="+codeAndCodeSystemSetDto.getConceptCode()+":"+codeAndCodeSystemSetDto.getCodeSystemOid());
+			if (iterator.hasNext()) {
+				builder.append("&");
+			}
+		}
+		return builder.toString();
+	}
+
 	@Override
 	public ValueSetQueryListDto RestfulValueSetCategories(
 			ValueSetQueryListDto valueSetQueryListDtos) {
@@ -192,6 +221,14 @@ public class ValueSetServiceImpl implements ValueSetService {
 		paramMap.put(PARAM_CODE_SYSTEM, codeSystem);
 		return paramMap;
 	}
+	
+	private Map<String, String> createParameterMapForMultipleValueSet(List<CodeAndCodeSystemSetDto> codeAndCodeSystemSetDtoList) {
+		Map<String, String> paramMap = new HashMap<String, String>();
+		for(CodeAndCodeSystemSetDto codeAndCodeSystemSetDto:codeAndCodeSystemSetDtoList) {
+			paramMap.put(PARAM_CODE_AND_CODESYSTEM_PAIR, codeAndCodeSystemSetDto.getConceptCode()+":"+codeAndCodeSystemSetDto.getCodeSystemOid());
+		}
+		return paramMap;
+	}
 
 	/**
 	 * Initializes the rest url.
@@ -203,7 +240,7 @@ public class ValueSetServiceImpl implements ValueSetService {
 		addParameter(builder, PARAM_CODE);
 		builder.append("&");
 		addParameter(builder, PARAM_CODE_SYSTEM);
-		restUrl = builder.toString();
+		singleCodeRestUrl = builder.toString();
 	}
 
 	/**

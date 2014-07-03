@@ -1,14 +1,14 @@
 package gov.samhsa.consent2share.web;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,8 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.CodeSystemDto;
-import gov.samhsa.consent2share.service.dto.ConceptCodeVSCSDto;
 import gov.samhsa.consent2share.service.dto.ConceptCodeDto;
+import gov.samhsa.consent2share.service.dto.ConceptCodeVSCSDto;
 import gov.samhsa.consent2share.service.dto.ValueSetDto;
 import gov.samhsa.consent2share.service.valueset.CodeSystemNotFoundException;
 import gov.samhsa.consent2share.service.valueset.CodeSystemService;
@@ -28,7 +28,9 @@ import gov.samhsa.consent2share.service.valueset.ValueSetNotFoundException;
 import gov.samhsa.consent2share.service.valueset.ValueSetService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +39,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -76,7 +79,7 @@ public class ConceptCodeControllerTest {
 		
 		when(conceptCodeService.create()).thenReturn(conceptCodeVSCSDto);
 		when(codeSystemService.findAll()).thenReturn(codeSystems);
-		when(valueSetService.findAll()).thenReturn(valueSets);
+		when(valueSetService.findAllWithoutDeletable()).thenReturn(valueSets);
 		
 		mockMvc.perform(get("/sysadmin/conceptCodeList"))
 			.andExpect(status().isOk())
@@ -103,23 +106,23 @@ public class ConceptCodeControllerTest {
 	@Test
 	public void testAjaxSearchConceptCode_By_Name() throws Exception{
 		List<ConceptCodeDto> conceptCodes= new ArrayList<ConceptCodeDto>();
+		Map<String, Object> pagedconceptCodes = new HashMap<String, Object>();
 		ConceptCodeDto ccdto=new ConceptCodeDto();
 		ccdto.setName("disorder");		
 		conceptCodes.add(ccdto);
-		when(conceptCodeService.findAllByName(anyString())).thenReturn(conceptCodes);
-		mockMvc.perform(get("/sysadmin/conceptCode/ajaxSearchConceptCode?searchCategory=name&&searchTerm=dis"))
+		when(conceptCodeService.findAllByName(anyString(), anyString(), anyString(), anyString(), anyInt())).thenReturn(pagedconceptCodes);
+
+		mockMvc.perform(get("/sysadmin/conceptCode/ajaxSearchConceptCode/pageNumber/0/searchCategory/name/searchTerm/D/codeSystem/LOINC/codeSystemVersion/2014/valueSetName/Alcohol-Ethanol-Toxicology-LOINC"))
 		.andExpect(status().isOk())
 		.andExpect(content().contentType("application/json;charset=UTF-8"));
 	}
 	
 	@Test
 	public void testAjaxSearchConceptCode_By_Code() throws Exception{
-		List<ConceptCodeDto> conceptCodes= new ArrayList<ConceptCodeDto>();
 		ConceptCodeDto ccdto=new ConceptCodeDto();
-		ccdto.setCode("disorder");		
-		conceptCodes.add(ccdto);
-		when(conceptCodeService.findAllByName(anyString())).thenReturn(conceptCodes);
-		mockMvc.perform(get("/sysadmin/conceptCode/ajaxSearchConceptCode?searchCategory=code&&searchTerm=dis"))
+		ccdto.setCode("disorder");	
+		when(conceptCodeService.findAllByName(anyString(), anyString(), anyString(), anyString(), anyInt())).thenReturn(mock(Map.class));
+		mockMvc.perform(get("/sysadmin/conceptCode/ajaxSearchConceptCode/pageNumber/0/searchCategory/code/searchTerm/3/codeSystem/LOINC/codeSystemVersion/2014/valueSetName/Alcohol-Ethanol-Toxicology-LOINC"))
 		.andExpect(status().isOk())
 		.andExpect(content().contentType("application/json;charset=UTF-8"));
 	}

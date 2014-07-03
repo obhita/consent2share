@@ -17,7 +17,8 @@ public enum URLArgument {
 	LAST_NAME (URLHelper.LAST_NAME, 5, 4),
 	FIRST_NAME (URLHelper.FIRST_NAME, 6, 5),
 	ENTITY_TYPE (URLHelper.FIRST_NAME, 7, 6),
-	PROVIDER_ORGANIZATION_NAME (URLHelper.PROVIDER_ORGANIZATION_NAME, 8, 7);
+	PROVIDER_ORGANIZATION_NAME (URLHelper.PROVIDER_ORGANIZATION_NAME, 8, 7),
+	PAGE_NUMBER (URLHelper.PAGE_NUMBER, 9, 8);
 	
     private final String argumentName;
     private final int postalCodeArrayIdx;
@@ -44,6 +45,7 @@ public enum URLArgument {
     	public static final String LAST_NAME = "lastname";
     	public static final String FIRST_NAME = "firstname";
     	public static final String PROVIDER_ORGANIZATION_NAME = "orgname";
+    	public static final String PAGE_NUMBER = "pageNumber";
     	public static final String SEARCH_STRING = "%";
     }
     
@@ -78,6 +80,9 @@ public enum URLArgument {
     	else if (name.equals(URLHelper.ENTITY_TYPE)){
     		return ENTITY_TYPE;
     	}
+    	else if (name.equals(URLHelper.PAGE_NUMBER)){
+    		return PAGE_NUMBER;
+    	}
     	throw new IllegalArgumentException("URL paramter type '" + name + "' not found.");
     }
     
@@ -90,10 +95,10 @@ public enum URLArgument {
 
     public static String[] createArgumentArray(String methodType) {
     	if(methodType.equals(URLHelper.POSTAL_CODE_METHOD_TYPE)){
-    		return new String[]{URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING};
+    		return new String[]{URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING};
     	}
     	else if (methodType.equals(URLHelper.CITY_STATE_METHOD_TYPE)){
-    		return new String[]{URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING};
+    		return new String[]{URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING, URLHelper.SEARCH_STRING};
     	}
     	throw new IllegalArgumentException("Method type '" + methodType + "' not found.");
     }

@@ -242,11 +242,9 @@ public class PolicyEnforcementPointImplTest {
 		xacmlResponse = new XacmlResponse();
 		xacmlResponse.setPdpDecision("PERMIT");
 		segmentDocumentResponse1 = new SegmentDocumentResponse();
-		segmentDocumentResponse1
-				.setMaskedDocument(segmentDocumentResponse1String);
+		segmentDocumentResponse1.setSegmentedDocumentXml(segmentDocumentResponse1String);
 		segmentDocumentResponse2 = new SegmentDocumentResponse();
-		segmentDocumentResponse2
-				.setMaskedDocument(segmentDocumentResponse2String);
+		segmentDocumentResponse2.setSegmentedDocumentXml(segmentDocumentResponse2String);
 		directEmailSendRequest = new DirectEmailSendRequest();
 		directEmailSendRequest.setC32("original c32");
 		byteValue = new byte[] { '0', '1', '2', '3' };
@@ -1222,8 +1220,7 @@ public class PolicyEnforcementPointImplTest {
 				enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenThrow(SamlTokenPrincipalException.class);
 		when(
@@ -1273,8 +1270,7 @@ public class PolicyEnforcementPointImplTest {
 				enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1322,8 +1318,7 @@ public class PolicyEnforcementPointImplTest {
 				enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1372,8 +1367,7 @@ public class PolicyEnforcementPointImplTest {
 				enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1421,8 +1415,7 @@ public class PolicyEnforcementPointImplTest {
 				enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1468,8 +1461,7 @@ public class PolicyEnforcementPointImplTest {
 				enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1518,8 +1510,7 @@ public class PolicyEnforcementPointImplTest {
 				enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1565,8 +1556,7 @@ public class PolicyEnforcementPointImplTest {
 		when(marshaller.marshall(isA(Object.class))).thenReturn(enforcementPolicies).thenThrow(SimpleMarshallerException.class).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1611,8 +1601,7 @@ public class PolicyEnforcementPointImplTest {
 		when(marshaller.marshall(isA(Object.class))).thenReturn(enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1657,8 +1646,7 @@ public class PolicyEnforcementPointImplTest {
 		when(marshaller.marshall(isA(Object.class))).thenReturn(enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1703,8 +1691,7 @@ public class PolicyEnforcementPointImplTest {
 				enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1756,8 +1743,7 @@ public class PolicyEnforcementPointImplTest {
 				enforcementPolicies).thenReturn(enforcementPolicies);
 		when(
 				documentSegmentation.segmentDocument(anyString(),
-						eq(enforcementPolicies), eq(false), eq(false), eq(""),
-						eq(""), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(
+						eq(enforcementPolicies), eq(false))).thenReturn(
 				segmentDocumentResponse1).thenReturn(segmentDocumentResponse2);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
@@ -1811,8 +1797,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(segmentDocumentResponse1);
+						anyString(), eq(false))).thenReturn(segmentDocumentResponse1);
 		when(context.getUserPrincipal()).thenThrow(SamlTokenPrincipalException.class);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -1833,7 +1818,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -1860,8 +1845,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(segmentDocumentResponse1);
+						anyString(), eq(false))).thenReturn(segmentDocumentResponse1);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -1880,7 +1864,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -1907,8 +1891,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(segmentDocumentResponse1);
+						anyString(), eq(false))).thenReturn(segmentDocumentResponse1);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -1927,7 +1910,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -1953,8 +1936,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(segmentDocumentResponse1);
+						anyString(), eq(false))).thenReturn(segmentDocumentResponse1);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -1973,7 +1955,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -1999,8 +1981,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(false))).thenReturn(segmentDocumentResponse1);
+						anyString(), eq(false))).thenReturn(segmentDocumentResponse1);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -2019,7 +2000,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -2045,8 +2026,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(true))).thenThrow(InvalidOriginalClinicalDocumentException.class);
+						anyString(), eq(true))).thenThrow(InvalidOriginalClinicalDocumentException.class);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -2065,7 +2045,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -2091,8 +2071,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(true))).thenThrow(InvalidSegmentedClinicalDocumentException.class);
+						anyString(), eq(true))).thenThrow(InvalidSegmentedClinicalDocumentException.class);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -2111,7 +2090,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -2137,8 +2116,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(true))).thenThrow(XmlDocumentReadFailureException.class);
+						anyString(), eq(true))).thenThrow(XmlDocumentReadFailureException.class);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -2157,7 +2135,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -2183,8 +2161,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(true))).thenReturn(segmentDocumentResponse1);
+						anyString(), eq(true))).thenReturn(segmentDocumentResponse1);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -2203,7 +2180,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenThrow(IOException.class);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenThrow(IOException.class);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -2229,8 +2206,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(true))).thenReturn(segmentDocumentResponse1);
+						anyString(), eq(true))).thenReturn(segmentDocumentResponse1);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -2249,7 +2225,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -2275,8 +2251,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), eq(true))).thenReturn(segmentDocumentResponse1);
+						anyString(), eq(true))).thenReturn(segmentDocumentResponse1);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -2295,7 +2270,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -2326,8 +2301,7 @@ public class PolicyEnforcementPointImplTest {
 		segmentDocumentResponse1 = mock(SegmentDocumentResponse.class);
 
 		when(documentSegmentation.segmentDocument(anyString(),
-						anyString(), any(Boolean.class), any(Boolean.class), anyString(),
-						anyString(), anyString(), any(XacmlRequest.class), any(Boolean.class))).thenReturn(segmentDocumentResponse1);
+						anyString(), any(Boolean.class))).thenReturn(segmentDocumentResponse1);
 		when(context.getUserPrincipal()).thenReturn(samlTokenPrincipal);
 		when(
 				samlTokenParser.parse(samlTokenPrincipal.getToken(),
@@ -2348,7 +2322,7 @@ public class PolicyEnforcementPointImplTest {
 				.thenReturn("1760717789");
 
 		
-		when(segmentDocumentResponse1.getProcessedDocument()).thenReturn(dataHandler);
+		when(segmentDocumentResponse1.getDocumentPayloadRawData()).thenReturn(dataHandler);
 		when(dataHandlerToBytesConverter.toByteArray(any(DataHandler.class))).thenReturn(byteValue);
 		// Act
 		DirectEmailSendResponse response = pep
@@ -2386,12 +2360,12 @@ public class PolicyEnforcementPointImplTest {
 				enforcementPolicies);
 		SegmentDocumentResponse segmentDocumentResponse = mock(SegmentDocumentResponse.class);
 		String segmentedC32 = "segmentedC32";
-		when(segmentDocumentResponse.getMaskedDocument()).thenReturn(
+		when(segmentDocumentResponse.getSegmentedDocumentXml()).thenReturn(
 				segmentedC32);
 
 		when(
 				documentSegmentation.segmentDocument(c32Xml,
-						enforcementPolicies, false, false, "", "", "UniquId", xacmlRequest, false))
+						enforcementPolicies, false))
 				.thenReturn(segmentDocumentResponse);
 
 		// Act

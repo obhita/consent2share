@@ -1116,13 +1116,14 @@ public class AdminController extends AbstractController {
 			String phone = request.getParameter("phone");
 			String firstname = request.getParameter("firstname");
 			String lastname = request.getParameter("lastname");
-
+			int pageNumber = Integer.parseInt(request.getParameter("pageNumber"));
+			
 			if (providerSearchLookupService.isValidatedSearch(usstate, city,zipcode, gender, specialty, phone, firstname, lastname) == true) 
 			{
 				IOUtils.copy(
 						new ByteArrayInputStream(providerSearchLookupService
 								.providerSearch(usstate, city, zipcode, gender,
-										specialty, phone, firstname, lastname)
+										specialty, phone, firstname, lastname, pageNumber)
 								.getBytes()), out);
 				out.flush();
 				out.close();

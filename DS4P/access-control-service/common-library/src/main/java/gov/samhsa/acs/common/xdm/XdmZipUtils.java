@@ -73,8 +73,8 @@ public class XdmZipUtils {
 	 * @param c32 the c32
 	 * @param index the index
 	 * @param readMe the read me
-	 * @param kekMaskingKey the kek masking key
-	 * @param kekEncryptionKey the kek encryption key
+	 * @param kekMaskingKey the kek masking key (nillable)
+	 * @param kekEncryptionKey the kek encryption key (nillable)
 	 * @return the byte[]
 	 */
 	public static byte[] createXDMPackage(String metadata, String xsl, String c32,
@@ -99,8 +99,12 @@ public class XdmZipUtils {
 			addZipEntry(PATH_INDEX, indexBytes, zos);
 			addZipEntry(PATH_XSL, xslBytes, zos);
 			addZipEntry(PATH_METADATA, metaBytes, zos);
-			addZipEntry(PATH_KEKENCRYPT, kekEncryptionKey, zos);
-			addZipEntry(PATH_KEKMASKING, kekMaskingKey, zos);
+			if(kekEncryptionKey != null){
+				addZipEntry(PATH_KEKENCRYPT, kekEncryptionKey, zos);	
+			}
+			if(kekMaskingKey != null){
+				addZipEntry(PATH_KEKMASKING, kekMaskingKey, zos);				
+			}			
 			
 			zos.finish();
 			bytesOut = os.toByteArray();

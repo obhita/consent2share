@@ -57,6 +57,9 @@ public class XacmlResult {
 	@XmlElement(name="pdpObligation")
 	private List<String> pdpObligations;
 	
+	/** The patient id. */
+	private String patientId;
+	
 	/**
 	 * Instantiates a new xacml result.
 	 */
@@ -152,5 +155,23 @@ public class XacmlResult {
 	 */
 	public void setPdpObligations(List<String> pdpObligations) {
 		this.pdpObligations = pdpObligations;
+	}
+
+	/**
+	 * Gets the patient id.
+	 *
+	 * @return the patient id
+	 */
+	public String getPatientId() {
+		return patientId;
+	}
+
+	/**
+	 * Sets the patient id.
+	 *
+	 * @param patientId the new patient id
+	 */
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
 	}	
 }

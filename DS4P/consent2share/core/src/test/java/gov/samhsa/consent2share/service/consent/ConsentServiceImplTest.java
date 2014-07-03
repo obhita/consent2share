@@ -1,8 +1,5 @@
 package gov.samhsa.consent2share.service.consent;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -28,8 +25,6 @@ import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 import gov.samhsa.consent2share.service.dto.ConsentDto;
-import gov.samhsa.consent2share.service.dto.ConsentValidationDto;
-import gov.samhsa.consent2share.service.dto.PreConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
@@ -635,155 +630,6 @@ public class ConsentServiceImplTest {
 		verify(consent).setConsentRevokationType("NO NEVER");
 	}
 	
-	@Test
-	public void testCheckForDuplicateConsents_when_no_duplicates() throws ParseException {
-		PreConsentDto preConsentDto = new PreConsentDto();
-		ConsentDto consentDto = mock(ConsentDto.class);
-		
-		Set<String> providersPermittedToDiscloseSet = new HashSet<String>();
-		String providersPermittedToDisclose1 = "1346575297";
-		String providersPermittedToDisclose2 = "2346575297";
-		providersPermittedToDiscloseSet.add(providersPermittedToDisclose1);
-		providersPermittedToDiscloseSet.add(providersPermittedToDisclose2);
-		
-		Set<String> providersDisclosureIsMadeToSet = new HashSet<String>();
-		String providersDisclosureIsMadeTo1 = "1083949036";
-		providersDisclosureIsMadeToSet.add(providersDisclosureIsMadeTo1);
-		
-		Set<String> organizationalProvidersDisclosureIsMadeToSet = new HashSet<String>();
-		String organizationalProvidersDisclosureIsMadeTo1 = "1174858088";
-		organizationalProvidersDisclosureIsMadeToSet.add(organizationalProvidersDisclosureIsMadeTo1);
-		
-		Set<String> organizationalProvidersPermittedToDiscloseSet = new HashSet<String>();
-		String organizationalProvidersPermittedToDisclose1 = "2174858089";
-		organizationalProvidersPermittedToDiscloseSet.add(organizationalProvidersPermittedToDisclose1);
-		
-		Set<String> shareForPurposeOfUseCodesSet = new HashSet<String>();
-		String shareForPurposeOfUseCodes1 = "CLINTRCH";
-		shareForPurposeOfUseCodesSet.add(shareForPurposeOfUseCodes1);
-		
-		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-		Date consentStart = dateFormat.parse("06/03/2013");
-		Date consentEnd = dateFormat.parse("06/17/2014");
-		
-		preConsentDto.setProvidersPermittedToDisclose(providersPermittedToDiscloseSet);
-		preConsentDto.setProvidersDisclosureIsMadeTo(providersDisclosureIsMadeToSet);
-		preConsentDto.setOrganizationalProvidersPermittedToDisclose(organizationalProvidersPermittedToDiscloseSet);
-		preConsentDto.setOrganizationalProvidersDisclosureIsMadeTo(organizationalProvidersDisclosureIsMadeToSet);
-		
-		preConsentDto.setShareForPurposeOfUseCodes(shareForPurposeOfUseCodesSet);
-		preConsentDto.setConsentStart(consentStart);
-		preConsentDto.setConsentEnd(consentEnd);
-		
-		when(consentCheckService.getConflictConsent(any(ConsentDto.class))).thenReturn(null);
-		
-		ConsentService spy = spy(cst);
-		
-		when(spy.makeConsentDto()).thenReturn(consentDto);
-		
-		ConsentValidationDto results = spy.checkForDuplicateConsents(preConsentDto, "albert.smith");
-		verify(consentDto).setUsername("albert.smith");
-		verify(consentDto).setProvidersPermittedToDisclose(providersPermittedToDiscloseSet);
-		verify(consentDto).setProvidersPermittedToDiscloseNpi(providersPermittedToDiscloseSet);
-		verify(consentDto).setProvidersDisclosureIsMadeTo(providersDisclosureIsMadeToSet);
-		verify(consentDto).setProvidersDisclosureIsMadeToNpi(providersDisclosureIsMadeToSet);
-		verify(consentDto).setOrganizationalProvidersPermittedToDisclose(organizationalProvidersPermittedToDiscloseSet);
-		verify(consentDto).setOrganizationalProvidersPermittedToDiscloseNpi(organizationalProvidersPermittedToDiscloseSet);
-		verify(consentDto).setOrganizationalProvidersDisclosureIsMadeTo(organizationalProvidersDisclosureIsMadeToSet);
-		verify(consentDto).setOrganizationalProvidersDisclosureIsMadeToNpi(organizationalProvidersDisclosureIsMadeToSet);
-		verify(consentDto).setShareForPurposeOfUseCodes(shareForPurposeOfUseCodesSet);
-		verify(consentDto).setConsentStart(consentStart);
-		verify(consentDto).setConsentEnd(consentEnd);
-		assertEquals(null, results);
-	}
-	
-	@Test
-	public void testCheckForDuplicateConsents_when_duplicates_exists() throws ParseException {
-		PreConsentDto preConsentDto = new PreConsentDto();
-		ConsentDto consentDto = mock(ConsentDto.class);
-		
-		Set<String> providersPermittedToDiscloseSet = new HashSet<String>();
-		String providersPermittedToDisclose1 = "1346575297";
-		String providersPermittedToDisclose2 = "2346575297";
-		providersPermittedToDiscloseSet.add(providersPermittedToDisclose1);
-		providersPermittedToDiscloseSet.add(providersPermittedToDisclose2);
-		
-		Set<String> providersDisclosureIsMadeToSet = new HashSet<String>();
-		String providersDisclosureIsMadeTo1 = "1083949036";
-		providersDisclosureIsMadeToSet.add(providersDisclosureIsMadeTo1);
-		
-		Set<String> organizationalProvidersDisclosureIsMadeToSet = new HashSet<String>();
-		String organizationalProvidersDisclosureIsMadeTo1 = "1174858088";
-		organizationalProvidersDisclosureIsMadeToSet.add(organizationalProvidersDisclosureIsMadeTo1);
-		
-		Set<String> organizationalProvidersPermittedToDiscloseSet = new HashSet<String>();
-		String organizationalProvidersPermittedToDisclose1 = "2174858089";
-		organizationalProvidersPermittedToDiscloseSet.add(organizationalProvidersPermittedToDisclose1);
-		
-		Set<String> validationProvidersPermittedToDiscloseSet = new HashSet<String>();
-		validationProvidersPermittedToDiscloseSet.add(providersPermittedToDisclose1);
-		validationProvidersPermittedToDiscloseSet.add(providersPermittedToDisclose2);
-		validationProvidersPermittedToDiscloseSet.add(organizationalProvidersPermittedToDisclose1);
-		
-		Set<String> validationExistingProvidersPermittedToDiscloseSet = new HashSet<String>();
-		validationProvidersPermittedToDiscloseSet.add(providersPermittedToDisclose1);
-		
-		Set<String> validationProvidersDisclosureIsMadeToSet = new HashSet<String>();
-		validationProvidersDisclosureIsMadeToSet.add(providersDisclosureIsMadeTo1);
-		validationProvidersDisclosureIsMadeToSet.add(organizationalProvidersDisclosureIsMadeTo1);
-		
-		Set<String> shareForPurposeOfUseCodesSet = new HashSet<String>();
-		String shareForPurposeOfUseCodes1 = "CLINTRCH";
-		shareForPurposeOfUseCodesSet.add(shareForPurposeOfUseCodes1);
-		
-		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-		Date consentStart = dateFormat.parse("06/03/2013");
-		Date consentEnd = dateFormat.parse("06/17/2014");
-		
-		preConsentDto.setProvidersPermittedToDisclose(providersPermittedToDiscloseSet);
-		preConsentDto.setProvidersDisclosureIsMadeTo(providersDisclosureIsMadeToSet);
-		preConsentDto.setOrganizationalProvidersPermittedToDisclose(organizationalProvidersPermittedToDiscloseSet);
-		preConsentDto.setOrganizationalProvidersDisclosureIsMadeTo(organizationalProvidersDisclosureIsMadeToSet);
-		
-		preConsentDto.setShareForPurposeOfUseCodes(shareForPurposeOfUseCodesSet);
-		preConsentDto.setConsentStart(consentStart);
-		preConsentDto.setConsentEnd(consentEnd);
-		
-		ConsentValidationDto consentValidationDto = mock(ConsentValidationDto.class);
-		
-		when(consentValidationDto.getSelectedAuthorizedProviders()).thenReturn(validationProvidersPermittedToDiscloseSet);
-		when(consentValidationDto.getSelectedDiscloseToProviders()).thenReturn(validationProvidersDisclosureIsMadeToSet);
-		when(consentValidationDto.getSelectedPurposeOfUse()).thenReturn(shareForPurposeOfUseCodesSet);
-		when(consentValidationDto.getSelectedConsentStartDate()).thenReturn(dateFormat.format(consentStart));
-		when(consentValidationDto.getSelectedConsentEndDate()).thenReturn(dateFormat.format(consentEnd));
-		
-		when(consentValidationDto.getExistingAuthorizedProviders()).thenReturn(validationExistingProvidersPermittedToDiscloseSet);
-		when(consentValidationDto.getExistingDiscloseToProviders()).thenReturn(validationProvidersDisclosureIsMadeToSet);
-		when(consentValidationDto.getExistingPurposeOfUse()).thenReturn(shareForPurposeOfUseCodesSet);
-		when(consentValidationDto.getExistingConsentStartDate()).thenReturn(dateFormat.format(consentStart));
-		when(consentValidationDto.getExistingConsentEndDate()).thenReturn(dateFormat.format(consentEnd));
-		
-		when(consentCheckService.getConflictConsent(any(ConsentDto.class))).thenReturn(consentValidationDto);
-		
-		ConsentService spy = spy(cst);
-		
-		when(spy.makeConsentDto()).thenReturn(consentDto);
-		
-		ConsentValidationDto results = spy.checkForDuplicateConsents(preConsentDto, "albert.smith");
-		verify(consentDto).setUsername("albert.smith");
-		verify(consentDto).setProvidersPermittedToDisclose(providersPermittedToDiscloseSet);
-		verify(consentDto).setProvidersPermittedToDiscloseNpi(providersPermittedToDiscloseSet);
-		verify(consentDto).setProvidersDisclosureIsMadeTo(providersDisclosureIsMadeToSet);
-		verify(consentDto).setProvidersDisclosureIsMadeToNpi(providersDisclosureIsMadeToSet);
-		verify(consentDto).setOrganizationalProvidersPermittedToDisclose(organizationalProvidersPermittedToDiscloseSet);
-		verify(consentDto).setOrganizationalProvidersPermittedToDiscloseNpi(organizationalProvidersPermittedToDiscloseSet);
-		verify(consentDto).setOrganizationalProvidersDisclosureIsMadeTo(organizationalProvidersDisclosureIsMadeToSet);
-		verify(consentDto).setOrganizationalProvidersDisclosureIsMadeToNpi(organizationalProvidersDisclosureIsMadeToSet);
-		verify(consentDto).setShareForPurposeOfUseCodes(shareForPurposeOfUseCodesSet);
-		verify(consentDto).setConsentStart(consentStart);
-		verify(consentDto).setConsentEnd(consentEnd);
-		assertEquals(consentValidationDto, results);
-	}
 	
 	@Test
 	public void testGetConsentSignedStageWhenConsentIsSigned() {

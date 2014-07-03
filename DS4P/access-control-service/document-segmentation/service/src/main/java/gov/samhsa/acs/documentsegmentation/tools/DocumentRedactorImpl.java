@@ -33,6 +33,7 @@ import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
+import gov.samhsa.acs.common.tool.exception.DocumentAccessorException;
 import gov.samhsa.acs.documentsegmentation.tools.dto.RedactList;
 import gov.samhsa.acs.documentsegmentation.tools.dto.RedactedDocument;
 
@@ -94,11 +95,6 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 		this.documentAccessor = documentAccessor;
 	}
 
-	// commented out for redact-only application
-	// /** The pdp obligation prefix for redact. */
-	// private final String PDP_OBLIGATION_PREFIX_REDACT =
-	// "urn:oasis:names:tc:xspa:2.0:resource:patient:redact:";
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -110,14 +106,14 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 	 */
 	@Override
 	public RedactedDocument redactDocument(String document,
-			RuleExecutionContainer ruleExecutionContainer,
-			XacmlResult xacmlResult, FactModel factModel) {
+			RuleExecutionContainer ruleExecutionContainer, FactModel factModel) {
 
 		Document xmlDocument = null;
 		List<Node> redactNodeList = new LinkedList<Node>();
 		RedactList redactList = new RedactList();
 		Set<String> redactSectionSet = new HashSet<String>();
 		Set<String> redactCategorySet = new HashSet<String>();
+		XacmlResult xacmlResult = factModel.getXacmlResult();
 
 		try {
 			xmlDocument = documentXmlConverter.loadDocument(document);
@@ -171,6 +167,15 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 					response.setItemAction(RuleExecutionResponse.ITEM_ACTION_REDACT);
 				}
 			}
+			
+			// Add empty component/section under structuredBody if none exists (required to pass validation)
+			Node structuredBody = documentAccessor.getNode(xmlDocument, "//hl7:structuredBody[not(hl7:component)]");
+			if(structuredBody != null){
+				Element emptyComponent = xmlDocument.createElementNS("urn:hl7-org:v3", "component");
+				Element emptySection = xmlDocument.createElementNS("urn:hl7-org:v3", "section");
+				emptyComponent.appendChild(emptySection);
+				structuredBody.appendChild(emptyComponent);
+			}
 
 			// Convert redacted document to xml string
 			document = documentXmlConverter.convertXmlDocToString(xmlDocument);
@@ -222,6 +227,23 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 			throw new DS4PException(e.toString(), e);
 		}
 		return document;
+	}
+	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.acs.documentsegmentation.tools.DocumentRedactor#cleanUpEmbeddedClinicalDocumentFromFactModel(java.lang.String)
+	 */
+	@Override
+	public String cleanUpEmbeddedClinicalDocumentFromFactModel(String factModelXml){
+		try {
+		Document factModel = documentXmlConverter.loadDocument(factModelXml);
+		Element embeddedClinicalDocument = documentAccessor.getElement(factModel, "//hl7:EmbeddedClinicalDocument");
+
+		embeddedClinicalDocument.getParentNode().removeChild(embeddedClinicalDocument);
+		return documentXmlConverter.convertXmlDocToString(factModel);
+		} catch (DocumentAccessorException e) {
+			logger.error(e.getMessage(), e);
+			throw new DS4PException(e);
+		}
 	}
 
 	/**
@@ -301,31 +323,5 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Checks if the xacmlResult has any redact obligations for a single
-	 * executionResonse's sensitivity value.
-	 * 
-	 * @param xacmlResult
-	 *            the xacml result
-	 * @param response
-	 *            the response
-	 * @return true, if successful
-	 * @deprecated
-	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private boolean containsRedactObligation(XacmlResult xacmlResult,
-			RuleExecutionResponse response) {
-		// commented out for redact-only application
-		// return
-		// xacmlResult.getPdpObligations().contains(PDP_OBLIGATION_PREFIX_REDACT+response.getSensitivity());
-		boolean result = false;
-		if (response.getSensitivity() != null) {
-			result = xacmlResult.getPdpObligations().contains(
-					response.getSensitivity().toString());
-		}
-		return result;
 	}
 }

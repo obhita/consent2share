@@ -1,5 +1,9 @@
 package gov.samhsa.consent2share.web;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.dto.ValueSetLookUpDto;
 import gov.samhsa.consent2share.service.dto.ValueSetQueryDto;
@@ -29,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ValueSetLookupController {
 	protected static final String REQUEST_MAPPING_LIST = "/lookup";
 	protected static final String REDIRECT_MAPPING_LIST = "/lookupService";
+	protected static final String MULTIPLE_VALUESET_LOOKUP = "/lookupService/multipleValueset";
 	protected static final String REST_MAPPING_LIST = "/lookupService/rest";
 	protected static final String LOOKUP_GET = "/lookup/get";
 	protected static final String MODEL_ATTIRUTE_LOOKUPDTO = "lookupDto";
@@ -119,6 +124,39 @@ public class ValueSetLookupController {
 		}
 
 		return valueSetQueryDto;
+	}
+	
+	@RequestMapping(value = MULTIPLE_VALUESET_LOOKUP, method = RequestMethod.GET)
+	public @ResponseBody
+	List<ValueSetQueryDto> lookupValuesetCategoriesOfMultipleCodesAndCodeSystemSet(
+			@RequestParam(value = "code:codeSystemOid", required = false, defaultValue = "296.8:2.16.840.1.113883.6.90") List<String> codeAndCodeSystemPairList,
+			Model model) {
+		List<ValueSetQueryDto> valueSetQueryDtoList=new ArrayList<ValueSetQueryDto>();
+		for (String codeAndCodeSystemPair:codeAndCodeSystemPairList) {
+			List<String> spilitedCodeAndCodeSystem=new ArrayList<String>(Arrays.asList(codeAndCodeSystemPair.split(":")));
+			if (spilitedCodeAndCodeSystem.size()!=2) continue;
+			String code=spilitedCodeAndCodeSystem.get(0);
+			String codeSystemOid=spilitedCodeAndCodeSystem.get(1);
+			LOGGER.debug("Rendering Concept Code list page");
+			ValueSetQueryDto valueSetQueryDto = new ValueSetQueryDto();
+			try {
+				valueSetQueryDto.setCodeSystemOid(codeSystemOid);
+				valueSetQueryDto.setConceptCode(code);
+				valueSetQueryDto = lookupService.RestfulValueSetCategories(code.trim(),
+						codeSystemOid.trim());
+			} catch (CodeSystemVersionNotFoundException e) {
+				LOGGER.debug(e.getMessage());
+			} catch (ConceptCodeNotFoundException e) {
+				LOGGER.debug(e.getMessage());
+			} catch (ValueSetNotFoundException e) {
+				LOGGER.debug(e.getMessage());
+			}
+			valueSetQueryDtoList.add(valueSetQueryDto);
+		}
+		
+		
+
+		return valueSetQueryDtoList;
 	}
 	
 	/**

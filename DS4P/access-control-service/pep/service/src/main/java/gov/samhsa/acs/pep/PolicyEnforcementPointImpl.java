@@ -556,17 +556,14 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 				// packageAsXdm = input.getPackageAsXdm()
 				boolean packageAsXdm = true;
 				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
-						.segmentDocument(originalC32, xacmlResultString,
-								packageAsXdm, true, input.getSenderEmail(),
-								input.getRecipientEmail(),
-								xdsDocumentEntryUniqueId, xacmlRequest, true);
+						.segmentDocument(originalC32, xacmlResultString, true);
+				documentSegmentation.setAdditionalMetadataForSegmentedClinicalDocument(segmentDocumentResponse, input.getSenderEmail(), input.getRecipientEmail(), xdsDocumentEntryUniqueId, xacmlResult);
+				documentSegmentation.setDocumentPayloadRawData(segmentDocumentResponse, packageAsXdm, input.getSenderEmail(), input.getRecipientEmail(), xacmlResult);
 
 				processedPayload = dataHandlerToBytesConverter
-						.toByteArray(segmentDocumentResponse
-								.getProcessedDocument());
+						.toByteArray(segmentDocumentResponse.getDocumentPayloadRawData());
 
-				response.setMaskedDocument(segmentDocumentResponse
-						.getMaskedDocument());
+				response.setMaskedDocument(segmentDocumentResponse.getSegmentedDocumentXml());
 				response.setFilteredStreamBody(processedPayload);
 
 			} else {
@@ -671,25 +668,16 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 			XacmlResult xacmlResult = createXacmlResult(xacmlRequest,
 					xacmlResponse);
 
-			String enforcementPolicies = null;
+			String enforcementPolicies = marshaller.marshall(xacmlResult);
 
-			enforcementPolicies = marshaller.marshall(xacmlResult);
-
-			boolean packageAsXdm = false;
-			boolean encryptDocument = false;
-			String senderEmailAddress = "";
-			String recipientEmailAddress = "";
-			String xdsDocumentEntryUniqueId = "UniquId";
 			segmentDocumentResponse = documentSegmentation.segmentDocument(
-					c32Xml, enforcementPolicies, packageAsXdm, encryptDocument,
-					senderEmailAddress, recipientEmailAddress,
-					xdsDocumentEntryUniqueId, xacmlRequest, false);
+					c32Xml, enforcementPolicies, false);
 		} catch (Throwable t) {
 			logger.error(messageId, "Error in tryPolicy", t);
 			throw new PolicyEnforcementPointException(t);
 		}
 
-		return segmentDocumentResponse.getMaskedDocument();
+		return segmentDocumentResponse.getSegmentedDocumentXml();
 	}
 
 	/**
@@ -812,20 +800,13 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 		for (DocumentResponse documentResponse : response.getDocumentResponse()) {
 			String document = new String(documentResponse.getDocument());
 
-			boolean packageAsXdm = false;
-			boolean encryptDocument = false;
-			String senderEmailAddress = "";
-			String recipientEmailAddress = "";
 			String xdsDocumentEntryUniqueId = documentResponse
 					.getDocumentUniqueId();
 
 			SegmentDocumentResponse segmentDocumentResponse = null;
 			try {
 				segmentDocumentResponse = documentSegmentation.segmentDocument(
-						document, enforcementPolicies, packageAsXdm,
-						encryptDocument, senderEmailAddress,
-						recipientEmailAddress, xdsDocumentEntryUniqueId,
-						xacmlRequest, true);
+						document, enforcementPolicies, true);
 			} catch (InvalidOriginalClinicalDocumentException e) {
 				StringBuilder errorBuilder = new StringBuilder();
 				errorBuilder.append("Schema validation failed: Invalid document before segmentation: ");
@@ -852,7 +833,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 				handleXmlValidationError(documentResponse, removeList, errorMap, xdsDocumentEntryUniqueId);
 			}
 			if (segmentDocumentResponse != null) {
-				documentResponse.setDocument(segmentDocumentResponse.getMaskedDocument().getBytes());
+				documentResponse.setDocument(segmentDocumentResponse.getSegmentedDocumentXml().getBytes());
 			}
 
 			// logging SegmentDocumentResponse
@@ -921,6 +902,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 		xacmlResult.setPdpObligations(xacmlResponse.getPdpObligation());
 		xacmlResult.setSubjectPurposeOfUse(SubjectPurposeOfUse
 				.fromAbbreviation(xacmlRequest.getPurposeOfUse()));
+		xacmlResult.setPatientId(xacmlRequest.getPatientId());
 		return xacmlResult;
 	}
 

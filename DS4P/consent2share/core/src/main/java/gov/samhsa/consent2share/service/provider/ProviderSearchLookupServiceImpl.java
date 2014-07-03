@@ -80,21 +80,22 @@ public class ProviderSearchLookupServiceImpl implements
 	 */
 	public String providerSearch(String usstate, String city, String zipcode,
 			String gender, String specialty, String phone, String firstname,
-			String lastname) {
+			String lastname, int pageNumber) {
 		// check the rule
 		String query = generateProviderSearchURL(usstate, city, zipcode,
-				gender, specialty, phone, firstname, lastname).replace(" ",
+				gender, specialty, phone, firstname, lastname, pageNumber).replace(" ",
 				"%20");
 
 		StringBuilder output = new StringBuilder();
 
 		output.append(callProviderSearch(query));
 
-		if (lastname != null && firstname == null) {
-			output.append(callProviderSearch(query.replace("lastname",
-					"orgname")));
-
-		}
+		// TODO (AO): fix org search
+//		if (lastname != null && firstname == null) {
+//			output.append(callProviderSearch(query.replace("lastname",
+//					"orgname")));
+//
+//		}
 		return output.toString().replace("]}{\"providers\":[", "");
 	}
 
@@ -103,9 +104,11 @@ public class ProviderSearchLookupServiceImpl implements
 	 */
 	public String generateProviderSearchURL(String usstate, String city,
 			String zipcode, String gender, String specialty, String phone,
-			String firstname, String lastname) {
+			String firstname, String lastname, int pageNumber) {
 		StringBuffer query = new StringBuffer(getProviderSearchURL());
 
+		query.append("/pageNumber/").append(pageNumber);
+		
 		if (usstate != null)
 			query.append("/usstate/").append(usstate);
 		if (city != null)
@@ -122,7 +125,7 @@ public class ProviderSearchLookupServiceImpl implements
 			query.append("/firstname/").append(firstname);
 		if (lastname != null)
 			query.append("/lastname/").append(lastname);
-
+		
 		return query.toString();
 
 	}

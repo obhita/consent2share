@@ -3,10 +3,12 @@ package com.feisystems.provider.service.controllers;
 import static com.feisystems.provider.service.ProviderService.SEARCH_STRING;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.feisystems.provider.Provider;
 import com.feisystems.provider.dtos.ProviderDto;
 import com.feisystems.provider.dtos.ProvidersDto;
 import com.feisystems.provider.service.ProviderService;
@@ -56,84 +59,84 @@ public class ProviderController {
 		
 	}
 
-	@RequestMapping(value="/providers/{npi}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/{npi}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProviderDto findProviderByNPI(@PathVariable("npi") String npi){
+	public @ResponseBody ProviderDto findProviderByNPI(@PathVariable("pageNumber") String pageNumber, @PathVariable("npi") String npi){
+		// FIXME (AO)
 		return providerService.getProvider(npi);
 	}
 
 
-	@RequestMapping(value="/providers/city/{city}/usstate/{usstate}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/city/{city}/usstate/{usstate}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProvidersDto findbyCityAndState(@PathVariable("city") String city, @PathVariable("usstate") String usStateAbbreviation){
+	public @ResponseBody ProvidersDto findbyCityAndState(@PathVariable("pageNumber") String pageNumber, @PathVariable("city") String city, @PathVariable("usstate") String usStateAbbreviation){
 		return new ProvidersDto(providerService.getByGenderCodeAndUSStateAbbreviationAndCityAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(
-				SEARCH_STRING, usStateAbbreviation, city, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING));
+				SEARCH_STRING, usStateAbbreviation, city, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, pageNumber));
 	}
 
-	@RequestMapping(value="/providers/zipcode/{zipcode}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/zipcode/{zipcode}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProvidersDto findbyPostalCode(@PathVariable("zipcode") String postalCode){
+	public @ResponseBody ProvidersDto findbyPostalCode(@PathVariable("pageNumber") String pageNumber, @PathVariable("zipcode") String postalCode){
 		return new ProvidersDto(providerService.getByGenderCodeAndPostalCodeAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(
-				SEARCH_STRING, postalCode, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING));
+				SEARCH_STRING, postalCode, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, pageNumber));
 	}
 
-	@RequestMapping(value="/providers/usstate/{usstate}/city/{city}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/usstate/{usstate}/city/{city}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProvidersDto findbyCityAndState2(@PathVariable("usstate") String usStateAbbreviation, @PathVariable("city") String city){
-		return new ProvidersDto(
-				providerService.getByGenderCodeAndUSStateAbbreviationAndCityAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(SEARCH_STRING, usStateAbbreviation, city, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING));
+	public @ResponseBody ProvidersDto findbyCityAndState2(@PathVariable("pageNumber") String pageNumber, @PathVariable("usstate") String usStateAbbreviation, @PathVariable("city") String city){
+		return new ProvidersDto(providerService.getByGenderCodeAndUSStateAbbreviationAndCityAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(SEARCH_STRING, usStateAbbreviation, city, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, SEARCH_STRING, pageNumber));
 	}
 	
 
-	@RequestMapping(value="/providers/{name1}/{value1}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/{name1}/{value1}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProvidersDto searchWithOneArguments(@PathVariable("name1") String name1, @PathVariable("value1") String value1, 
+	public @ResponseBody ProvidersDto searchWithOneArguments(@PathVariable("pageNumber") String pageNumber, @PathVariable("name1") String name1, @PathVariable("value1") String value1, 
 															  	HttpServletRequest request){		
 		String methodType = getMethodType(request);
 		String[] args = URLArgument.createArgumentArray(methodType);
-		fillArray(args, methodType, name1, value1);
+		fillArray(args, methodType, "pageNumber", pageNumber, name1, value1);
 		return new ProvidersDto(executeProvidersMethod(methodType, args));
 	}
 
-	@RequestMapping(value="/providers/{name1}/{value1}/{name2}/{value2}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/{name1}/{value1}/{name2}/{value2}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProvidersDto searchWithTwoArguments(@PathVariable("name1") String name1, @PathVariable("value1") String value1, 
+	public @ResponseBody ProvidersDto searchWithTwoArguments(@PathVariable("pageNumber") String pageNumber, @PathVariable("name1") String name1, @PathVariable("value1") String value1, 
 															  @PathVariable("name2") String name2, @PathVariable("value2") String value2, 
 															  	HttpServletRequest request){		
 		String methodType = getMethodType(request);
 		String[] args = URLArgument.createArgumentArray(methodType);
-		fillArray(args, methodType, name1, value1, name2, value2);
+		fillArray(args, methodType, "pageNumber", pageNumber, name1, value1, name2, value2);
 		return new ProvidersDto(executeProvidersMethod(methodType, args));
 	}
 
-	@RequestMapping(value="/providers/{name1}/{value1}/{name2}/{value2}/{name3}/{value3}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/{name1}/{value1}/{name2}/{value2}/{name3}/{value3}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProvidersDto searchWithThreeArguments(@PathVariable("name1") String name1, @PathVariable("value1") String value1, 
+	public @ResponseBody ProvidersDto searchWithThreeArguments(@PathVariable("pageNumber") String pageNumber, @PathVariable("name1") String name1, @PathVariable("value1") String value1, 
 			  @PathVariable("name2") String name2, @PathVariable("value2") String value2, 
 			  @PathVariable("name3") String name3, @PathVariable("value3") String value3, 
 			  HttpServletRequest request){		
 		String methodType = getMethodType(request);
 		String[] args = URLArgument.createArgumentArray(methodType);
-		fillArray(args, methodType, name1, value1, name2, value2, name3, value3);
+		fillArray(args, methodType, "pageNumber", pageNumber, name1, value1, name2, value2, name3, value3);
 		return new ProvidersDto(executeProvidersMethod(methodType, args));
 	}
 
-	@RequestMapping(value="/providers/{name1}/{value1}/{name2}/{value2}/{name3}/{value3}/{name4}/{value4}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/{name1}/{value1}/{name2}/{value2}/{name3}/{value3}/{name4}/{value4}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProvidersDto searchWithFourArguments(@PathVariable("name1") String name1, @PathVariable("value1") String value1, 
+	public @ResponseBody ProvidersDto searchWithFourArguments(@PathVariable("pageNumber") String pageNumber, @PathVariable("name1") String name1, @PathVariable("value1") String value1, 
 			  @PathVariable("name2") String name2, @PathVariable("value2") String value2, 
 			  @PathVariable("name3") String name3, @PathVariable("value3") String value3, 
 			  @PathVariable("name4") String name4, @PathVariable("value4") String value4, 
 			  HttpServletRequest request){		
 		String methodType = getMethodType(request);
 		String[] args = URLArgument.createArgumentArray(methodType);
-		fillArray(args, methodType, name1, value1, name2, value2, name3, value3, name4, value4);
+		fillArray(args, methodType, "pageNumber", pageNumber, name1, value1, name2, value2, name3, value3, name4, value4);
 		return new ProvidersDto(executeProvidersMethod(methodType, args));
 	}
 
-	@RequestMapping(value="/providers/{name1}/{value1}/{name2}/{value2}/{name3}/{value3}/{name4}/{value4}/{name5}/{value5}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/{name1}/{value1}/{name2}/{value2}/{name3}/{value3}/{name4}/{value4}/{name5}/{value5}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProvidersDto searchWithFiveArguments(@PathVariable("name1") String name1, @PathVariable("value1") String value1, 
+	public @ResponseBody ProvidersDto searchWithFiveArguments(@PathVariable("pageNumber") String pageNumber, @PathVariable("name1") String name1, @PathVariable("value1") String value1, 
 			  @PathVariable("name2") String name2, @PathVariable("value2") String value2, 
 			  @PathVariable("name3") String name3, @PathVariable("value3") String value3, 
 			  @PathVariable("name4") String name4, @PathVariable("value4") String value4, 
@@ -141,13 +144,13 @@ public class ProviderController {
 			  HttpServletRequest request){		
 		String methodType = getMethodType(request);
 		String[] args = URLArgument.createArgumentArray(methodType);
-		fillArray(args, methodType, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5);
+		fillArray(args, methodType, "pageNumber", pageNumber, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5);
 		return new ProvidersDto(executeProvidersMethod(methodType, args));
 	}
 
-	@RequestMapping(value="/providers/{name1}/{value1}/{name2}/{value2}/{name3}/{value3}/{name4}/{value4}/{name5}/{value5}/{name6}/{value6}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/{name1}/{value1}/{name2}/{value2}/{name3}/{value3}/{name4}/{value4}/{name5}/{value5}/{name6}/{value6}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProvidersDto searchWithSixArguments(@PathVariable("name1") String name1, @PathVariable("value1") String value1, 
+	public @ResponseBody ProvidersDto searchWithSixArguments(@PathVariable("pageNumber") String pageNumber, @PathVariable("name1") String name1, @PathVariable("value1") String value1, 
 			  @PathVariable("name2") String name2, @PathVariable("value2") String value2, 
 			  @PathVariable("name3") String name3, @PathVariable("value3") String value3, 
 			  @PathVariable("name4") String name4, @PathVariable("value4") String value4, 
@@ -156,13 +159,13 @@ public class ProviderController {
 			  HttpServletRequest request){		
 		String methodType = getMethodType(request);
 		String[] args = URLArgument.createArgumentArray(methodType);
-		fillArray(args, methodType, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6);
+		fillArray(args, methodType, "pageNumber", pageNumber, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6);
 		return new ProvidersDto(executeProvidersMethod(methodType, args));
 	}
 
-	@RequestMapping(value="/providers/{name1}/{value1}/{name2}/{value2}/{name3}/{value3}/{name4}/{value4}/{name5}/{value5}/{name6}/{value6}/{name7}/{value7}", method=RequestMethod.GET)
+	@RequestMapping(value="/providers/pageNumber/{pageNumber}/{name1}/{value1}/{name2}/{value2}/{name3}/{value3}/{name4}/{value4}/{name5}/{value5}/{name6}/{value6}/{name7}/{value7}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody ProvidersDto searchWithSevenArguments(@PathVariable("name1") String name1, @PathVariable("value1") String value1, 
+	public @ResponseBody ProvidersDto searchWithSevenArguments(@PathVariable("pageNumber") String pageNumber, @PathVariable("name1") String name1, @PathVariable("value1") String value1, 
 			  @PathVariable("name2") String name2, @PathVariable("value2") String value2, 
 			  @PathVariable("name3") String name3, @PathVariable("value3") String value3, 
 			  @PathVariable("name4") String name4, @PathVariable("value4") String value4, 
@@ -172,7 +175,7 @@ public class ProviderController {
 			  HttpServletRequest request){		
 		String methodType = URLArgument.URLHelper.CITY_STATE_METHOD_TYPE;
 		String[] args = URLArgument.createArgumentArray(methodType);
-		fillArray(args, methodType, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, name7, value7);
+		fillArray(args, methodType, "pageNumber", pageNumber, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, name7, value7);
 		return new ProvidersDto(executeProvidersMethod(methodType, args));
 	}
 
@@ -194,13 +197,13 @@ public class ProviderController {
 		
 	}
 	
-	private List<ProviderDto> executeProvidersMethod (String methodType, String[] args){
+	private Map<String, Object> executeProvidersMethod (String methodType, String[] args){
 		if(URLHelper.CITY_STATE_METHOD_TYPE.equals(methodType)){
 			return providerService.getByGenderCodeAndUSStateAbbreviationAndCityAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(
-					args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);		
+					args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);		
 		}
 		return providerService.getByGenderCodeAndPostalCodeAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(
-				args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]); 
+				args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]); 
 	}
 
 }

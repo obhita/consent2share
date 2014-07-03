@@ -26,8 +26,13 @@
 package gov.samhsa.acs.documentsegmentation.valueset;
 
 
+import gov.samhsa.acs.documentsegmentation.valueset.dto.CodeAndCodeSystemSetDto;
+import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryDto;
 import gov.samhsa.acs.documentsegmentation.valueset.dto.ValueSetQueryListDto;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -49,6 +54,9 @@ public interface ValueSetService {
 	
 	
 	 public ValueSetQueryListDto RestfulValueSetCategories(ValueSetQueryListDto valueSetQueryListDtos) ;
+
+	List<Map<String, Object>> lookupValuesetCategoriesOfMultipleCodeAndCodeSystemSet(
+			List<CodeAndCodeSystemSetDto> codeAndCodeSystemSetDtoList);
 	
 	
 }

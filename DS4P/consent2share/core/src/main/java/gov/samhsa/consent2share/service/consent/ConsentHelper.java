@@ -12,9 +12,12 @@ import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.joda.time.Interval;
@@ -155,8 +158,10 @@ public class ConsentHelper {
 		consentValidationDto.setExistingDiscloseToProviders(isMadeToName);
 		consentValidationDto.setExistingAuthorizedProviders(toDiscloseName);
 		
-		consentValidationDto.setSelectedDiscloseToProviders(consentDto.getMadeToNames());
-		consentValidationDto.setSelectedAuthorizedProviders(consentDto.getAuthorizerNames());
+		
+		
+		consentValidationDto.setSelectedDiscloseToProviders(getSelectedProviderIsMadeToName(consentDto));
+		consentValidationDto.setSelectedAuthorizedProviders(getSelectedAuthorizedProviders(consentDto));
 		
 		
 		//pou
@@ -190,6 +195,59 @@ public class ConsentHelper {
 		return consentValidationDto;
 				
 	}
+	
+	protected Set<String> getSelectedProviderIsMadeToName(ConsentDto consentDto) {
+
+		Set<String> madeToSet = new HashSet<String>();
+		int sizeOfPMadeTo = 0;
+
+		if (consentDto.getProvidersDisclosureIsMadeTo() != null)
+			sizeOfPMadeTo = sizeOfPMadeTo
+					+ consentDto.getProvidersDisclosureIsMadeTo().size();
+		if (consentDto.getOrganizationalProvidersDisclosureIsMadeTo() != null)
+			sizeOfPMadeTo = sizeOfPMadeTo
+					+ consentDto.getOrganizationalProvidersDisclosureIsMadeTo()
+							.size();
+
+		if (consentDto.getMadeToNames().size() == 2 && sizeOfPMadeTo == 1) {
+			Iterator it = consentDto.getMadeToNames().iterator();
+			String a = it.next() + "," + it.next();
+			madeToSet.add(a);
+
+		} else {
+			madeToSet = consentDto.getMadeToNames();
+		}
+
+		return madeToSet;
+
+	}
+	
+	protected Set<String> getSelectedAuthorizedProviders(ConsentDto consentDto) {
+
+		Set<String> madeToSet = new HashSet<String>();
+		int sizeOfAuthorizedProviders = 0;
+
+		if (consentDto.getProvidersPermittedToDisclose() != null)
+			sizeOfAuthorizedProviders = sizeOfAuthorizedProviders
+					+ consentDto.getProvidersPermittedToDisclose().size();
+		if (consentDto.getOrganizationalProvidersPermittedToDisclose() != null)
+			sizeOfAuthorizedProviders = sizeOfAuthorizedProviders
+					+ consentDto.getOrganizationalProvidersPermittedToDisclose()
+							.size();
+
+		if (consentDto.getAuthorizerNames().size() == 2 && sizeOfAuthorizedProviders == 1) {
+			Iterator it = consentDto.getAuthorizerNames().iterator();
+			String a = it.next() + "," + it.next();
+			madeToSet.add(a);
+
+		} else {
+			madeToSet = consentDto.getAuthorizerNames();
+		}
+		return madeToSet;
+
+	}
+	
+	
 
 	protected Set<String> getProviderIsMadeToName(Consent consent) {
 

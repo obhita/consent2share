@@ -4,7 +4,9 @@ import gov.samhsa.consent2share.service.dto.ValueSetDto;
 import gov.samhsa.consent2share.service.dto.ValueSetVSCDto;
 
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,7 +47,7 @@ public interface ValueSetService {
   * @param pageNumber the page number
   * @return the list
   */
- public List<ValueSetDto> findAll(int pageNumber);
+ public Map<String, Object> findAll(int pageNumber);
  
  /**
   * Finds ValueSet by id.
@@ -75,29 +77,44 @@ public interface ValueSetService {
  
 
  /**
-  * Find by name.
+  * Find all by name.
   *
   * @param searchTerm the search term
-  * @return the list
+  * @param valueSetCategory the value set category
+  * @param pageNumber the page number
+  * @return the map
   */
- public List<ValueSetDto> findAllByName(String searchTerm);
+ public Map<String, Object> findAllByName(String searchTerm, String valueSetCategory, int pageNumber);
  
  /**
   * Find by code.
   *
   * @param searchTerm the search term
-  * @return the list
+  * @param valueSetCategory the value set category
+  * @param pageNumber the page number
+  * @return the map
   */
- public List<ValueSetDto> findAllByCode(String searchTerm);
-	
+public Map<String, Object> findAllByCode(String searchTerm, String valueSetCategory, int pageNumber);
+
 	/**
 	 * Value set batch upload.
-	 *
-	 * @param valueSetDto the value set dto
-	 * @param file            the bytes
+	 * 
+	 * @param valueSetDto
+	 *            the value set dto
+	 * @param file
+	 *            the bytes
 	 * @return the value set dto
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
-	public ValueSetDto valueSetBatchUpload(ValueSetDto valueSetDto, MultipartFile file) throws Exception;
+	public ValueSetDto valueSetBatchUpload(ValueSetDto valueSetDto,
+			MultipartFile file) throws Exception;
+
+	/**
+	 * Find all without deletable.
+	 *
+	 * @return the list
+	 */
+	public List<ValueSetDto> findAllWithoutDeletable();
 
 }

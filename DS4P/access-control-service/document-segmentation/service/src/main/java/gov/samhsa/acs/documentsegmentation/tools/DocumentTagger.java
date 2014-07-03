@@ -25,19 +25,20 @@
  ******************************************************************************/
 package gov.samhsa.acs.documentsegmentation.tools;
 
+/**
+ * The Interface DocumentTagger.
+ */
 public interface DocumentTagger {
 
 	/**
-	 * Tag document
-	 * 
+	 * Tag document.
+	 *
 	 * @param document
 	 *            the document
 	 * @param executionResponseContainer
 	 *            the execution response container
-	 * @param messageId
-	 *            the message id
 	 * @return the string
 	 */
 	public abstract String tagDocument(String document,
-			String executionResponseContainer, String messageId);
+			String executionResponseContainer);
 }

@@ -15,6 +15,7 @@ import gov.samhsa.consent2share.service.dto.ConceptCodeVSCSDto;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -215,39 +216,75 @@ public class ConceptCodeServiceImpl implements ConceptCodeService {
 	 * @see gov.samhsa.consent2share.service.valueset.ConceptCodeService#findAll()
 	 */
 	@Override
-	public List<ConceptCodeDto> findAll(int pageNumber) {
+	public Map<String, Object> findAll(int pageNumber) {
+		
 		LOGGER.debug("Finding all conceptCodes with paging");
 		Sort sort = new Sort(new Order(Direction.ASC, "code"));
 		PageRequest pageRequest = new PageRequest(pageNumber, CONCEPT_CODE_PAGE_SIZE, sort);
 		
-		Page<ConceptCode> conceptCodes = conceptCodeRepository.findAll(pageRequest);
-		LOGGER.debug("Total Concept Codes: " + conceptCodes.getTotalElements());
-		LOGGER.debug("Total Pages: " + conceptCodes.getTotalPages());
+		Page<ConceptCode> pagedConceptCodes = conceptCodeRepository.findAll(pageRequest);
+		LOGGER.debug("Total Concept Codes: " + pagedConceptCodes.getTotalElements());
+		LOGGER.debug("Total Pages: " + pagedConceptCodes.getTotalPages());
 		
-		return valueSetMgmtHelper
-				.convertConceptCodeEntitiesToDtos(conceptCodes.getContent());
+		Map<String, Object> pageResultsMap = new HashMap<String, Object>();
+		pageResultsMap.put("conceptCodes", valueSetMgmtHelper
+				.convertConceptCodeEntitiesToDtos(pagedConceptCodes.getContent()));
+		pageResultsMap.put("totalNumberOfConceptCodes", pagedConceptCodes.getTotalElements());
+		pageResultsMap.put("totalPages", pagedConceptCodes.getTotalPages());
+		pageResultsMap.put("itemsPerPage", pagedConceptCodes.getSize());
+		pageResultsMap.put("currentPage", pagedConceptCodes.getNumber());
+		pageResultsMap.put("numberOfElements", pagedConceptCodes.getNumberOfElements());
+		
+		return pageResultsMap;
 	}
 	
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.service.valueset.ConceptCodeService#findAllByCode(java.lang.String)
 	 */
 	@Override
-	public List<ConceptCodeDto> findAllByCode(String searchTerm) {
+	public Map<String, Object> findAllByCode(String searchTerm, String codeSystem, String codeSystemVersion, String valueSetName, int pageNumber) {
+		Sort sort = new Sort(new Order(Direction.ASC, "code"));
+		PageRequest pageRequest = new PageRequest(pageNumber, CONCEPT_CODE_PAGE_SIZE, sort);
 		
-		List<ConceptCode> conceptCodes = conceptCodeRepository.findAllByCodeLike("%"+searchTerm+"%");
-		return valueSetMgmtHelper
-				.convertConceptCodeEntitiesToDtos(conceptCodes);
+		Page<ConceptCode> pagedConceptCodes = conceptCodeRepository.findAllByCodeLike("%"+searchTerm+"%", "%"+codeSystem+"%", "%"+codeSystemVersion+"%", "%"+valueSetName+"%", pageRequest);
+		LOGGER.debug("Total Concept Codes: " + pagedConceptCodes.getTotalElements());
+		LOGGER.debug("Total Pages: " + pagedConceptCodes.getTotalPages());
+		
+		Map<String, Object> pageResultsMap = new HashMap<String, Object>();
+		pageResultsMap.put("conceptCodes", valueSetMgmtHelper
+				.convertConceptCodeEntitiesToDtos(pagedConceptCodes.getContent()));
+		pageResultsMap.put("totalNumberOfConceptCodes", pagedConceptCodes.getTotalElements());
+		pageResultsMap.put("totalPages", pagedConceptCodes.getTotalPages());
+		pageResultsMap.put("itemsPerPage", pagedConceptCodes.getSize());
+		pageResultsMap.put("currentPage", pagedConceptCodes.getNumber());
+		pageResultsMap.put("numberOfElements", pagedConceptCodes.getNumberOfElements());
+		
+		return pageResultsMap;
 	}
 	
+
 	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.service.valueset.ConceptCodeService#findAllByName(java.lang.String)
+	 * @see gov.samhsa.consent2share.service.valueset.ConceptCodeService#findAllByName(java.lang.String, java.lang.String, java.lang.String, java.lang.String, int)
 	 */
 	@Override
-	public List<ConceptCodeDto> findAllByName(String searchTerm) {
+	public Map<String, Object>  findAllByName(String searchTerm, String codeSystem, String codeSystemVersion, String valueSetName, int pageNumber) {
+		Sort sort = new Sort(new Order(Direction.ASC, "name"));
+		PageRequest pageRequest = new PageRequest(pageNumber, CONCEPT_CODE_PAGE_SIZE, sort);
 		
-		List<ConceptCode> conceptCodes = conceptCodeRepository.findAllByNameLike("%"+searchTerm+"%");
-		return valueSetMgmtHelper
-				.convertConceptCodeEntitiesToDtos(conceptCodes);
+		Page<ConceptCode> pagedConceptCodes = conceptCodeRepository.findAllByNameLike("%"+searchTerm+"%", "%"+codeSystem+"%", "%"+codeSystemVersion+"%", "%"+valueSetName+"%", pageRequest);
+		LOGGER.debug("Total Concept Codes: " + pagedConceptCodes.getTotalElements());
+		LOGGER.debug("Total Pages: " + pagedConceptCodes.getTotalPages());
+		
+		Map<String, Object> pageResultsMap = new HashMap<String, Object>();
+		pageResultsMap.put("conceptCodes", valueSetMgmtHelper
+				.convertConceptCodeEntitiesToDtos(pagedConceptCodes.getContent()));
+		pageResultsMap.put("totalNumberOfConceptCodes", pagedConceptCodes.getTotalElements());
+		pageResultsMap.put("totalPages", pagedConceptCodes.getTotalPages());
+		pageResultsMap.put("itemsPerPage", pagedConceptCodes.getSize());
+		pageResultsMap.put("currentPage", pagedConceptCodes.getNumber());
+		pageResultsMap.put("numberOfElements", pagedConceptCodes.getNumberOfElements());
+		
+		return pageResultsMap;
 	}
 
 	/* (non-Javadoc)
@@ -274,6 +311,12 @@ public class ConceptCodeServiceImpl implements ConceptCodeService {
 	}
 
 
+	/**
+	 * Gets the all value sets in map.
+	 *
+	 * @return the all value sets in map
+	 * @throws ValueSetNotFoundException the value set not found exception
+	 */
 	private Map<Long, String> getAllValueSetsInMap() throws ValueSetNotFoundException {
 		// Get all valuesets
 		List<ValueSet> valueSets = valueSetRepository.findAll();
@@ -456,6 +499,12 @@ public class ConceptCodeServiceImpl implements ConceptCodeService {
 	}
 	
 
+	/**
+	 * Gets the all value set ids for concept code.
+	 *
+	 * @param conceptCodeId the concept code id
+	 * @return the all value set ids for concept code
+	 */
 	private List<Long> getAllValueSetIdsForConceptCode(Long  conceptCodeId) {
 		List<ConceptCodeValueSet> cValueSets = conceptCodeValueSetRepository.findAllByPkConceptCodeId(conceptCodeId);
 		List<Long> selValueSetIds = new ArrayList<Long>();

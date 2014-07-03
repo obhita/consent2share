@@ -134,8 +134,8 @@ public class PepImplIT {
 		final String documentSegmentationEndpointAddress = "http://localhost:90/DocumentSegmentation/services/DocumentSegmentationService";
 		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
 				ruleExecutionService, null, documentEditor,
-				marshaller, documentEncrypter, documentRedactor,
-				documentMasker, documentTagger, documentFactModelExtractor,
+				marshaller, documentRedactor,
+				documentTagger, documentFactModelExtractor,
 				null, null, additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
 
 	}

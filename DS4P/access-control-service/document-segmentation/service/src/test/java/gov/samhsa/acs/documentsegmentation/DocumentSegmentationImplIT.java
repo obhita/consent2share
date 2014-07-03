@@ -1,6 +1,7 @@
 package gov.samhsa.acs.documentsegmentation;
 
 import gov.samhsa.acs.brms.RuleExecutionServiceImpl;
+import gov.samhsa.acs.brms.domain.FactModel;
 import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
 import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.brms.guvnor.GuvnorServiceImpl;
@@ -128,13 +129,11 @@ public class DocumentSegmentationImplIT {
 
 		DocumentSegmentationImpl documentSegmentation = new DocumentSegmentationImpl(
 				ruleExecutionService, null, documentEditor,
-				marshaller, documentEncrypter, documentRedactor,
-				documentMasker, documentTagger, documentFactModelExtractor,
+				marshaller, documentRedactor,
+				documentTagger, documentFactModelExtractor,
 				embeddedClinicalDocumentExtractor, new ValueSetServiceImplMock(fileReader), additionalMetadataGeneratorForSegmentedClinicalDocumentImpl);
 		SegmentDocumentResponse result = documentSegmentation.segmentDocument(
-				c32Document.toString(), xacmlResult, false, true,
-				senderEmailAddress, recipientEmailAddress,
-				xdsDocumentEntryUniqueId, xacmlRequest, false);
+				c32Document.toString(), xacmlResult, false);
 
 		Assert.assertNotNull(result);
 	}
@@ -154,9 +153,10 @@ public class DocumentSegmentationImplIT {
 					ruleExecutionResponseContainer.getBytes());
 			ruleExecutionContainer = (RuleExecutionContainer) jaxbUnmarshaller
 					.unmarshal(input);
-
+			FactModel factModel = new FactModel();
+			factModel.setXacmlResult(xacmlResultObject);
 			document = documentRedactor.redactDocument(c32Document,
-					ruleExecutionContainer, xacmlResultObject, null).getRedactedDocument();
+					ruleExecutionContainer, factModel).getRedactedDocument();
 
 			Document processedDoc = documentXmlConverter.loadDocument(document);
 			FileHelper

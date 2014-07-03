@@ -25,10 +25,8 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.domain.valueset;
 
-
-
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -38,10 +36,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ValueSetRepository extends JpaRepository<ValueSet, Long>, JpaSpecificationExecutor<ValueSet>{
 	
-	@Query("select p from ValueSet p where p.name like ?1")
-	public List<ValueSet> findAllByNameLike(String searchTerm);
+	@Query("select DISTINCT(vs) from ValueSet vs, ValueSetCategory vsc where vs.name like ?1 AND vs.valueSetCategory.id = vsc.id AND vsc.code like ?2")
+	public Page<ValueSet> findAllByNameLike(String searchTerm, String valueSetCategory, Pageable pageable);
 	
-	@Query("select p from ValueSet p where p.code like ?1")
-	public List<ValueSet> findAllByCodeLike(String searchTerm);
+	@Query("select DISTINCT(vs) from ValueSet vs, ValueSetCategory vsc where vs.code like ?1 AND vs.valueSetCategory.id = vsc.id AND vsc.code like ?2")
+	public Page<ValueSet> findAllByCodeLike(String searchTerm, String valueSetCategory, Pageable pageable);
 
 }

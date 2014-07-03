@@ -12,7 +12,8 @@
 		username="${rabbitMQ.username}" password="${rabbitMQ.password}" port="${rabbitMQ.port}" host="${rabbitMQ.host}" />
 
 	<!-- A template for sending messages and performing other commands to RabbitMQ -->
-	<rabbit:template id="amqpTemplate" connection-factory="connectionFactory" />
+	<!-- Set channel-transacted to true to tell the framework to use a transactional channel and to end all operations (send or receive) with a commit or rollback depending on the outcome, with an exception signaling a rollback. -->
+	<rabbit:template id="amqpTemplate" connection-factory="connectionFactory" channel-transacted="true" />
 
 	<!-- This helps in configuring the AMQP broker, like creating a new queue -->
 	<rabbit:admin connection-factory="connectionFactory" />

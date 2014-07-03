@@ -64,9 +64,8 @@ public class DocumentSegmentationImplEndpointTest {
 		wsdlURL = new URL(address + "?wsdl");
 		segmentDocumentResponse = new SegmentDocumentResponse();
 
-		segmentDocumentResponse
-				.setMaskedDocument("<ClinicalDocument></ClinicalDocument>");
-		segmentDocumentResponse.setProcessedDocument(null);
+		segmentDocumentResponse.setSegmentedDocumentXml("<ClinicalDocument></ClinicalDocument>");
+		segmentDocumentResponse.setDocumentPayloadRawData(null);
 
 		ep = Endpoint.publish(address, new DocumentSegmentationServiceImpl(
 				documentSegmentationMock));
@@ -91,8 +90,7 @@ public class DocumentSegmentationImplEndpointTest {
 		SegmentDocumentRequest request = new SegmentDocumentRequest();
 
 		when(
-				documentSegmentationMock.segmentDocument(null, null, false,
-						false, null, null, null,xacmlRequestMock, false)).thenReturn(
+				documentSegmentationMock.segmentDocument(null, null, false)).thenReturn(
 				segmentDocumentResponse);
 
 		SegmentDocumentResponse response = port.segmentDocument(request);
@@ -101,9 +99,9 @@ public class DocumentSegmentationImplEndpointTest {
 	}
 
 	private void validateResponse(SegmentDocumentResponse resp) {
-		logger.debug("resp.getMaskedDocument(): " + resp.getMaskedDocument());
+		logger.debug("resp.getMaskedDocument(): " + resp.getSegmentedDocumentXml());
 		Assert.assertEquals("<ClinicalDocument></ClinicalDocument>",
-				segmentDocumentResponse.getMaskedDocument(),
-				resp.getMaskedDocument());
+				segmentDocumentResponse.getSegmentedDocumentXml(),
+				resp.getSegmentedDocumentXml());
 	}
 }

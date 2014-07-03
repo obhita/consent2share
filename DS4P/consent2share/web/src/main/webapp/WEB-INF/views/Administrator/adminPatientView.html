@@ -1355,8 +1355,8 @@
 																					<option th:each="gender : ${administrativeGenderCodes}" th:value="${gender.code}"
 																						th:text="${gender.displayName}">F</option>
 																				</select>
-																				<label for="search_specialty">Specialty</label>
-																				<input id="search_specialty" name="specialty" type="text" class="form-control" />
+																				<label for="search_specialty" hidden="true">Specialty</label>
+																				<input id="search_specialty" name="specialty" type="hidden" class="form-control" />
 																				<label for="search_phone">Phone</label>
 																				<div class="form-group">
 																					<input style="width: 3em" maxlength="3" id="search_phone1"

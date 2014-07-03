@@ -109,7 +109,7 @@ public class DocumentTaggerImplTest {
 
 		// Act
 		String taggedDocument = documentTagger.tagDocument(c32,
-				executionResponseContainer, messageId);
+				executionResponseContainer);
 
 		// Assert
 		logger.debug(taggedDocument);
@@ -145,7 +145,7 @@ public class DocumentTaggerImplTest {
 
 		// Act
 		String taggedDocument = documentTagger.tagDocument(c32,
-				executionResponseContainer, messageId);
+				executionResponseContainer);
 
 		// Assert
 		logger.debug(taggedDocument);
@@ -190,7 +190,7 @@ public class DocumentTaggerImplTest {
 
 		// Act
 		String taggedDocument = documentTagger.tagDocument(c32,
-				executionResponseContainer, messageId);
+				executionResponseContainer);
 
 		// Assert
 		Document taggedDoc = documentXmlConverter.loadDocument(taggedDocument);
@@ -216,7 +216,7 @@ public class DocumentTaggerImplTest {
 
 		// Act
 		String taggedDocument = documentTagger.tagDocument(remC32,
-				responseContainer, messageId);
+				responseContainer);
 
 		// Assert
 		Document doc = documentXmlConverter.loadDocument(taggedDocument);
@@ -237,7 +237,7 @@ public class DocumentTaggerImplTest {
 
 		// Act
 		String taggedDocument = documentTagger.tagDocument(remC32,
-				responseContainer, messageId);
+				responseContainer);
 
 		// Assert
 		Document doc = documentXmlConverter.loadDocument(taggedDocument);
@@ -1007,7 +1007,7 @@ public class DocumentTaggerImplTest {
 		// Empty xml file
 		@SuppressWarnings("unused")
 		String taggedDocument = documentTagger.tagDocument("",
-				executionResponseContainer, messageId);
+				executionResponseContainer);
 	}
 
 	private Node getNode(Document xmlDocument, String xPathExpr)
@@ -1061,7 +1061,7 @@ public class DocumentTaggerImplTest {
 
 		// Act
 		String taggedDocument = documentTagger.tagDocument(robustC32,
-				responseContainer, messageId);
+				responseContainer);
 
 		// Assert
 		Document doc = documentXmlConverter.loadDocument(taggedDocument);

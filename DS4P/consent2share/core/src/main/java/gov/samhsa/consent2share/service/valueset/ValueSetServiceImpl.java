@@ -12,7 +12,9 @@ import gov.samhsa.consent2share.service.dto.ValueSetDto;
 import gov.samhsa.consent2share.service.dto.ValueSetVSCDto;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -212,19 +214,39 @@ public class ValueSetServiceImpl implements ValueSetService {
 		List<ValueSet> valueSets = valueSetRepository.findAll();
 		return setDeletableToValueSetDto(valueSets);
 	}	
-	
+
 	/* (non-Javadoc)
-	 * @see gov.samhsa.consent2share.service.valueset.ConceptCodeService#findAll()
+	 * @see gov.samhsa.consent2share.service.valueset.ValueSetService#findAllWithoutDeletable()
 	 */
 	@Override
-	public List<ValueSetDto> findAll(int pageNumber) {
+	public List<ValueSetDto> findAllWithoutDeletable() {		
+		LOGGER.debug("Finding all valueSets");
+		
+    	List<ValueSet> valueSets = valueSetRepository.findAll();
+		
+    	return valueSetMgmtHelper.convertValueSetEntitiesToDtosWithoutDeletable(valueSets);
+	}	
+	
+	/* (non-Javadoc)
+	 * @see gov.samhsa.consent2share.service.valueset.ValueSetService#findAll(int)
+	 */
+	@Override
+	public Map<String, Object> findAll(int pageNumber) {
 		LOGGER.debug("Finding all valueSets with paging");
 		Sort sort = new Sort(new Order(Direction.ASC, "code"));
 		PageRequest pageRequest = new PageRequest(pageNumber, VALUE_SET_PAGE_SIZE, sort);
 		
 		Page<ValueSet> valueSets = valueSetRepository.findAll(pageRequest);
 		
-		return setDeletableToValueSetDto(valueSets.getContent());
+		Map<String, Object> pageResultsMap = new HashMap<String, Object>();
+		pageResultsMap.put("valueSets", setDeletableToValueSetDto((valueSets.getContent())));
+		pageResultsMap.put("totalNumberOfValueSets", valueSets.getTotalElements());
+		pageResultsMap.put("totalPages", valueSets.getTotalPages());
+		pageResultsMap.put("itemsPerPage", valueSets.getSize());
+		pageResultsMap.put("currentPage", valueSets.getNumber());
+		pageResultsMap.put("numberOfElements", valueSets.getNumberOfElements());
+		
+		return pageResultsMap;
 	}
 	
 	
@@ -232,9 +254,22 @@ public class ValueSetServiceImpl implements ValueSetService {
 	 * @see gov.samhsa.consent2share.service.valueset.ValueSetService#findAllByName(java.lang.String)
 	 */
 	@Override
-	public List<ValueSetDto> findAllByName(String searchTerm){
-		List<ValueSet> valueSets = valueSetRepository.findAllByNameLike("%"+searchTerm+"%");
-		return setDeletableToValueSetDto(valueSets);
+	public Map<String, Object> findAllByName(String searchTerm, String valueSetCategory, int pageNumber){
+		
+		Sort sort = new Sort(new Order(Direction.ASC, "code"));
+		PageRequest pageRequest = new PageRequest(pageNumber, VALUE_SET_PAGE_SIZE, sort);
+		
+		Page<ValueSet> pagedValueSets = valueSetRepository.findAllByNameLike("%"+searchTerm+"%", "%"+valueSetCategory+"%", pageRequest);
+		
+		Map<String, Object> pageResultsMap = new HashMap<String, Object>();
+		pageResultsMap.put("valueSets", setDeletableToValueSetDto(pagedValueSets.getContent()));
+		pageResultsMap.put("totalNumberOfValueSets", pagedValueSets.getTotalElements());
+		pageResultsMap.put("totalPages", pagedValueSets.getTotalPages());
+		pageResultsMap.put("itemsPerPage", pagedValueSets.getSize());
+		pageResultsMap.put("currentPage", pagedValueSets.getNumber());
+		pageResultsMap.put("numberOfElements", pagedValueSets.getNumberOfElements());
+		
+		return pageResultsMap;
 		
 	}
 
@@ -255,11 +290,22 @@ public class ValueSetServiceImpl implements ValueSetService {
 	 * @see gov.samhsa.consent2share.service.valueset.ValueSetService#findAllByCode(java.lang.String)
 	 */
 	@Override
-	public List<ValueSetDto> findAllByCode(String searchTerm){
-		List<ValueSet> valueSets = valueSetRepository.findAllByCodeLike("%"+searchTerm+"%");
+	public Map<String, Object> findAllByCode(String searchTerm, String valueSetCategory, int pageNumber){
 		
-		return setDeletableToValueSetDto(valueSets);
+		Sort sort = new Sort(new Order(Direction.ASC, "code"));
+		PageRequest pageRequest = new PageRequest(pageNumber, VALUE_SET_PAGE_SIZE, sort);
 		
+		Page<ValueSet> pagedValueSets = valueSetRepository.findAllByCodeLike("%"+searchTerm+"%", "%"+valueSetCategory+"%", pageRequest);
+		
+		Map<String, Object> pageResultsMap = new HashMap<String, Object>();
+		pageResultsMap.put("valueSets", setDeletableToValueSetDto(pagedValueSets.getContent()));
+		pageResultsMap.put("totalNumberOfValueSets", pagedValueSets.getTotalElements());
+		pageResultsMap.put("totalPages", pagedValueSets.getTotalPages());
+		pageResultsMap.put("itemsPerPage", pagedValueSets.getSize());
+		pageResultsMap.put("currentPage", pagedValueSets.getNumber());
+		pageResultsMap.put("numberOfElements", pagedValueSets.getNumberOfElements());
+		
+		return pageResultsMap;
 	}
 
 

@@ -1,3 +1,8 @@
+var cc_paginationInfo = {
+};
+
+var pagedUrl;
+
 var conceptCodeListDataStore = (function() {
 	var ary_conceptCodeList = new Array();
 	
@@ -210,6 +215,7 @@ var lastValsetModalState = (function(){
 })();
 
 $(document).ready(function(){
+	var pageLength = 20;
 	var divPanelState = $('div#div_panelStateInfo').data('panel-state');
 	
 	if(divPanelState == "resetoptions"){
@@ -224,7 +230,8 @@ $(document).ready(function(){
 		e.preventDefault();
 	});
 	
-	loadAllConceptCodes();
+	//loadAllConceptCodes();
+	loadInitialConceptCodes(0);
 	
 	showTable();
 	
@@ -238,18 +245,24 @@ $(document).ready(function(){
 		
 		var clickedIcon = $(this);
 		var clickedParent = clickedIcon.parent("li.pagination-li");
-		
+
 		if(clickedParent.hasClass("pagination-page")){
 			var target_pagenum = clickedIcon.data("pagenum"); 
+			loadPageConceptCodes(target_pagenum - 1);
 			gotoTargetPage(target_pagenum);
 		}else if((clickedParent.is("#pagination_next")) && (clickedParent.hasClass("disabled") === false)){
+			loadPageConceptCodes(getCurrentPagenum());
 			gotoNextPage();
 		}else if((clickedParent.is("#pagination_prev")) && (clickedParent.hasClass("disabled") === false)){
+			loadPageConceptCodes(getCurrentPagenum() - 2);
 			gotoPrevPage();
 		}else if((clickedParent.is("#pagination_first")) && (clickedParent.hasClass("disabled") === false)){
+			loadPageConceptCodes(0);
 			jumpToFirstPagegroup();
 			gotoFirstPage();
 		}else if((clickedParent.is("#pagination_last")) && (clickedParent.hasClass("disabled") === false)){
+			var numResults = $("#pagination_numresults").text();
+			loadPageConceptCodes(Math.ceil(numResults/pageLength) - 1);
 			jumpToLastPagegroup();
 			gotoLastPage();
 		}
@@ -276,51 +289,56 @@ $(document).ready(function(){
 						window.alert("ERROR: Unable to delete concept code.");
 					}
 			});
+
+			rebuildPagination(cc_paginationInfo.totalPages);
+			loadPageConceptCodes(getPageToLoadAfterDelete());
+			setNumResultsDisplay(cc_paginationInfo.totalNumberOfConceptCodes - 1);
+			
 		}
 	});
 	
 	
-	$('table#current_conceptcodes_table').on("recordDeleted.c2s_ui.data_display", function(evt){
-		try{
-			rebuildTableFromAry();
-		}catch(err){
-			if(err.name == "RangeError"){
-				if(err.message.search("Sanity Check Failed:") > -1){
-					var new_cur_page = cur_page - 1;
-					
-					//Sanity Check
-					if(checkIsPage(new_cur_page) !== true){
-						//rethrow original error
-						throw err;
-					}else{
-						try{
-							setPaginationActiveClass(new_cur_page);
-							rebuildTableFromAry();
-						}catch(err2){
-							//set pagination active class back to original value
-							setPaginationActiveClass(cur_page);
-							//rethrow original error
-							throw err;
-						}
-					}
-				}
-			}
-		}
-		var cur_page = getCurrentPagenum();
-		try{
-			rebuildPagination(null, cur_page);
-		}catch(err){
-			if(err.name == "TypeError"){
-				
-				if(err.message.search("Invalid pagenum_to_set") > -1){
-					rebuildPagination(1, 1);
-				}else{
-					//rethrow error
-					throw err;
-				}
-			}
-		}
-	});
+//	$('table#current_conceptcodes_table').on("recordDeleted.c2s_ui.data_display", function(evt){
+//		try{
+//			//rebuildTableFromAry();
+//		}catch(err){
+//			if(err.name == "RangeError"){
+//				if(err.message.search("Sanity Check Failed:") > -1){
+//					var new_cur_page = cur_page - 1;
+//					
+//					//Sanity Check
+//					if(checkIsPage(new_cur_page) !== true){
+//						//rethrow original error
+//						throw err;
+//					}else{
+//						try{
+//							setPaginationActiveClass(new_cur_page);
+//							rebuildTableFromAry();
+//						}catch(err2){
+//							//set pagination active class back to original value
+//							setPaginationActiveClass(cur_page);
+//							//rethrow original error
+//							throw err;
+//						}
+//					}
+//				}
+//			}
+//		}
+//		var cur_page = getCurrentPagenum();
+//		try{
+//			rebuildPagination(null, cur_page);
+//		}catch(err){
+//			if(err.name == "TypeError"){
+//				
+//				if(err.message.search("Invalid pagenum_to_set") > -1){
+//					rebuildPagination(1, 1);
+//				}else{
+//					//rethrow error
+//					throw err;
+//				}
+//			}
+//		}
+//	});
 	
 	//event handler for change events on BATCH UPLOAD batch_select_codesys dropdown
 	$('select#batch_select_codesys').change(function(evt){
@@ -345,17 +363,12 @@ $(document).ready(function(){
 	
 	//event handler for change events on select_filter_on_cs dropdown
 	$('select#select_filter_on_cs').change(function(evt){
+		
 		var selCodeSysName = $(this).val();
-		
-		//Hide table while rebuilding
-		hideTable();
-		
+	
 		resetSelectFilterOnCsVs();
 		resetSelectFilterOnValSetName();
-		
-		//Filter array
-		resetFilterArray();
-		
+	
 		if(selCodeSysName != ""){
 			setSelectCsVsIsEnabled(true);
 			
@@ -366,10 +379,12 @@ $(document).ready(function(){
 				}
 			});
 			
-			filterCodeSysNameFromSelect();
+			//filterCodeSysNameFromSelect();
 			
 			//Change table header text
 			setHeaderForFilter();
+			
+			filterWithPagination();
 		}else{
 			setSelectCsVsIsEnabled(false);
 			
@@ -377,78 +392,122 @@ $(document).ready(function(){
 			setHeaderForNoFilter();
 		}
 		
-		//Clear and rebuild table
-		initTableFromAry();
 		
-		//Show table once rebuild complete
-		showTable();
+//		
+//		//Hide table while rebuilding
+//		hideTable();
+//		
+//		resetSelectFilterOnCsVs();
+//		resetSelectFilterOnValSetName();
+//		
+//		//Filter array
+//	//	resetFilterArray();
+//		
+//		if(selCodeSysName != ""){
+//			setSelectCsVsIsEnabled(true);
+//			
+//			$('input.cs_version_data').each(function(){
+//				if($(this).data('cs-name') == selCodeSysName){
+//					var tempVal = $(this).data('cs-version-value');
+//					appendOptionToSelect("select_filter_on_cs_vs", tempVal, tempVal);
+//				}
+//			});
+//			
+//			filterCodeSysNameFromSelect();
+//			
+//			//Change table header text
+//			setHeaderForFilter();
+//		}else{
+//			setSelectCsVsIsEnabled(false);
+//			
+//			//Change table header text
+//			setHeaderForNoFilter();
+//		}
+//		
+//		//Clear and rebuild table
+//		//initTableFromAry();
+//		loadInitialConceptCodes(0);
+//		
+//		//Show table once rebuild complete
+//		showTable();
 	});
 	
 	//event handler for change events on select_filter_on_cs_vs dropdown
 	$('select#select_filter_on_cs_vs').change(function(evt){
-		var selCodeSysVersionName = $(this).val();
-		var selCodeSysName = $('select#select_filter_on_cs').val();
-		
-		//Hide table while rebuilding
-		hideTable();
 		
 		resetSelectFilterOnValSetName();
 		
-		//Filter array
-		resetFilterArray();
-		
-		//Reapply previous filter
-		filterCodeSysNameFromSelect();
-		
-		if(selCodeSysVersionName != ""){
-			filterCodeSysVersionNameFromSelect();
-			
-			//Change table header text
-			setHeaderForFilter();
-		}else{
-			if(selCodeSysName == ""){
-				setHeaderForNoFilter();
-			}
-		}
-		
-		//Clear and rebuild table
-		initTableFromAry();
-		
-		//Show table once rebuild complete
-		showTable();
+		filterWithPagination();
+//		
+//		var selCodeSysVersionName = $(this).val();
+//		var selCodeSysName = $('select#select_filter_on_cs').val();
+//		
+//		//Hide table while rebuilding
+//		hideTable();
+//		
+//		resetSelectFilterOnValSetName();
+//		
+//		//Filter array
+//		resetFilterArray();
+//		
+//		//Reapply previous filter
+//		filterCodeSysNameFromSelect();
+//		
+//		if(selCodeSysVersionName != ""){
+//			filterCodeSysVersionNameFromSelect();
+//			
+//			//Change table header text
+//			setHeaderForFilter();
+//		}else{
+//			if(selCodeSysName == ""){
+//				setHeaderForNoFilter();
+//			}
+//		}
+//		
+//		//Clear and rebuild table
+//		initTableFromAry();
+//		
+//		//Show table once rebuild complete
+//		showTable();
 	});
 	
 	//event handler for change events on select_filter_on_valset_name dropdown
 	$('select#select_filter_on_valset_name').change(function(evt){
-		var selValSetNameId = $(this).val();
-		var selCodeSysName = $('select#select_filter_on_cs').val();
 		
-		//Hide table while rebuilding
-		hideTable();
-		
-		//Filter array
-		resetFilterArray();
-		
-		//Reapply previous filters
 		filterCodeSysNameFromSelect();
 		filterCodeSysVersionNameFromSelect();
 		
-		if(selValSetNameId != ""){
-			filterValueSetNameFromSelect();
-			
-			//Change table header text
-			setHeaderForFilter();
-		}else{
-			if(selCodeSysName == ""){
-				setHeaderForNoFilter();
-			}
-		}
+		filterWithPagination();
 		
-		//Clear and rebuild table
-		initTableFromAry();
-		
-		//Show table once rebuild complete
-		showTable();
+//		var selValSetNameId = $(this).val();
+//		var selCodeSysName = $('select#select_filter_on_cs').val();
+//		
+//		//Hide table while rebuilding
+//		hideTable();
+//		
+//		//Filter array
+//		resetFilterArray();
+//		
+//		//Reapply previous filters
+//		filterCodeSysNameFromSelect();
+//		filterCodeSysVersionNameFromSelect();
+//		
+//		if(selValSetNameId != ""){
+//			filterValueSetNameFromSelect();
+//			
+//			//Change table header text
+//			setHeaderForFilter();
+//		}else{
+//			if(selCodeSysName == ""){
+//				setHeaderForNoFilter();
+//			}
+//		}
+//		
+//		//Clear and rebuild table
+//		initTableFromAry();
+//		
+//		//Show table once rebuild complete
+//		showTable();
 	});
 
 	//event handler for click event on reset button
@@ -464,67 +523,58 @@ $(document).ready(function(){
 		var in_searchParam = $('input#txt_search_conceptcode_name').val();
 		
 		if(in_searchParam.length > 0){
-			var responseObj = {};
+			var codeSystemSelected = ($('select#select_filter_on_cs').val() != "" ? $('select#select_filter_on_cs').val() : "empty");
+			var codeSystemVersionSelected = ($('select#select_filter_on_cs_vs').val() != "" ? $('select#select_filter_on_cs_vs').val() : "empty");
+			var valueSetNameSelected = ($('select#select_filter_on_valset_name  :selected').text().indexOf("Value Set Name") >= 0 ? "empty" : $('select#select_filter_on_valset_name  :selected').text());
+
+			pagedUrl = "conceptCode/ajaxSearchConceptCode/pageNumber/pageNumberPlaceHolder/searchCategory/name/searchTerm/"+in_searchParam+"/codeSystem/"+codeSystemSelected+"/codeSystemVersion/"+codeSystemVersionSelected+"/valueSetName/"+valueSetNameSelected;
 			
-			$.ajax({url: "conceptCode/ajaxSearchConceptCode",
-					method: "GET",
-					data: {searchCategory: "name",
-						   searchTerm: in_searchParam},
-					success: function(response){
-						responseObj = response;
+			$.ajax({url: "conceptCode/ajaxSearchConceptCode/pageNumber/0/searchCategory/name/searchTerm/"+in_searchParam+"/codeSystem/"+codeSystemSelected+"/codeSystemVersion/"+codeSystemVersionSelected+"/valueSetName/"+valueSetNameSelected,
+
+				method: "GET",
+				success: function(response){
+
+					var totalNumberOfConceptCodes = response.totalNumberOfConceptCodes;
+					var totalPages = response.totalPages;
+					var conceptCodes = response.conceptCodes;
+					var numberOfElements = response.numberOfElements;
+					
+					setPaginationInfo(totalNumberOfConceptCodes, totalPages, conceptCodes, numberOfElements);
+					
+					clearTable();
+					
+					if(totalNumberOfConceptCodes > 0){
 						
-						var responseLength = responseObj.length;
-						
-						if(responseLength > 0){
-							conceptCodeListDataStore.emptyConceptCodeArray();
+						for(var i = 0; i < numberOfElements; i++){
 							
-							for(var i = 0; i < responseLength; i++){
-								var in_conceptcode_id = responseObj[i].id;
-								var in_conceptcode_code = responseObj[i].code;
-								var in_conceptcode_name = responseObj[i].name;
-								var in_conceptcode_cs_name = responseObj[i].codeSystemName;
-								var in_conceptcode_cs_vs_name = responseObj[i].codeSystemVersionName;
-								
-								conceptCodeListDataStore.pushConceptCode(in_conceptcode_id, in_conceptcode_code, in_conceptcode_name, in_conceptcode_cs_name, in_conceptcode_cs_vs_name);
-								
-								var in_conceptcode_valsets_ary = new Array();
-								in_conceptcode_valsets_ary = responseObj[i].valueSetMap;
-								
-								for (curValSet in in_conceptcode_valsets_ary){
-									var in_valset_key = curValSet;
-									var in_valset_name = in_conceptcode_valsets_ary[curValSet];
-								
-									try{
-										conceptCodeListDataStore.pushConceptCodeValSetByConceptCodeId(in_conceptcode_id, in_valset_key, in_valset_name);
-									}catch(e){
-										console.log("ERROR: An unknown error has occured while attempting to call conceptCodeListDataStore.pushConceptCodeValSetByConceptCodeId() inside ajax success function for ajaxSearchConceptCode by name.");
-										console.log("      Error details: " + e);
-										window.alert("ERROR: An unknown error has occured.");
-									}
-								}
-								
-							}
-							clearSearchConceptCodeCodeInput();
-							
-							resetSelectFilterOnCs();
-							resetSelectFilterOnCsVs();
-							resetSelectFilterOnValSetName();
-							
-							//Change table header text
-							setHeaderForSearchName();
-							
-							//Reset Filter
-							resetFilterArray();
-							
-							initTableFromAry();
-						}else{
-							window.alert("No results found");
+							var temp_conceptcode_id = conceptCodes[i].id;
+							var temp_conceptcode_code = conceptCodes[i].code;
+							var temp_conceptcode_name = conceptCodes[i].name;
+							var temp_conceptcode_cs_name = conceptCodes[i].codeSystemName;
+							var temp_conceptcode_cs_vs_name = conceptCodes[i].codeSystemVersionName;
+							var temp_conceptcode_valsets_ary = new Array();
+
+							temp_conceptcode_valsets_ary = conceptCodes[i].valueSetMap;
+							insertTableRow(temp_conceptcode_id, temp_conceptcode_code, temp_conceptcode_name, temp_conceptcode_cs_name, temp_conceptcode_cs_vs_name, temp_conceptcode_valsets_ary);
 						}
-					},
-					error: function(e){
-						window.alert("ERROR - An error occured while search for concept code by name: " + e.responseText);
+						
+						clearSearchConceptCodeCodeInput();
+						
+						//Change table header text
+						setHeaderForSearchName();
+						
+						rebuildPagination(totalPages);
+						setNumResultsDisplay(totalNumberOfConceptCodes);
+					}else{
+						window.alert("No results found");
+						//rebuildPagination(totalPages);
+						hidePaginationHolder();
 					}
-			});
+				},
+				error: function(e){
+					window.alert("ERROR - An error occured while search for concept code by code: " + e.responseText);
+				}
+		});
 		}
 	});
 	
@@ -536,44 +586,50 @@ $(document).ready(function(){
 		var in_searchParam = $('input#txt_search_conceptcode_code').val();
 		
 		if(in_searchParam.length > 0){
-			var responseObj = {};
+			var codeSystemSelected = ($('select#select_filter_on_cs').val() != "" ? $('select#select_filter_on_cs').val() : "empty");
+			var codeSystemVersionSelected = ($('select#select_filter_on_cs_vs').val() != "" ? $('select#select_filter_on_cs_vs').val() : "empty");
+			var valueSetNameSelected = ($('select#select_filter_on_valset_name  :selected').text().indexOf("Value Set Name") >= 0 ? "empty" : $('select#select_filter_on_valset_name  :selected').text());
+
+			pagedUrl = "conceptCode/ajaxSearchConceptCode/pageNumber/pageNumberPlaceHolder/searchCategory/code/searchTerm/"+in_searchParam+"/codeSystem/"+codeSystemSelected+"/codeSystemVersion/"+codeSystemVersionSelected+"/valueSetName/"+valueSetNameSelected;
 			
-			$.ajax({url: "conceptCode/ajaxSearchConceptCode",
+			$.ajax({url: "conceptCode/ajaxSearchConceptCode/pageNumber/0/searchCategory/code/searchTerm/"+in_searchParam+"/codeSystem/"+codeSystemSelected+"/codeSystemVersion/"+codeSystemVersionSelected+"/valueSetName/"+valueSetNameSelected,
 					method: "GET",
-					data: {searchCategory: "code",
-						   searchTerm: in_searchParam},
 					success: function(response){
-						responseObj = response;
+
+						var totalNumberOfConceptCodes = response.totalNumberOfConceptCodes;
+						var totalPages = response.totalPages;
+						var conceptCodes = response.conceptCodes;
+						var numberOfElements = response.numberOfElements;
 						
-						var responseLength = responseObj.length;
+						setPaginationInfo(totalNumberOfConceptCodes, totalPages, conceptCodes, numberOfElements);
 						
-						if(responseLength > 0){
-							conceptCodeListDataStore.emptyConceptCodeArray();
+						clearTable();
+						
+						if(totalNumberOfConceptCodes > 0){
 							
-							for(var i = 0; i < responseLength; i++){
-								try{
-									storeConceptCodeRecord(responseObj[i]);
-								}catch(e){
-									console.log("ERROR: An unknown error has occured while attempting to call storeConceptCodeRecord() inside AJAX call to ajaxSearchConceptCode");
-									console.log("      Error details: " + e);
-									window.alert("ERROR: An unknown error has occured.");
-								}
+							for(var i = 0; i < numberOfElements; i++){
+								
+								var temp_conceptcode_id = conceptCodes[i].id;
+								var temp_conceptcode_code = conceptCodes[i].code;
+								var temp_conceptcode_name = conceptCodes[i].name;
+								var temp_conceptcode_cs_name = conceptCodes[i].codeSystemName;
+								var temp_conceptcode_cs_vs_name = conceptCodes[i].codeSystemVersionName;
+								var temp_conceptcode_valsets_ary = new Array();
+
+								temp_conceptcode_valsets_ary = conceptCodes[i].valueSetMap;
+								insertTableRow(temp_conceptcode_id, temp_conceptcode_code, temp_conceptcode_name, temp_conceptcode_cs_name, temp_conceptcode_cs_vs_name, temp_conceptcode_valsets_ary);
 							}
+						
 							clearSearchConceptCodeNameInput();
-							
-							resetSelectFilterOnCs();
-							resetSelectFilterOnCsVs();
-							resetSelectFilterOnValSetName();
 							
 							//Change table header text
 							setHeaderForSearchCode();
 							
-							//Reset Filter
-							resetFilterArray();
-							
-							initTableFromAry();
+							rebuildPagination(totalPages);
+							setNumResultsDisplay(totalNumberOfConceptCodes);
 						}else{
 							window.alert("No results found");
+							hidePaginationHolder();
 						}
 					},
 					error: function(e){
@@ -641,7 +697,7 @@ function loadAllConceptCodes(){
 	$.ajax({url: "conceptCode/ajaxGetAllConceptCodes",
 		    success: function(response){
 		    	responseObj = response;
-				
+		    	
 				var responseLength = responseObj.length;
 				
 				if(responseLength > 0){
@@ -674,13 +730,127 @@ function loadAllConceptCodes(){
 	);
 }
 
+
+function loadInitialConceptCodes(pageNumber){
+	
+	$.ajax({url: "conceptCode/ajaxGetPagedConceptCodes/pageNumber/" + pageNumber,
+		    success: function(response){
+
+				var totalNumberOfConceptCodes = response.totalNumberOfConceptCodes;
+				var totalPages = response.totalPages;
+				var conceptCodes = response.conceptCodes;
+				var numberOfElements = response.numberOfElements;
+				
+				setPaginationInfo(totalNumberOfConceptCodes, totalPages, conceptCodes, numberOfElements);
+				
+				if(totalNumberOfConceptCodes > 0){
+					pagedUrl = "conceptCode/ajaxGetPagedConceptCodes/pageNumber/pageNumberPlaceHolder";
+					
+					for(var i = 0; i < numberOfElements; i++){
+						
+						var temp_conceptcode_id = conceptCodes[i].id;
+						var temp_conceptcode_code = conceptCodes[i].code;
+						var temp_conceptcode_name = conceptCodes[i].name;
+						var temp_conceptcode_cs_name = conceptCodes[i].codeSystemName;
+						var temp_conceptcode_cs_vs_name = conceptCodes[i].codeSystemVersionName;
+						var temp_conceptcode_valsets_ary = new Array();
+
+						temp_conceptcode_valsets_ary = conceptCodes[i].valueSetMap;
+						insertTableRow(temp_conceptcode_id, temp_conceptcode_code, temp_conceptcode_name, temp_conceptcode_cs_name, temp_conceptcode_cs_vs_name, temp_conceptcode_valsets_ary);
+					}
+					
+//					
+//
+//					clearSearchConceptCodeNameInput();
+//					
+//					resetSelectFilterOnCs();
+//					resetSelectFilterOnCsVs();
+//					resetSelectFilterOnValSetName();
+//					
+//					//Reset Filter
+//					resetFilterArray();
+//					
+//					initTableFromAry();
+					
+					rebuildPagination(totalPages);
+					setNumResultsDisplay(totalNumberOfConceptCodes);
+				}
+		    },
+		    error: function(err){
+		    	window.alert("ERROR: " + err.responseText);}
+		    }
+	);
+}
+
+
+function loadPageConceptCodes(pageNumber){
+	// replace placeholder with page number
+	pagedUrl = pagedUrl.replace("pageNumberPlaceHolder", pageNumber);
+
+	$.ajax({url: pagedUrl,
+		    success: function(response){
+
+				var totalNumberOfConceptCodes = response.totalNumberOfConceptCodes;
+				var totalPages = response.totalPages;
+				var conceptCodes = response.conceptCodes;
+				var numberOfElements = response.numberOfElements;
+				
+				setPaginationInfo(totalNumberOfConceptCodes, totalPages, conceptCodes, numberOfElements);
+				
+				clearTable();
+				
+				if(totalNumberOfConceptCodes > 0){
+					
+					for(var i = 0; i < numberOfElements; i++){
+						
+						var temp_conceptcode_id = conceptCodes[i].id;
+						var temp_conceptcode_code = conceptCodes[i].code;
+						var temp_conceptcode_name = conceptCodes[i].name;
+						var temp_conceptcode_cs_name = conceptCodes[i].codeSystemName;
+						var temp_conceptcode_cs_vs_name = conceptCodes[i].codeSystemVersionName;
+						var temp_conceptcode_valsets_ary = new Array();
+
+						temp_conceptcode_valsets_ary = conceptCodes[i].valueSetMap;
+						insertTableRow(temp_conceptcode_id, temp_conceptcode_code, temp_conceptcode_name, temp_conceptcode_cs_name, temp_conceptcode_cs_vs_name, temp_conceptcode_valsets_ary);
+					}
+				}
+				else{
+					window.alert("No results found");
+				}
+				// set back page number placeholder for next call 
+				pagedUrl = pagedUrl.replace("pageNumber/"+pageNumber, "pageNumber/pageNumberPlaceHolder");
+		    },
+		    error: function(err){
+		    	window.alert("ERROR: " + err.responseText);}
+		    }
+	);
+}
+
+function getPageToLoadAfterDelete() {
+	if (getCurrentPagenum() === 1) {
+		return 0;
+	} else if (cc_paginationInfo.numberOfElements === 1) {
+		return getCurrentPagenum() - 2;
+	} else {
+		return getCurrentPagenum() - 1;
+	}
+
+}
+
+function setPaginationInfo(totalNumberOfConceptCodes, totalPages, conceptCodes, numberOfElements) {
+	cc_paginationInfo.totalNumberOfConceptCodes = totalNumberOfConceptCodes;
+	cc_paginationInfo.totalPages = totalPages;
+	cc_paginationInfo.conceptCodes = conceptCodes;
+	cc_paginationInfo.numberOfElements = numberOfElements;
+}
+
 /**
  * Initialize HTML table rows on initial page load & when filter/search changes
  */
 function initTableFromAry(){
-	setPaginationActiveClass(1);
-	var num_pages = rebuildTableFromAry();
-	rebuildPagination(num_pages);
+	//setPaginationActiveClass(1);
+	//var num_pages = rebuildTableFromAry();
+	//rebuildPagination(num_pages);
 }
 
 function storeConceptCodeRecord(in_conceptCodeRecord){
@@ -837,36 +1007,37 @@ function rebuildTableFromAry(){
  * @param temp_conceptcode_valsets_ary
  */
 function insertTableRow(temp_conceptcode_id, temp_conceptcode_code, temp_conceptcode_name, temp_conceptcode_cs_name, temp_conceptcode_cs_vs_name, temp_conceptcode_valsets_ary){
-	var valset_string = "";
+	var valset_string = "", temp_valset_key, temp_valset_name;
 	
-	var ary_len = temp_conceptcode_valsets_ary.length;
-	
-	for(var i = 0; i < ary_len; i++){
-		var temp_valset_key = temp_conceptcode_valsets_ary[i]['valset_key'];
-		var temp_valset_name = temp_conceptcode_valsets_ary[i]['valset_name'];
-		
-		valset_string = valset_string + "<div class='conceptcode-valset-record' data-conceptcode-valset-key='" + temp_valset_key + "' data-conceptcode-valsetcat-code='" + temp_valset_name + "' id='conceptcode_valset_data_" + temp_conceptcode_id + "_" + temp_valset_key + "'>" +
-											"<span>" + temp_valset_name + "</span>" +
-										"</div>";
+	for(i in temp_conceptcode_valsets_ary){
+		if (temp_conceptcode_valsets_ary.hasOwnProperty(i)) {
+			temp_valset_key = i;
+			temp_valset_name = temp_conceptcode_valsets_ary[i];
+			
+			valset_string = valset_string + "<div class='conceptcode-valset-record' data-conceptcode-valset-key='" + i + "' data-conceptcode-valsetcat-code='" + temp_valset_name + "' id='conceptcode_valset_data_" + temp_conceptcode_id + "_" + temp_valset_key + "'>" +
+			"<span>" + temp_valset_name + "</span>" + "</div>";
+			
+		}
 	}
-	
+
 	$('table#current_conceptcodes_table > tbody').append("<tr class='conceptcode-record' data-conceptcode-cs-name='" + temp_conceptcode_cs_name + "' data-conceptcode-id='" + temp_conceptcode_id + "' data-conceptcode-cs-vs-name='" + temp_conceptcode_cs_vs_name + "' data-conceptcode-name='" + temp_conceptcode_name + "' data-conceptcode-code='" + temp_conceptcode_code + "'>" +
-							"<td>" +
-								"<span>" +
-									"<span class='delete-record-trigger btn btn-danger btn-xs'>" +
-										"<span class='fa fa-minus fa-white'></span>" +
-									"</span>" +
-								"</span>" +
-							"</td>" +
-							"<td>" +
-								"<a href='conceptCode/edit/" + temp_conceptcode_id + "' >" +
-									"<span>" + temp_conceptcode_code + "</span>" +
-								"</a>" +
-							"</td>" +
-							"<td>" + temp_conceptcode_name + "</td>" +
-							"<td>" + valset_string + "</td>" +
-							"<td>" + temp_conceptcode_cs_name + "    :   " + temp_conceptcode_cs_vs_name + "</td>" +
-						"</tr>");
+			"<td>" +
+				"<span>" +
+					"<span class='delete-record-trigger btn btn-danger btn-xs'>" +
+						"<span class='fa fa-minus fa-white'></span>" +
+					"</span>" +
+				"</span>" +
+			"</td>" +
+			"<td>" +
+				"<a href='conceptCode/edit/" + temp_conceptcode_id + "' >" +
+					"<span>" + temp_conceptcode_code + "</span>" +
+				"</a>" +
+			"</td>" +
+			"<td>" + temp_conceptcode_name + "</td>" +
+			"<td>" + valset_string + "</td>" +
+			"<td>" + temp_conceptcode_cs_name + "    :   " + temp_conceptcode_cs_vs_name + "</td>" +
+		"</tr>");
+	
 }
 
 
@@ -876,7 +1047,7 @@ function deleteConceptCode(clickedElementParentTr){
 	try{
 		clickedElementParentTr.trigger("recordDeleting.c2s_ui.data_display", {concept_code_id: cur_conceptcode_id});
 		
-		conceptCodeListDataStore.removeConceptCodeByConceptCodeId(cur_conceptcode_id);
+//		conceptCodeListDataStore.removeConceptCodeByConceptCodeId(cur_conceptcode_id);
 		//filteredConceptCodeListIndex.removeCodeIndexByCodeIndex(conceptCodeIndex);
 		resetFilterArray();
 		filterCodeSysNameFromSelect();
@@ -887,6 +1058,67 @@ function deleteConceptCode(clickedElementParentTr){
 	}catch(err){
 		//FIXME (MH): Catch & handle certain types of specific errors here; rethrow errors when appropriate
 		throw err;
+	}
+}
+
+
+function filterWithPagination() {
+	var in_searchParam = "empty";
+	var searchCategory = "name";
+	if ($('input#txt_search_conceptcode_code').val() != "") {
+		in_searchParam = $('input#txt_search_conceptcode_code').val();
+		searchCategory = "code";
+	} else if ($('input#txt_search_conceptcode_name').val()) {
+		in_searchParam = $('input#txt_search_conceptcode_name').val();
+	}
+	
+	if(in_searchParam.length > 0){
+		var codeSystemSelected = ($('select#select_filter_on_cs').val() != "" ? $('select#select_filter_on_cs').val() : "empty");
+		var codeSystemVersionSelected = ($('select#select_filter_on_cs_vs').val() != "" ? $('select#select_filter_on_cs_vs').val() : "empty");
+		var valueSetNameSelected = ($('select#select_filter_on_valset_name  :selected').text().indexOf("Value Set Name") >= 0 ? "empty" : $('select#select_filter_on_valset_name  :selected').text());
+
+		pagedUrl = "conceptCode/ajaxSearchConceptCode/pageNumber/pageNumberPlaceHolder/searchCategory/"+searchCategory+"/searchTerm/"+in_searchParam+"/codeSystem/"+codeSystemSelected+"/codeSystemVersion/"+codeSystemVersionSelected+"/valueSetName/"+valueSetNameSelected;
+		
+		$.ajax({url: "conceptCode/ajaxSearchConceptCode/pageNumber/0/searchCategory/"+searchCategory+"/searchTerm/"+in_searchParam+"/codeSystem/"+codeSystemSelected+"/codeSystemVersion/"+codeSystemVersionSelected+"/valueSetName/"+valueSetNameSelected,
+
+			method: "GET",
+			success: function(response){
+
+				var totalNumberOfConceptCodes = response.totalNumberOfConceptCodes;
+				var totalPages = response.totalPages;
+				var conceptCodes = response.conceptCodes;
+				var numberOfElements = response.numberOfElements;
+				
+				clearTable();
+				
+				if(totalNumberOfConceptCodes > 0){
+					
+					for(var i = 0; i < numberOfElements; i++){
+						
+						var temp_conceptcode_id = conceptCodes[i].id;
+						var temp_conceptcode_code = conceptCodes[i].code;
+						var temp_conceptcode_name = conceptCodes[i].name;
+						var temp_conceptcode_cs_name = conceptCodes[i].codeSystemName;
+						var temp_conceptcode_cs_vs_name = conceptCodes[i].codeSystemVersionName;
+						var temp_conceptcode_valsets_ary = new Array();
+
+						temp_conceptcode_valsets_ary = conceptCodes[i].valueSetMap;
+						insertTableRow(temp_conceptcode_id, temp_conceptcode_code, temp_conceptcode_name, temp_conceptcode_cs_name, temp_conceptcode_cs_vs_name, temp_conceptcode_valsets_ary);
+					}
+					
+					//Change table header text
+					setHeaderForFilter();
+					
+					rebuildPagination(totalPages);
+					setNumResultsDisplay(totalNumberOfConceptCodes);
+				}else{
+					window.alert("No results found");
+				}
+			},
+			error: function(e){
+				window.alert("ERROR - An error occured while search for concept code by code: " + e.responseText);
+			}
+	});
 	}
 }
 
@@ -1379,7 +1611,7 @@ function gotoTargetPage(in_targetPage){
 			disablePrevPageIcon();
 		}
 		
-		rebuildTableFromAry();
+		//rebuildTableFromAry();
 		$('div#conceptcode_pagination_holder > ul.pagination').trigger("gotoTargetPageComplete.c2s_ui.pagination", {newPagenum: in_targetPage});
 	}
 }

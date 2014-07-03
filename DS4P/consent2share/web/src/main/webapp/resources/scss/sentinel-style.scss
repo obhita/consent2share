@@ -294,25 +294,6 @@ used more than once per page.
 	.joyride-tip-guide{
 		z-index: 1501;
 	}
-	
-	
-	
-	/* Override margin-left on div.icheckbox_square-blue when inside of wizard */
-	form.wizard div.content div.icheckbox_square-blue{
-		margin-left: 0px;
-		background-color: #fff;
-	}
-	
-	/* Override default rules for wizard plug-in body */
-	.wizard > .content > .body {
-		width: 100% !important;
-		height: 100% !important;
-		overflow-y: auto;
-		
-		input {
-			display: inline-block !important;
-		}
-	}
 
 
 /* ----------------------------------------------------[ General Page Features ] */
@@ -1377,14 +1358,8 @@ used more than once per page.
 		z-index: 1600;
 		
 		.inputform, form { 
-		    > div{
-                padding-left: 25px;
-                
-             /* The following rule is a temporary fix. In the long term, the
-                padding-left: 25px rule above needs to be given a more specific selector */
-                &.steps, &.clearfix{
-                	padding-left: 0px;
-                }
+		    > div {
+ /*               padding-left: 25px;	 */
 		    }
 			label {
 				display: inline-block;
@@ -2290,10 +2265,6 @@ Utility rules modify minor aspects of an element
 
 .force-italic {
 	font-style: italic !important;
-}
-
-.grayout{
-	color: #BABABA !important;
 }
 	 
 	 

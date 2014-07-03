@@ -1,0 +1,35 @@
+<configuration>
+
+  <appender name="STDOUT"
+    class="ch.qos.logback.core.ConsoleAppender">
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <param name="Pattern"
+        value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+    </layout>
+  </appender>
+  
+  <appender name="FILE"
+    class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>logback-audit.log</File>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <FileNamePattern>
+        logback-audit.%d{yyyy-MM-dd}.log.zip
+      </FileNamePattern>
+    </rollingPolicy>
+    
+    <encoder>
+      %d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n
+    </encoder>
+    
+    <!-- keep 30 days' worth of history -->
+    <maxHistory>30</maxHistory>
+  </appender>
+  
+  <logger name="ch.qos.logback.audit" level="info" />
+
+  <root>
+    <level value="INFO" />
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+  </root>
+</configuration>

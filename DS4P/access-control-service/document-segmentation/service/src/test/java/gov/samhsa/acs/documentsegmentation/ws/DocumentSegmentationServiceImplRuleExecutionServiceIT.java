@@ -117,8 +117,8 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 										ruleExecutionService,
 										null,
 										documentEditor, marshaller,
-										documentEncrypter, documentRedactor,
-										documentMasker, documentTagger,
+										documentRedactor,
+										documentTagger,
 										documentFactModelExtractor,
 										embeddedClinicalDocumentExtractor, new ValueSetServiceImplMock(fileReader), additionalMetadataGeneratorForSegmentedClinicalDocumentImpl)));
 	}
@@ -153,24 +153,20 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 		param.setRecipientEmailAddress(recipientEmailAddress);
 		param.setXdsDocumentEntryUniqueId(xdsDocumentEntryUniqueId);
 		SegmentDocumentResponse resp = pdspt.segmentDocument(param);
-		logger.debug("resp.getMaskedDocument()");
-		logger.debug(resp.getMaskedDocument());
-		logger.debug("resp.getPostProcessingMetadata()");
-		logger.debug(resp.getPostProcessingMetadata());
-		logger.debug("resp.getKekEncryptionKey().toString()");
-		logger.debug(resp.getKekEncryptionKey().toString());
-		logger.debug("resp.getKekMaskingKey().toString()");
-		logger.debug(resp.getKekMaskingKey().toString());
-		logger.debug("resp.getProcessedDocument().toString()");
-		logger.debug(resp.getProcessedDocument().toString());
+		logger.debug("resp.getSegmentedDocumentXml()");
+		logger.debug(resp.getSegmentedDocumentXml());
+		logger.debug("resp.getPostSegmentationMetadataXml()");
+		logger.debug(resp.getPostSegmentationMetadataXml());
+		logger.debug("resp.getDocumentPayloadRawData().toString()");
+		logger.debug(resp.getDocumentPayloadRawData().toString());
 
 		assertTrue(
 				"The processed document should not contain this observation id per 'Substance abuse (disorder)' rule in Guvnor",
-				!resp.getMaskedDocument().contains(
+				!resp.getSegmentedDocumentXml().contains(
 						"e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7"));
 		assertTrue(
 				"The processed document should not contain this observation id per 'DUMMY - Acute HIV' ruke un Guvnor (it should have been redacted)",
-				!resp.getMaskedDocument().contains(
+				!resp.getSegmentedDocumentXml().contains(
 						"d11275e7-67ae-11db-bd13-0800200c9a66"));
 	}
 }

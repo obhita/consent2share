@@ -216,7 +216,7 @@ public class AuditServiceImplTest {
 		modifiedEntityTypeEntitys.add(mock(ModifiedEntityTypeEntity.class));
 		modifiedEntityTypeEntitys.add(mock(ModifiedEntityTypeEntity.class));
 		String revClassName = pasut.findRevClassName(modifiedEntityTypeEntitys);
-		assertEquals("Signed PDF Consent", revClassName);
+		assertEquals("Add provider", revClassName);
 	}
 
 	@Test

@@ -28,15 +28,6 @@
 <!-- END: Favicon -->
 
 </head>
-<head>
-<link th:href="@{/resources/css/aero.css}"
-	href="../../../resources/css/aero.css" rel="stylesheet" />
-<link th:href="@{/resources/css/blue.css}"
-	href="../../../resources/css/blue.css" rel="stylesheet" />
-<link th:href="@{/resources/css/jquery.steps.css}"
-	href="../../resources/css/jquery.steps.css" rel="stylesheet" />
-</head>
-
 
 <body id="listConsent-page" class="fouc_loading">
 
@@ -309,11 +300,11 @@
 												th:unless="(${notification} == 'notification_add_second_provider' or ${notification} =='notification_add_provider' )">
 
 												<span title="plus button" id="consent-main-plus-span">
-													<button id="consent-main-plus-btn"
-														class="btn btn-success btn-xs add-btn">
+													<a id="consent-main-plus-btn"
+														class="btn btn-success btn-xs add-btn" th:href="@{/consents/addConsent.html}">
 														<span class="fa fa-plus fa-white"></span><span>Add
 															a Consent</span>
-													</button>
+													</a>
 												</span>
 											</div>
 											<!-- Issue #124 Fix End  -->
@@ -859,235 +850,6 @@
 						</div>
 					</div>
 				</div>
-
-
-				<!-- Add Consent Wizard Modal -->
-				<div class="modal fade" id="addConsentWizardModal" tabindex="-1"
-					role="dialog" aria-labelledby="addConsentWizardModalLabel"
-					aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal"
-									aria-hidden="true">X</button>
-								<h3 class="modal-title" id="addConsentWizardModalLabel">Add
-									Consent Wizard</h3>
-							</div>
-							<div class="modal-body">
-
-								<!-- START jQuery Steps Wizard Plugin -->
-								<form id="frm_add_consent_wizard_holder"
-									th:object="${preConsentDto}"
-									th:action="@{/consents/addNewConsent.html}"
-									action="addNewConsent.html" method="POST"
-									class="wizard clearfix" novalidate="novalidate">
-
-									<!-- Wizard Step 1 -->
-									<h1>Authorize From</h1>
-									<div data-mode="html" data-step="1">
-										<!-- START: Content of Wizard Step 1 panel: -->
-										<div class="authorize_from_holder">
-											<div>
-												<label for="authorize-list">Select the individual(s)
-													and or organization(s) authorized to share your
-													information:</label>
-												<div class="error"></div>
-												<div id="authorize-list" class="modal_checkbox_list">
-													<div id="authorize_list_container">
-														<div class="wizard-list-item"
-															th:each="individualProvider:${individualProvidersDto}">
-															<label for="inidividualProvider"
-																th:for="'from'+${individualProvider.npi}"> <input
-																class="toDiscloseList" id="inidividualProvider"
-																th:field="*{providersPermittedToDisclose}"
-																th:id="'from'+${individualProvider.npi}"
-																value="1234567890" th:value="${individualProvider.npi}"
-																type="checkbox" name="individualConsentAuthorizedFrom"
-																style="float: none;" /> <span
-																th:text="${individualProvider.lastName+', '+individualProvider.firstName}">Doe,
-																	John</span>
-															</label>
-														</div>
-														<div class="wizard-list-item"
-															th:each="organizationalProvider:${organizationalProvidersDto}">
-															<label for="organizationalProvider"
-																th:for="'from'+${organizationalProvider.npi}"> <input
-																class="toDiscloseList" id="organizationalProvider"
-																th:field="*{organizationalProvidersPermittedToDisclose}"
-																th:id="'from'+${organizationalProvider.npi}"
-																value="1234567890"
-																th:value="${organizationalProvider.npi}" type="checkbox"
-																name="organizationalConsentAuthorizedFrom"
-																style="float: none;" /> <span
-																th:text="${organizationalProvider.orgName}">Doe,
-																	John</span>
-															</label>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-										<!-- END: Content of Wizard Step 1 panel: -->
-									</div>
-									<!-- End of Step 1 -->
-
-									<!-- Wizard Step 2 -->
-									<h1>Disclose To</h1>
-									<div data-mode="html" data-step="2">
-										<!-- START: Content of Wizard Step 2 panel: -->
-										<div class="disclose_to_holder">
-											<div>
-												<label for="disclose-list">Select the individual(s)
-													and/or organization(s) for disclosure:</label>
-												<div class="error"></div>
-												<div id="disclose-list" class="modal_checkbox_list">
-													<div id="disclose_list_container">
-														<div class="wizard-list-item"
-															th:each="individualProvider:${individualProvidersDto}">
-															<label for="inidividualProvider"
-																th:for="'to'+${individualProvider.npi}" class="">
-																<input class="isMadeToList" id="inidividualProvider"
-																th:field="*{providersDisclosureIsMadeTo}"
-																th:id="'to'+${individualProvider.npi}"
-																value="1234567890" th:value="${individualProvider.npi}"
-																type="checkbox" name="individualConsentMadeTo"
-																style="float: none;" /><span
-																th:text="${individualProvider.lastName+', '+individualProvider.firstName}">
-																	Doe, John</span>
-															</label>
-														</div>
-														<div class="wizard-list-item"
-															th:each="organizationalProvider:${organizationalProvidersDto}">
-															<label for="organizationalProvider"
-																th:for="'to'+${organizationalProvider.npi}" class="">
-																<input class="isMadeToList" id="organizationalProvider"
-																th:field="*{organizationalProvidersDisclosureIsMadeTo}"
-																th:id="'to'+${organizationalProvider.npi}"
-																value="1234567890"
-																th:value="${organizationalProvider.npi}" type="checkbox"
-																name="organizationalConsentMadeTo" style="float: none;" /><span
-																th:text="${organizationalProvider.orgName}"> Doe,
-																	John</span>
-															</label>
-														</div>
-
-													</div>
-
-												</div>
-											</div>
-										</div>
-										<!-- END: Content of Wizard Step 2 panel: -->
-									</div>
-									<!-- End of Step 2 -->
-
-									<!-- Wizard Step 3 -->
-									<h1>Dates</h1>
-									<div data-mode="html" data-step="3">
-										<!-- START: Content of Wizard Step 3 panel: -->
-
-										<p>
-											<span>Enter a start and end date during wich your
-												medical records will be shared.</span>
-										</p>
-
-										<div class="summary-container bottom-margin10">
-											<label for="date_picker_start"> <span
-												th:text="#{start}">Consent Start</span>
-											</label>
-											<div class="input-group datepicker"
-												data-date-format="mm/dd/yyyy">
-												<input class="datepicker" id="date_picker_start"
-													name="consentStart" value="04/10/2014"
-													th:field="${preConsentDto.consentStart}" />
-											</div>
-										</div>
-
-										<div class="summary-container bottom-margin10">
-											<label for="date_picker_end"> <span th:text="#{end}">Consent
-													End</span>
-											</label>
-											<div class="input-group datepicker date"
-												data-date-format="mm/dd/yyyy">
-												<input class="datepicker" id="date_picker_end"
-													name="consentEnd" value="04/10/2015"
-													th:field="${preConsentDto.consentEnd}" />
-											</div>
-										</div>
-
-										<!-- END: Content of Wizard Step 3 panel: -->
-									</div>
-									<!-- End of Step 3 -->
-
-									<!-- Wizard Step 4 -->
-									<h1>Purpose of Use</h1>
-									<div data-mode="html" data-step="3">
-										<p>
-											<span>Choose for what purposes your medical
-												information may be used</span>
-										</p>
-
-										<div class="purposeofshareform">
-											<div class="alert alert-warning">
-												Share my information&nbsp;<strong>only</strong>&nbsp;for
-												specified purpose(s) of use.
-											</div>
-
-											<div class="consent-select">
-												<div>
-													<button id="btn_share_purposes_select_all"
-														class="btn btn-default btn-xs btn-sel-all-tab"
-														type="button">Select All</button>
-												</div>
-												<div>
-													<button id="btn_share_purposes_deselect_all"
-														class="btn btn-default btn-xs btn-desel-all-tab"
-														type="button">Deselect All</button>
-												</div>
-											</div>
-
-											<div id="purposeOfSharingInputs">
-												<div th:each="purposeOfUseItem:${purposeOfUse}">
-													<span> <input id="emergency"
-														th:field="*{shareForPurposeOfUseCodes}"
-														th:id="${purposeOfUseItem.code}"
-														th:value="${purposeOfUseItem.code}" type="checkbox"
-														name="purposeOfUseInput" checked="checked" />
-													</span> <span> <label for="emergency"
-														th:for="${purposeOfUseItem.code}"
-														th:text="#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}"
-														class="checkbox checkedCheckbox2">Emergency</label>
-													</span> <a href="#"
-														th:id="${'i-icon_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')}"
-														data-trigger="click" data-toggle="popover"
-														data-placement="bottom" data-content="icon context"
-														data-title="title"> <span style="margin-left: 5px;"
-														class="fa fa-info-circle"></span>
-													</a> <input
-														th:attr="data-linkid=${'i-icon_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')},data-intitle=#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')}}"
-														class="input_i-text"
-														th:id="${'i-text_' + #strings.replace(purposeOfUseItem.displayName, ' ', '-')}"
-														type="hidden"
-														th:value="#{${#strings.replace(purposeOfUseItem.displayName, ' ', '_')+'_text'}}" />
-												</div>
-											</div>
-										</div>
-
-										<div id="content2" class="edit top-margin10">
-											<div class="inline-block">
-												<div id="sharedpurpose"></div>
-											</div>
-										</div>
-									</div>
-
-								</form>
-								<!-- END jQuery Steps Wizard Plugin -->
-
-							</div>
-						</div>
-					</div>
-				</div>
-
-
 			</div>
 			<!-- end first row -->
 		</div>
@@ -1126,28 +888,18 @@
 
 	<!-- START: JavaScript-->
 
+    <script src="../../../resources/js/jquery.validate.min.js"  
+        th:src="@{/resources/js/jquery.validate.min.js}" type="text/javascript">
+    </script>        
 	<script src="../../../resources/js/modernizr.mq.js"
 		th:src="@{/resources/js/modernizr.mq.js}" type="text/javascript"></script>
-
 	<script src="../../../resources/js/jquery.cookie.js"
 		th:src="@{/resources/js/jquery.cookie.js}" type="text/javascript"></script>
 	<script src="../../../resources/js/jquery.toggle.buttons.js"
 		th:src="@{/resources/js/jquery.toggle.buttons.js}"
 		type="text/javascript"></script>
-	<script src="../../../resources/js/bootstrap-datepicker.js"
-		th:src="@{/resources/js/bootstrap-datepicker.js}"
-		type="text/javascript"></script>
-	<script src="../../../resources/js/jquery.icheck.js"
-		th:src="@{/resources/js/jquery.icheck.js}" type="text/javascript"></script>
-	<script src="../../../resources/js/jquery.validate.min.js"
-		th:src="@{/resources/js/jquery.validate.min.js}"
-		type="text/javascript"></script>
-	<script src="../../../resources/js/jquery.steps.js"
-		th:src="@{/resources/js/jquery.steps.js}" type="text/javascript"></script>
 
 	<!-- Custom JS Script -->
-	<script src="../../resources/js/formatParser.js"
-		th:src="@{/resources/js/formatParser.js}" type="text/javascript"></script>
 	<script src="../../../resources/js/consent/listConsent.js"
 		th:src="@{/resources/js/consent/listConsent.js}"
 		type="text/javascript"></script>

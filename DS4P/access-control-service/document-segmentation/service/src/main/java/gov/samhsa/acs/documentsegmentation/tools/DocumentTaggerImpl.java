@@ -52,14 +52,12 @@ public class DocumentTaggerImpl implements DocumentTagger {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * gov.samhsa.acs.documentsegmentation.util
+	 * @see gov.samhsa.acs.documentsegmentation.util
 	 * .DocumentTagger#tagDocument(java.lang.String, java.lang.String,
 	 * java.lang.String)
 	 */
 	@Override
-	public String tagDocument(String document,
-			String executionResponseContainer, String messageId) {
+	public String tagDocument(String document, String executionResponseContainer) {
 		StringWriter out = new StringWriter();
 		InputStream in = null;
 		String taggedDocument = null;
@@ -82,7 +80,6 @@ public class DocumentTaggerImpl implements DocumentTagger {
 			t.setURIResolver(new StringURIResolver().put(
 					"ruleExecutionResponseContainer",
 					executionResponseContainer));
-			t.setParameter("privacyPoliciesExternalDocUrl", messageId);
 
 			t.transform(new StreamSource(new StringReader(document)),
 					new StreamResult(out));

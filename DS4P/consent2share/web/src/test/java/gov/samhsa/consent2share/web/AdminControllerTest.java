@@ -1,19 +1,18 @@
 package gov.samhsa.consent2share.web;
 
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
@@ -24,7 +23,6 @@ import gov.samhsa.consent2share.infrastructure.security.AuthenticatedUser;
 import gov.samhsa.consent2share.infrastructure.security.UserContext;
 import gov.samhsa.consent2share.service.admin.AdminService;
 import gov.samhsa.consent2share.service.audit.AdminAuditService;
-import gov.samhsa.consent2share.service.consent.ConsentNotFoundException;
 import gov.samhsa.consent2share.service.consent.ConsentService;
 import gov.samhsa.consent2share.service.dto.AbstractPdfDto;
 import gov.samhsa.consent2share.service.dto.AdminProfileDto;
@@ -55,27 +53,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.hamcrest.Description;
-import org.hamcrest.Matchers;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.util.NestedServletException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AdminControllerTest {
@@ -510,8 +500,9 @@ public class AdminControllerTest {
 	@Test
 	public void testAjaxProviderSearch_Checked_Status_Is_OK() throws Exception {
 		 when(providerSearchLookupService.isValidatedSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(true);
-		 when(providerSearchLookupService.providerSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn("artifitial JSON");
-		 mockMvc.perform(get("/Administrator/providerSearch.html"))
+
+		 when(providerSearchLookupService.providerSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyInt())).thenReturn("artifitial JSON");
+		 mockMvc.perform(get("/Administrator/providerSearch.html").param("pageNumber", "1"))
          	.andExpect(status().isOk())
          	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}

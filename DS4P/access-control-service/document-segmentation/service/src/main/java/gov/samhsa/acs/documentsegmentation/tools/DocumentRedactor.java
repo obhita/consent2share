@@ -27,7 +27,6 @@ package gov.samhsa.acs.documentsegmentation.tools;
 
 import gov.samhsa.acs.brms.domain.FactModel;
 import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
-import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.documentsegmentation.tools.dto.RedactedDocument;
 
 /**
@@ -37,20 +36,17 @@ public interface DocumentRedactor {
 
 	/**
 	 * Redact document.
-	 * 
+	 *
 	 * @param document
 	 *            the document
 	 * @param ruleExecutionContainer
 	 *            the rule execution container
-	 * @param xacmlResult
-	 *            the xacml result
 	 * @param factModel
 	 *            the fact model
 	 * @return the string
 	 */
 	public abstract RedactedDocument redactDocument(String document,
-			RuleExecutionContainer ruleExecutionContainer,
-			XacmlResult xacmlResult, FactModel factModel);
+			RuleExecutionContainer ruleExecutionContainer, FactModel factModel);
 
 	/**
 	 * Clean up generated entry ids.
@@ -60,4 +56,14 @@ public interface DocumentRedactor {
 	 * @return the string
 	 */
 	public abstract String cleanUpGeneratedEntryIds(String document);
+
+	/**
+	 * Clean up embedded clinical document from fact model.
+	 *
+	 * @param factModelXml
+	 *            the fact model xml
+	 * @return the string
+	 */
+	public abstract String cleanUpEmbeddedClinicalDocumentFromFactModel(
+			String factModelXml);
 }

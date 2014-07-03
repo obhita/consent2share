@@ -5,6 +5,7 @@ import gov.samhsa.consent2share.service.dto.ConceptCodeVSCSDto;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,23 +51,31 @@ public interface ConceptCodeService {
 	 * @param pageNumber the page number
 	 * @return the list
 	 */
-	public List<ConceptCodeDto> findAll(int pageNumber);
+	public Map<String, Object> findAll(int pageNumber);
 	
 	/**
 	 * Find all by code.
 	 *
 	 * @param searchTerm the search term
+	 * @param codeSystem the code system
+	 * @param codeSystemVersion the code system version
+	 * @param valueSetName the value set name
+	 * @param pageNumber the page number
 	 * @return the list
 	 */
-	public List<ConceptCodeDto> findAllByCode(String searchTerm);
+	public Map<String, Object> findAllByCode(String searchTerm, String codeSystem, String codeSystemVersion, String valueSetName, int pageNumber);
 
 	/**
 	 * Find all by name.
 	 *
 	 * @param searchTerm the search term
+	 * @param codeSystem the code system
+	 * @param codeSystemVersion the code system version
+	 * @param valueSetName the value set name
+	 * @param pageNumber the page number
 	 * @return the list
 	 */
-	public List<ConceptCodeDto> findAllByName(String searchTerm);
+	public Map<String, Object> findAllByName(String searchTerm, String codeSystem, String codeSystemVersion, String valueSetName, int pageNumber);
 
 	/**
 	 * Finds ConceptCode by id.

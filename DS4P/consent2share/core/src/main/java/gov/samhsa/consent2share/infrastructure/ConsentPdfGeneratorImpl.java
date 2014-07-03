@@ -152,7 +152,7 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 					chunkState.setUnderline(1, -2);
 				}
 				if(consent.getPatient().getAddress().getPostalCode()!=null){
-					chunkZip=new Chunk(consent.getPatient().getAddress().getPostalCode()+"\n\n");
+					chunkZip=new Chunk(consent.getPatient().getAddress().getPostalCode());
 					chunkZip.setUnderline(1, -2);
 				}
 			}
@@ -182,6 +182,7 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 				paragraph2.add(chunk36);
 				paragraph2.add(chunkZip);
 			}
+			paragraph2.add(new Chunk("\n\n"));
 			paragraph2.add(chunk4);
 			paragraph2.add(createConsentMadeFromTable(consent));
 			paragraph2.add(chunk6);
@@ -217,9 +218,10 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 			paragraph4.setSpacingBefore(10);
 
 			
-			Chunk chunk11 = new Chunk("\nShare for the following purpose(s):",fontbold);
+			Chunk chunk11 = new Chunk("Share for the following purpose(s):",fontbold);
 			chunk11.setUnderline(1, -2);
 			
+			paragraph4.add(new Chunk("\n"));
 			paragraph4.add(chunk11);
 			
 			// Do Not Share Purpose of Use List
@@ -238,7 +240,7 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 			Chunk chunk14;
 			if (consent.getEndDate() != null) {
 				chunk14 = new Chunk(String.format(
-						"Expiration Date: %tm/%td/%ty ",
+						"Expiration Date: %tm/%td/%ty",
 						consent.getEndDate(),
 						consent.getEndDate(),
 						consent.getEndDate()));
@@ -248,6 +250,22 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 			}
 
 			chunk14.setUnderline(1, -2);
+			
+			Chunk chunk15;
+			if (consent.getEndDate() != null) {
+				chunk15 = new Chunk(String.format(
+						"Effecitive Date: %tm/%td/%ty\n",
+						consent.getStartDate(),
+						consent.getStartDate(),
+						consent.getStartDate()));
+			} else {
+				chunk15 = new Chunk(
+						"N/A");
+			}
+
+			chunk15.setUnderline(1, -2);
+			
+			paragraph6.add(chunk15);
 			paragraph6.add(chunk14);
 			
 			document.add(consentID);

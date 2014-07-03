@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,7 +31,6 @@ import gov.samhsa.consent2share.domain.consent.AbstractSignedPDFDocument;
 import gov.samhsa.consent2share.domain.consent.Consent;
 import gov.samhsa.consent2share.domain.consent.ConsentRepository;
 import gov.samhsa.consent2share.infrastructure.EchoSignSignatureService;
-import gov.samhsa.consent2share.service.consentexport.ConsentExportService;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -43,7 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class EchoSignPollingService.
  */
@@ -65,7 +63,7 @@ public class EchoSignPollingService implements EsignaturePollingService {
 
 	/**
 	 * Instantiates a new echo sign polling service.
-	 * 
+	 *
 	 * @param ConsentRepository
 	 *            the consent repository
 	 * @param signatureService
@@ -80,14 +78,14 @@ public class EchoSignPollingService implements EsignaturePollingService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * gov.samhsa.consent2share.esignaturepolling.EsignaturePollingService#poll
 	 * ()
 	 */
 	@Override
 	public void poll() {
-		logger.info("Starts polling at {}...", new Date().toString());
+		logger.debug("Starts polling at {}...", new Date().toString());
 
 		try {
 			Set<Consent> consentSet = new HashSet<Consent>();
@@ -99,12 +97,12 @@ public class EchoSignPollingService implements EsignaturePollingService {
 							.findBySignedPdfConsentRevokeDocumentSignedStatusNot(Signed_Staus));
 
 			for (Consent consent : consentSet) {
-				AbstractSignedPDFDocument document = SignedPDFDocumentBinder(consent);
+				AbstractSignedPDFDocument document = getPdfDocument(consent);
 				String parentDocumentKey = document.getDocumentId();
 				String childDocumentKey = signatureService
-						.getChildDocumentKey(document.getDocumentId());
+						.getChildDocumentKey(parentDocumentKey);
 
-				logger.info(
+				logger.debug(
 						"Starts calling adobe echosign web service to get document info at {}...",
 						new Date().toString());
 				DocumentInfo latestDocumentInfo;
@@ -115,26 +113,24 @@ public class EchoSignPollingService implements EsignaturePollingService {
 					latestDocumentInfo = signatureService
 							.getDocumentInfo(childDocumentKey);
 
-				logger.info(
+				logger.debug(
 						"Ended calling adobe echosign web service to get document info at {}.",
 						new Date().toString());
-				
-				for(DocumentHistoryEvent event:latestDocumentInfo.getEvents().getDocumentHistoryEvent()) {
-					if (event.getDescription().startsWith("Document esigned by")) {
-						if (consent.getSignedPdfConsentRevoke()==null)
-							consent.setSignedDate(event.getDate().toGregorianCalendar().getTime());
-						else 
-							consent.setRevocationDate(event.getDate().toGregorianCalendar().getTime());
+
+				String latestSignStatus = getLatestSignStatus(latestDocumentInfo);
+				boolean isSigned = latestSignStatus.equals(Signed_Staus);
+				if (isSigned) {
+					for(DocumentHistoryEvent event:latestDocumentInfo.getEvents().getDocumentHistoryEvent()) {
+						if (event.getDescription().startsWith("Document esigned by")) {
+							Date signedDate = event.getDate().toGregorianCalendar().getTime();
+							if (consent.getSignedPdfConsentRevoke()==null)
+								consent.setSignedDate(signedDate);
+							else
+								consent.setRevocationDate(signedDate);
+						}
 					}
-						
-				}
 
-				String latestSignStatus = latestDocumentInfo.getStatus()
-						.toString();
-
-				if (latestSignStatus.equals(Signed_Staus)) {
-
-					logger.info(
+					logger.debug(
 							"Starts calling adobe echosign web service to get signed document at {}...",
 							new Date().toString());
 					byte[] latestData = null;
@@ -145,34 +141,47 @@ public class EchoSignPollingService implements EsignaturePollingService {
 						latestData = signatureService
 								.getLatestDocument(childDocumentKey);
 
-					logger.info(
+					logger.debug(
 							"Ended calling adobe echosign web service to get signed document at {}.",
 							new Date().toString());
 
 					document.setContent(latestData, consent.getId());
 					document.setDocumentSignedStatus(latestSignStatus);
-				}
 
-				consentRepository.save(consent);
+					consentRepository.save(consent);
+				}
 			}
+
+
 		} catch (Exception e) {
-			logger.error("Error occurred:", e);
+			String errorMessage = "Error occurred in EchoSignPollingService.";
+			logger.error(errorMessage, e);
+			throw new EchoSignPollingServiceException(errorMessage, e);
 		}
 
-		logger.info("Ended polling at {}.", new Date().toString());
+		logger.debug("Ended polling at {}.", new Date().toString());
+	}
+
+	protected String getLatestSignStatus(DocumentInfo latestDocumentInfo) {
+		String latestSignStatus = latestDocumentInfo.getStatus().toString();
+		return latestSignStatus;
 	}
 
 	/**
-	 * Signed pdf document binder.
-	 * 
+	 * Get pdf document.
+	 *
 	 * @param consent
 	 *            the consent
 	 * @return the abstract signed pdf document
 	 */
-	private AbstractSignedPDFDocument SignedPDFDocumentBinder(Consent consent) {
-		if (consent.getSignedPdfConsent().getDocumentSignedStatus()
-				.equals("SIGNED"))
+	private AbstractSignedPDFDocument getPdfDocument(Consent consent) {
+		if (isRevokedConsent(consent))
 			return consent.getSignedPdfConsentRevoke();
 		return consent.getSignedPdfConsent();
+	}
+
+	private boolean isRevokedConsent(Consent consent) {
+		return consent.getSignedPdfConsent().getDocumentSignedStatus()
+				.equals("SIGNED");
 	}
 }

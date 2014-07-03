@@ -1,13 +1,12 @@
 package gov.samhsa.consent2share.service.valueset;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import javax.annotation.Resource;
-
-import gov.samhsa.consent2share.domain.valueset.CodeSystem;
 import gov.samhsa.consent2share.domain.valueset.CodeSystemRepository;
 import gov.samhsa.consent2share.domain.valueset.CodeSystemVersion;
 import gov.samhsa.consent2share.domain.valueset.CodeSystemVersionRepository;
@@ -24,16 +23,19 @@ import gov.samhsa.consent2share.service.dto.ConceptCodeVSCSDto;
 import gov.samhsa.consent2share.service.dto.ValueSetDto;
 import gov.samhsa.consent2share.service.dto.ValueSetVSCDto;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -202,24 +204,24 @@ public class ConceptCodeServiceImplTest {
 	
 	@Test
 	public void testFindAllByName() {
-		List<ConceptCode> conceptCodes = mock(List.class);
+		Page<ConceptCode> conceptCodes = mock(Page.class);
 		List<ConceptCodeDto> conceptCodeDtos = mock(List.class);
 		
-		when(conceptCodeRepository.findAllByNameLike(anyString())).thenReturn(conceptCodes);
-		when(valueSetMgmtHelper.convertConceptCodeEntitiesToDtos(conceptCodes)).thenReturn(conceptCodeDtos);
-		assertEquals(conceptCodeServiceImpl.findAllByName("a"),conceptCodeDtos);
+		when(conceptCodeRepository.findAllByNameLike(anyString(), anyString(), anyString(), anyString(), any(Pageable.class))).thenReturn(conceptCodes);
+		when(valueSetMgmtHelper.convertConceptCodeEntitiesToDtos(conceptCodes.getContent())).thenReturn(conceptCodeDtos);
+		assertEquals(conceptCodeServiceImpl.findAllByName("a", null, null, null, 0).get("conceptCodes"),conceptCodeDtos);
 		
 	}
 	
 	@Test
 	public void testFindAllByCode() {
 		
-		List<ConceptCode> conceptCodes = mock(List.class);
+		Page<ConceptCode> conceptCodes = mock(Page.class);
 		List<ConceptCodeDto> conceptCodeDtos = mock(List.class);
 		
-		when(conceptCodeRepository.findAllByCodeLike(anyString())).thenReturn(conceptCodes);
-		when(valueSetMgmtHelper.convertConceptCodeEntitiesToDtos(conceptCodes)).thenReturn(conceptCodeDtos);
-		assertEquals(conceptCodeServiceImpl.findAllByCode("a"),conceptCodeDtos);
+		when(conceptCodeRepository.findAllByCodeLike(anyString(), anyString(), anyString(), anyString(), any(Pageable.class))).thenReturn(conceptCodes);
+		when(valueSetMgmtHelper.convertConceptCodeEntitiesToDtos(conceptCodes.getContent())).thenReturn(conceptCodeDtos);
+		assertEquals(conceptCodeServiceImpl.findAllByCode("a", null, null, null, 0).get("conceptCodes"),conceptCodeDtos);
 	}
 	 
 	

@@ -153,6 +153,23 @@
 									</fileset>
 								</configuration>
 							</execution>
+							
+							<execution>
+								<id>create-data-valueset</id>
+								<phase>install</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<orderFile>ascending</orderFile>
+									<fileset>
+										<basedir>${basedir}</basedir>
+										<includes>
+											<include>src/main/resources/mysql-scripts/data/persona/c2s-valueset-data.sql</include>
+										</includes>
+									</fileset>
+								</configuration>
+							</execution>
 
 							<execution>
 								<id>create-data-persona</id>
@@ -165,7 +182,7 @@
 									<fileset>
 										<basedir>${basedir}</basedir>
 										<includes>
-											<include>src/main/resources/mysql-scripts/data/persona/*.sql</include>
+											<include>src/main/resources/mysql-scripts/data/persona/consent2share-persona-data.sql</include>
 										</includes>
 									</fileset>
 								</configuration>

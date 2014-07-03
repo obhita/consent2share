@@ -385,7 +385,7 @@ public class AuditServiceImpl implements AuditService {
 		}
 		if (modifiedEntityTypeEntitys.size() == 3) {
 
-			entityClassname.append("Signed PDF Consent");
+			entityClassname.append("Add provider");
 
 		}
 		return entityClassname.toString();

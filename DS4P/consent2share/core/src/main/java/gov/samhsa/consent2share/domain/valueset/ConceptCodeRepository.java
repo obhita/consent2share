@@ -27,6 +27,8 @@ package gov.samhsa.consent2share.domain.valueset;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -35,12 +37,23 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ConceptCodeRepository extends JpaRepository<ConceptCode, Long>, JpaSpecificationExecutor<ConceptCode> {
 	
-	@Query("select p from ConceptCode p where p.name like ?1")
-	public List<ConceptCode> findAllByNameLike(String searchTerm);
+	@Query("select DISTINCT(c) from ConceptCode c, CodeSystemVersion csv, CodeSystem cs, ConceptCodeValueSet ccvs, ValueSet vs where c.name like ?1 AND "
+			+ "c.codeSystemVersion.id = csv.id AND csv.codeSystem.id = cs.id AND cs.name like ?2 AND csv.name like ?3 AND "
+			+ "(c.id = ccvs.pk.conceptCode AND ccvs.pk.valueSet = vs.id AND vs.code like ?4)")
+	public Page<ConceptCode> findAllByNameLike(String searchTerm, String codeSystem, String codeSystemVersion, String valueSetName, Pageable pageable);
 	
-	@Query("select p from ConceptCode p where p.code like ?1")
-	public List<ConceptCode> findAllByCodeLike(String searchTerm);
+	@Query("select DISTINCT(c) from ConceptCode c, CodeSystemVersion csv, CodeSystem cs, ConceptCodeValueSet ccvs, ValueSet vs where c.code like ?1 AND "
+			+ "c.codeSystemVersion.id = csv.id AND csv.codeSystem.id = cs.id AND cs.name like ?2 AND csv.name like ?3 AND "
+			+ "(c.id = ccvs.pk.conceptCode AND ccvs.pk.valueSet = vs.id AND vs.code like ?4)")
+	public Page<ConceptCode> findAllByCodeLike(String searchTerm, String codeSystem, String codeSystemVersion, String valueSetName, Pageable pageable);
+	
+	
+	@Query("select p from ConceptCode p where p.codeSystemVersion like ?1")
+	public List<ConceptCode> findAllByCodeSystemVersion(Long codeSystemVersionId);
 
 	ConceptCode findByCodeAndCodeSystemVersionId(String code, Long id);
+	
+	@Query("SELECT c.name, c.code, v.name FROM ConceptCode c, ConceptCodeValueSet cv, ValueSet v where c.id = cv.pk.conceptCode AND cv.pk.valueSet = v.id AND c.code LIKE ?1")
+	public Page<ConceptCode> findAllByFilter(String code, Pageable pageable);
 
 }

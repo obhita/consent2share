@@ -198,6 +198,9 @@
                 </section>
       
                 <section>
+                	<input type="hidden" id="paginationMapInfo" th:attr="data-totalNumberOfValueSets=${valueSetsPagedMap['totalNumberOfValueSets']},
+                	data-totalPages=${valueSetsPagedMap['totalPages']}, data-itemsPerPage=${valueSetsPagedMap['itemsPerPage']},
+                	data-currentPage=${valueSetsPagedMap['currentPage']}, data-numberOfElements=${valueSetsPagedMap['numberOfElements']}" />
                 	<table id="current_valuesets_table" class="table table-striped table-bordered">
                        <thead>
                            <tr id="valueset_table_header">
@@ -222,7 +225,7 @@
 		               				<th>Category Name</th>
 							</tr>
 
-			              	<tr th:each="valueSetDto : ${valueSetDtos}" class="valset-record" th:attr="data-valset-id=${valueSetDto.id},
+			              	<tr th:each="valueSetDto : ${valueSetsPagedMap['valueSets']}" class="valset-record" th:attr="data-valset-id=${valueSetDto.id},
 			              	data-valset-code=${valueSetDto.code},data-valset-cat-code=${valueSetDto.valueSetCatCode},
 			              	data-valset-name=${valueSetDto.name},data-valset-cat-name=${valueSetDto.valueSetCatName}">
 			              	 	 <td class="btn-cannot-delete-text">

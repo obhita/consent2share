@@ -71,7 +71,6 @@ import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentValidationDto;
-import gov.samhsa.consent2share.service.dto.PreConsentDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
 
 import java.io.ByteArrayInputStream;
@@ -257,6 +256,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 *            the id
 	 * @return the consent
 	 */
+	@Transactional(readOnly=true)
 	public Consent findConsent(Long id) {
 		Consent consent = consentRepository.findOne(id);
 		return consent;
@@ -267,6 +267,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 * 
 	 * @return the list
 	 */
+	@Transactional(readOnly=true)
 	public List<Consent> findAllConsents() {
 		return consentRepository.findAll();
 	}
@@ -376,6 +377,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 *            the consent id
 	 * @return the consent pdf dto
 	 */
+	@Transactional(readOnly=true)
 	public ConsentPdfDto findConsentPdfDto(Long consentId) {
 		Consent consent = consentRepository.findOne(consentId);
 		ConsentPdfDto consentPdfDto = makeConsentPdfDto();
@@ -403,6 +405,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 * @see gov.samhsa.consent2share.service.consent.ConsentService#
 	 * findConsentRevokationPdfDto(java.lang.Long)
 	 */
+	@Transactional(readOnly=true)
 	public ConsentRevokationPdfDto findConsentRevokationPdfDto(Long consentId) {
 		Consent consent = consentRepository.findOne(consentId);
 		ConsentRevokationPdfDto consentRevokationPdfDto = makeConsentRevokationPdfDto();
@@ -454,6 +457,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 * @return the list
 	 */
 	// @PreAuthorize("ROLE_USER")
+	@Transactional(readOnly=true)
 	public List<ConsentListDto> findAllConsentsDtoByPatient(Long patientId) {
 		Patient patient = patientRepository.findOne(patientId);
 		List<Consent> consents = consentRepository.findByPatient(patient);
@@ -470,6 +474,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 * findAllConsentsDtoByUserName(java.lang.String)
 	 */
 	@Override
+	@Transactional(readOnly=true)
 	public List<ConsentListDto> findAllConsentsDtoByUserName(String userName) {
 		Patient patient = patientRepository.findByUsername(userName);
 		List<Consent> consents = consentRepository.findByPatient(patient);
@@ -623,6 +628,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 *            the max results
 	 * @return the list
 	 */
+	@Transactional(readOnly=true)
 	public List<Consent> findConsentEntries(int firstResult, int maxResults) {
 		return consentRepository.findAll(
 				new org.springframework.data.domain.PageRequest(firstResult
@@ -676,7 +682,7 @@ public class ConsentServiceImpl implements ConsentService {
 		else
 			patient = patientRepository
 					.findByUsername(consentDto.getUsername());
-		patient = patientRepository.findByUsername(consentDto.getUsername());
+		//patient = patientRepository.findByUsername(consentDto.getUsername());
 		Map<String, AbstractProvider> providerMap = new HashMap<String, AbstractProvider>();
 		for (IndividualProvider o : patient.getIndividualProviders())
 			providerMap.put(o.getNpi(), o);
@@ -894,6 +900,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 * @return true, if is consent belong to this user
 	 */
 	@Override
+	@Transactional(readOnly=true)
 	public boolean isConsentBelongToThisUser(Long consentId, Long patientId) {
 		if (consentRepository.findOne(consentId) != null) {
 			Consent consent1 = consentRepository.findOne(consentId);
@@ -911,6 +918,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 *            the consent id
 	 * @return ConsentDto
 	 */
+	@Transactional(readOnly=true)
 	public ConsentDto findConsentById(Long consentId) {
 		Consent consent = null;
 		ConsentDto consentDto = null;
@@ -1093,6 +1101,7 @@ public class ConsentServiceImpl implements ConsentService {
 	 * gov.samhsa.consent2share.service.consent.ConsentService#findConsentContentDto
 	 * (java.lang.Long)
 	 */
+	@Transactional(readOnly=true)
 	public AbstractPdfDto findConsentContentDto(Long consentId) {
 		Consent consent = findConsent(consentId);
 		AbstractPdfDto consentPdfDto;
@@ -1443,32 +1452,10 @@ public class ConsentServiceImpl implements ConsentService {
 		return result.getJavascript();
 	}
 
-	@Override
-	public ConsentValidationDto checkForDuplicateConsents(PreConsentDto preConsentDto, String patientUsername) {
-		ConsentDto consentDto = makeConsentDto();
-
-		consentDto.setUsername(patientUsername);
-		
-		consentDto.setProvidersDisclosureIsMadeTo(preConsentDto.getProvidersDisclosureIsMadeTo());
-		consentDto.setProvidersDisclosureIsMadeToNpi(preConsentDto.getProvidersDisclosureIsMadeTo());
-		consentDto.setProvidersPermittedToDisclose(preConsentDto.getProvidersPermittedToDisclose());
-		consentDto.setProvidersPermittedToDiscloseNpi(preConsentDto.getProvidersPermittedToDisclose());
-		
-		consentDto.setOrganizationalProvidersDisclosureIsMadeTo(preConsentDto.getOrganizationalProvidersDisclosureIsMadeTo());
-		consentDto.setOrganizationalProvidersDisclosureIsMadeToNpi(preConsentDto.getOrganizationalProvidersDisclosureIsMadeTo());
-		consentDto.setOrganizationalProvidersPermittedToDisclose(preConsentDto.getOrganizationalProvidersPermittedToDisclose());
-		consentDto.setOrganizationalProvidersPermittedToDiscloseNpi(preConsentDto.getOrganizationalProvidersPermittedToDisclose());
-		
-		consentDto.setShareForPurposeOfUseCodes(preConsentDto.getShareForPurposeOfUseCodes());
-		consentDto.setConsentStart(preConsentDto.getConsentStart());
-		consentDto.setConsentEnd(preConsentDto.getConsentEnd());
-		
-		ConsentValidationDto consentValidationDto = consentCheckService.getConflictConsent(consentDto);
-		
-		return consentValidationDto;
-	}
+	
 
 	@Override
+	@Transactional(readOnly=true)
 	public String getConsentSignedStage(Long consentId) {
 		String signStatus="NA";
 		Consent consent=consentRepository.findOne(consentId);

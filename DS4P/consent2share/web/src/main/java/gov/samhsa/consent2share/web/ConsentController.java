@@ -49,7 +49,6 @@ import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentValidationDto;
 import gov.samhsa.consent2share.service.dto.PatientProfileDto;
-import gov.samhsa.consent2share.service.dto.PreConsentDto;
 import gov.samhsa.consent2share.service.dto.SpecificMedicalInfoDto;
 import gov.samhsa.consent2share.service.dto.TryMyPolicyDto;
 import gov.samhsa.consent2share.service.notification.NotificationService;
@@ -219,7 +218,7 @@ public class ConsentController extends AbstractController {
 		Long patientId = patientService.findIdByUsername(currentUser
 				.getUsername());
 		Long directConsentId = accessReferenceMapper
-				.getDirectReference(consentId);
+				.getDirectReference(consentId.substring(0, 6));
 		consentService.addUnsignedConsentRevokationPdf(directConsentId,
 				revokationType);
 		if (consentService
@@ -287,24 +286,9 @@ public class ConsentController extends AbstractController {
 			model.addAttribute("duplicateConsentId", duplicateConsentId);
 		}
 
-		List<AddConsentIndividualProviderDto> individualProvidersDto = patientService
-				.findAddConsentIndividualProviderDtoByUsername(username);
-		List<AddConsentOrganizationalProviderDto> organizationalProvidersDto = patientService
-				.findAddConsentOrganizationalProviderDtoByUsername(username);
-
-		List<AddConsentFieldsDto> purposeOfUseDto = purposeOfUseCodeService
-				.findAllPurposeOfUseCodesAddConsentFieldsDto();
-
-		PreConsentDto preConsentDto = new PreConsentDto();
-
 		model.addAttribute("listConsentDtos", consentListDtos);
-		model.addAttribute("preConsentDto", preConsentDto);
 		model.addAttribute("currentUser", currentUser);
 		model.addAttribute("emailSent", emailSent);
-		model.addAttribute("individualProvidersDto", individualProvidersDto);
-		model.addAttribute("organizationalProvidersDto",
-				organizationalProvidersDto);
-		model.addAttribute("purposeOfUse", purposeOfUseDto);
 		model.addAttribute("notification", notification);
 
 		return "views/consents/listConsents";
@@ -327,10 +311,11 @@ public class ConsentController extends AbstractController {
 						.findIdByUsername(currentUser.getUsername()));
 		if (consentPreSignStringList != null) {
 			for (String consentIdString : consentPreSignStringList) {
-				long consentId = Long.parseLong(consentIdString);
+				long directconsentId = accessReferenceMapper
+						.getDirectReference(consentIdString);
 				for (ConsentListDto consentListDto : consentListDtos) {
 					if (consentListDto.getId()
-							.equals(String.valueOf(consentId))
+							.equals(String.valueOf(directconsentId))
 							&& consentListDto.getConsentStage().equals(
 									"CONSENT_SIGNED"))
 						isSigned = true;
@@ -341,7 +326,9 @@ public class ConsentController extends AbstractController {
 		if (consentPreRevokeStringList != null) {
 			for (String consentIdString : consentPreRevokeStringList) {
 				for (ConsentListDto consentListDto : consentListDtos) {
-					if (consentListDto.getId().equals(consentIdString)
+					long directconsentId = accessReferenceMapper
+							.getDirectReference(consentIdString);
+					if (consentListDto.getId().equals(String.valueOf(directconsentId))
 							&& consentListDto.getRevokeStage().equals(
 									"REVOCATION_REVOKED"))
 						isSigned = true;
@@ -353,57 +340,6 @@ public class ConsentController extends AbstractController {
 
 	}
 
-	/*
-	 * // check for duplicate policy ConsentValidationDto consentValidationDto =
-	 * consentCheckService .getConflictConsent(consentDto);
-	 */
-
-	@RequestMapping(value = "/checkDuplicateConsent", method = RequestMethod.POST)
-	public @ResponseBody
-	String checkDuplicateConsent(PreConsentDto preConsentDto)
-			throws JSONException, IOException {
-		AuthenticatedUser currentUser = userContext.getCurrentUser();
-		PatientProfileDto currentPatient = null;
-
-		if (currentUser.getIsProviderAdmin() == false) {
-			currentPatient = patientService
-					.findPatientProfileByUsername(currentUser.getUsername());
-
-			if (currentPatient == null) {
-				// TODO (MH): Convert to AjaxException
-				throw new PatientNotFoundException(
-						"Patient not found by username");
-			}
-
-		} else {
-			// TODO (MH): Convert to AjaxException
-			throw new IllegalStateException(
-					"ProviderAdmin users cannot access the ConsentController");
-		}
-
-		ConsentValidationDto consentValidationDto = consentService
-				.checkForDuplicateConsents(preConsentDto,
-						currentPatient.getUsername());
-
-		// check for duplicate policy
-		if (consentValidationDto != null) {
-			String indirRef = accessReferenceMapper
-					.getIndirectReference(consentValidationDto
-							.getExistingConsentId());
-
-			consentValidationDto.setExistingConsentId(indirRef);
-			// duplicate policy found
-			ObjectMapper mapper = new ObjectMapper();
-			throw new AjaxException(HttpStatus.CONFLICT,
-					mapper.writeValueAsString(consentValidationDto));
-		} else {
-			JSONObject succObj = new JSONObject();
-			succObj.put("isSuccess", true);
-			succObj.put("isAdmin", false);
-			return succObj.toString();
-		}
-	}
-
 	/**
 	 * Consent add.
 	 * 
@@ -411,8 +347,8 @@ public class ConsentController extends AbstractController {
 	 *            the model
 	 * @return the string
 	 */
-	@RequestMapping(value = "addNewConsent.html", method = RequestMethod.POST)
-	public String consentAdd(PreConsentDto preConsentDto, Model model) {
+	@RequestMapping(value = "addConsent.html")
+	public String addConsent(Model model) {
 		AuthenticatedUser currentUser = userContext.getCurrentUser();
 		PatientProfileDto currentPatient = null;
 
@@ -455,31 +391,6 @@ public class ConsentController extends AbstractController {
 				.findAllClinicalDocumentSectionTypeCodesAddConsentFieldsDto();
 		List<AddConsentFieldsDto> clinicalDocumentTypeDto = clinicalDocumentTypeCodeService
 				.findAllClinicalDocumentTypeCodesAddConsentFieldsDto();
-
-		consentDto.setProvidersDisclosureIsMadeTo(preConsentDto
-				.getProvidersDisclosureIsMadeTo());
-		consentDto.setProvidersDisclosureIsMadeToNpi(preConsentDto
-				.getProvidersDisclosureIsMadeTo());
-		consentDto.setProvidersPermittedToDisclose(preConsentDto
-				.getProvidersPermittedToDisclose());
-		consentDto.setProvidersPermittedToDiscloseNpi(preConsentDto
-				.getProvidersPermittedToDisclose());
-
-		consentDto.setOrganizationalProvidersDisclosureIsMadeTo(preConsentDto
-				.getOrganizationalProvidersDisclosureIsMadeTo());
-		consentDto
-				.setOrganizationalProvidersDisclosureIsMadeToNpi(preConsentDto
-						.getOrganizationalProvidersDisclosureIsMadeTo());
-		consentDto.setOrganizationalProvidersPermittedToDisclose(preConsentDto
-				.getOrganizationalProvidersPermittedToDisclose());
-		consentDto
-				.setOrganizationalProvidersPermittedToDiscloseNpi(preConsentDto
-						.getOrganizationalProvidersPermittedToDisclose());
-
-		consentDto.setShareForPurposeOfUseCodes(preConsentDto
-				.getShareForPurposeOfUseCodes());
-		consentDto.setConsentStart(preConsentDto.getConsentStart());
-		consentDto.setConsentEnd(preConsentDto.getConsentEnd());
 
 		model.addAttribute("defaultStartDate",
 				dateFormat.format(today.getTime()));
@@ -615,26 +526,58 @@ public class ConsentController extends AbstractController {
 			BindingResult bindingResult, Model model,
 			@RequestParam(value = "ICD9", required = false) HashSet<String> icd9)
 			throws ConsentGenException, IOException, JSONException {
+		try{
 		if (consentDto.getId() != null) {
 			String directConsentId = String.valueOf(accessReferenceMapper
 					.getDirectReference(consentDto.getId()));
 			consentDto.setId(directConsentId);
 		}
+		}catch(Throwable t){
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+		}
+		
+		
 		Set<String> isMadeTo = new HashSet<String>();
 		Set<String> isMadeFrom = new HashSet<String>();
-		consentDto.setConsentEnd(consentHelper.setDateAsEndOfDay(consentDto
+		
+		try{
+			consentDto.setConsentEnd(consentHelper.setDateAsEndOfDay(consentDto
 				.getConsentEnd()));
+		}catch(ArrayIndexOutOfBoundsException e){
+			logger.warn("ArrayIndexOutOfBoundsException thrown in consentAddPost() method of ConsentController when calling consentHelper.setDateAsEndOfDay()");
+			logger.warn("    Stack Trace: " + e);
+			
+			throw new AjaxException(HttpStatus.BAD_REQUEST, "Invalid value(s) passed in for one or more date fields.");
+		}catch(Throwable t){
+			logger.warn("An unknown error has occured in consentAddPost() method of ConsentController when calling consentHelper.setDateAsEndOfDay()");
+			logger.warn("    Stack Trace: " + t);
+			
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+		}
 
-		if (consentDto.getOrganizationalProvidersDisclosureIsMadeTo() != null)
-			isMadeTo.addAll(consentDto
-					.getOrganizationalProvidersDisclosureIsMadeTo());
-		if (consentDto.getProvidersDisclosureIsMadeTo() != null)
-			isMadeTo.addAll(consentDto.getProvidersDisclosureIsMadeTo());
-		if (consentDto.getOrganizationalProvidersPermittedToDisclose() != null)
-			isMadeFrom.addAll(consentDto
-					.getOrganizationalProvidersPermittedToDisclose());
-		if (consentDto.getProvidersPermittedToDisclose() != null)
-			isMadeFrom.addAll(consentDto.getProvidersPermittedToDisclose());
+		try{
+			if (consentDto.getOrganizationalProvidersDisclosureIsMadeTo() != null)
+				isMadeTo.addAll(consentDto
+						.getOrganizationalProvidersDisclosureIsMadeTo());
+			if (consentDto.getProvidersDisclosureIsMadeTo() != null)
+				isMadeTo.addAll(consentDto.getProvidersDisclosureIsMadeTo());
+			if (consentDto.getOrganizationalProvidersPermittedToDisclose() != null)
+				isMadeFrom.addAll(consentDto
+						.getOrganizationalProvidersPermittedToDisclose());
+			if (consentDto.getProvidersPermittedToDisclose() != null)
+				isMadeFrom.addAll(consentDto.getProvidersPermittedToDisclose());
+		}catch(Throwable t){
+			logger.warn("An unknown error has occured in consentAddPost() method of ConsentController");
+			logger.warn("    Stack Trace: " + t);
+			
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+		}
+		
+		try{
+			boolean tempTest = consentService.areThereDuplicatesInTwoSets(isMadeTo, isMadeFrom);
+		}catch(Throwable t){
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+		}
 
 		if ((!isMadeTo.isEmpty())
 				&& (!isMadeFrom.isEmpty())
@@ -643,20 +586,46 @@ public class ConsentController extends AbstractController {
 
 			// Make sure username from consentDto matches a valid patient
 			// username
-			if (patientService.findPatientProfileByUsername(consentDto
-					.getUsername()) == null) {
-				throw new IllegalArgumentException(
-						"Username from consentDto does not match any valid patient usernames");
+			
+			PatientProfileDto checkMatch = null;
+			
+			try{
+				checkMatch = patientService.findPatientProfileByUsername(consentDto.getUsername());
+			}catch(Throwable t){
+				logger.warn("Username from consentDto does not match any valid patient usernames");
+				throw new AjaxException(HttpStatus.UNPROCESSABLE_ENTITY, "Username from consentDto does not match any valid patient usernames");
+			}
+			
+			if (checkMatch == null) {
+				logger.warn("Username from consentDto does not match any valid patient usernames");
+				throw new AjaxException(HttpStatus.UNPROCESSABLE_ENTITY, "Username from consentDto does not match any valid patient usernames");
 			} else {
 				Set<SpecificMedicalInfoDto> doNotShareClinicalConceptCodes = new HashSet<SpecificMedicalInfoDto>();
 				if (icd9 != null)
-					doNotShareClinicalConceptCodes = consentHelper
-							.getDoNotShareClinicalConceptCodes(icd9);
+					try{
+						doNotShareClinicalConceptCodes = consentHelper
+								.getDoNotShareClinicalConceptCodes(icd9);
+					}catch(Throwable t){
+						logger.warn("An unknown error has occured in consentAddPost() method of ConsentController");
+						logger.warn("    Stack Trace: " + t);
+						
+						throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+					}
 
 				consentDto
 						.setDoNotShareClinicalConceptCodes(doNotShareClinicalConceptCodes);
-
-				Object obj = consentService.saveConsent(consentDto, 0);
+				
+				Object obj = null;
+				
+				try{
+					obj = consentService.saveConsent(consentDto, 0);
+				}catch(Throwable t){
+					logger.warn("An unknown error has occured in consentAddPost() method of ConsentController while calling consentService.saveConsent()");
+					logger.warn("    Stack Trace: " + t);
+					
+					throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+				}
+				
 				if (null != obj && obj instanceof ConsentValidationDto) {
 
 					ConsentValidationDto conDto = (ConsentValidationDto) obj;
@@ -666,13 +635,41 @@ public class ConsentController extends AbstractController {
 					conDto.setExistingConsentId(indirRef);
 					// duplicate policy found
 					ObjectMapper mapper = new ObjectMapper();
-					throw new AjaxException(HttpStatus.CONFLICT,
-							mapper.writeValueAsString(conDto));
+					String errorMessage = null;
+					
+					try{
+						errorMessage = mapper.writeValueAsString(conDto);
+					}catch(Throwable t){
+						logger.warn("An unknown error has occured in consentAddPost() method of ConsentController while calling mapper.writeValueAsString()");
+						logger.warn("    Stack Trace: " + t);
+						
+						throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+					}
+					
+					throw new AjaxException(HttpStatus.CONFLICT, errorMessage);
 				}
+				
 				JSONObject succObj = new JSONObject();
-				succObj.put("isSuccess", true);
-				succObj.put("isAdmin", false);
-				return succObj.toString();
+				
+				try{
+					succObj.put("isSuccess", true);
+					succObj.put("isAdmin", false);
+				}catch(Throwable t){
+					logger.warn("An unknown error has occured in consentAddPost() method of ConsentController while calling succObj.put()");
+					logger.warn("    Stack Trace: " + t);
+					
+					throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+				}
+				
+				String str_succObj = succObj.toString();
+				
+				if(str_succObj == null){
+					logger.warn("An unknown error has occured consentAddPost() method of ConsentController. Call to succObj.toString() returned null value.");
+					
+					throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+				}
+				
+				return str_succObj;
 			}
 		} else {
 			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR,
@@ -970,14 +967,15 @@ public class ConsentController extends AbstractController {
 		for (int i = 0; i < clinicalDocuments.size(); i++) {
 
 			// return c32 documents only
-			if (clinicalDocuments.get(i).getClinicalDocumentTypeCode()
-					.getCode().equals(C32_DOC_CODE)) {
+			// TODO (AO): temporary solution to display c32 without having document types
+//			if (clinicalDocuments.get(i).getClinicalDocumentTypeCode()
+//					.getCode().equals(C32_DOC_CODE)) {
 				ClinicalDocumentDto dto = new ClinicalDocumentDto();
 				dto.setId(String.valueOf(clinicalDocuments.get(i).getId()));
 				dto.setFilename(clinicalDocuments.get(i).getFilename());
 
 				c32Documents.add(dto);
-			}
+			//}
 		}
 
 		// TODO: move dto to service

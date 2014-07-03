@@ -314,6 +314,17 @@ public class ValueSetMgmtHelper {
 		return valueSetDtos;
 	}
 
+	public List<ValueSetDto> convertValueSetEntitiesToDtosWithoutDeletable(
+			List<ValueSet> valueSets) {
+		List<ValueSetDto> valueSetDtos = new ArrayList<ValueSetDto>();
+		
+		for (ValueSet valueSet : valueSets) {
+			ValueSetDto valueSetDto = createValuesetDtoFromEntityWithoutDeletable(valueSet);
+			valueSetDtos.add(valueSetDto);
+		}
+		return valueSetDtos;
+	}
+	
 	/**
 	 * Creates the valueset dto from entity.
 	 *
@@ -338,6 +349,24 @@ public class ValueSetMgmtHelper {
 		return valueSetDto;
 	}
 
+	/**
+	 * Creates the valueset dto from entity.
+	 *
+	 * @param valueSet the value set
+	 * @return the value set dto
+	 */
+	public ValueSetDto createValuesetDtoFromEntityWithoutDeletable(ValueSet valueSet) {
+		ValueSetDto valueSetDto = new ValueSetDto();
+		valueSetDto.setCode(valueSet.getCode());
+		valueSetDto.setDescription(valueSet.getDescription());
+		valueSetDto.setName(valueSet.getName());
+		valueSetDto.setId(valueSet.getId());
+		valueSetDto.setValueSetCategoryId(valueSet.getValueSetCategory().getId());
+		valueSetDto.setValueSetCatName(valueSet.getValueSetCategory().getName());
+		valueSetDto.setValueSetCatCode(valueSet.getValueSetCategory().getCode());
+		return valueSetDto;
+	}
+	
 	/**
 	 * Convert value set entities to map.
 	 *

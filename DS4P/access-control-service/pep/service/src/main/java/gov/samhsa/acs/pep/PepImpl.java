@@ -248,16 +248,12 @@ public class PepImpl implements Pep {
 
 				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
 						.segmentDocument(originalC32,
-								xacmlResponseXml.toString(), packageAsXdm,
-								true, senderEmailAddress,
-								recipientEmailAddress, "", null, false);
+								xacmlResponseXml.toString(), false);
 
 				processedPayload = dataHandlerToBytesConverter
-						.toByteArray(segmentDocumentResponse
-								.getProcessedDocument());
+						.toByteArray(segmentDocumentResponse.getDocumentPayloadRawData());
 
-				c32Response.setMaskedDocument(segmentDocumentResponse
-						.getMaskedDocument());
+				c32Response.setMaskedDocument(segmentDocumentResponse.getSegmentedDocumentXml());
 				c32Response.setFilteredStreamBody(processedPayload);
 			} catch (PropertyException e) {
 				throw new DS4PException(e.toString(), e);
@@ -373,16 +369,12 @@ public class PepImpl implements Pep {
 
 				SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
 						.segmentDocument(originalC32,
-								xacmlResponseXml.toString(), packageAsXdm,
-								true, senderEmailAddress,
-								recipientEmailAddress, xdsDocumentEntryUniqueId, null, false);
+								xacmlResponseXml.toString(), false);
 
 				processedPayload = dataHandlerToBytesConverter
-						.toByteArray(segmentDocumentResponse
-								.getProcessedDocument());
+						.toByteArray(segmentDocumentResponse.getDocumentPayloadRawData());
 
-				c32Response.setMaskedDocument(segmentDocumentResponse
-						.getMaskedDocument());
+				c32Response.setMaskedDocument(segmentDocumentResponse.getSegmentedDocumentXml());
 				c32Response.setFilteredStreamBody(processedPayload);
 			} catch (PropertyException e) {
 				throw new DS4PException(e.toString(), e);
@@ -676,13 +668,9 @@ public class PepImpl implements Pep {
 					SegmentDocumentResponse segmentDocumentResponse = documentSegmentation
 							.segmentDocument(originalDocument, xacmlResponseXml
 									.toString(), /* "<xacmlResult><pdpDecision>Permit</pdpDecision><purposeOfUse>TREAT</purposeOfUse><messageId>4617a579-1881-4e40-9f98-f85bd81d6502</messageId><homeCommunityId>2.16.840.1.113883.3.467</homeCommunityId><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:org:us-privacy-law:42CFRPart2</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:org:refrain-policy:NORDSLCD</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:redact:ETH</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:redact:PSY</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:mask:HIV</pdpObligation></xacmlResult>" */
-									false, true,
-									"leo.smith@direct.obhita-stage.org",
-									enforcePolicy.getXspasubject()
-											.getSubjectEmailAddress(), "", null, false);
+									false);
 					processedPayload = dataHandlerToBytesConverter
-							.toByteArray(segmentDocumentResponse
-									.getProcessedDocument());
+							.toByteArray(segmentDocumentResponse.getDocumentPayloadRawData());
 					// get processed document
 					String processedDocument = new String(processedPayload);
 					// LOGGER.debug("processedDoc: " + processedDocument);
@@ -693,16 +681,9 @@ public class PepImpl implements Pep {
 							0, document);
 					// set response from xdsb
 					retrieveDocumentSetResponse
-							.setReturn(marshall(xdsbRetrieveDocumentSetResponse));
+							.setReturn(marshall(xdsbRetrieveDocumentSetResponse));									
 					retrieveDocumentSetResponse
-							.setKekEncryptionKey(segmentDocumentResponse
-									.getKekEncryptionKey());
-					retrieveDocumentSetResponse
-							.setKekMaskingKey(segmentDocumentResponse
-									.getKekMaskingKey());
-					retrieveDocumentSetResponse
-							.setMetadata(segmentDocumentResponse
-									.getPostProcessingMetadata());
+							.setMetadata(segmentDocumentResponse.getPostSegmentationMetadataXml());
 				} else {
 					DocumentResponse document = new DocumentResponse();
 					document.setDocument(rawDocument);

@@ -150,8 +150,9 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResultMock);
 		String result = documentRedactor.redactDocument(c32,
-				ruleExecutionContainer, xacmlResultMock, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 		logger.debug("RESULT--> " + result);
 
 		// Assert
@@ -189,10 +190,11 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResultObj);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(robustC32,
-				ruleExecutionContainer, xacmlResultObj, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 
 		// Assert
 		assertNotNull(getSectionElement(robustC32, PROBLEMS_SECTION));
@@ -233,10 +235,11 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResultObj);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(robustC32,
-				ruleExecutionContainer, xacmlResultObj, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 
 		// Assert
 		assertNotNull(getSectionElement(robustC32, PROBLEMS_SECTION));
@@ -277,10 +280,11 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResultObj);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(robustC32,
-				ruleExecutionContainer, xacmlResultObj, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 
 		// Assert
 		assertNotNull(getSectionElement(robustC32, PROBLEMS_SECTION));
@@ -320,10 +324,11 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResultObj);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(robustC32,
-				ruleExecutionContainer, xacmlResultObj, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 
 		// Assert
 		assertNotNull(getSectionElement(robustC32, PROBLEMS_SECTION));
@@ -364,10 +369,11 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResultObj);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(robustC32,
-				ruleExecutionContainer, xacmlResultObj, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 
 		// Assert
 		assertNotNull(getSectionElement(robustC32, PROBLEMS_SECTION));
@@ -409,10 +415,11 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResultObj);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(robustC32,
-				ruleExecutionContainer, xacmlResultObj, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 
 		// Assert
 		assertNotNull(getSectionElement(robustC32, PROBLEMS_SECTION));
@@ -454,10 +461,11 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResultObj);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(robustC32,
-				ruleExecutionContainer, xacmlResultObj, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 
 		// Assert
 		assertNotNull(getSectionElement(robustC32, PROBLEMS_SECTION));
@@ -499,10 +507,11 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResultObj);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(robustC32,
-				ruleExecutionContainer, xacmlResultObj, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 
 		// Assert
 		assertNotNull(getSectionElement(robustC32, PROBLEMS_SECTION));
@@ -547,10 +556,11 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResultObj);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(c32,
-				ruleExecutionContainer, xacmlResultObj, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 
 		// Assert
 		assertNotNull(getSectionElement(c32, PROBLEMS_SECTION));
@@ -656,10 +666,11 @@ public class DocumentRedactorImplTest {
 		setValueSetCategories(factModel);
 		String ethObservationId = "e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7";
 		String hivObservationId = "d11275e7-67ae-11db-bd13-0800200c9a66";
+		factModel.setXacmlResult(xacmlResultObj);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(c32,
-				ruleExecutionContainer, xacmlResultObj, factModel).getRedactedDocument();
+				ruleExecutionContainer, factModel).getRedactedDocument();
 
 		// Assert
 		assertNotNull(getSectionElement(c32, PROBLEMS_SECTION));
@@ -702,11 +713,11 @@ public class DocumentRedactorImplTest {
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		String ethObservationId = "d17e379";
 		String hivObservationId = "d17e356";
+		factModel.setXacmlResult(xacmlResultMock);
 
 		// Act
 		String redactedC32 = documentRedactor.redactDocument(remC32,
-				remRuleExecutionContainerActualObj, remXacmlResultObj,
-				factModel).getRedactedDocument();
+				remRuleExecutionContainerActualObj, factModel).getRedactedDocument();
 
 		// Assert
 		// sections
@@ -735,7 +746,7 @@ public class DocumentRedactorImplTest {
 	@Test(expected = DS4PException.class)
 	public void testRedactDocument_Throws_DS4PException() {
 		@SuppressWarnings("unused")
-		String result = documentRedactor.redactDocument("", null, null, null).getRedactedDocument();
+		String result = documentRedactor.redactDocument("", null, new FactModel()).getRedactedDocument();
 	}
 
 	// Sensitivity in container doesn't mean anything anymore.
@@ -756,11 +767,11 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(xacmlResult);
 
 		// Act
 		String result = documentRedactor.redactDocument(c32,
-				setRuleExecutionContainer_WrongSensitivity(), xacmlResult,
-				factModel).getRedactedDocument();
+				setRuleExecutionContainer_WrongSensitivity(), factModel).getRedactedDocument();
 		logger.debug("RESULT--> " + result);
 
 		// Assert
@@ -788,11 +799,12 @@ public class DocumentRedactorImplTest {
 		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
+		factModel.setXacmlResult(setMockXacmlResult(xacmlResultWithWrongObligations));
 
 		// Act
 		String result = documentRedactor.redactDocument(c32,
 				ruleExecutionContainer,
-				setMockXacmlResult(xacmlResultWithWrongObligations), factModel).getRedactedDocument();
+				factModel).getRedactedDocument();
 		logger.debug("RESULT--> " + result);
 
 		// Assert

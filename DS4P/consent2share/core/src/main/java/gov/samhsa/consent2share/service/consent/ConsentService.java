@@ -34,8 +34,6 @@ import gov.samhsa.consent2share.service.dto.ConsentDto;
 import gov.samhsa.consent2share.service.dto.ConsentListDto;
 import gov.samhsa.consent2share.service.dto.ConsentPdfDto;
 import gov.samhsa.consent2share.service.dto.ConsentRevokationPdfDto;
-import gov.samhsa.consent2share.service.dto.ConsentValidationDto;
-import gov.samhsa.consent2share.service.dto.PreConsentDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -289,7 +287,6 @@ public interface ConsentService {
 			ConsentRevokationPdfDto consentRevokationPdfDto);
 	
 	
-	public ConsentValidationDto checkForDuplicateConsents(PreConsentDto preConsentDto, String patientUsername);
 	
 	String getConsentSignedStage(Long consentId);
 }

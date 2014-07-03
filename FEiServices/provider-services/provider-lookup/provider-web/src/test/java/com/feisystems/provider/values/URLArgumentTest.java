@@ -57,10 +57,10 @@ public class URLArgumentTest {
 	@Test
 	public void testCreateArgumentArray() {
 		String[] cityStateArray = URLArgument.createArgumentArray(URLHelper.CITY_STATE_METHOD_TYPE);
-		assertEquals(9, cityStateArray.length);
+		assertEquals(10, cityStateArray.length);
 
 		String[] zipArray = URLArgument.createArgumentArray(URLHelper.POSTAL_CODE_METHOD_TYPE);
-		assertEquals(8, zipArray.length);		
+		assertEquals(9, zipArray.length);		
 	}
 
 	@Test

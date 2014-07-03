@@ -23,11 +23,10 @@
 			<xsd:element name="SegmentDocumentResponse">
 				<xsd:complexType>
 					<xsd:sequence>
-						<xsd:element name="processedDocument" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
-						<xsd:element name="maskedDocument" type="xsd:string"/>
-						<xsd:element name="postProcessingMetadata" type="xsd:string"/>
-						<xsd:element name="kekMaskingKey" type="xsd:base64Binary"/>
-						<xsd:element name="kekEncryptionKey" type="xsd:base64Binary"/>
+						<xsd:element name="documentPayloadRawData" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
+						<xsd:element name="segmentedDocumentXml" type="xsd:string"/>
+						<xsd:element name="postSegmentationMetadataXml" type="xsd:string"/>
+						<xsd:element name="executionResponseContainerXml" type="xsd:string"/>
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>

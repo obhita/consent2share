@@ -571,10 +571,6 @@ ul.dashboard-list li a span {
   z-index: 1501;
 }
 
-body#listConsent-page .datepicker.dropdown-menu {
-  z-index: 1601 !important;
-}
-
 .input-append.date .add-on i, .input-prepend.date .add-on i {
   display: block;
   cursor: pointer;

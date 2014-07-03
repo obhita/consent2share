@@ -1,7 +1,7 @@
 package com.feisystems.provider.service;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Map;
 
 import com.feisystems.provider.dtos.ProviderDto;
 
@@ -31,11 +31,12 @@ public interface ProviderService extends Serializable {
 	 * @param firstName no partial wildcard but may be fully wildcard to '%'
 	 * @param entityType wildcard searchable speciality so implementation should add '%' at the end for search i.e. 'general%' May be wildcard to '%'
 	 * @param providerOrganizationName wildcard searchable speciality so implementation should add '%' at the end for search i.e. 'general%' May be wildcard to '%'
+	 * @param pageNumber page number to display
 	 * @return {@code java.util.List} of {@link com.feisystems.provider.dtos.fcom.feisystems.provider.ProviderDto	 */
-	List<ProviderDto> getByGenderCodeAndPostalCodeAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(
+	 Map<String, Object> getByGenderCodeAndPostalCodeAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(
 			String genderCode, String postalCode, String taxonomy,
 			String phone, String lastName, String firstName, String entityType,
-			String providerOrganizationName);
+			String providerOrganizationName, String pageNumber);
 	
 	/**
 	 * Retrieve {@link com.feicom.feisystems.provider.ProviderDtong the parameters described below.  
@@ -50,10 +51,11 @@ public interface ProviderService extends Serializable {
 	 * @param firstName no partial wildcard but may be fully wildcard to '%'
 	 * @param entityType wildcard searchable speciality so implementation should add '%' at the end for search i.e. 'general%' May be wildcard to '%'
 	 * @param providerOrganizationName wildcard searchable speciality so implementation should add '%' at the end for search i.e. 'general%' May be wildcard to '% 
+	 * @param pageNumber page number to display
 	 * @return {@code java.util.List} of {@link com.feisystems.provider.dtos.feiscom.feisystems.provider.ProviderDto */
-	public List<ProviderDto> getByGenderCodeAndUSStateAbbreviationAndCityAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(
+	public Map<String, Object> getByGenderCodeAndUSStateAbbreviationAndCityAndSpecialityAndTelephoneNumberAndLastNameAndFirstNameAndEntityTypeAndProviderOrganizationName(
 			String genderCode, String usStateAbbreviation, String city,
-			String taxonomy, String phone, String lastName, String firstName, String entityType, String providerOrganizationName);
+			String taxonomy, String phone, String lastName, String firstName, String entityType, String providerOrganizationName, String pageNumber);
 
 	
 

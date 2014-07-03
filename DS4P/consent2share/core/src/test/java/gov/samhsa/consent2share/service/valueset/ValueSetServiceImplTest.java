@@ -26,6 +26,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -109,39 +111,38 @@ public class ValueSetServiceImplTest {
 		assertEquals(vst.findAll(),valueSetDtosMock);
 	}
 
-	
 	@Test
 	public void testFindAllByName() {
-		List<ValueSet> valueSetsMock = mock(List.class);
-		when(valueSetRepository.findAllByNameLike(anyString())).thenReturn(valueSetsMock);
+		Page<ValueSet> valueSetsMock = mock(Page.class);
+		when(valueSetRepository.findAllByNameLike(anyString(), anyString(), any(Pageable.class))).thenReturn(valueSetsMock);
 		
 		List<ValueSetDto> valueSetDtosMock = new ArrayList<ValueSetDto>();
 		ValueSetDto valueSetDtoMock=mock(ValueSetDto.class);
 		valueSetDtosMock.add(valueSetDtoMock);	
-		when(valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSetsMock)).thenReturn(valueSetDtosMock);
+		when(valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSetsMock.getContent())).thenReturn(valueSetDtosMock);
 	
 		when(valueSetDtoMock.getId()).thenReturn((long) 1);
 		when(conceptCodeValueSetRepository.findAllByPkValueSetId(anyLong())).thenReturn(null);
 		
-		
-		assertEquals(vst.findAllByName("a"),valueSetDtosMock);
+		assertEquals(vst.findAllByName("a", null, 0).get("valueSets"),valueSetDtosMock);
 		
 	}
 	
 	@Test
 	public void testFindAllByCode() {
-		List<ValueSet> valueSetsMock = mock(List.class);
-		when(valueSetRepository.findAllByCodeLike(anyString())).thenReturn(valueSetsMock);
+		Page<ValueSet> valueSetsMock = mock(Page.class);
+
+		when(valueSetRepository.findAllByCodeLike(anyString(), anyString(), any(Pageable.class))).thenReturn(valueSetsMock);
 		
 		List<ValueSetDto> valueSetDtosMock = new ArrayList<ValueSetDto>();
 		ValueSetDto valueSetDtoMock=mock(ValueSetDto.class);
 		valueSetDtosMock.add(valueSetDtoMock);	
-		when(valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSetsMock)).thenReturn(valueSetDtosMock);
+		when(valueSetMgmtHelper.convertValueSetEntitiesToDtos(valueSetsMock.getContent())).thenReturn(valueSetDtosMock);
 		
 		when(valueSetDtoMock.getId()).thenReturn((long) 1);
 		when(conceptCodeValueSetRepository.findAllByPkValueSetId(anyLong())).thenReturn(null);
 		
-		assertEquals(vst.findAllByCode("a"),valueSetDtosMock);
+		assertEquals(vst.findAllByCode("a", "ETH", 0).get("valueSets"),valueSetDtosMock);
 		
 	}	
 	

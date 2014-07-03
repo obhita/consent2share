@@ -1,7 +1,5 @@
 package gov.samhsa.consent2share.web;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -43,13 +41,9 @@ import gov.samhsa.consent2share.service.reference.SensitivityPolicyCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
 import gov.samhsa.consent2share.service.valueset.ValueSetCategoryService;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -332,7 +326,8 @@ public class ConsentControllerTest {
 	}
 	
 	@Test
-	public void testStartAddConsent_Check_if_all_attributes_are_added_and_right_view_is_returned() throws Exception{
+	public void testConsentAddGet_Check_if_all_attributes_are_added_and_right_view_is_returned() throws Exception{
+		ConsentDto consentDto=mock(ConsentDto.class);
 		@SuppressWarnings("unchecked")
 		ArrayList<AddConsentIndividualProviderDto> individualProvidersDto=
 			(ArrayList<AddConsentIndividualProviderDto>)mock(ArrayList.class);
@@ -351,9 +346,7 @@ public class ConsentControllerTest {
 		@SuppressWarnings("unchecked")
 		List<AddConsentFieldsDto> clinicalDocumentTypeDto=
 				(List<AddConsentFieldsDto>)mock(ArrayList.class);
-		
-		ConsentDto consentDto = new ConsentDto();
-		
+
 		when(patientService.findAddConsentIndividualProviderDtoByUsername(anyString()))
 			.thenReturn(individualProvidersDto);
 		when(patientService.findAddConsentOrganizationalProviderDtoByUsername(anyString()))
@@ -367,53 +360,13 @@ public class ConsentControllerTest {
 			.thenReturn(clinicalDocumentSectionTypeDto);
 		when(clinicalDocumentTypeCodeService.findAllClinicalDocumentTypeCodesAddConsentFieldsDto())
 			.thenReturn(clinicalDocumentTypeDto);
-		when(consentService.makeConsentDto()).thenReturn(consentDto);
-		
-		Set<String> providersPermittedToDiscloseSet = new HashSet<String>();
-		String providersPermittedToDisclose1 = "1346575297";
-		String providersPermittedToDisclose2 = "2346575297";
-		providersPermittedToDiscloseSet.add(providersPermittedToDisclose1);
-		providersPermittedToDiscloseSet.add(providersPermittedToDisclose2);
-		
-		Set<String> providersDisclosureIsMadeToSet = new HashSet<String>();
-		String providersDisclosureIsMadeTo1 = "1083949036";
-		providersDisclosureIsMadeToSet.add(providersDisclosureIsMadeTo1);
-		
-		Set<String> organizationalProvidersDisclosureIsMadeToSet = new HashSet<String>();
-		String organizationalProvidersDisclosureIsMadeTo1 = "1174858088";
-		organizationalProvidersDisclosureIsMadeToSet.add(organizationalProvidersDisclosureIsMadeTo1);
-		
-		Set<String> organizationalProvidersPermittedToDiscloseSet = new HashSet<String>();
-		String organizationalProvidersPermittedToDisclose1 = "2174858089";
-		organizationalProvidersPermittedToDiscloseSet.add(organizationalProvidersPermittedToDisclose1);
-		
-		Set<String> shareForPurposeOfUseCodesSet = new HashSet<String>();
-		String shareForPurposeOfUseCodes1 = "CLINTRCH";
-		shareForPurposeOfUseCodesSet.add(shareForPurposeOfUseCodes1);
-		
-		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-		Date consentStart = dateFormat.parse("06/03/2013");
-		Date consentEnd = dateFormat.parse("06/17/2014");
-		
-		mockMvc.perform(post("/consents/addNewConsent.html")
-			.param("providersPermittedToDisclose", providersPermittedToDisclose1)
-			.param("providersPermittedToDisclose", providersPermittedToDisclose2)
-			.param("providersDisclosureIsMadeTo", providersDisclosureIsMadeTo1)
-			.param("organizationalProvidersDisclosureIsMadeTo", organizationalProvidersDisclosureIsMadeTo1)
-			.param("organizationalProvidersPermittedToDisclose", organizationalProvidersPermittedToDisclose1)
-			.param("shareForPurposeOfUseCodes", shareForPurposeOfUseCodes1)
-			.param("consentStart", dateFormat.format(consentStart))
-			.param("consentEnd", dateFormat.format(consentEnd))
-			)
+		when(consentService.makeConsentDto())
+			.thenReturn(consentDto);
+
+		mockMvc.perform(get("/consents/addConsent.html"))
 			.andExpect(model().attribute("patient_lname", patientService.findPatientProfileByUsername("mockedUser").getLastName()))
 			.andExpect(model().attribute("patient_fname", patientService.findPatientProfileByUsername("mockedUser").getFirstName()))
-			.andExpect(model().attribute("consentDto", hasProperty("providersPermittedToDisclose", equalTo(providersPermittedToDiscloseSet))))
-			.andExpect(model().attribute("consentDto", hasProperty("providersDisclosureIsMadeTo", equalTo(providersDisclosureIsMadeToSet))))
-			.andExpect(model().attribute("consentDto", hasProperty("organizationalProvidersDisclosureIsMadeTo", equalTo(organizationalProvidersDisclosureIsMadeToSet))))
-			.andExpect(model().attribute("consentDto", hasProperty("organizationalProvidersPermittedToDisclose", equalTo(organizationalProvidersPermittedToDiscloseSet))))
-			.andExpect(model().attribute("consentDto", hasProperty("shareForPurposeOfUseCodes", equalTo(shareForPurposeOfUseCodesSet))))
-			.andExpect(model().attribute("consentDto", hasProperty("consentStart", equalTo(consentStart))))
-			.andExpect(model().attribute("consentDto", hasProperty("consentEnd", equalTo(consentEnd))))
+			.andExpect(model().attribute("consentDto", consentDto))
 			.andExpect(model().attribute("individualProvidersDto", individualProvidersDto))
 			.andExpect(model().attribute("clinicalDocumentSectionType", clinicalDocumentSectionTypeDto))
 			.andExpect(model().attribute("clinicalDocumentType", clinicalDocumentTypeDto))
@@ -424,6 +377,7 @@ public class ConsentControllerTest {
 			.andExpect(model().attribute("stateCodes", stateCodeService.findAllStateCodes()))
 			.andExpect(model().attribute("isProviderAdminUser", false))
 			.andExpect(view().name("views/consents/addConsent"));
+
 	}
 	
 	/**

@@ -1,17 +1,15 @@
 package gov.samhsa.acs.documentsegmentation.tools;
 
-import static org.junit.Assert.assertTrue;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.junit.Assert.assertTrue;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
-import gov.samhsa.consent2share.commonunit.xml.RegexBasedDifferenceListener;
 import gov.samhsa.consent2share.commonunit.xml.XmlComparator;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.custommonkey.xmlunit.DifferenceListener;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.BeforeClass;
 import org.junit.Test;

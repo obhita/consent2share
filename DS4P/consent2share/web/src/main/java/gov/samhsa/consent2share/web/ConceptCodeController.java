@@ -17,6 +17,7 @@ import gov.samhsa.consent2share.service.valueset.ValueSetNotFoundException;
 import gov.samhsa.consent2share.service.valueset.ValueSetService;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -106,7 +111,7 @@ public class ConceptCodeController extends AbstractNodeController {
         try {
         	conceptCodeVSCSDto = conceptCodeService.create();
         	codeSystems = codeSystemService.findAll();
-        	valueSets = valueSetService.findAll();
+        	valueSets = valueSetService.findAllWithoutDeletable();
         } catch (ValueSetNotFoundException e) {
 	           LOGGER.debug("No value sets found in the system");
 		} catch (CodeSystemNotFoundException e) {
@@ -336,19 +341,28 @@ public class ConceptCodeController extends AbstractNodeController {
      * @param searchTerm
      * @return conceptCodes
      */
-	@RequestMapping("/conceptCode/ajaxSearchConceptCode")
+	@RequestMapping("/conceptCode/ajaxSearchConceptCode/pageNumber/{pageNumber}/searchCategory/{searchCategory}/searchTerm/{searchTerm}/codeSystem/{codeSystem}/codeSystemVersion/{codeSystemVersion}/valueSetName/{valueSetName}")
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody List<ConceptCodeDto> searchConceptCode(
-			@RequestParam(value ="searchCategory",required = true) String searchCategory, 
-			@RequestParam(value ="searchTerm",required = true) String searchTerm) {
+	public @ResponseBody Map<String, Object> searchConceptCode(
+			@PathVariable("searchCategory") String searchCategory, 
+			@PathVariable("searchTerm") String searchTerm,
+			@PathVariable("codeSystem") String codeSystem,
+			@PathVariable("codeSystemVersion") String codeSystemVersion,
+			@PathVariable("valueSetName") String valueSetName,
+			@PathVariable("pageNumber") String pageNumber) {
 		
-		List<ConceptCodeDto> conceptCodes=null;
+		codeSystem = validateEmptyFilterParams(codeSystem);
+		codeSystemVersion = validateEmptyFilterParams(codeSystemVersion);
+		valueSetName = validateEmptyFilterParams(valueSetName);
+		searchTerm = validateEmptyFilterParams(searchTerm);
+		
+		Map<String, Object> conceptCodes=null;
 		
 		try{
 			if(searchCategory.equals("code"))
-				conceptCodes = conceptCodeService.findAllByCode(searchTerm);
+				conceptCodes = conceptCodeService.findAllByCode(searchTerm, codeSystem, codeSystemVersion, valueSetName, Integer.parseInt(pageNumber));
 			else if(searchCategory.equals("name"))
-				conceptCodes = conceptCodeService.findAllByName(searchTerm);
+				conceptCodes = conceptCodeService.findAllByName(searchTerm, codeSystem, codeSystemVersion, valueSetName, Integer.parseInt(pageNumber));
 		}catch(IllegalArgumentException e){
 			conceptCodes = null;
 			throw new AjaxException(HttpStatus.BAD_REQUEST, "Unable to perform search because the request parameters contained invalid data.");
@@ -362,6 +376,16 @@ public class ConceptCodeController extends AbstractNodeController {
 	}
 	
 	
+	/**
+	 * Validate empty filter params.
+	 *
+	 * @param param the param
+	 * @return the string
+	 */
+	private String validateEmptyFilterParams(String param) {
+		return param.replace("empty", "");
+	}
+
 	/**
 	 * Get all concept codes via AJAX
 	 * 
@@ -384,6 +408,21 @@ public class ConceptCodeController extends AbstractNodeController {
 		return conceptCodes;
 	}
 
+	@RequestMapping("/conceptCode/ajaxGetPagedConceptCodes/pageNumber/{pageNumber}")
+	@ResponseStatus(HttpStatus.OK)
+	public @ResponseBody Map<String, Object> getAllConceptCodes(@PathVariable("pageNumber") String pageNumber) {
+		Map<String, Object> conceptCodesMap = null;
+		
+		try{
+			conceptCodesMap = conceptCodeService.findAll(Integer.parseInt(pageNumber));
+		}catch(Exception e){
+			LOGGER.warn("An exception was caught in search ConceptCode.");
+			throw new AjaxException(HttpStatus.INTERNAL_SERVER_ERROR, "An unknown error has occured.");
+		}
+		
+		return conceptCodesMap;
+	}
+	
 	@RequestMapping(value = "/conceptCode/batchUpload", method = RequestMethod.POST)
 	public String batchUpload(@RequestParam(value = "codeSystemId", required=false) String codeSystemId,
 			@RequestParam(value = "codeSystemVersionId", required=false) Long codeSystemVersionId, HttpServletRequest request,

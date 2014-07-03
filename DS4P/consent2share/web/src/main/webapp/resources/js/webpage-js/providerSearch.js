@@ -67,9 +67,8 @@ $(function(){
 	});
 });
 
-jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage )
+jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage, totalNumberOfProviders, totalPages )
 {
-	//window.alert( 'items_per_page = '+ items_per_page );
 	var lnkCnt4most = 8 ;
 	var lnkCnt4short = 2 ;
 	var currentPage = 0 ;
@@ -84,13 +83,18 @@ jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage )
 		function pageLinkClicked( pageNo, evt ) // event handler for the pagination links
 		{
 			currentPage = pageNo;
+
+			//alert("Page link clicked: " + currentPage);
 			buildPagingLinks();
+			// add pagination
+			clickedPagelookup();
 			func2showPage( arrHtmlStr, pageNo, items_per_page );
 		}
 		
 		function buildPagingLinks() {	
 			pageLinksBar.empty();
-			var pageCnt = Math.ceil( arrHtmlStr.length / items_per_page );	
+			//var pageCnt = Math.ceil( arrHtmlStr.length / items_per_page );	
+			var pageCnt = totalPages;
 			var halfLinkCnt = Math.ceil(lnkCnt4most/2);
 			var startPageLink = currentPage > halfLinkCnt ? Math.max( Math.min( currentPage-halfLinkCnt, pageCnt-lnkCnt4most), 0) : 0 ;
 			var endPageLink = currentPage > halfLinkCnt ? Math.min(currentPage+halfLinkCnt, pageCnt) : Math.min( lnkCnt4most, pageCnt );
@@ -150,6 +154,9 @@ jQuery.fn.buildPagingBar = function( arrHtmlStr, items_per_page, func2showPage )
 function lookup (){
 	    var providerSearchForm="";
 	    var ajaxFinishedFlag=0;
+	    var pageNumber = 0;
+	    var totalNumberOfProviders = 0;
+	    var totalPages = 0;
 
         var arrProviderHtmStr = new Array();
     	var items_per_page = 10 ;
@@ -194,8 +201,10 @@ function lookup (){
 		$("#provider_search_modal .search-loading").show();
 	    //window.alert( providerSearchForm );
 		
+		providerSearchForm+="&pageNumber=0";
+		
 		setTimeout( killAjaxCall, 10000); 
-	    
+
 		var myAjaxCall= $.ajax({
         	dataType: "json",
 			url: "providerSearch.html",
@@ -206,24 +215,27 @@ function lookup (){
 				ajaxFinishedFlag++;
 				if(queryResult==null) 
 				{
-					showResult( queryResult, items_per_page );
+					showResult( queryResult, items_per_page, totalNumberOfProviders, totalPages);
 					return;
 				}
 				
 				result4ajaxJSON=queryResult;
 				
+				totalNumberOfProviders = queryResult["totalNumberOfProviders"];
+				totalPages = queryResult["totalPages"];
+				
+				
 				for (var i=0;i<queryResult["providers"].length;i++) {
 					addable="true";
 					for(var j=0;j<npiLists.length;j++)
 						{
-
 						if(queryResult["providers"][i]["npi"]==npiLists[j])
 							addable="false";
 						}
 					arrProviderHtmStr[i] = getResultRowHtmStr( i, queryResult["providers"][i], addable );
 				}
 				
-				showResult( arrProviderHtmStr, items_per_page );
+				showResult( arrProviderHtmStr, items_per_page, totalNumberOfProviders, totalPages );
 			}
         
 			});
@@ -239,6 +251,112 @@ function lookup (){
 
 
 }
+
+
+
+function clickedPagelookup (){
+	    var providerSearchForm="";
+	    var ajaxFinishedFlag=0;
+	    var pageNumber = 0;
+	    var totalNumberOfProviders = 0;
+	    var totalPages = 0;
+
+        var arrProviderHtmStr = new Array();
+    	var items_per_page = 10 ;
+        var rsHtmStrDeli = "<rsHtmStrDeli>" ;
+		//$("#Pagination").empty();
+	    
+		$("#resultList").hide();
+		$("#noResult").hide();
+		$("#noResponse").hide();
+		$("#resultList").empty();
+
+		if ($("#city_name").val() != ""){
+			providerSearchForm+="&city="+$("#city_name").val();
+		}
+		if ($("#state_name").val() != ""){
+			providerSearchForm+="&usstate="+$("#state_name").val();
+		}
+		if ($("#zip_code").val() != ""){
+			providerSearchForm+="&zipcode="+$("#zip_code").val();
+		}
+		if ($("#gender").val() != ""){
+			var gender=null;
+			if ($("#gender").val()=="M")
+				gender='MALE';
+			if ($("#gender").val()=="F")
+				gender="FEMALE";
+			providerSearchForm+="&gender="+gender;
+		}
+		if ($("#specialty").val() != ""){
+			providerSearchForm+="&specialty="+$("#specialty").val();
+		}
+		if ($("#phone1").val() != ""){
+			providerSearchForm+="&phone="+$("#phone1").val()+$("#phone2").val()+$("#phone3").val();
+		}
+		if ($("#first_name").val() != ""){
+			providerSearchForm+="&firstname="+$("#first_name").val();
+		}
+		
+		if ($("#last_name").val() != ""){
+			providerSearchForm+="&lastname="+$("#last_name").val();
+		}
+		$("#provider_search_modal .search-loading").show();
+	    //window.alert( providerSearchForm );
+		
+		pageNumber = $(".currentpage").text() - 1;
+		
+		providerSearchForm+="&pageNumber="+pageNumber;
+		setTimeout( killAjaxCall, 10000); 
+
+		var myAjaxCall= $.ajax({
+        	dataType: "json",
+			url: "providerSearch.html",
+			type:"GET",
+			async:true, 
+			data: providerSearchForm,
+			success: function (queryResult) { 
+				ajaxFinishedFlag++;
+				if(queryResult==null) 
+				{
+					showResultPaged( queryResult, items_per_page, totalNumberOfProviders, totalPages);
+					return;
+				}
+				
+				result4ajaxJSON=queryResult;
+				
+				totalNumberOfProviders = queryResult["totalNumberOfProviders"];
+				totalPages = queryResult["totalPages"];
+				
+				
+				for (var i=0;i<queryResult["providers"].length;i++) {
+					addable="true";
+					for(var j=0;j<npiLists.length;j++)
+						{
+						if(queryResult["providers"][i]["npi"]==npiLists[j])
+							addable="false";
+						}
+					arrProviderHtmStr[i] = getResultRowHtmStr( i, queryResult["providers"][i], addable );
+				}
+				
+				showResultPaged( arrProviderHtmStr, items_per_page, totalNumberOfProviders, totalPages );
+			}
+        
+			});
+		
+		function killAjaxCall(){  // if no response, abort both getJson requests
+		    if(ajaxFinishedFlag==0){
+		    myAjaxCall.abort();
+		    setTimeout( function() { $("#provider_search_modal .search-loading").fadeOut({ duration: 400}); }, 200 );
+		    $("#noResponse").show();
+		    }
+		
+	}
+
+
+}
+
+
 
 function getResultRowHtmStr( i, rs, addable )
 {
@@ -268,16 +386,31 @@ function getResultRowHtmStr( i, rs, addable )
 	return ret ;
 }
 
-function showResult( arrHtmlStr, items_per_page )
+function showResult( arrHtmlStr, items_per_page , totalNumberOfProviders, totalPages)
 {
-	//if( arrHtmlStr ) window.alert( 'arrHtmlStr.length = '+ arrHtmlStr.length );
 	setTimeout( function() { $("#provider_search_modal .search-loading").fadeOut({ duration: 400}); }, 200 );
 
     if( arrHtmlStr != null && arrHtmlStr.length > 0)
     {
-		$("#Pagination").buildPagingBar( arrHtmlStr, items_per_page, showCurrentPage ); 
-		//window.alert( 'b4 Pagination.show/hide' );
-		( arrHtmlStr.length > items_per_page ) ? $("#Pagination").show() : $("#Pagination").hide() ; 
+		$("#Pagination").buildPagingBar( arrHtmlStr, items_per_page, showCurrentPage, totalNumberOfProviders, totalPages ); 
+		( totalNumberOfProviders > items_per_page ) ? $("#Pagination").show() : $("#Pagination").hide() ; 
+    	$("#resultList").show();
+	}
+	else{
+		$("#Pagination").hide(); 
+		$("#noResult").show();
+	}
+}
+
+function showResultPaged( arrHtmlStr, items_per_page , totalNumberOfProviders, totalPages)
+{
+	setTimeout( function() { $("#provider_search_modal .search-loading").fadeOut({ duration: 400}); }, 200 );
+
+    if( arrHtmlStr != null && arrHtmlStr.length > 0)
+    {
+		( totalNumberOfProviders > items_per_page ) ? $("#Pagination").show() : $("#Pagination").hide() ; 
+    	showCurrentPageWithPagination(arrHtmlStr, 3, items_per_page);
+    	$("#Pagination").show();
     	$("#resultList").show();
 	}
 	else{
@@ -294,7 +427,18 @@ function showCurrentPage( arrHtmlStr, page_index, items_per_page )
  
     for(var i=page_index*items_per_page; i<max_elem; i++)
         newcontent += ( arrHtmlStr[i] ) ;
+    
+    $('#resultList').html( newcontent );
+}
+
+function showCurrentPageWithPagination( arrHtmlStr, page_index, items_per_page )
+{
+    var max_elem = Math.min((page_index+1) * items_per_page, arrHtmlStr.length );
+    var newcontent = '';
  
+    for(var i=0; i<max_elem; i++)
+        newcontent += ( arrHtmlStr[i] ) ;
+    
     $('#resultList').html( newcontent );
 }
 

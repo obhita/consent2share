@@ -39,8 +39,8 @@ public class ProviderSearchLookupServiceImplTest {
 		when(pss.getProviderSearchURL()).thenReturn("providerSearchUrl");
 		String usstate="MD";
 		String city="baltimore";
-		String callUrl=pss.generateProviderSearchURL(usstate,city,null,null,null,null,null,null);
-		assertEquals("providerSearchUrl/usstate/MD/city/baltimore",callUrl);		
+		String callUrl=pss.generateProviderSearchURL(usstate,city,null,null,null,null,null,null,0);
+		assertEquals("providerSearchUrl/pageNumber/0/usstate/MD/city/baltimore",callUrl);		
 	}
 	
 	@Test
@@ -48,8 +48,8 @@ public class ProviderSearchLookupServiceImplTest {
 		ProviderSearchLookupService pss=spy(providerSearchLookupServiceImpl);
 		when(pss.getProviderSearchURL()).thenReturn("providerSearchUrl");
 		String zipcode="21046";
-		String callUrl=pss.generateProviderSearchURL(null,null,zipcode,null,null,null,null,null);
-		assertEquals("providerSearchUrl/zipcode/21046",callUrl);		
+		String callUrl=pss.generateProviderSearchURL(null,null,zipcode,null,null,null,null,null,0);
+		assertEquals("providerSearchUrl/pageNumber/0/zipcode/21046",callUrl);		
 	}
 	
 	
@@ -59,8 +59,8 @@ public class ProviderSearchLookupServiceImplTest {
 		when(pss.getProviderSearchURL()).thenReturn("providerSearchUrl");
 		String firstname="abc";
 		String lastname="cba";
-		String callUrl=pss.generateProviderSearchURL(null,null,null,null,null,null,firstname,lastname);
-		assertEquals("providerSearchUrl/firstname/abc/lastname/cba",callUrl);		
+		String callUrl=pss.generateProviderSearchURL(null,null,null,null,null,null,firstname,lastname,0);
+		assertEquals("providerSearchUrl/pageNumber/0/firstname/abc/lastname/cba",callUrl);		
 	}
 	
 	@Test
@@ -69,8 +69,8 @@ public class ProviderSearchLookupServiceImplTest {
 		when(pss.getProviderSearchURL()).thenReturn("providerSearchUrl");
 		String gender="male";
 		String specialty="dentist";
-		String callUrl=pss.generateProviderSearchURL(null,null,null,gender,specialty,null,null,null);
-		assertEquals("providerSearchUrl/gender/male/specialty/dentist",callUrl);		
+		String callUrl=pss.generateProviderSearchURL(null,null,null,gender,specialty,null,null,null,0);
+		assertEquals("providerSearchUrl/pageNumber/0/gender/male/specialty/dentist",callUrl);		
 	}
 	
 	@Test
@@ -78,8 +78,8 @@ public class ProviderSearchLookupServiceImplTest {
 		ProviderSearchLookupService pss=spy(providerSearchLookupServiceImpl);
 		when(pss.getProviderSearchURL()).thenReturn("providerSearchUrl");
 		String phone="410123456";
-		String callUrl=pss.generateProviderSearchURL(null,null,null,null,null,phone,null,null);
-		assertEquals("providerSearchUrl/phone/410123456",callUrl);		
+		String callUrl=pss.generateProviderSearchURL(null,null,null,null,null,phone,null,null,0);
+		assertEquals("providerSearchUrl/pageNumber/0/phone/410123456",callUrl);		
 	}
 		
 	@Test

@@ -1,14 +1,17 @@
 package gov.samhsa.consent2share.web;
 
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import gov.samhsa.consent2share.infrastructure.FieldValidator;
 import gov.samhsa.consent2share.infrastructure.HashMapResultToProviderDtoConverter;
 import gov.samhsa.consent2share.infrastructure.security.AccessReferenceMapper;
@@ -32,7 +35,12 @@ import gov.samhsa.consent2share.service.reference.RaceCodeService;
 import gov.samhsa.consent2share.service.reference.ReligiousAffiliationCodeService;
 import gov.samhsa.consent2share.service.reference.StateCodeService;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -138,12 +146,11 @@ public class ProviderControllerTest {
 			.andExpect(view().name("views/patients/connectionMain"));
 	}
 	
-	
 	@Test
 	public void testAjaxProviderSearch_Checked_Status_Is_OK() throws Exception {
 		 when(providerSearchLookupService.isValidatedSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(true);
-		 when(providerSearchLookupService.providerSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn("artifitial JSON");
-		 mockMvc.perform(get("/patients/providerSearch.html"))
+		 when(providerSearchLookupService.providerSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyInt())).thenReturn("artifitial JSON");
+		 mockMvc.perform(get("/patients/providerSearch.html").param("pageNumber", "0"))
          	.andExpect(status().isOk())
          	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
