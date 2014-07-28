@@ -63,7 +63,7 @@ public class PepClientIT {
 
 		SimpleMarshallerImpl marshaller = new SimpleMarshallerImpl();
 
-		logger.debug("Adhoc Response: " + marshaller.marshall(response1));
+		logger.debug("Adhoc Response: " + marshaller.marshal(response1));
 
 		Scanner scan = new Scanner(System.in);
 		logger.debug("Please enter documentUniqueId:");
@@ -88,7 +88,7 @@ public class PepClientIT {
 			throw e;
 		}
 
-		logger.debug("Retrieve Response: " + marshaller.marshall(retrieveDocResp));
+		logger.debug("Retrieve Response: " + marshaller.marshal(retrieveDocResp));
 		if (null == retrieveDocResp.getDocumentResponse())
 			logger.debug(new String(retrieveDocResp.getDocumentResponse().get(0).getDocument()));
 	}
@@ -96,7 +96,7 @@ public class PepClientIT {
 	private static AdhocQueryRequest constructAdhocQuery() throws Exception {
 		SimpleMarshallerImpl marshaller = new SimpleMarshallerImpl();
 		String reqString = " <ns3:AdhocQueryRequest xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\"         xmlns:ns2=\"urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0\"         xmlns=\"urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0\"       xmlns:ns3=\"urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0\"><ns3:ResponseOption returnType=\"LeafClass\" returnComposedObjects=\"true\"/><AdhocQuery id=\"urn:uuid:14d4debf-8f97-4251-9a74-a90016b0af0d\"><Slot name=\"$XDSDocumentEntryPatientId\"><ValueList><Value>'d3bb3930-7241-11e3-b4f7-00155d3a2124^^^&amp;2.16.840.1.113883.4.357&amp;ISO'</Value></ValueList></Slot><Slot name=\"$XDSDocumentEntryStatus\"><ValueList><Value>('urn:oasis:names:tc:ebxml-regrep:StatusType:Approved')</Value></ValueList></Slot><Slot name=\"$XDSDocumentEntryFormatCode\"><ValueList><Value>'2.16.840.1.113883.10.20.1^^HITSP'</Value></ValueList></Slot></AdhocQuery></ns3:AdhocQueryRequest>";
-		AdhocQueryRequest request = marshaller.unmarshallFromXml(AdhocQueryRequest.class, reqString);
+		AdhocQueryRequest request = marshaller.unmarshalFromXml(AdhocQueryRequest.class, reqString);
 
 		return request;
 	}
@@ -113,7 +113,7 @@ public class PepClientIT {
 		}
 		builder.append("</urn:RetrieveDocumentSetRequest>");
 
-		RetrieveDocumentSetRequest request = marshaller.unmarshallFromXml(RetrieveDocumentSetRequest.class,
+		RetrieveDocumentSetRequest request = marshaller.unmarshalFromXml(RetrieveDocumentSetRequest.class,
 				builder.toString());
 		logger.debug("RetrieveDocumentSetRequest XML:" + builder.toString());
 		return request;

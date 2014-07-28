@@ -156,7 +156,7 @@ public class AspectUtils {
 		if(null == marshaller)
 			marshaller = new SimpleMarshallerImpl();
 		try {
-			retVal = asTag(object.getClass()) + " In XML format : " +  marshaller.marshall(object);
+			retVal = asTag(object.getClass()) + " In XML format : " +  marshaller.marshal(object);
 		} catch (SimpleMarshallerException e1) {
 			retVal =  asTag(object.getClass()) +  " : " + getObjectdetails(object);
 		}	

@@ -43,7 +43,7 @@
          </Slot>
          <Slot name="urn:siframework.org:ds4p:purposeofuse">
             <ValueList>
-               <Value>TREAT</Value>
+               <Value>TREATMENT</Value>
             </ValueList>
          </Slot>
          <Slot name="urn:siframework.org:ds4p:obligationpolicy">

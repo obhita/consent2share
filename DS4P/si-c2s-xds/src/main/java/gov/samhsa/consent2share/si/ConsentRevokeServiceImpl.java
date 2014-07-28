@@ -122,7 +122,7 @@ public class ConsentRevokeServiceImpl implements ConsentRevokeService {
 		AdhocQueryResponse adhocQueryResponse = xdsbRegistry
 				.registryStoredQuery(patientUniqueId, null,
 						XdsbDocumentType.PRIVACY_CONSENT, false, messageId);
-		String adhocQueryResponseXml = marshaller.marshall(adhocQueryResponse);
+		String adhocQueryResponseXml = marshaller.marshal(adhocQueryResponse);
 		Document adhocQueryResponseDoc = documentXmlConverter
 				.loadDocument(adhocQueryResponseXml);
 		NodeList nodeList = documentAccessor.getNodeList(adhocQueryResponseDoc,

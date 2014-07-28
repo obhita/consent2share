@@ -20,7 +20,7 @@ global gov.samhsa.acs.brms.domain.RuleExecutionContainer ruleExecutionContainer
 rule "Substance abuse (disorder)"
 	dialect "mvel"
 	when
-		$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+		$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 		$cd : ClinicalFact( code == "66214007" , codeSystem == "2.16.840.1.113883.6.96" , c32SectionLoincCode == "11450-4" )
 	then
 		RuleExecutionResponse $ruleExecutionResponse = new RuleExecutionResponse();
@@ -40,7 +40,7 @@ end
 rule "Drug abuse (disorder)"
 	dialect "mvel"
 	when
-		$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+		$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 		$cd : ClinicalFact( code == "26416006" , codeSystem == "2.16.840.1.113883.6.96" , c32SectionLoincCode == "11450-4" )
 	then
 		RuleExecutionResponse $ruleExecutionResponse = new RuleExecutionResponse();
@@ -74,7 +74,7 @@ end
 rule "Clinical Rule Mental health problem (finding) REDACT"
 	dialect "mvel"
 	when
-		$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+		$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 		$cd : ClinicalFact( codeSystem == "2.16.840.1.113883.6.96" , code == "413307004" , c32SectionLoincCode == "11450-4" )
 	then
 		RuleExecutionResponse $ruleExecutionResponse = new RuleExecutionResponse();
@@ -94,7 +94,7 @@ end
 rule "Acute HIV"
 	dialect "mvel"
 	when
-		$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+		$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 		$cd : ClinicalFact( code == "111880001" , codeSystem == "2.16.840.1.113883.6.96" , c32SectionLoincCode == "11450-4" )
 	then
 		RuleExecutionResponse $ruleExecutionResponse = new RuleExecutionResponse();
@@ -114,7 +114,7 @@ end
 rule 'TestRuleAllergies2'
 dialect 'mvel'
 when
-	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 	$cd : ClinicalFact( code == "1191" , codeSystem == "2.16.840.1.113883.6.88" , c32SectionLoincCode == "48765-2" )
 then
 	RuleExecutionResponse $response = new RuleExecutionResponse();
@@ -129,7 +129,7 @@ end
 rule 'TestRuleAllergies1'
 dialect 'mvel'
 when
-	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 	$cd : ClinicalFact( code == "70618" , codeSystem == "2.16.840.1.113883.6.88" , c32SectionLoincCode == "48765-2" )
 then
 	RuleExecutionResponse $response = new RuleExecutionResponse();
@@ -144,7 +144,7 @@ end
 rule 'TestRuleProblems1'
 dialect 'mvel'
 when
-	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 	$cd : ClinicalFact( code == "195967001" , codeSystem == "2.16.840.1.113883.6.96" , c32SectionLoincCode == "11450-4" )
 then
 	RuleExecutionResponse $response = new RuleExecutionResponse();
@@ -159,7 +159,7 @@ end
 rule 'TestRuleProblems2'
 dialect 'mvel'
 when
-	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 	$cd : ClinicalFact( code == "233604007" , codeSystem == "2.16.840.1.113883.6.96" , c32SectionLoincCode == "11450-4" )
 then
 	RuleExecutionResponse $response = new RuleExecutionResponse();
@@ -174,7 +174,7 @@ end
 rule 'TestRuleMedications1'
 dialect 'mvel'
 when
-	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 	$cd : ClinicalFact( code == "307782" , codeSystem == "2.16.840.1.113883.6.88" , c32SectionLoincCode == "10160-0" )
 then
 	RuleExecutionResponse $response = new RuleExecutionResponse();
@@ -189,7 +189,7 @@ end
 rule 'TestRuleMedications2'
 dialect 'mvel'
 when
-	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 	$cd : ClinicalFact( code == "309362" , codeSystem == "2.16.840.1.113883.6.88" , c32SectionLoincCode == "10160-0" )
 then
 	RuleExecutionResponse $response = new RuleExecutionResponse();
@@ -204,7 +204,7 @@ end
 rule 'TestRuleResults1'
 dialect 'mvel'
 when
-	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 	$cd : ClinicalFact( code == "30313-1" , codeSystem == "2.16.840.1.113883.6.1" , c32SectionLoincCode == "30954-2" )
 then
 	RuleExecutionResponse $response = new RuleExecutionResponse();
@@ -219,7 +219,7 @@ end
 rule 'TestRuleResults2'
 dialect 'mvel'
 when
-	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 	$cd : ClinicalFact( code == "33765-9" , codeSystem == "2.16.840.1.113883.6.1" , c32SectionLoincCode == "30954-2" )
 then
 	RuleExecutionResponse $response = new RuleExecutionResponse();
@@ -234,7 +234,7 @@ end
 rule 'TestRuleMedications3'
 dialect 'mvel'
 when
-	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 	$cd : ClinicalFact( code == "993536" , codeSystem == "2.16.840.1.113883.6.88" , c32SectionLoincCode == "10160-0" )
 then
 	RuleExecutionResponse $response = new RuleExecutionResponse();
@@ -249,7 +249,7 @@ end
 rule 'TestRuleResults3'
 dialect 'mvel'
 when
-	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.treatment )
+	$xacml : XacmlResult( subjectPurposeOfUse == SubjectPurposeOfUse.HEALTHCARE_TREATMENT )
 	$cd : ClinicalFact( code == "20109005" , codeSystem == "2.16.840.1.113883.6.96" , c32SectionLoincCode == "30954-2" )
 then
 	RuleExecutionResponse $response = new RuleExecutionResponse();

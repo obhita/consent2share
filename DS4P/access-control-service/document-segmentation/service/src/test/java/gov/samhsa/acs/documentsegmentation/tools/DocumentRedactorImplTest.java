@@ -4,8 +4,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -21,15 +21,22 @@ import gov.samhsa.acs.brms.domain.RuleExecutionResponse;
 import gov.samhsa.acs.brms.domain.Sensitivity;
 import gov.samhsa.acs.brms.domain.UsPrivacyLaw;
 import gov.samhsa.acs.brms.domain.XacmlResult;
-import gov.samhsa.acs.common.dto.XacmlRequest;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.DocumentAccessorImpl;
 import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
 import gov.samhsa.acs.common.tool.FileReaderImpl;
 import gov.samhsa.acs.common.tool.SimpleMarshallerImpl;
-import gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl;
-import gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl;
-import gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractClinicalFactLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractObligationLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractPostRedactionLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractDocumentLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.Entry;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTextNodeByCode;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTextNodeByDisplayName;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.documentlevel.UnsupportedHeaderElementHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.obligationlevel.Section;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.DocumentCleanupForNoEntryAndNoSection;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.RuleExecutionResponseMarkerForRedactedEntries;
 import gov.samhsa.acs.documentsegmentation.valueset.ValueSetService;
 import gov.samhsa.acs.documentsegmentation.valueset.ValueSetServiceImplMock;
 
@@ -38,6 +45,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -68,6 +76,7 @@ public class DocumentRedactorImplTest {
 	private static final String HIV = "HIV";
 	private static final String HIV_SELECTED = "HIV";
 	private static final String PSY = "PSY";
+	@SuppressWarnings("unused")
 	private static final String PSY_SELECTED = "Psychiatric Information";
 	private static final String ETH = "ETH";
 	private static final String ETH_SELECTED = "Drug Abuse";
@@ -84,6 +93,8 @@ public class DocumentRedactorImplTest {
 
 	private static final String EMPTY_RULE_EXECUTION_RESPONSE_CONTAINER = "<ruleExecutionContainer><executionResponseList></executionResponseList></ruleExecutionContainer>";
 	private static final String MOCK_XACML_RESULT = "<xacmlResult><pdpDecision>Permit</pdpDecision><purposeOfUse>TREAT</purposeOfUse><messageId>4617a579-1881-4e40-9f98-f85bd81d6502</messageId><homeCommunityId>2.16.840.1.113883.3.467</homeCommunityId><pdpObligation>Drug Abuse</pdpObligation><pdpObligation>Psychiatric Information</pdpObligation><pdpObligation>HIV</pdpObligation></xacmlResult>";
+	public static final Set<String> unsupportedHeaders = 
+			new HashSet<String>(Arrays.asList("realmCode", "custodian"));
 
 	private static SimpleMarshallerImpl marshaller;
 	private static FileReaderImpl fileReader;
@@ -123,7 +134,7 @@ public class DocumentRedactorImplTest {
 				documentXmlConverter, documentAccessor);
 
 		ruleExecutionContainer = setRuleExecutionContainer();
-		ruleExecutionContainerWithHivEth = marshaller.unmarshallFromXml(
+		ruleExecutionContainerWithHivEth = marshaller.unmarshalFromXml(
 				RuleExecutionContainer.class,
 				fileReader.readFile("ruleExecutionResponseContainer.xml"));
 		xacmlResultMock = setMockXacmlResult(MOCK_XACML_RESULT);
@@ -133,9 +144,21 @@ public class DocumentRedactorImplTest {
 		xacmlResult = fileReader.readFile("testXacmlResult.xml");
 
 		documentXmlConverterSpy = setSpyDocumentXmlConverter();
+		
+		Set<AbstractObligationLevelRedactionHandler> obligationLevelChain = new HashSet<AbstractObligationLevelRedactionHandler>();
+		Set<AbstractClinicalFactLevelRedactionHandler> clinicalFactLevelChain = new HashSet<AbstractClinicalFactLevelRedactionHandler>();
+		Set<AbstractPostRedactionLevelRedactionHandler> postRedactionChain = new HashSet<AbstractPostRedactionLevelRedactionHandler>();
+		Set<AbstractDocumentLevelRedactionHandler> documentLevelRedactionHandlers=new HashSet<AbstractDocumentLevelRedactionHandler>();
+		documentLevelRedactionHandlers.add(new UnsupportedHeaderElementHandler(documentAccessor, unsupportedHeaders));
+		obligationLevelChain.add(new Section(documentAccessor));
+		clinicalFactLevelChain.add(new Entry(documentAccessor));
+		clinicalFactLevelChain.add(new HumanReadableTextNodeByCode(documentAccessor));
+		clinicalFactLevelChain.add(new HumanReadableTextNodeByDisplayName(documentAccessor));
+		postRedactionChain.add(new DocumentCleanupForNoEntryAndNoSection(documentAccessor));
+		postRedactionChain.add(new RuleExecutionResponseMarkerForRedactedEntries(documentAccessor));
 
-		documentRedactor = new DocumentRedactorImpl(documentXmlConverterSpy,
-				documentAccessorMock);
+		documentRedactor = new DocumentRedactorImpl(marshaller, documentXmlConverterSpy,
+				documentAccessorMock, documentLevelRedactionHandlers, obligationLevelChain, clinicalFactLevelChain, postRedactionChain);
 	}
 
 	@Test
@@ -147,7 +170,7 @@ public class DocumentRedactorImplTest {
 		c32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResultMock);
@@ -183,11 +206,11 @@ public class DocumentRedactorImplTest {
 		XacmlResult xacmlResultObj = initXacmlResult(problems, allergies,
 				medications, results, hiv, psy, eth, gdis, sdv, sex, std);
 		String factModelXml = factModelExtractor.extractFactModel(robustC32,
-				marshaller.marshall(xacmlResultObj));
+				marshaller.marshal(xacmlResultObj));
 		robustC32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResultObj);
@@ -228,11 +251,11 @@ public class DocumentRedactorImplTest {
 		XacmlResult xacmlResultObj = initXacmlResult(problems, allergies,
 				medications, results, hiv, psy, eth, gdis, sdv, sex, std);
 		String factModelXml = factModelExtractor.extractFactModel(robustC32,
-				marshaller.marshall(xacmlResultObj));
+				marshaller.marshal(xacmlResultObj));
 		robustC32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResultObj);
@@ -273,11 +296,11 @@ public class DocumentRedactorImplTest {
 		XacmlResult xacmlResultObj = initXacmlResult(problems, allergies,
 				medications, results, hiv, psy, eth, gdis, sdv, sex, std);
 		String factModelXml = factModelExtractor.extractFactModel(robustC32,
-				marshaller.marshall(xacmlResultObj));
+				marshaller.marshal(xacmlResultObj));
 		robustC32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResultObj);
@@ -317,11 +340,11 @@ public class DocumentRedactorImplTest {
 		XacmlResult xacmlResultObj = initXacmlResult(problems, allergies,
 				medications, results, hiv, psy, eth, gdis, sdv, sex, std);
 		String factModelXml = factModelExtractor.extractFactModel(robustC32,
-				marshaller.marshall(xacmlResultObj));
+				marshaller.marshal(xacmlResultObj));
 		robustC32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResultObj);
@@ -362,11 +385,11 @@ public class DocumentRedactorImplTest {
 		XacmlResult xacmlResultObj = initXacmlResult(problems, allergies,
 				medications, results, hiv, psy, eth, gdis, sdv, sex, std);
 		String factModelXml = factModelExtractor.extractFactModel(robustC32,
-				marshaller.marshall(xacmlResultObj));
+				marshaller.marshal(xacmlResultObj));
 		robustC32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResultObj);
@@ -408,11 +431,11 @@ public class DocumentRedactorImplTest {
 		XacmlResult xacmlResultObj = initXacmlResult(problems, allergies,
 				medications, results, hiv, psy, eth, gdis, sdv, sex, std);
 		String factModelXml = factModelExtractor.extractFactModel(robustC32,
-				marshaller.marshall(xacmlResultObj));
+				marshaller.marshal(xacmlResultObj));
 		robustC32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResultObj);
@@ -454,11 +477,11 @@ public class DocumentRedactorImplTest {
 		XacmlResult xacmlResultObj = initXacmlResult(problems, allergies,
 				medications, results, hiv, psy, eth, gdis, sdv, sex, std);
 		String factModelXml = factModelExtractor.extractFactModel(robustC32,
-				marshaller.marshall(xacmlResultObj));
+				marshaller.marshal(xacmlResultObj));
 		robustC32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResultObj);
@@ -500,11 +523,11 @@ public class DocumentRedactorImplTest {
 		XacmlResult xacmlResultObj = initXacmlResult(problems, allergies,
 				medications, results, hiv, psy, eth, gdis, sdv, sex, std);
 		String factModelXml = factModelExtractor.extractFactModel(robustC32,
-				marshaller.marshall(xacmlResultObj));
+				marshaller.marshal(xacmlResultObj));
 		robustC32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResultObj);
@@ -549,11 +572,11 @@ public class DocumentRedactorImplTest {
 		String ethObservationId = "e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7";
 		String hivObservationId = "d11275e7-67ae-11db-bd13-0800200c9a66";
 		String factModelXml = factModelExtractor.extractFactModel(c32,
-				marshaller.marshall(xacmlResultObj));
+				marshaller.marshal(xacmlResultObj));
 		c32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResultObj);
@@ -599,6 +622,27 @@ public class DocumentRedactorImplTest {
 		foundGeneratedEntryIds = documentAccessor.getNodeList(docCleanedUp, xPathExpr);
 		// clean document shouldn't have any entry id elements
 		assertTrue(foundGeneratedEntryIds.getLength()==0);		
+	}
+	
+	@Test
+	public void testCleanUpGeneratedServiceEventIds() throws Exception{
+		// Arrange
+		initDocumentRedactorWithActualServices();
+		String c32WithGeneratedServiceEventIds = fileReader.readFile("testC32WithGeneratedEntryIds.xml");
+		
+		// Act
+		String cleanC32 = documentRedactor.cleanUpGeneratedServiceEventIds(c32WithGeneratedServiceEventIds);
+		
+		// Assert
+		Document docWithGeneratedServiceEventIds = documentXmlConverter.loadDocument(c32WithGeneratedServiceEventIds);
+		Document docCleanedUp = documentXmlConverter.loadDocument(cleanC32);		
+		String xPathExpr = "//hl7:generatedServiceEventId";
+		NodeList foundGeneratedServiceEventIds = documentAccessor.getNodeList(docWithGeneratedServiceEventIds, xPathExpr);
+		// original document must have ServiceEvent ids
+		assertTrue(foundGeneratedServiceEventIds.getLength()>0);
+		foundGeneratedServiceEventIds = documentAccessor.getNodeList(docCleanedUp, xPathExpr);
+		// clean document shouldn't have any entry id elements
+		assertTrue(foundGeneratedServiceEventIds.getLength()==0);		
 	}
 		
 	@SuppressWarnings("unchecked")
@@ -657,11 +701,11 @@ public class DocumentRedactorImplTest {
 		XacmlResult xacmlResultObj = initXacmlResult(problems, allergies,
 				medications, results, hiv, psy, eth, gdis, sdv, sex, std);
 		String factModelXml = factModelExtractor.extractFactModel(c32,
-				marshaller.marshall(xacmlResultObj));
+				marshaller.marshal(xacmlResultObj));
 		c32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		String ethObservationId = "e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7";
@@ -699,14 +743,14 @@ public class DocumentRedactorImplTest {
 		String remRuleExecutionContainerActual = fileReader
 				.readFile("testRemRuleExecutionContainerActual.xml");
 		RuleExecutionContainer remRuleExecutionContainerActualObj = marshaller
-				.unmarshallFromXml(RuleExecutionContainer.class,
+				.unmarshalFromXml(RuleExecutionContainer.class,
 						remRuleExecutionContainerActual);
 		String remXacmlResult = fileReader.readFile("testRemXacmlResult.xml");
-		XacmlResult remXacmlResultObj = marshaller.unmarshallFromXml(
+		XacmlResult remXacmlResultObj = marshaller.unmarshalFromXml(
 				XacmlResult.class, remXacmlResult);
 		String factModelXml = factModelExtractor.extractFactModel(remC32,
-				marshaller.marshall(remXacmlResultObj));
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+				marshaller.marshal(remXacmlResultObj));
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		remC32 = embeddedClinicalDocumentExtractor
@@ -764,7 +808,7 @@ public class DocumentRedactorImplTest {
 		c32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(xacmlResult);
@@ -796,7 +840,7 @@ public class DocumentRedactorImplTest {
 		c32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		setValueSetCategories(factModel);
 		factModel.setXacmlResult(setMockXacmlResult(xacmlResultWithWrongObligations));
@@ -855,7 +899,7 @@ public class DocumentRedactorImplTest {
 				.replace(HIV, hiv).replace(PSY, psy).replace(ETH, eth)
 				.replace(GDIS, gdis).replace(SDV, sdv).replace(SEX, sex)
 				.replace(STD, std);
-		XacmlResult xacmlResultObj = marshaller.unmarshallFromXml(
+		XacmlResult xacmlResultObj = marshaller.unmarshalFromXml(
 				XacmlResult.class, xacmlResultForTest);
 		xacmlResultObj.getPdpObligations().removeAll(Arrays.asList("", null));
 		return xacmlResultObj;
@@ -864,7 +908,7 @@ public class DocumentRedactorImplTest {
 	private RuleExecutionContainer initRuleExecutionContainer()
 			throws JAXBException {
 		RuleExecutionContainer ruleExecutionContainer = marshaller
-				.unmarshallFromXml(RuleExecutionContainer.class,
+				.unmarshalFromXml(RuleExecutionContainer.class,
 						EMPTY_RULE_EXECUTION_RESPONSE_CONTAINER);
 		return ruleExecutionContainer;
 	}
@@ -955,7 +999,7 @@ public class DocumentRedactorImplTest {
 		 * when(mock.getPdpObligations()).thenReturn(obligations)
 		 * .thenReturn(obligations).thenReturn(obligations); return mock;
 		 */
-		return marshaller.unmarshallFromXml(XacmlResult.class, xacmlResultXml);
+		return marshaller.unmarshalFromXml(XacmlResult.class, xacmlResultXml);
 	}
 
 	@SuppressWarnings("unused")

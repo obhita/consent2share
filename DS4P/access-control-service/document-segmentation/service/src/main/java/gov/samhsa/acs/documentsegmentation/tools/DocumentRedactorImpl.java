@@ -28,14 +28,17 @@ package gov.samhsa.acs.documentsegmentation.tools;
 import gov.samhsa.acs.brms.domain.ClinicalFact;
 import gov.samhsa.acs.brms.domain.FactModel;
 import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
-import gov.samhsa.acs.brms.domain.RuleExecutionResponse;
 import gov.samhsa.acs.brms.domain.XacmlResult;
 import gov.samhsa.acs.common.exception.DS4PException;
 import gov.samhsa.acs.common.tool.DocumentAccessor;
 import gov.samhsa.acs.common.tool.DocumentXmlConverter;
+import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.common.tool.exception.DocumentAccessorException;
-import gov.samhsa.acs.documentsegmentation.tools.dto.RedactList;
 import gov.samhsa.acs.documentsegmentation.tools.dto.RedactedDocument;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractClinicalFactLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractObligationLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractPostRedactionLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractDocumentLevelRedactionHandler;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -59,20 +62,27 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	/** The marshaller. */
+	private SimpleMarshaller marshaller;
+
 	/** The document xml converter. */
 	private DocumentXmlConverter documentXmlConverter;
 
 	/** The document accessor. */
 	private DocumentAccessor documentAccessor;
+	
+	/** The document level redaction handlers. */
+	private Set<AbstractDocumentLevelRedactionHandler> documentLevelRedactionHandlers;
 
-	/** The Constant XPATH_HUMAN_READABLE_TEXT_NODE. */
-	public static final String XPATH_HUMAN_READABLE_TEXT_NODE = "//hl7:section[child::hl7:entry[child::hl7:generatedEntryId/text()='%1']]/hl7:text//*/text()[contains(lower-case(.), '%2')]";
+	/** The obligation level redaction handlers. */
+	private Set<AbstractObligationLevelRedactionHandler> obligationLevelRedactionHandlers;
 
-	/** The Constant XPATH_SECTION. */
-	public static final String XPATH_SECTION = "//hl7:structuredBody/hl7:component[child::hl7:section[child::hl7:code[@code='%1']]]";
+	/** The clinical fact level redaction handlers. */
+	private Set<AbstractClinicalFactLevelRedactionHandler> clinicalFactLevelRedactionHandlers;
 
-	/** The Constant XPATH_ENTRY. */
-	public static final String XPATH_ENTRY = "//hl7:entry[child::hl7:generatedEntryId[text()='%1']]";
+	/** The post redaction level redaction handlers. */
+	private Set<AbstractPostRedactionLevelRedactionHandler> postRedactionLevelRedactionHandlers;
+	
 
 	/**
 	 * Instantiates a new document redactor impl.
@@ -83,16 +93,35 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 	/**
 	 * Instantiates a new document redactor impl.
 	 * 
+	 * @param marshaller
+	 *            the marshaller
 	 * @param documentXmlConverter
 	 *            the document xml converter
 	 * @param documentAccessor
 	 *            the document accessor
+	 * @param obligationLevelRedactionHandlers
+	 *            the obligation level redaction handlers
+	 * @param clinicalFactLevelRedactionHandlers
+	 *            the clinical fact level redaction handlers
+	 * @param postRedactionLevelRedactionHandlers
+	 *            the post redaction level redaction handlers
 	 */
-	public DocumentRedactorImpl(DocumentXmlConverter documentXmlConverter,
-			DocumentAccessor documentAccessor) {
+	public DocumentRedactorImpl(
+			SimpleMarshaller marshaller,
+			DocumentXmlConverter documentXmlConverter,
+			DocumentAccessor documentAccessor,
+			Set<AbstractDocumentLevelRedactionHandler> documentLevelRedactionHandlers,
+			Set<AbstractObligationLevelRedactionHandler> obligationLevelRedactionHandlers,
+			Set<AbstractClinicalFactLevelRedactionHandler> clinicalFactLevelRedactionHandlers,
+			Set<AbstractPostRedactionLevelRedactionHandler> postRedactionLevelRedactionHandlers) {
 		super();
+		this.marshaller = marshaller;
 		this.documentXmlConverter = documentXmlConverter;
 		this.documentAccessor = documentAccessor;
+		this.documentLevelRedactionHandlers=documentLevelRedactionHandlers;
+		this.obligationLevelRedactionHandlers = obligationLevelRedactionHandlers;
+		this.clinicalFactLevelRedactionHandlers = clinicalFactLevelRedactionHandlers;
+		this.postRedactionLevelRedactionHandlers = postRedactionLevelRedactionHandlers;
 	}
 
 	/*
@@ -109,72 +138,62 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 			RuleExecutionContainer ruleExecutionContainer, FactModel factModel) {
 
 		Document xmlDocument = null;
+		String tryPolicyDocument = null;
 		List<Node> redactNodeList = new LinkedList<Node>();
-		RedactList redactList = new RedactList();
+		Set<String> redactSectionCodesAndGeneratedEntryIds = new HashSet<String>();
 		Set<String> redactSectionSet = new HashSet<String>();
 		Set<String> redactCategorySet = new HashSet<String>();
 		XacmlResult xacmlResult = factModel.getXacmlResult();
 
 		try {
 			xmlDocument = documentXmlConverter.loadDocument(document);
+			Document factModelDocument = documentXmlConverter
+					.loadDocument(marshaller.marshal(factModel));
+			
+			//Document Level redaction handlers
+			for (AbstractDocumentLevelRedactionHandler documentLevelRedactionHandler:documentLevelRedactionHandlers){
+				documentLevelRedactionHandler.execute(xmlDocument,redactSectionCodesAndGeneratedEntryIds, redactNodeList);
+			}
 
-			// If there is any section with a code exists in pdp obligations,
-			// add that section to redactNodeList.
-			for (String sectionCode : xacmlResult.getPdpObligations()) {
-				int added = addNodesToList(xmlDocument, redactNodeList,
-						redactList, XPATH_SECTION, sectionCode, "");
-				if (added > 0) {
-					redactSectionSet.add(sectionCode);
+			// OBLIGATION LEVEL REDACTION HANDLERS
+			for (String obligation : xacmlResult.getPdpObligations()) {
+				for (AbstractObligationLevelRedactionHandler obligationLevelRedactionHandler : obligationLevelRedactionHandlers) {
+					obligationLevelRedactionHandler.execute(xmlDocument,
+							xacmlResult, factModel, factModelDocument,
+							ruleExecutionContainer, redactNodeList,
+							redactSectionCodesAndGeneratedEntryIds,
+							redactSectionSet, obligation);
 				}
 			}
 
-			// For each clinical fact
+			// CLINICAL FACT LEVEL REDACTION HANDLERS
 			for (ClinicalFact fact : factModel.getClinicalFactList()) {
-				String foundCategory = null;
-				// If there is at least one value set category in obligations
-				if ((foundCategory = containsAny(
-						xacmlResult.getPdpObligations(),
-						fact.getValueSetCategories())) != null) {
-					// Search and add the entry to redactNodeList
-					addNodesToList(xmlDocument, redactNodeList, redactList,
-							XPATH_ENTRY, fact.getEntry(), "");
-					// Search and add human-readable text nodes to
-					// redactNodeList
-					addNodesToList(xmlDocument, redactNodeList, redactList,
-							XPATH_HUMAN_READABLE_TEXT_NODE, fact.getEntry(),
-							fact.getDisplayName().toLowerCase());
-					addNodesToList(xmlDocument, redactNodeList, redactList,
-							XPATH_HUMAN_READABLE_TEXT_NODE, fact.getEntry(),
-							fact.getCode().toLowerCase());
-					redactCategorySet.add(foundCategory);
+				// For each clinical fact
+				for (AbstractClinicalFactLevelRedactionHandler clinicalFactLevelRedactionHandler : clinicalFactLevelRedactionHandlers) {
+					clinicalFactLevelRedactionHandler.execute(xmlDocument,
+							xacmlResult, factModel, factModelDocument, fact,
+							ruleExecutionContainer, redactNodeList,
+							redactSectionCodesAndGeneratedEntryIds,
+							redactCategorySet);
 				}
 			}
 
-			// Redact all nodes in redactNodeList (sections, entries, text
-			// nodes)
+			// Create tryPolicyDocument before the actual redacting
+			tryPolicyDocument = documentXmlConverter
+					.convertXmlDocToString(xmlDocument);
+
+			// REDACTION
+			// Redact all nodes in redactNodeList
+			// (sections, entries, text nodes)
 			for (Node nodeToBeReadacted : redactNodeList) {
 				redactNodeIfNotNull(nodeToBeReadacted);
 			}
 
-			// Mark redacted sections and entries in ruleExecutionContainer, so
-			// they can be ignored during tagging
-			for (RuleExecutionResponse response : ruleExecutionContainer
-					.getExecutionResponseList()) {
-				if (redactList.getRedactList().contains(
-						response.getC32SectionLoincCode())
-						|| redactList.getRedactList().contains(
-								response.getEntry())) {
-					response.setItemAction(RuleExecutionResponse.ITEM_ACTION_REDACT);
-				}
-			}
-			
-			// Add empty component/section under structuredBody if none exists (required to pass validation)
-			Node structuredBody = documentAccessor.getNode(xmlDocument, "//hl7:structuredBody[not(hl7:component)]");
-			if(structuredBody != null){
-				Element emptyComponent = xmlDocument.createElementNS("urn:hl7-org:v3", "component");
-				Element emptySection = xmlDocument.createElementNS("urn:hl7-org:v3", "section");
-				emptyComponent.appendChild(emptySection);
-				structuredBody.appendChild(emptyComponent);
+			// POST REDACTION LEVEL REDACTION HANDLERS
+			for (AbstractPostRedactionLevelRedactionHandler postRedactionRedactionHandler : postRedactionLevelRedactionHandlers) {
+				postRedactionRedactionHandler.execute(xmlDocument, xacmlResult,
+						factModel, factModelDocument, ruleExecutionContainer,
+						redactNodeList, redactSectionCodesAndGeneratedEntryIds);
 			}
 
 			// Convert redacted document to xml string
@@ -186,8 +205,8 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 			logger.error(e.getMessage(), e);
 			throw new DS4PException(e.toString(), e);
 		}
-		return new RedactedDocument(document, redactSectionSet,
-				redactCategorySet);
+		return new RedactedDocument(document, tryPolicyDocument,
+				redactSectionSet, redactCategorySet);
 	}
 
 	/*
@@ -200,88 +219,47 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 	public String cleanUpGeneratedEntryIds(String document) {
 		// Remove all generatedEntryId elements to clean up the clinical
 		// document
-		Document xmlDocument = null;
-		try {
-			xmlDocument = documentXmlConverter.loadDocument(document);
-
-			String xPathExprGeneratedEntryId = "//hl7:generatedEntryId";
-			NodeList generatedEntryIds = null;
-
-			generatedEntryIds = documentAccessor.getNodeList(xmlDocument,
-					xPathExprGeneratedEntryId);
-
-			if (generatedEntryIds != null) {
-				for (int i = 0; i < generatedEntryIds.getLength(); i++) {
-					Node generatedEntryIdNode = generatedEntryIds.item(i);
-					Element generatedEntryIdElement = (Element) generatedEntryIdNode;
-					generatedEntryIdElement.getParentNode().removeChild(
-							generatedEntryIdElement);
-				}
-			}
-			document = documentXmlConverter.convertXmlDocToString(xmlDocument);
-		} catch (XPathExpressionException e) {
-			logger.error(e.getMessage(), e);
-			throw new DS4PException(e.toString(), e);
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw new DS4PException(e.toString(), e);
-		}
-		return document;
+		String xPathExprGeneratedEntryId = "//hl7:generatedEntryId";
+		return cleanUpElements(document, xPathExprGeneratedEntryId);
 	}
-	
-	/* (non-Javadoc)
-	 * @see gov.samhsa.acs.documentsegmentation.tools.DocumentRedactor#cleanUpEmbeddedClinicalDocumentFromFactModel(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see gov.samhsa.acs.documentsegmentation.tools.DocumentRedactor#
+	 * cleanUpGeneratedServiceEventIds(java.lang.String)
 	 */
 	@Override
-	public String cleanUpEmbeddedClinicalDocumentFromFactModel(String factModelXml){
+	public String cleanUpGeneratedServiceEventIds(String document) {
+		// Remove all generatedServiceEventId elements to clean up the clinical
+		// document
+		String xPathExprGeneratedEntryId = "//hl7:generatedServiceEventId";
+		return cleanUpElements(document, xPathExprGeneratedEntryId);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see gov.samhsa.acs.documentsegmentation.tools.DocumentRedactor#
+	 * cleanUpEmbeddedClinicalDocumentFromFactModel(java.lang.String)
+	 */
+	@Override
+	public String cleanUpEmbeddedClinicalDocumentFromFactModel(
+			String factModelXml) {
 		try {
-		Document factModel = documentXmlConverter.loadDocument(factModelXml);
-		Element embeddedClinicalDocument = documentAccessor.getElement(factModel, "//hl7:EmbeddedClinicalDocument");
+			Document factModel = documentXmlConverter
+					.loadDocument(factModelXml);
+			Element embeddedClinicalDocument = documentAccessor.getElement(
+					factModel, "//hl7:EmbeddedClinicalDocument");
 
-		embeddedClinicalDocument.getParentNode().removeChild(embeddedClinicalDocument);
-		return documentXmlConverter.convertXmlDocToString(factModel);
+			embeddedClinicalDocument.getParentNode().removeChild(
+					embeddedClinicalDocument);
+			return documentXmlConverter.convertXmlDocToString(factModel);
 		} catch (DocumentAccessorException e) {
 			logger.error(e.getMessage(), e);
 			throw new DS4PException(e);
 		}
-	}
-
-	/**
-	 * Adds the nodes to list.
-	 * 
-	 * @param xmlDocument
-	 *            the xml document
-	 * @param listOfNodes
-	 *            the list of nodes
-	 * @param redactList
-	 *            the redact list
-	 * @param xPathExpr
-	 *            the x path expr
-	 * @param value1
-	 *            the value1
-	 * @param value2
-	 *            the value2
-	 * @return the int number of added nodes
-	 * @throws XPathExpressionException
-	 *             the x path expression exception
-	 */
-	private int addNodesToList(Document xmlDocument, List<Node> listOfNodes,
-			RedactList redactList, String xPathExpr, String value1,
-			String value2) throws XPathExpressionException {
-		int added = 0;
-		NodeList nodeList = documentAccessor.getNodeList(xmlDocument, xPathExpr
-				.replace("%1", value1).replace("%2", value2));
-		if (nodeList != null) {
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				// add section or generated entry code to redactList, so they
-				// can be ignored during tagging
-				redactList.getRedactList().add(value1);
-				listOfNodes.add(nodeList.item(i));
-				added++;
-			}
-		}
-		return added;
-	}
+	}	
 
 	/**
 	 * Redact node if not null.
@@ -297,31 +275,47 @@ public class DocumentRedactorImpl implements DocumentRedactor {
 				nodeToBeRedacted.getParentNode().removeChild(nodeToBeRedacted);
 			} catch (NullPointerException e) {
 				StringBuilder builder = new StringBuilder();
-				builder.append("The text value '");
+				builder.append("The node value '");
 				builder.append(nodeToBeRedacted.getNodeValue());
-				builder.append("' must have been removed already, it cannot be removed again. This might happen if one of the search text contains the other.");
+				builder.append("' must have been removed already, it cannot be removed again. This might happen if one of the search text contains the other and multiple criterias match to mark the node to be redacted.");
 				logger.warn(builder.toString());
 			}
 		}
 	}
 
 	/**
-	 * Contains any.
-	 * 
-	 * @param obligations
-	 *            the obligations
-	 * @param categories
-	 *            the categories
-	 * @return true, if successful
+	 * Clean up elements.
+	 *
+	 * @param document
+	 *            the document
+	 * @param xPathExpr
+	 *            the x path expr
+	 * @return the string
 	 */
-	private String containsAny(List<String> obligations, Set<String> categories) {
-		if (obligations != null && categories != null) {
-			for (String category : categories) {
-				if (obligations.contains(category)) {
-					return category;
+	private String cleanUpElements(String document, String xPathExpr) {
+		Document xmlDocument = null;
+		try {
+			xmlDocument = documentXmlConverter.loadDocument(document);
+
+			NodeList nodes = null;
+
+			nodes = documentAccessor.getNodeList(xmlDocument, xPathExpr);
+
+			if (nodes != null) {
+				for (int i = 0; i < nodes.getLength(); i++) {
+					Node node = nodes.item(i);
+					Element element = (Element) node;
+					element.getParentNode().removeChild(element);
 				}
 			}
+			document = documentXmlConverter.convertXmlDocToString(xmlDocument);
+		} catch (XPathExpressionException e) {
+			logger.error(e.getMessage(), e);
+			throw new DS4PException(e.toString(), e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw new DS4PException(e.toString(), e);
 		}
-		return null;
+		return document;
 	}
 }

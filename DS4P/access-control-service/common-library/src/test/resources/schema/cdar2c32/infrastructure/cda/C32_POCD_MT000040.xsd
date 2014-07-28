@@ -210,8 +210,8 @@ StaticMifToXsd.xsl version 2.0</xs:documentation>
 			<xs:element name="code" type="CE"/>
 			<xs:element name="title" type="ST" minOccurs="0"/>
 			<xs:element name="effectiveTime" type="TS"/>
-			<xs:element name="confidentialityCode" type="CE"/>
-			<xs:element name="languageCode" type="CS" minOccurs="0"/>
+            <xs:element name="confidentialityCode" type="CE" />
+            <xs:element name="languageCode" type="CS" minOccurs="0"/>
 			<xs:element name="setId" type="II" minOccurs="0"/>
 			<xs:element name="versionNumber" type="INT" minOccurs="0"/>
 			<xs:element name="copyTime" type="TS" minOccurs="0"/>

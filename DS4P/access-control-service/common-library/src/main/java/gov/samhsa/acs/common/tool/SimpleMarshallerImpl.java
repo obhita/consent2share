@@ -47,7 +47,7 @@ public class SimpleMarshallerImpl implements SimpleMarshaller {
 	 * unmarshallFromXml(java.lang.Class, java.lang.String)
 	 */
 	@Override
-	public <T> T unmarshallFromXml(Class<T> clazz, String xml)
+	public <T> T unmarshalFromXml(Class<T> clazz, String xml)
 			throws SimpleMarshallerException {
 		JAXBContext context;
 		try {
@@ -64,7 +64,7 @@ public class SimpleMarshallerImpl implements SimpleMarshaller {
 	 * @see gov.samhsa.acs.common.tool.Marshaller# marshall(java.lang.Object)
 	 */
 	@Override
-	public String marshall(Object obj) throws SimpleMarshallerException {
+	public String marshal(Object obj) throws SimpleMarshallerException {
 		JAXBContext context;
 		String output;
 		try {

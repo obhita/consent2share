@@ -137,7 +137,7 @@ public class DocumentTaggerImplTest {
 		c32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		String executionResponseContainer = ruleExecutionService
 				.assertAndExecuteClinicalFacts(factModel)
@@ -182,7 +182,7 @@ public class DocumentTaggerImplTest {
 		c32 = embeddedClinicalDocumentExtractor
 				.extractClinicalDocumentFromFactModel(factModelXml);
 		factModelXml = removeEmbeddedClinicalDocument(factModelXml);
-		FactModel factModel = marshaller.unmarshallFromXml(FactModel.class,
+		FactModel factModel = marshaller.unmarshalFromXml(FactModel.class,
 				factModelXml);
 		String executionResponseContainer = ruleExecutionService
 				.assertAndExecuteClinicalFacts(factModel)

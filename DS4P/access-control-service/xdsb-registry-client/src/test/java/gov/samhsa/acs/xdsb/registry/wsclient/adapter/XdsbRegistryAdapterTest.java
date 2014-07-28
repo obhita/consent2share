@@ -160,9 +160,9 @@ public class XdsbRegistryAdapterTest {
 				"1.3.6.1.4.1.21367.2010.1.2.1040");
 		String adhocQueryResponseString = fileReader
 				.readFile("adhocQueryResponseClinicalDocument.xml");
-		AdhocQueryResponse adhocQueryResponse = marshaller.unmarshallFromXml(
+		AdhocQueryResponse adhocQueryResponse = marshaller.unmarshalFromXml(
 				AdhocQueryResponse.class, adhocQueryResponseString);
-		when(marshallerMock.marshall(adhocQueryResponse)).thenReturn(
+		when(marshallerMock.marshal(adhocQueryResponse)).thenReturn(
 				adhocQueryResponseString);
 		Document doc = documentXmlConverter
 				.loadDocument(adhocQueryResponseString);
@@ -191,9 +191,9 @@ public class XdsbRegistryAdapterTest {
 				"1.3.6.1.4.1.21367.2010.1.2.1040");
 		String adhocQueryResponseString = fileReader
 				.readFile("adhocQueryResponsePrivacyConsent.xml");
-		AdhocQueryResponse adhocQueryResponse = marshaller.unmarshallFromXml(
+		AdhocQueryResponse adhocQueryResponse = marshaller.unmarshalFromXml(
 				AdhocQueryResponse.class, adhocQueryResponseString);
-		when(marshallerMock.marshall(adhocQueryResponse)).thenReturn(
+		when(marshallerMock.marshal(adhocQueryResponse)).thenReturn(
 				adhocQueryResponseString);
 		Document doc = documentXmlConverter
 				.loadDocument(adhocQueryResponseString);
@@ -268,7 +268,7 @@ public class XdsbRegistryAdapterTest {
 		XdsbDocumentReference ref2 = new XdsbDocumentReference(
 				"1513150391310.11184.4632.11139.05080551281557",
 				"1.3.6.1.4.1.21367.2010.1.2.1040");
-		when(marshallerMock.marshall(responseMock)).thenReturn(
+		when(marshallerMock.marshal(responseMock)).thenReturn(
 				marshalledXmlStringMock);
 		when(documentXmlConverterMock.loadDocument(marshalledXmlStringMock))
 				.thenReturn(
@@ -303,7 +303,7 @@ public class XdsbRegistryAdapterTest {
 	public void testExtractFormatCode() throws JAXBException, IOException {
 		// Arrange
 		String expectedResponse = "'2.16.840.1.113883.10.20.1^^HITSP'";
-		AdhocQueryRequest requestMock = marshaller.unmarshallFromXml(
+		AdhocQueryRequest requestMock = marshaller.unmarshalFromXml(
 				AdhocQueryRequest.class,
 				fileReader.readFile("unitTestAdhocQueryRequest.xml"));
 
@@ -319,7 +319,7 @@ public class XdsbRegistryAdapterTest {
 	public void testExtractPatientId() throws JAXBException, IOException {
 		// Arrange
 		String expectedResponse = "'1c5c59f0-5788-11e3-84b3-00155d3a2124^^^&2.16.840.1.113883.4.357&ISO'";
-		AdhocQueryRequest requestMock = marshaller.unmarshallFromXml(
+		AdhocQueryRequest requestMock = marshaller.unmarshalFromXml(
 				AdhocQueryRequest.class,
 				fileReader.readFile("unitTestAdhocQueryRequest.xml"));
 
@@ -336,7 +336,7 @@ public class XdsbRegistryAdapterTest {
 			IOException {
 		// Arrange
 		String expectedResponse = "LeafClass";
-		AdhocQueryRequest requestMock = marshaller.unmarshallFromXml(
+		AdhocQueryRequest requestMock = marshaller.unmarshalFromXml(
 				AdhocQueryRequest.class,
 				fileReader.readFile("unitTestAdhocQueryRequest.xml"));
 
@@ -353,7 +353,7 @@ public class XdsbRegistryAdapterTest {
 			IOException {
 		// Arrange
 		String expectedResponse = "('urn:oasis:names:tc:ebxml-regrep:StatusType:Approved')";
-		AdhocQueryRequest requestMock = marshaller.unmarshallFromXml(
+		AdhocQueryRequest requestMock = marshaller.unmarshalFromXml(
 				AdhocQueryRequest.class,
 				fileReader.readFile("unitTestAdhocQueryRequest.xml"));
 
@@ -494,7 +494,7 @@ public class XdsbRegistryAdapterTest {
 		NodeList nodeListMock = mock(NodeList.class);
 		Node nodeMock = mock(Node.class);
 		String nodeValueMock = "nodeValueMock";
-		when(marshallerMock.marshall(responseMock)).thenReturn(responseXmlMock);
+		when(marshallerMock.marshal(responseMock)).thenReturn(responseXmlMock);
 		when(documentXmlConverterMock.loadDocument(responseXmlMock))
 				.thenReturn(documentMock);
 		when(documentAccessorMock.getNodeList(eq(documentMock), anyString()))
@@ -519,7 +519,7 @@ public class XdsbRegistryAdapterTest {
 		Document documentMock = mock(Document.class);
 		Node nodeMock = mock(Node.class);
 		String nodeValueMock = "nodeValueMock";
-		when(marshallerMock.marshall(responseMock)).thenReturn(responseXmlMock);
+		when(marshallerMock.marshal(responseMock)).thenReturn(responseXmlMock);
 		when(documentXmlConverterMock.loadDocument(responseXmlMock))
 				.thenReturn(documentMock);
 		when(documentAccessorMock.getNode(eq(documentMock), anyString()))

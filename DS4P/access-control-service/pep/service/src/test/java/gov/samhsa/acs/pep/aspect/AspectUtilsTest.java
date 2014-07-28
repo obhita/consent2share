@@ -43,7 +43,7 @@ public class AspectUtilsTest {
 	@Before
 	public void setUp() throws Exception {
 		simpleMarshaller = new SimpleMarshallerImpl();
-		adhocQuery = simpleMarshaller.unmarshallFromXml(
+		adhocQuery = simpleMarshaller.unmarshalFromXml(
 				AdhocQueryRequest.class, adhocQueryString);		
 	}
 
@@ -178,7 +178,7 @@ public class AspectUtilsTest {
 	@Test
 	public void testGetInXMLFormat() throws SimpleMarshallerException{
 		//arrange
-		when(marshaller.marshall("StringTest")).thenThrow(new SimpleMarshallerException("test"));
+		when(marshaller.marshal("StringTest")).thenThrow(new SimpleMarshallerException("test"));
 		//act
 		sut.getInXMLFormat("StingTest");
 	}

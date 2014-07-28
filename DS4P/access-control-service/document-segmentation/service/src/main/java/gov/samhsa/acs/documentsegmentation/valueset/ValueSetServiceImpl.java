@@ -133,26 +133,34 @@ public class ValueSetServiceImpl implements ValueSetService {
 	
 	@Override
 	public List<Map<String, Object>> lookupValuesetCategoriesOfMultipleCodeAndCodeSystemSet(List<CodeAndCodeSystemSetDto> codeAndCodeSystemSetDtoList){
-		String restURL=createMultipleCodeRestUrl(codeAndCodeSystemSetDtoList);
-		RestTemplate restTemplate = configureRestTemplate();
-		List<Map<String, Object>> resp = restTemplate.getForObject(restURL,List.class);
+		List<Map<String, Object>> resp=new ArrayList<Map<String, Object>>();
+		String restURL;
+		
+		StringBuilder builder;
+		Iterator<CodeAndCodeSystemSetDto> iterator=codeAndCodeSystemSetDtoList.iterator();
+		while(iterator.hasNext()) {
+			builder=new StringBuilder(endpointAddress+"/multipleValueset?");
+			while (iterator.hasNext()) {
+				CodeAndCodeSystemSetDto codeAndCodeSystemSetDto=iterator.next();
+				builder.append("code:codeSystemOid="+codeAndCodeSystemSetDto.getConceptCode()+":"+codeAndCodeSystemSetDto.getCodeSystemOid());
+				
+				if(builder.length()>1500)
+					break;
+				
+				if (iterator.hasNext()) {
+					builder.append("&");
+				}
+			}
+			restURL=builder.toString();
+			RestTemplate restTemplate = configureRestTemplate();
+			resp.addAll(restTemplate.getForObject(restURL,List.class));
+		}
 		return resp;
 	}
 	
-	private String createMultipleCodeRestUrl(List<CodeAndCodeSystemSetDto> codeAndCodeSystemSetDtoList) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(endpointAddress+"/multipleValueset");
-		builder.append("?");
-		Iterator<CodeAndCodeSystemSetDto> iterator=codeAndCodeSystemSetDtoList.iterator();
-		while (iterator.hasNext()) {
-			CodeAndCodeSystemSetDto codeAndCodeSystemSetDto=iterator.next();
-			builder.append("code:codeSystemOid="+codeAndCodeSystemSetDto.getConceptCode()+":"+codeAndCodeSystemSetDto.getCodeSystemOid());
-			if (iterator.hasNext()) {
-				builder.append("&");
-			}
-		}
-		return builder.toString();
-	}
+//	private String createMultipleCodeRestUrl(List<CodeAndCodeSystemSetDto> codeAndCodeSystemSetDtoList) {
+//		
+//	}
 
 	@Override
 	public ValueSetQueryListDto RestfulValueSetCategories(

@@ -1162,10 +1162,10 @@ public class ConsentServiceImpl implements ConsentService {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setValidating(false);
 			final DocumentBuilder db = dbf.newDocumentBuilder();
-
 			Document taggedC32Doc = db.parse(new InputSource(
-					new ByteArrayInputStream(originalC32.getBytes("utf-8"))));
+					new ByteArrayInputStream(segmentedC32.getBytes("utf-8"))));
 			changeXslPath(taggedC32Doc);
+			
 			NodeList taggedC32List = taggedC32Doc.getElementsByTagName("entry");
 
 			Document segmentedC32Doc = db.parse(new InputSource(
@@ -1173,20 +1173,29 @@ public class ConsentServiceImpl implements ConsentService {
 			NodeList segmentedC32List = segmentedC32Doc
 					.getElementsByTagName("entry");
 
-			originalC32Ids = getIds(taggedC32List);
-			segmentedC32Ids = getIds(segmentedC32List);
-
-			taggedC32Ids = getIdsToTag(originalC32Ids, segmentedC32Ids);
-
-			tagC32Document(taggedC32List, taggedC32Ids);
+			logger.info("Original C32: " + originalC32);
+			logger.info("Segmented C32: " + segmentedC32);
 
 			logger.info("Tagged C32 Entry size: " + taggedC32List.getLength());
 			logger.info("Segmented C32 Entry size: "
 					+ segmentedC32List.getLength());
+			
+			if (isSmartC32(originalC32)) {
+				originalC32Ids = getIdsForSmart(taggedC32List);
+				segmentedC32Ids = getIdsForSmart(segmentedC32List);
+			} else {
+				originalC32Ids = getIds(taggedC32List);
+				segmentedC32Ids = getIds(segmentedC32List);
+			}
 
-			logger.info("Original C32: " + originalC32);
-			logger.info("Segmented C32: " + segmentedC32);
-			;
+			taggedC32Ids = getIdsToTag(originalC32Ids, segmentedC32Ids);
+
+//			if (isSmartC32(originalC32)) {
+//				tagSmartC32Document(taggedC32List, taggedC32Ids);
+//			} else {
+//				tagC32Document(taggedC32List, taggedC32Ids);
+//			}
+
 
 			// write the content into xml file
 			TransformerFactory transformerFactory = TransformerFactory
@@ -1228,6 +1237,20 @@ public class ConsentServiceImpl implements ConsentService {
 		}
 
 		return byteArrayOutputStream.toString();
+	}
+
+	
+	/**
+	 * Checks if is smart c32.
+	 *
+	 * @param originalC32 the original c32
+	 * @return true, if is smart c32
+	 */
+	private boolean isSmartC32(String originalC32) {
+		if(originalC32.contains("content")) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -1311,15 +1334,104 @@ public class ConsentServiceImpl implements ConsentService {
 								.item(grandChildIndex);
 
 						if (grandChildNode.getNodeName().equalsIgnoreCase("ID")) {
-
-							listOfIdsInC32.add(grandChildNode.getAttributes()
-									.getNamedItem("root").getNodeValue());
+								listOfIdsInC32.add(grandChildNode.getAttributes().getNamedItem("root").getNodeValue());
 						}
+
 					}
 				}
 			}
 		}
 		return listOfIdsInC32;
+	}
+
+
+
+	private List<String> getIdsForSmart(NodeList c32List) {
+		List<String> listOfIdsInC32 = new ArrayList<String>();
+		
+		for (int i = 0; i < c32List.getLength(); i++) {
+
+			NodeList childNodes = c32List.item(i).getChildNodes();
+			
+			if (!isRedactableSection(c32List.item(i)))
+				continue;
+
+			for (int childIndex = 0; childIndex < childNodes.getLength(); childIndex++) {
+				Node childNode = childNodes.item(childIndex);
+
+				if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					NodeList grandChildNodeList = childNode.getChildNodes();
+
+					for (int grandChildIndex = 0; grandChildIndex < grandChildNodeList
+							.getLength(); grandChildIndex++) {
+						Node grandChildNode = grandChildNodeList
+								.item(grandChildIndex);
+
+						if (grandChildNode.getNodeName().equalsIgnoreCase("entryRelationship")) {
+							Node observationNode = grandChildNode.getChildNodes().item(1);
+							NodeList observationChildNodes = observationNode.getChildNodes();
+							
+							for (int observationIndex = 0; observationIndex < observationChildNodes.getLength(); observationIndex++) {
+							
+								Node observationChildNode = observationChildNodes.item(observationIndex);
+								
+								if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+								
+									if (observationChildNode.getNodeName().equalsIgnoreCase("text")) {
+										
+										Node referenceNode = observationChildNode.getChildNodes().item(1);
+										Node referenceValue = referenceNode.getAttributes().getNamedItem("value");
+										logger.info("Reference value is: " + referenceValue.getNodeValue());
+										
+										listOfIdsInC32.add(referenceValue.getNodeValue());
+									}
+								}
+							}
+						}
+
+					}
+				}
+			}
+		}
+		return listOfIdsInC32;
+	}
+	
+	/**
+	 * Checks if is redactable section.
+	 *
+	 * @param entryNode the entry node
+	 * @return true, if is redactable section
+	 */
+	private boolean isRedactableSection(Node entryNode) {
+		boolean isRedactable = false;
+		while (entryNode.getPreviousSibling() != null) {
+			Node previousSibling = entryNode.getPreviousSibling();
+			if (previousSibling.getNodeType() == Node.ELEMENT_NODE) {
+				if (previousSibling.getNodeName().equalsIgnoreCase("title")) {
+					NodeList c = previousSibling.getChildNodes();
+					isRedactable = validationSection(previousSibling.getChildNodes().item(0).getNodeValue());
+				}
+			} 
+			entryNode = previousSibling;
+		}
+		return isRedactable;
+	}
+
+	/**
+	 * Validation section.
+	 *
+	 * @param nodeValue the node value
+	 * @return true, if successful
+	 */
+	private boolean validationSection(String nodeValue) {
+		boolean redacted = false;
+		if (nodeValue.toUpperCase().matches("^.*?(PROBLEMS|MEDICATIONS|RESULTS|ALLERGIES).*$")) {
+			redacted = true;
+		}
+
+		logger.info("Node value: " + nodeValue + "   Is redactable: " + redacted);
+		return redacted;
 	}
 
 	/**
@@ -1388,6 +1500,66 @@ public class ConsentServiceImpl implements ConsentService {
 		}
 	}
 
+	/**
+	 * Tag smart c32 document.
+	 *
+	 * @param taggedC32List the tagged c32 list
+	 * @param taggedC32Ids the tagged c32 ids
+	 */
+	public void tagSmartC32Document(NodeList taggedC32List, List<String> taggedC32Ids) {
+
+		for (int i = 0; i < taggedC32List.getLength(); i++) {
+			Element elementToAddAttribute = (Element) taggedC32List.item(i);
+			
+			NodeList childNodes = taggedC32List.item(i).getChildNodes();
+			
+			if (!isRedactableSection(taggedC32List.item(i)))
+				continue;
+
+			for (int childIndex = 0; childIndex < childNodes.getLength(); childIndex++) {
+				Node childNode = childNodes.item(childIndex);
+
+				if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					NodeList grandChildNodeList = childNode.getChildNodes();
+
+					for (int grandChildIndex = 0; grandChildIndex < grandChildNodeList
+							.getLength(); grandChildIndex++) {
+						Node grandChildNode = grandChildNodeList
+								.item(grandChildIndex);
+
+						if (grandChildNode.getNodeName().equalsIgnoreCase("entryRelationship")) {
+							Node observationNode = grandChildNode.getChildNodes().item(1);
+							NodeList observationChildNodes = observationNode.getChildNodes();
+							
+							for (int observationIndex = 0; observationIndex < observationChildNodes.getLength(); observationIndex++) {
+							
+								Node observationChildNode = observationChildNodes.item(observationIndex);
+								
+								if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+								
+									if (observationChildNode.getNodeName().equalsIgnoreCase("text")) {
+										
+										Node referenceNode = observationChildNode.getChildNodes().item(1);
+										Node referenceValue = referenceNode.getAttributes().getNamedItem("value");
+										logger.info("Reference value is: " + referenceValue.getNodeValue());
+										
+										if (taggedC32Ids.contains(referenceValue.getNodeValue())) {
+											logger.info("Match!");
+											elementToAddAttribute.setAttribute("redact",
+													"redact");
+										}
+									}
+								}
+							}
+						}
+
+					}
+				}
+			}
+		}
+	}
+	
 	@Override
 	public String createConsentEmbeddedWidget(ConsentPdfDto consentPdfDto) {
 		Consent consent = consentRepository.findOne(consentPdfDto.getId());

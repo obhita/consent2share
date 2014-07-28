@@ -32,6 +32,8 @@ import gov.samhsa.acs.common.validation.exception.XmlSchemaFailureException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -108,10 +110,11 @@ public class XmlValidation {
 	 * @return true, if successful
 	 * @throws InvalidXmlDocumentException the invalid xml document exception
 	 * @throws XmlDocumentReadFailureException the xml document read failure exception
+	 * @throws UnsupportedEncodingException 
 	 */
 	public boolean validate(String xml) throws InvalidXmlDocumentException,
 			XmlDocumentReadFailureException {
-		return validate(new ByteArrayInputStream(xml.getBytes()));
+		return validate(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))));
 	}
 
 	/**

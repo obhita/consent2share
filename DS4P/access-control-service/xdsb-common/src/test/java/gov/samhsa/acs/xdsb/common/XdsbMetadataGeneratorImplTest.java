@@ -99,7 +99,7 @@ public class XdsbMetadataGeneratorImplTest {
 		// Act
 		SubmitObjectsRequest submitObjectsRequest = sut.generateMetadata(
 				documentMock, homeCommunityIdMock, null, null);
-		String xml = marshaller.marshall(submitObjectsRequest);
+		String xml = marshaller.marshal(submitObjectsRequest);
 
 		// Assert
 		assertNotNull(submitObjectsRequest);

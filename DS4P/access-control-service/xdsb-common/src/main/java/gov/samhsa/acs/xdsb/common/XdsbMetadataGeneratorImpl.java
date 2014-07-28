@@ -186,7 +186,7 @@ public class XdsbMetadataGeneratorImpl implements XdsbMetadataGenerator {
 				patientUniqueId, entryUUID);
 		SubmitObjectsRequest submitObjectsRequest = null;
 		try {
-			submitObjectsRequest = marshaller.unmarshallFromXml(
+			submitObjectsRequest = marshaller.unmarshalFromXml(
 					SubmitObjectsRequest.class, metadataXml);
 		} catch (JAXBException e) {
 			throw new DS4PException(e.toString(), e);

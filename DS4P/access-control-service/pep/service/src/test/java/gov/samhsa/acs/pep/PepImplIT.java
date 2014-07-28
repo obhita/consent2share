@@ -111,14 +111,14 @@ public class PepImplIT {
 		marshaller = new SimpleMarshallerImpl();
 		documentTagger = new DocumentTaggerImpl();
 		documentEncrypter = new DocumentEncrypterImpl();
-		documentRedactor = new DocumentRedactorImpl(new DocumentXmlConverterImpl(), null);
+		documentRedactor = new DocumentRedactorImpl(null, new DocumentXmlConverterImpl(), null,null, null, null, null);
 		documentMasker = new DocumentMaskerImpl();
 		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
 		additionalMetadataGeneratorForSegmentedClinicalDocumentImpl = new AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl();
 		;
 
 		c32Document = fileReader.readFile("c32.xml");
-		xacmlResult = "<xacmlResult><pdpDecision>Permit</pdpDecision><purposeOfUse>TREAT</purposeOfUse><messageId>4617a579-1881-4e40-9f98-f85bd81d6502</messageId><homeCommunityId>2.16.840.1.113883.3.467</homeCommunityId><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:org:us-privacy-law:42CFRPart2</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:org:refrain-policy:NORDSLCD</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:redact:ETH</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:redact:PSY</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:mask:HIV</pdpObligation></xacmlResult>";
+		xacmlResult = "<xacmlResult><pdpDecision>Permit</pdpDecision><purposeOfUse>TREATMENT</purposeOfUse><messageId>4617a579-1881-4e40-9f98-f85bd81d6502</messageId><homeCommunityId>2.16.840.1.113883.3.467</homeCommunityId><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:org:us-privacy-law:42CFRPart2</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:org:refrain-policy:NORDSLCD</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:redact:ETH</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:redact:PSY</pdpObligation><pdpObligation>urn:oasis:names:tc:xspa:2.0:resource:patient:mask:HIV</pdpObligation></xacmlResult>";
 		ruleExecutionResponseContainer = "<ruleExecutionContainer><executionResponseList><executionResponse><c32SectionLoincCode>11450-4</c32SectionLoincCode><c32SectionTitle>Problems</c32SectionTitle><code>66214007</code><codeSystemName>SNOMED CT</codeSystemName><displayName>Substance Abuse Disorder</displayName><documentObligationPolicy>ENCRYPT</documentObligationPolicy><documentRefrainPolicy>NORDSLCD</documentRefrainPolicy><impliedConfSection>R</impliedConfSection><itemAction>REDACT</itemAction><observationId>e11275e7-67ae-11db-bd13-0800200c9a66b827vs52h7</observationId><sensitivity>ETH</sensitivity><USPrivacyLaw>42CFRPart2</USPrivacyLaw></executionResponse><executionResponse><c32SectionLoincCode>11450-4</c32SectionLoincCode><c32SectionTitle>Problems</c32SectionTitle><code>111880001</code><codeSystemName>SNOMED CT</codeSystemName><displayName>Acute HIV</displayName><documentObligationPolicy>ENCRYPT</documentObligationPolicy><documentRefrainPolicy>NORDSLCD</documentRefrainPolicy><impliedConfSection>R</impliedConfSection><itemAction>MASK</itemAction><observationId>d11275e7-67ae-11db-bd13-0800200c9a66</observationId><sensitivity>HIV</sensitivity><USPrivacyLaw>42CFRPart2</USPrivacyLaw></executionResponse></executionResponseList></ruleExecutionContainer>";
 		senderEmailAddress = "leo.smith@direct.obhita-stage.org";
 		recipientEmailAddress = "Duane_Decouteau@direct.healthvault-stage.com";
@@ -152,7 +152,7 @@ public class PepImplIT {
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "consent2share@outlook.com";
 		// String purposeOfUse = "PWATRNY";
-		String purposeOfUse = "TREAT";
+		String purposeOfUse = "TREATMENT";
 		String xdsDocumentEntryUniqueId = "123";
 
 		// pdp
@@ -236,7 +236,7 @@ public class PepImplIT {
 		PepImpl pep = new PepImpl(contextHandler, c32Getter,
 				documentSegmentation, dataHandlerToBytesConverter,
 				xdsbRepository, xdsbRegistry, marshaller);
-		// pep.setSubjectPurposeOfUse("TREAT");
+		// pep.setSubjectPurposeOfUse("TREATMENT");
 		pep.setSubjectPurposeOfUse(purposeOfUse);
 		pep.setSubjectLocality("2.16.840.1.113883.3.467");
 		pep.setOrganization("SAMHSA");
@@ -293,7 +293,7 @@ public class PepImplIT {
 		String intermediarySubjectNPI = "1111111111";
 		String resourceId = "consent2share@outlook.com";
 		// String purposeOfUse = "PWATRNY";
-		String purposeOfUse = "TREAT";
+		String purposeOfUse = "TREATMENT";
 		String xdsDocumentEntryUniqueId = "123";
 
 		// pdp
@@ -370,7 +370,7 @@ public class PepImplIT {
 		PepImpl pep = new PepImpl(contextHandler, c32Getter,
 				documentSegmentation, dataHandlerToBytesConverter,
 				xdsbRepository, xdsbRegistry, marshaller);
-		// pep.setSubjectPurposeOfUse("TREAT");
+		// pep.setSubjectPurposeOfUse("TREATMENT");
 		pep.setSubjectPurposeOfUse(purposeOfUse);
 		pep.setSubjectLocality("2.16.840.1.113883.3.467");
 		// pep.setOrganization("SAMHSA");
@@ -410,7 +410,7 @@ public class PepImplIT {
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "consent2share@outlook.com";
 		// String purposeOfUse = "PWATRNY";
-		String purposeOfUse = "TREAT";
+		String purposeOfUse = "TREATMENT";
 		String xdsDocumentEntryUniqueId = "123";
 
 		// pdp
@@ -451,7 +451,7 @@ public class PepImplIT {
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "consent2share@outlook.com";
 		// String purposeOfUse = "PWATRNY";
-		String purposeOfUse = "TREAT";
+		String purposeOfUse = "TREATMENT";
 		String xdsDocumentEntryUniqueId = "123";
 
 		// pdp
@@ -504,7 +504,7 @@ public class PepImplIT {
 		String intermediarySubjectNPI = "1285969170";
 		String resourceId = "wrongresourceid@outlook.com";
 		// String purposeOfUse = "PWATRNY";
-		String purposeOfUse = "TREAT";
+		String purposeOfUse = "TREATMENT";
 		String xdsDocumentEntryUniqueId = "123";
 
 		// pdp
@@ -558,7 +558,7 @@ public class PepImplIT {
 		String intermediarySubjectNPI = "1174858088";
 		String resourceId = "consent2share@outlook.com";
 		// String purposeOfUse = "PWATRNY";
-		String purposeOfUse = "TREAT";
+		String purposeOfUse = "TREATMENT";
 		String xdsDocumentEntryUniqueId = "123";
 		//
 		// // pdp request
@@ -594,7 +594,7 @@ public class PepImplIT {
 		String intermediarySubjectNPI = "1174858088";
 		String resourceId = "consent2share@outlook.com";
 		// String purposeOfUse = "PWATRNY";
-		String purposeOfUse = "TREAT";
+		String purposeOfUse = "TREATMENT";
 		String xdsDocumentEntryUniqueId = "123";
 
 		// // pdp request
@@ -620,7 +620,7 @@ public class PepImplIT {
 	// String recepientSubjectNPI = "1111111111";
 	// String intermediarySubjectNPI = "1174858088";
 	// String resourceId = "consent2share@outlook.com";
-	// String purposeOfUse = "TREAT";
+	// String purposeOfUse = "TREATMENT";
 	// String xdsDocumentEntryUniqueId = "123";
 	//
 	// RequestGenerator requestGeneratorMock = new RequestGenerator();
@@ -640,7 +640,7 @@ public class PepImplIT {
 	// String recepientSubjectNPI = "1083949036";
 	// String intermediarySubjectNPI = "1111111111";
 	// String resourceId = "consent2share@outlook.com";
-	// String purposeOfUse = "TREAT";
+	// String purposeOfUse = "TREATMENT";
 	// String xdsDocumentEntryUniqueId = "123";
 	//
 	// RequestGenerator requestGeneratorMock = new RequestGenerator();
@@ -660,7 +660,7 @@ public class PepImplIT {
 	// String recepientSubjectNPI = "1083949036";
 	// String intermediarySubjectNPI = "1174858088";
 	// String resourceId = "consent2share@wrongEmailAddress.com";
-	// String purposeOfUse = "TREAT";
+	// String purposeOfUse = "TREATMENT";
 	// String xdsDocumentEntryUniqueId = "123";
 	//
 	// RequestGenerator requestGeneratorMock = new RequestGenerator();
@@ -732,7 +732,7 @@ public class PepImplIT {
 	// PepImpl pep = new PepImpl(contextHandler,
 	// c32Getter, documentSegmentation, dataHandlerToBytesConverter,
 	// xdsbRepository, xdsbRegistry);
-	// // pep.setSubjectPurposeOfUse("TREAT");
+	// // pep.setSubjectPurposeOfUse("TREATMENT");
 	// pep.setSubjectPurposeOfUse(purposeOfUse);
 	// pep.setSubjectLocality("2.16.840.1.113883.3.467");
 	// pep.setOrganization("SAMHSA");

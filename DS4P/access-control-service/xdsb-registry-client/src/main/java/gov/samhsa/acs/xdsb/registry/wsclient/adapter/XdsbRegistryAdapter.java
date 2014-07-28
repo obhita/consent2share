@@ -357,7 +357,7 @@ public class XdsbRegistryAdapter {
 			AdhocQueryResponse response) throws XdsbRegistryAdapterException {
 		try {
 			List<String> submissionSetUniqueIdList = new LinkedList<String>();
-			String responseXml = this.marshaller.marshall(response);
+			String responseXml = this.marshaller.marshal(response);
 			Document responseDoc = this.documentXmlConverter
 					.loadDocument(responseXml);
 			String xPathExpr = "//rim:ExternalIdentifier[@identificationScheme='$']/@value";
@@ -387,7 +387,7 @@ public class XdsbRegistryAdapter {
 			AdhocQueryResponse response, String messageId)
 			throws XdsbRegistryAdapterException {
 		try {
-			String responseXml = this.marshaller.marshall(response);
+			String responseXml = this.marshaller.marshal(response);
 			Document responseDoc = this.documentXmlConverter
 					.loadDocument(responseXml);
 			// Extract documentUniqueId if there is an association in the
@@ -430,7 +430,7 @@ public class XdsbRegistryAdapter {
 	public List<XdsbDocumentReference> extractXdsbDocumentReferenceList(
 			AdhocQueryResponse adhocQueryResponse) throws Exception, Throwable {
 		String adhocQueryResponseXmlString = marshaller
-				.marshall(adhocQueryResponse);
+				.marshal(adhocQueryResponse);
 		Document doc = documentXmlConverter
 				.loadDocument(adhocQueryResponseXmlString);
 
@@ -506,7 +506,7 @@ public class XdsbRegistryAdapter {
 		String adhocQueryResponseXmlString;
 		try {
 			adhocQueryResponseXmlString = marshaller
-					.marshall(adhocQueryResponse);
+					.marshal(adhocQueryResponse);
 			Document doc = documentXmlConverter
 					.loadDocument(adhocQueryResponseXmlString);
 
@@ -655,7 +655,7 @@ public class XdsbRegistryAdapter {
 			throws XdsbRegistryAdapterException {
 		try {
 			AdhocQueryRequest findSubmissionSetsRequest = this.marshaller
-					.unmarshallFromXml(
+					.unmarshalFromXml(
 							AdhocQueryRequest.class,
 							STORED_QUERY_FIND_SUBMISSION_SETS.replace(
 									PARAM_XDS_SUBMISSION_SET_PATIENT_ID,
@@ -685,7 +685,7 @@ public class XdsbRegistryAdapter {
 			throws XdsbRegistryAdapterException {
 		try {
 			AdhocQueryRequest getSubmissionSetAndContentsRequest = this.marshaller
-					.unmarshallFromXml(AdhocQueryRequest.class,
+					.unmarshalFromXml(AdhocQueryRequest.class,
 							STORED_QUERY_GET_SUBMISSION_SET_AND_CONTENTS
 									.replace(PARAM_XDS_SUBMISSION_SET_UNIQUEID,
 											submissionSetUniqueId));
@@ -891,7 +891,7 @@ public class XdsbRegistryAdapter {
 				adhocQueryResponse = responseFilter.filterByAuthor(
 						adhocQueryResponse, authorNPI);
 			}
-			logger.debug(messageId, marshaller.marshall(adhocQueryResponse));
+			logger.debug(messageId, marshaller.marshal(adhocQueryResponse));
 			return adhocQueryResponse;
 		} catch (SimpleMarshallerException e) {
 			throw new XdsbRegistryAdapterException(e);

@@ -214,6 +214,96 @@
 		scope="prototype" autowire="constructor" />
 	
 	<!-- DocumentSegmentation -->
+	<!-- DocumentSegmentation: Redaction Handlers: 
+		The implementations for "Obligation Level" and "Clinical Fact Level" redaction handlers
+		should aim to implement a single logic to collect the nodes in the 'listOfNodes'.
+		After these phases are executed, 'DocumentSegmentationServiceImpl' will redact 
+		the collected document nodes and start executing "Post Redaction Level" redaction handlers.
+		In this phase, the implementations should aim to clean up and/or modify the document 
+		itself; the 'listOfNodes' will not be consumed by the 'DocumentSegmentationServiceImpl' 
+		anymore, but it will be available in the redaction handler interface and can be referred if required.
+	-->
+	
+<!-- 	DocumentSegmentationService: Document Redaction Redaction Handler -->
+<!-- 	Unsupported c32 header redaction set -->
+	<util:set id="headersToRedact" value-type="java.lang.String">
+		<bean id="informant " class="java.lang.String">
+			<constructor-arg value="informant"/>
+		</bean>
+		<bean id="informationRecipient" class="java.lang.String">
+			<constructor-arg value="informationRecipient"/>
+		</bean>
+		<bean id="authenticator" class="java.lang.String">
+			<constructor-arg value="authenticator"/>
+		</bean>
+		<bean id="participant" class="java.lang.String">
+			<constructor-arg value="participant"/>
+		</bean>
+	</util:set>
+	
+	<util:set id="documentLevelRedactionHandlers" value-type="gov.samhsa.acs.documentsegmentation.tools.redact.impl.documentlevel.UnsupportedHeaderElementHandler">
+		<bean id="unsupportedHeaderElementHandler" 
+		class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.documentlevel.UnsupportedHeaderElementHandler">
+			<constructor-arg ref="documentAccessorImpl"/>
+			<constructor-arg ref="headersToRedact"/>
+		</bean>
+	</util:set>
+		
+	
+	<!-- DocumentSegmentation: Redaction Handlers: Obligation Level Redaction Handlers -->
+	<util:set id="obligationLevelRedactionHandlers" value-type="gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractObligationLevelRedactionHandler">
+		<bean id="section"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.obligationlevel.Section"
+			autowire="constructor"/>
+	</util:set>
+	
+	<!-- DocumentSegmentation: Redaction Handlers: Clinical Fact Level Redaction Handlers -->
+	<util:set id="clinicalFactLevelRedactionHandlers" value-type="gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractClinicalFactLevelRedactionHandler">
+		<bean id="documentationOfServiceEvent"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.DocumentationOfServiceEvent"
+			autowire="constructor"/>
+		<bean id="entry"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.Entry"
+			autowire="constructor"/>
+		<bean id="humanReadableContentElementByCode"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableContentElementByCode"
+			autowire="constructor"/>
+		<bean id="humanReadableContentElementByDisplayName"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableContentElementByDisplayName"
+			autowire="constructor"/>
+		<bean id="humanReadableContentElementById"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableContentElementById"
+			autowire="constructor"/>
+		<bean id="humanReadableTableRowByCode"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTableRowByCode"
+			autowire="constructor"/>
+		<bean id="humanReadableTableRowByDisplayName"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTableRowByDisplayName"
+			autowire="constructor"/>
+		<bean id="humanReadableTableRowById"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTableRowById"
+			autowire="constructor"/>
+		<bean id="humanReadableTextNodeByCode"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTextNodeByCode"
+			autowire="constructor"/>
+		<bean id="humanReadableTextNodeByDisplayName"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTextNodeByDisplayName"
+			autowire="constructor"/>
+	</util:set>
+	
+	<!-- DocumentSegmentation: Redaction Handlers: Post Redaction Level Redaction Handlers -->
+	<util:set id="postRedactionLevelRedactionHandlers" value-type="gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractPostRedactionLevelRedactionHandler">
+		<bean id="documentCleanupForDocumentationOfNoServiceEvent"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.DocumentCleanupForDocumentationOfNoServiceEvent"
+			autowire="constructor"/>
+		<bean id="documentCleanupForNoEntryAndNoSection"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.DocumentCleanupForNoEntryAndNoSection"
+			autowire="constructor"/>
+		<bean id="ruleExecutionResponseMarkerForRedactedEntries"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.RuleExecutionResponseMarkerForRedactedEntries"
+			autowire="constructor"/>
+	</util:set>
+	
 	<!-- DocumentSegmentation: tools -->
 	<bean id="documentEditorImpl"
 		class="gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl"
@@ -226,7 +316,12 @@
 		scope="prototype" autowire="constructor"/>
 	<bean id="documentRedactorImpl"
 		class="gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl"
-		scope="prototype" autowire="constructor"/>
+		scope="prototype" autowire="constructor">
+		<constructor-arg ref="documentLevelRedactionHandlers"/>
+		<constructor-arg ref="obligationLevelRedactionHandlers"/>
+		<constructor-arg ref="clinicalFactLevelRedactionHandlers"/>
+		<constructor-arg ref="postRedactionLevelRedactionHandlers"/>
+	</bean>
 	<bean id="documentTaggerImpl"
 		class="gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl"
 		scope="prototype"/>

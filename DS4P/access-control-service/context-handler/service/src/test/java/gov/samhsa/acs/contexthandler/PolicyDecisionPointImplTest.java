@@ -244,11 +244,11 @@ public class PolicyDecisionPointImplTest {
 		XacmlRequest xacmlRequest = new XacmlRequest();
 		xacmlRequest.setIntermediarySubjectNPI("1285969170");
 		xacmlRequest.setRecipientSubjectNPI("1568797520");
-		xacmlRequest.setPurposeOfUse("TREAT");
+		xacmlRequest.setPurposeOfUse("TREATMENT");
 		xacmlRequest.setPatientId("consent2share@outlook.com");
 		when(
 				requestGeneratorMock.generateRequest("1568797520",
-						"1285969170", "TREAT", "consent2share@outlook.com"))
+						"1285969170", "TREATMENT", "consent2share@outlook.com"))
 				.thenReturn(request);
 		pdp.deployPolicies(simplePDP, policies, xacmlRequest, false);
 		assertEquals(
@@ -284,7 +284,7 @@ public class PolicyDecisionPointImplTest {
 				.getStringFromResourceFile(policyFileUri);
 		
 		// Act
-		XacmlResponse xacmlResponse =  thePdp.evaluatePolicyForTrying(xacmlPolicy, "TREAT").getXacmlResponse();
+		XacmlResponse xacmlResponse =  thePdp.evaluatePolicyForTrying(xacmlPolicy, "TREATMENT").getXacmlResponse();
 		
 		// Assert
 		assertEquals(xacmlResponse.getPdpDecision().toLowerCase(), "permit");

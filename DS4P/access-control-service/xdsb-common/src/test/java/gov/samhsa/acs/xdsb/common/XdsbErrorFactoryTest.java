@@ -298,6 +298,6 @@ public class XdsbErrorFactoryTest {
 			throws SAXException, IOException, Throwable {
 		assertNotNull(actualResponse);
 		assertXMLEqual("", expectedResponse,
-				marshaller.marshall(actualResponse));
+				marshaller.marshal(actualResponse));
 	}
 }

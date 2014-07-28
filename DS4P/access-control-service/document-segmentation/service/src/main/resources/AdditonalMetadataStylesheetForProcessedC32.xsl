@@ -63,7 +63,7 @@
 		<xsl:param name="purposeOfUseString" />
 		<xsl:choose>
 			<xsl:when test="$purposeOfUseString = 'TREAT'">Treatment</xsl:when>
-			<xsl:when test="$purposeOfUseString = 'ETREAT'">Emergency Treatment</xsl:when>
+			<xsl:when test="$purposeOfUseString = 'EMERGENCY'">Emergency Treatment</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="$purposeOfUseString" />
 			</xsl:otherwise>

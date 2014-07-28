@@ -42,44 +42,51 @@ public interface DocumentAccessor {
 
 	/**
 	 * Gets the element.
-	 * 
+	 *
 	 * @param xmlDocument
 	 *            the xml document
 	 * @param xPathExpr
 	 *            the x path expr
+	 * @param arguments
+	 *            the arguments
 	 * @return the element
 	 * @throws DocumentAccessorException
 	 *             the document accessor exception
 	 */
-	public abstract Element getElement(Document xmlDocument, String xPathExpr)
-			throws DocumentAccessorException;
+	public abstract Element getElement(Document xmlDocument, String xPathExpr,
+			String... arguments) throws DocumentAccessorException;
 
 	/**
 	 * Gets the node.
-	 * 
+	 *
 	 * @param xmlDocument
 	 *            the xml document
 	 * @param xPathExpr
 	 *            the x path expr
+	 * @param arguments
+	 *            the arguments
 	 * @return the node
 	 * @throws DocumentAccessorException
 	 *             the document accessor exception
 	 */
-	public abstract Node getNode(Document xmlDocument, String xPathExpr)
-			throws DocumentAccessorException;
+	public abstract Node getNode(Document xmlDocument, String xPathExpr,
+			String... arguments) throws DocumentAccessorException;
 
 	/**
 	 * Gets the node list.
-	 * 
+	 *
 	 * @param xmlDocument
 	 *            the xml document
 	 * @param xPathExpr
 	 *            the x path expr
+	 * @param arguments
+	 *            the arguments
 	 * @return the node list
 	 * @throws DocumentAccessorException
 	 *             the document accessor exception
 	 */
-	public abstract NodeList getNodeList(Document xmlDocument, String xPathExpr)
+	public abstract NodeList getNodeList(Document xmlDocument,
+			String xPathExpr, String... arguments)
 			throws DocumentAccessorException;
 
 	/**

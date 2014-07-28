@@ -92,19 +92,19 @@
     <doNotShareSensitivityPolicyCodesList/>
     <shareForPurposeOfUseCodesList>
         <shareForPurposeOfUseCodes>
-            <code>TREAT</code>
+            <code>TREATMENT</code>
             <codeSystem>2.16.840.1.113883.1.11.20448</codeSystem>
             <codeSystemName>PurposeOfUse</codeSystemName>
             <displayName>Treatment</displayName>
         </shareForPurposeOfUseCodes>
+<!--         <shareForPurposeOfUseCodes> -->
+<!--             <code>CAREMGT</code> -->
+<!--             <codeSystem>2.16.840.1.113883.1.11.20448</codeSystem> -->
+<!--             <codeSystemName>PurposeOfUse</codeSystemName> -->
+<!--             <displayName>Care Management Treatment</displayName> -->
+<!--         </shareForPurposeOfUseCodes> -->
         <shareForPurposeOfUseCodes>
-            <code>CAREMGT</code>
-            <codeSystem>2.16.840.1.113883.1.11.20448</codeSystem>
-            <codeSystemName>PurposeOfUse</codeSystemName>
-            <displayName>Care Management Treatment</displayName>
-        </shareForPurposeOfUseCodes>
-        <shareForPurposeOfUseCodes>
-            <code>ETREAT</code>
+            <code>EMERGENCY</code>
             <codeSystem>2.16.840.1.113883.1.11.20448</codeSystem>
             <codeSystemName>PurposeOfUse</codeSystemName>
             <displayName>Emergency Treatment</displayName>

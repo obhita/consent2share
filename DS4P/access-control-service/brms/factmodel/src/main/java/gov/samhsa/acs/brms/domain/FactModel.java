@@ -26,6 +26,7 @@
 package gov.samhsa.acs.brms.domain;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -48,6 +49,11 @@ public class FactModel {
 	@XmlElementWrapper(name="ClinicalFacts")
 	@XmlElement(name="ClinicalFact")
 	private List<ClinicalFact> clinicalFactList = new ArrayList<ClinicalFact>();
+	
+	/** The entry references. */
+	@XmlElementWrapper(name="EntryReferences")
+	@XmlElement(name="EntryReference")
+	private List<EntryReference> entryReferences  = new LinkedList<EntryReference>();
 		
 	/**
 	 * Gets the XACML result.
@@ -84,4 +90,22 @@ public class FactModel {
 	public void setClinicalFactList(List<ClinicalFact> clinicalFacts) {
 		this.clinicalFactList = clinicalFacts;
 	}
+
+	/**
+	 * Gets the entry references.
+	 *
+	 * @return the entry references
+	 */
+	public List<EntryReference> getEntryReferences() {
+		return entryReferences;
+	}
+
+	/**
+	 * Sets the entry references.
+	 *
+	 * @param entryReferences the new entry references
+	 */
+	public void setEntryReferences(List<EntryReference> entryReferences) {
+		this.entryReferences = entryReferences;
+	}	
 }

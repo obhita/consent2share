@@ -36,7 +36,7 @@
                              classifiedObject="Document01"
                              id="CLS0-2"
                              objectType="urn:oasis:names:tc:ebxmlregrep:ObjectType:RegistryObject:Classification"
-                             nodeRepresentation="TREAT">
+                             nodeRepresentation="TREATMENT">
             <rim:Slot name="codingScheme">
                <rim:ValueList>
                   <rim:Value>2.16.840.1.113883.1.11.20448</rim:Value>

@@ -16,11 +16,20 @@
         <FactModel xsl:exclude-result-prefixes="#all">
             <xsl:sequence select="$xacmlResult"/>
 
-            <ClinicalFacts>
+            <xsl:variable name="entry"
+                select="/ClinicalDocument/component/structuredBody/component/section/entry"/>
 
-                <xsl:variable name="entry"
-                    select="/ClinicalDocument/component/structuredBody/component/section/entry"/>
+            <xsl:variable name="documentationOfServiceEvent"
+                select="/ClinicalDocument/documentationOf/serviceEvent"/>
+
+            <ClinicalFacts>
                 
+                <xsl:for-each select="$documentationOfServiceEvent//.[@code and @codeSystem]">
+                    <ClinicalFact>
+                        <xsl:call-template name="serviceEvents"/>
+                    </ClinicalFact>
+                </xsl:for-each>
+
                 <xsl:for-each select="$entry//.[@code and @codeSystem]">
                     <ClinicalFact>
                         <xsl:call-template name="clinicalFacts"/>
@@ -28,16 +37,46 @@
                 </xsl:for-each>
 
             </ClinicalFacts>
+
+            <EntryReferences>
+
+                <!--<xsl:for-each select="$entry//reference[starts-with(@value, '#')]">-->
+                <xsl:for-each select="$entry//reference">
+                    <EntryReference>
+                        <xsl:call-template name="entryReferences"/>
+                    </EntryReference>
+                </xsl:for-each>
+
+            </EntryReferences>
+
             <!--<xsl:result-document href="c32-out.xml">-->
             <EmbeddedClinicalDocument xsl:exclude-result-prefixes="#all" xmlns="urn:hl7-org:v3">
                 <xsl:call-template name="clinicalDocument"/>
                 <xsl:call-template name="entry"/>
+                <xsl:call-template name="serviceEvent"/>
             </EmbeddedClinicalDocument>
             <!--</xsl:result-document>-->
         </FactModel>
 
     </xsl:template>
-
+    
+    <xsl:template name="serviceEvents" exclude-result-prefixes="#all">
+        <code>
+            <xsl:value-of select="@code"/>
+        </code>
+        <displayName>
+            <xsl:value-of select="@displayName"/>
+        </displayName>
+        <codeSystem>
+            <xsl:value-of select="@codeSystem"/>
+        </codeSystem>
+        <codeSystemName>
+            <xsl:value-of select="@codeSystemName"/>
+        </codeSystemName>
+        <entry>
+            <xsl:value-of select="generate-id(ancestor::serviceEvent)"/>
+        </entry>
+    </xsl:template>
 
     <xsl:template name="clinicalFacts" exclude-result-prefixes="#all">
         <code>
@@ -66,9 +105,34 @@
         </entry>
     </xsl:template>
 
+    <xsl:template name="entryReferences" exclude-result-prefixes="#all">
+        <entry>
+            <xsl:value-of select="generate-id(ancestor::entry)"/>
+        </entry>
+        <reference>
+            <!--<xsl:value-of select="substring(@value,2)"/>-->
+            <xsl:value-of select="replace(@value, '#', '')"/>
+        </reference>
+    </xsl:template>
+
     <xsl:template name="clinicalDocument" match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+    <xsl:template name="serviceEvent" match="serviceEvent[parent::documentationOf]">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="realmCode"/>
+            <xsl:apply-templates select="typeId"/>
+            <xsl:apply-templates select="templateId"/>
+            <xsl:apply-templates select="id"/>
+            <xsl:apply-templates select="code"/>
+            <xsl:apply-templates select="effectiveTime"/>
+            <xsl:apply-templates select="performer"/>
+            <generatedServiceEventId xsl:exclude-result-prefixes="#all" xmlns="urn:hl7-org:v3">
+                <xsl:value-of select="generate-id(.)"/>
+            </generatedServiceEventId>
         </xsl:copy>
     </xsl:template>
     <xsl:template name="entry" match="entry">

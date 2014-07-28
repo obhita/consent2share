@@ -629,23 +629,23 @@ public class ConsentTransformerImplTest {
 
 		TypeCodesDto tcd3 = new TypeCodesDto();
 		tcd3.setDisplayName("Emergency Treatment");
-		tcd3.setCode("ETREAT");
+		tcd3.setCode("EMERGENCY");
 		tcd3.setCodeSystem("2.16.840.1.113883.1.11.20448");
 		tcd3.setCodeSystemName("PurposeOfUse");
 
 		consentShareForPurposeOfUseCode.add(tcd3);
 
-		tcd3 = new TypeCodesDto();
-		tcd3.setDisplayName("Care Management Treatment");
-		tcd3.setCode("CAREMGT");
-		tcd3.setCodeSystem("2.16.840.1.113883.1.11.20448");
-		tcd3.setCodeSystemName("PurposeOfUse");
-
-		consentShareForPurposeOfUseCode.add(tcd3);
+//		tcd3 = new TypeCodesDto();
+//		tcd3.setDisplayName("Care Management Treatment");
+//		tcd3.setCode("CAREMGT");
+//		tcd3.setCodeSystem("2.16.840.1.113883.1.11.20448");
+//		tcd3.setCodeSystemName("PurposeOfUse");
+//
+//		consentShareForPurposeOfUseCode.add(tcd3);
 
 		tcd3 = new TypeCodesDto();
 		tcd3.setDisplayName("Treatment");
-		tcd3.setCode("TREAT");
+		tcd3.setCode("TREATMENT");
 		tcd3.setCodeSystem("2.16.840.1.113883.1.11.20448");
 		tcd3.setCodeSystemName("PurposeOfUse");
 

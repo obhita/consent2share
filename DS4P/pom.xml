@@ -193,6 +193,7 @@
 
 		<javax.servlet.version>2.5</javax.servlet.version>
 		<flexjson.version>2.1</flexjson.version>
+		<json.version>20140107</json.version>
 		<apache.commons.version>3.1</apache.commons.version>
 
 		<modelmapper.version>0.5.6</modelmapper.version>
@@ -223,6 +224,8 @@
 		<solr-solrj.version>3.6.1</solr-solrj.version>
 		<el-api.version>2.2</el-api.version>
 		<selenium-server.version>2.39.0</selenium-server.version>
+		<selenium-java.version>2.39.0</selenium-java.version>
+		<selenium-firefox-driver.version>2.33.0</selenium-firefox-driver.version>
 		<jaxb-impl.version>2.2.7</jaxb-impl.version>
 		<jaxb.version>2.1.9</jaxb.version>
 		<Saxon-HE.version>9.5.1-2</Saxon-HE.version>
@@ -254,7 +257,7 @@
 		<jaxws-api.version>2.2.8</jaxws-api.version>
 		<esapi.version>2.1.0</esapi.version>
 		<recaptcha4j.version>0.0.7</recaptcha4j.version>
-		
+
 		<bcprov-jdk15on.version>1.50</bcprov-jdk15on.version>
 
 	</properties>
@@ -323,6 +326,31 @@
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>${guava.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.seleniumhq.selenium</groupId>
+				<artifactId>selenium-java</artifactId>
+				<version>${selenium-java.version}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<artifactId>commons-logging</artifactId>
+						<groupId>commons-logging</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.seleniumhq.selenium</groupId>
+				<artifactId>selenium-firefox-driver</artifactId>
+				<version>${selenium-firefox-driver.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.seleniumhq.selenium</groupId>
+				<artifactId>selenium-server</artifactId>
+				<version>${selenium-server.version}</version>
+				<scope>test</scope>
 			</dependency>
 
 			<!-- Logging -->
@@ -660,6 +688,12 @@
 				<groupId>net.sf.flexjson</groupId>
 				<artifactId>flexjson</artifactId>
 				<version>${flexjson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>${json.version}</version>
 			</dependency>
 
 			<dependency>
@@ -1250,7 +1284,7 @@
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-library</artifactId>

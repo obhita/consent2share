@@ -550,7 +550,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 				XacmlResult xacmlResult = createXacmlResult(xacmlRequest,
 						xacmlResponse);
 
-				String xacmlResultString = marshaller.marshall(xacmlResult);
+				String xacmlResultString = marshaller.marshal(xacmlResult);
 
 				String xdsDocumentEntryUniqueId = "";
 				// packageAsXdm = input.getPackageAsXdm()
@@ -668,7 +668,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 			XacmlResult xacmlResult = createXacmlResult(xacmlRequest,
 					xacmlResponse);
 
-			String enforcementPolicies = marshaller.marshall(xacmlResult);
+			String enforcementPolicies = marshaller.marshal(xacmlResult);
 
 			segmentDocumentResponse = documentSegmentation.segmentDocument(
 					c32Xml, enforcementPolicies, false);
@@ -677,7 +677,8 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 			throw new PolicyEnforcementPointException(t);
 		}
 
-		return segmentDocumentResponse.getSegmentedDocumentXml();
+		//return segmentDocumentResponse.getSegmentedDocumentXml();
+		return segmentDocumentResponse.getTryPolicyDocumentXml();
 	}
 
 	/**
@@ -794,7 +795,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 			XacmlResponse xacmlResponse) throws SimpleMarshallerException,
 			AuditException {
 		XacmlResult xacmlResult = createXacmlResult(xacmlRequest, xacmlResponse);
-		String enforcementPolicies = marshaller.marshall(xacmlResult);
+		String enforcementPolicies = marshaller.marshal(xacmlResult);
 		Map<String, String> errorMap = new HashMap<String, String>();
 		List<DocumentResponse> removeList = new LinkedList<DocumentResponse>();
 		for (DocumentResponse documentResponse : response.getDocumentResponse()) {
@@ -952,7 +953,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 		predicateMap.put(PATIENT_UNIQUE_ID, xacmlRequest.getPatientUniqueId());
 		predicateMap.put(PURPOSE_OF_USE, xacmlRequest.getPurposeOfUse());
 		try {
-			predicateMap.put(REQUEST_BODY, marshaller.marshall(request));
+			predicateMap.put(REQUEST_BODY, marshaller.marshal(request));
 		} catch (SimpleMarshallerException e) {
 			logger.error(xacmlRequest.getMessageId(), e.getMessage());
 			logger.error(xacmlRequest.getMessageId(),
@@ -978,7 +979,7 @@ public class PolicyEnforcementPointImpl implements PolicyEnforcementPoint,
 		AuditVerb auditVerb = resolveResponseAuditVerb(response, pepResponseStatus);
 		Assert.notNull(auditVerb, "Cannot resolve AuditVerb; it cannot be null.");
 		Map<PredicateKey, String> predicateMap = auditService.createPredicateMap();
-		predicateMap.put(RESPONSE_BODY, marshaller.marshall(response));
+		predicateMap.put(RESPONSE_BODY, marshaller.marshal(response));
 		auditService.audit(this, xacmlRequest.getMessageId(), auditVerb, xacmlRequest.getPatientId(), predicateMap);
 	}
 

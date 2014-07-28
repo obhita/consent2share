@@ -25,6 +25,17 @@ import gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl;
 import gov.samhsa.acs.documentsegmentation.tools.EmbeddedClinicalDocumentExtractorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractClinicalFactLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractObligationLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractPostRedactionLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractDocumentLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.Entry;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTextNodeByCode;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTextNodeByDisplayName;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.documentlevel.UnsupportedHeaderElementHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.obligationlevel.Section;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.DocumentCleanupForNoEntryAndNoSection;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.RuleExecutionResponseMarkerForRedactedEntries;
 import gov.samhsa.acs.documentsegmentation.valueset.ValueSetService;
 import gov.samhsa.acs.documentsegmentation.valueset.ValueSetServiceImplMock;
 import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentResponse;
@@ -32,6 +43,9 @@ import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentRespo
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.Key;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -53,6 +67,8 @@ import ch.qos.logback.audit.AuditException;
 public class DocumentSegmentationImplIT {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	public static final Set<String> unsupportedHeaders = 
+			new HashSet<String>(Arrays.asList("realmCode", "custodian"));
 
 	private static String xacmlResult;
 	private static String ruleExecutionResponseContainer;
@@ -96,7 +112,18 @@ public class DocumentSegmentationImplIT {
 		documentEncrypter = new DocumentEncrypterImpl(documentXmlConverter);
 		documentAccessor = new DocumentAccessorImpl();
 		valueSetService = new ValueSetServiceImplMock();
-		documentRedactor = new DocumentRedactorImpl(documentXmlConverter, documentAccessor);
+		Set<AbstractObligationLevelRedactionHandler> obligationLevelChain = new HashSet<AbstractObligationLevelRedactionHandler>();
+		Set<AbstractClinicalFactLevelRedactionHandler> clinicalFactLevelChain = new HashSet<AbstractClinicalFactLevelRedactionHandler>();
+		Set<AbstractPostRedactionLevelRedactionHandler> postRedactionChain = new HashSet<AbstractPostRedactionLevelRedactionHandler>();
+		Set<AbstractDocumentLevelRedactionHandler> documentLevelRedactionHandlers=new HashSet<AbstractDocumentLevelRedactionHandler>();
+		documentLevelRedactionHandlers.add(new UnsupportedHeaderElementHandler(documentAccessor, unsupportedHeaders));
+		obligationLevelChain.add(new Section(documentAccessor));
+		clinicalFactLevelChain.add(new Entry(documentAccessor));
+		clinicalFactLevelChain.add(new HumanReadableTextNodeByCode(documentAccessor));
+		clinicalFactLevelChain.add(new HumanReadableTextNodeByDisplayName(documentAccessor));
+		postRedactionChain.add(new DocumentCleanupForNoEntryAndNoSection(documentAccessor));
+		postRedactionChain.add(new RuleExecutionResponseMarkerForRedactedEntries(documentAccessor));
+		documentRedactor = new DocumentRedactorImpl(marshaller, documentXmlConverter, documentAccessor,documentLevelRedactionHandlers, obligationLevelChain, clinicalFactLevelChain, postRedactionChain);
 		documentMasker = new DocumentMaskerImpl();
 		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
 		additionalMetadataGeneratorForSegmentedClinicalDocumentImpl = new AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl();
@@ -116,7 +143,7 @@ public class DocumentSegmentationImplIT {
 				new GuvnorServiceImpl(endpointAddressGuvnorService, "admin",
 						"admin"), new SimpleMarshallerImpl());
 		try {
-			xacmlResultObject = marshaller.unmarshallFromXml(XacmlResult.class,
+			xacmlResultObject = marshaller.unmarshalFromXml(XacmlResult.class,
 					xacmlResult);
 		} catch (JAXBException e) {
 			logger.error(e.getMessage(), e);

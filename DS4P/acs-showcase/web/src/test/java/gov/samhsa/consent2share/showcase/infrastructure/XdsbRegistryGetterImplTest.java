@@ -59,7 +59,7 @@ public class XdsbRegistryGetterImplTest {
 
 		// Act
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201301UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201301UV02.class,
 						hl7v3XmlMock)).thenReturn(requestMock);
 		doNothing().when(sut).setEidValues(requestMock, "eId", "eIdDomain");
 		when(
@@ -86,7 +86,7 @@ public class XdsbRegistryGetterImplTest {
 
 		// Act
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201301UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201301UV02.class,
 						hl7v3XmlMock)).thenReturn(requestMock);
 		when(
 				xdsbRegistryWebServiceClientMock
@@ -108,7 +108,7 @@ public class XdsbRegistryGetterImplTest {
 
 		// Act
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201301UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201301UV02.class,
 						hl7v3XmlMock)).thenThrow(JAXBException.class);
 
 		sut.addPatientRegistryRecord(hl7v3XmlMock, "", "");
@@ -125,7 +125,7 @@ public class XdsbRegistryGetterImplTest {
 		String hl7v3XmlMock = "hl7v3XmlMock";
 
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201304UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201304UV02.class,
 						hl7v3XmlMock)).thenReturn(requestMock);
 		when(
 				xdsbRegistryWebServiceClientMock
@@ -153,7 +153,7 @@ public class XdsbRegistryGetterImplTest {
 
 		// Act
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201304UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201304UV02.class,
 						hl7v3XmlMock)).thenReturn(requestMock);
 		when(
 				xdsbRegistryWebServiceClientMock
@@ -174,7 +174,7 @@ public class XdsbRegistryGetterImplTest {
 
 		// Act
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201304UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201304UV02.class,
 						hl7v3XmlMock)).thenThrow(JAXBException.class);
 
 		sut.resolvePatientRegistryDuplicates(hl7v3XmlMock, "", "");
@@ -192,7 +192,7 @@ public class XdsbRegistryGetterImplTest {
 
 		// Act
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201302UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201302UV02.class,
 						hl7v3XmlMock)).thenReturn(requestMock);
 		when(
 				xdsbRegistryWebServiceClientMock
@@ -219,7 +219,7 @@ public class XdsbRegistryGetterImplTest {
 
 		// Act
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201302UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201302UV02.class,
 						hl7v3XmlMock)).thenReturn(requestMock);
 		when(
 				xdsbRegistryWebServiceClientMock
@@ -240,7 +240,7 @@ public class XdsbRegistryGetterImplTest {
 		String hl7v3XmlMock = "hl7v3XmlMock";
 
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201302UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201302UV02.class,
 						hl7v3XmlMock)).thenThrow(JAXBException.class);
 		thrown.expect(AcsShowCaseException.class);
 
@@ -252,7 +252,7 @@ public class XdsbRegistryGetterImplTest {
 	public void testSetEidValues_PRPAIN201301UV02() throws JAXBException {
 		// Arrange
 		String xmlPRPAIN201301UV02 = "<PRPA_IN201301UV02 xmlns=\"urn:hl7-org:v3\" ITSVersion=\"XML_1.0\"><id root=\"21acf7be-007c-41e6-b176-d0969794983b\"></id><creationTime value=\"20091112115139\"></creationTime><interactionId extension=\"PRPA_IN201301UV02\" root=\"2.16.840.1.113883.1.6\"></interactionId><processingCode code=\"P\"></processingCode><processingModeCode code=\"T\"></processingModeCode><acceptAckCode code=\"AL\"></acceptAckCode><receiver typeCode=\"RCV\"><device classCode=\"DEV\" determinerCode=\"INSTANCE\"><id root=\"1.2.840.114350.1.13.99999.4567\"></id><asAgent classCode=\"AGNT\"><representedOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\"><id root=\"1.2.840.114350.1.13.99999.1234\"></id></representedOrganization></asAgent></device></receiver><sender typeCode=\"SND\"><device classCode=\"DEV\" determinerCode=\"INSTANCE\"><id root=\"1.2.840.114350.1.13.99998.8734\"></id><asAgent classCode=\"AGNT\"><representedOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\"><id root=\"1.2.840.114350.1.13.99998\"></id></representedOrganization></asAgent></device></sender><controlActProcess classCode=\"CACT\" moodCode=\"EVN\"><code code=\"PRPA_TE201301UV02\" codeSystem=\"2.16.840.1.113883.1.6\"></code><subject typeCode=\"SUBJ\"><registrationEvent classCode=\"REG\" moodCode=\"EVN\"><id nullFlavor=\"NA\"></id><statusCode code=\"active\"></statusCode><subject1 typeCode=\"SBJ\"><patient classCode=\"PAT\"><id assigningAuthorityName=\"NIST2010\" extension=\"1c5c59f0-5788-11e3-84b3-00155d3a2124\" root=\"2.16.840.1.113883.4.357\"></id><statusCode code=\"active\"></statusCode><patientPerson><name><given>Asample</given><family>Patientone</family></name><telecom use=\"H\" value=\"tel:610-220-4354\"></telecom><administrativeGenderCode code=\"M\"></administrativeGenderCode><birthTime value=\"19710510\"></birthTime><addr><streetAddressLine>3351 N chatham rd</streetAddressLine><city>ellicott city</city><state>Maryland</state></addr></patientPerson><providerOrganization><id root=\"1.2.840.114350.1.13.99998.8734\"></id><contactParty></contactParty></providerOrganization></patient></subject1><custodian typeCode=\"CST\"><assignedEntity classCode=\"ASSIGNED\"><id root=\"1.2.840.114350.1.13.99998.8734\"></id></assignedEntity></custodian></registrationEvent></subject></controlActProcess></PRPA_IN201301UV02>";
-		PRPAIN201301UV02 requestMock = marshaller.unmarshallFromXml(
+		PRPAIN201301UV02 requestMock = marshaller.unmarshalFromXml(
 				PRPAIN201301UV02.class, xmlPRPAIN201301UV02);
 		String eIdMock = "eIdMock";
 		String eIdDomainMock = "eIdDomainMock";
@@ -273,7 +273,7 @@ public class XdsbRegistryGetterImplTest {
 	public void testSetEidValues_PRPAIN201302UV02() throws JAXBException {
 		// Arrange
 		String xmlPRPAIN201302UV02 = "<PRPA_IN201302UV02 xmlns=\"urn:hl7-org:v3\" ITSVersion=\"XML_1.0\"><id root=\"21acf7be-007c-41e6-b176-d0969794983b\"></id><creationTime value=\"20091112115139\"></creationTime><interactionId extension=\"PRPA_IN201302UV02\" root=\"2.16.840.1.113883.1.6\"></interactionId><processingCode code=\"P\"></processingCode><processingModeCode code=\"T\"></processingModeCode><acceptAckCode code=\"AL\"></acceptAckCode><receiver typeCode=\"RCV\"><device classCode=\"DEV\" determinerCode=\"INSTANCE\"><id root=\"1.2.840.114350.1.13.99999.4567\"></id><asAgent classCode=\"AGNT\"><representedOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\"><id root=\"1.2.840.114350.1.13.99999.1234\"></id></representedOrganization></asAgent></device></receiver><sender typeCode=\"SND\"><device classCode=\"DEV\" determinerCode=\"INSTANCE\"><id root=\"1.2.840.114350.1.13.99998.8734\"></id><asAgent classCode=\"AGNT\"><representedOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\"><id root=\"1.2.840.114350.1.13.99998\"></id></representedOrganization></asAgent></device></sender><controlActProcess classCode=\"CACT\" moodCode=\"EVN\"><code code=\"PRPA_TE201302UV02\" codeSystem=\"2.16.840.1.113883.1.6\"></code><subject typeCode=\"SUBJ\"><registrationEvent classCode=\"REG\" moodCode=\"EVN\"><id nullFlavor=\"NA\"></id><statusCode code=\"active\"></statusCode><subject1 typeCode=\"SBJ\"><patient classCode=\"PAT\"><id assigningAuthorityName=\"NIST2010\" extension=\"1c5c59f0-5788-11e3-84b3-00155d3a2124\" root=\"2.16.840.1.113883.4.357\"></id><statusCode code=\"active\"></statusCode><patientPerson><name><given>Asample</given><family>Patientone</family></name><telecom use=\"H\" value=\"555-255-5454\"></telecom><administrativeGenderCode code=\"M\"></administrativeGenderCode><birthTime value=\"19710510\"></birthTime><addr><streetAddressLine>3351 N chatham rd</streetAddressLine><city>ellicott city</city><state>Maryland</state></addr></patientPerson><providerOrganization><id root=\"1.2.840.114350.1.13.99998.8734\"></id><contactParty></contactParty></providerOrganization></patient></subject1><custodian typeCode=\"CST\"><assignedEntity classCode=\"ASSIGNED\"><id root=\"1.2.840.114350.1.13.99998.8734\"></id></assignedEntity></custodian></registrationEvent></subject></controlActProcess></PRPA_IN201302UV02>";
-		PRPAIN201302UV02 requestMock = marshaller.unmarshallFromXml(
+		PRPAIN201302UV02 requestMock = marshaller.unmarshalFromXml(
 				PRPAIN201302UV02.class, xmlPRPAIN201302UV02);
 		String eIdMock = "eIdMock";
 		String eIdDomainMock = "eIdDomainMock";
@@ -302,7 +302,7 @@ public class XdsbRegistryGetterImplTest {
 		sut.setXdsbRegistryWebServiceClient(xdsbRegistryWebServiceClientMock);
 
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201301UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201301UV02.class,
 						hl7v3XmlMock)).thenReturn(mockPRPAIN201301UV02);
 		doNothing().when(sut).setEidValues(mockPRPAIN201301UV02, eIdMock,
 				eIdDomainMock);
@@ -331,7 +331,7 @@ public class XdsbRegistryGetterImplTest {
 		sut.setXdsbRegistryWebServiceClient(xdsbRegistryWebServiceClientMock);
 
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201302UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201302UV02.class,
 						hl7v3XmlMock)).thenReturn(mockPRPAIN201302UV02);
 		doNothing().when(sut).setEidValues(mockPRPAIN201302UV02, eIdMock,
 				eIdDomainMock);
@@ -360,7 +360,7 @@ public class XdsbRegistryGetterImplTest {
 		sut.setXdsbRegistryWebServiceClient(xdsbRegistryWebServiceClientMock);
 
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201304UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201304UV02.class,
 						hl7v3XmlMock)).thenReturn(mockPRPAIN201304UV02);
 		doNothing().when(sut).setEidValues(mockPRPAIN201304UV02, eIdMock,
 				eIdDomainMock);
@@ -390,7 +390,7 @@ public class XdsbRegistryGetterImplTest {
 		thrown.expect(AcsShowCaseException.class);
 
 		when(
-				marshallerMock.unmarshallFromXml(PRPAIN201304UV02.class,
+				marshallerMock.unmarshalFromXml(PRPAIN201304UV02.class,
 						hl7v3XmlMock)).thenReturn(mockPRPAIN201304UV02);
 		doNothing().when(sut).setEidValues(mockPRPAIN201304UV02, eIdMock,
 				eIdDomainMock);

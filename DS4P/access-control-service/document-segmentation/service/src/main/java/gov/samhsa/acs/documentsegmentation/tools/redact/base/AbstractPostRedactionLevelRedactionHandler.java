@@ -23,50 +23,61 @@
  *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package gov.samhsa.acs.documentsegmentation.tools.dto;
+package gov.samhsa.acs.documentsegmentation.tools.redact.base;
 
-import java.util.HashSet;
+import gov.samhsa.acs.brms.domain.FactModel;
+import gov.samhsa.acs.brms.domain.RuleExecutionContainer;
+import gov.samhsa.acs.brms.domain.XacmlResult;
+import gov.samhsa.acs.common.tool.DocumentAccessor;
+
+import java.util.List;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.xpath.XPathExpressionException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
- * The Class RedactList.
+ * The Class AbstractPostRedactionLevelRedactionHandler.
  */
-@XmlRootElement(name = "RedactList", namespace = "urn:hl7-org:v3")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class RedactList {
-
-	/** The redact list. */
-	@XmlElement(name = "RedactItem", namespace = "urn:hl7-org:v3")
-	private Set<String> redactList;
+public abstract class AbstractPostRedactionLevelRedactionHandler extends
+		AbstractRedactionHandler {
 
 	/**
-	 * Instantiates a new redact list.
+	 * Instantiates a new abstract post redaction level callback.
+	 *
+	 * @param documentAccessor
+	 *            the document accessor
 	 */
-	public RedactList() {
-		redactList = new HashSet<String>();
+	public AbstractPostRedactionLevelRedactionHandler(DocumentAccessor documentAccessor) {
+		super(documentAccessor);
 	}
 
 	/**
-	 * Gets the redact list.
-	 * 
-	 * @return the redact list
+	 * Execute.
+	 *
+	 * @param xmlDocument
+	 *            the xml document
+	 * @param xacmlResult
+	 *            the xacml result
+	 * @param factModel
+	 *            the fact model
+	 * @param factModelDocument
+	 *            the fact model document
+	 * @param ruleExecutionContainer
+	 *            the rule execution container
+	 * @param listOfNodes
+	 *            the list of nodes
+	 * @param redactSectionCodesAndGeneratedEntryIds
+	 *            the redact section codes and generated entry ids
+	 * @throws XPathExpressionException
+	 *             the x path expression exception
 	 */
-	public Set<String> getRedactList() {
-		return redactList;
-	}
-
-	/**
-	 * Sets the redact list.
-	 * 
-	 * @param redactList
-	 *            the new redact list
-	 */
-	public void setRedactList(Set<String> redactList) {
-		this.redactList = redactList;
-	}
+	public abstract void execute(Document xmlDocument, XacmlResult xacmlResult,
+			FactModel factModel, Document factModelDocument,
+			RuleExecutionContainer ruleExecutionContainer,
+			List<Node> listOfNodes,
+			Set<String> redactSectionCodesAndGeneratedEntryIds)
+			throws XPathExpressionException;
 }

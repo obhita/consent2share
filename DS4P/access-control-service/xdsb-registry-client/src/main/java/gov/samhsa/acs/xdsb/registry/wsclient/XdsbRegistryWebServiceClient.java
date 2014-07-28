@@ -102,7 +102,7 @@ public class XdsbRegistryWebServiceClient {
 	public String addPatientRegistryRecord(PRPAIN201301UV02 input) throws XdsbRegistryClientException{
 		XDSRegistry port = createPort();
 		try {
-			return marshaller.marshall(port.patientRegistryRecordAdded(input));
+			return marshaller.marshal(port.patientRegistryRecordAdded(input));
 		} catch (SimpleMarshallerException e) {
 			throw new XdsbRegistryClientException(e);
 		}
@@ -118,7 +118,7 @@ public class XdsbRegistryWebServiceClient {
 	public String resolvePatientRegistryDuplicates(PRPAIN201304UV02 input) throws XdsbRegistryClientException{
 		XDSRegistry port = createPort();
 		try {
-			return marshaller.marshall(port.patientRegistryDuplicatesResolved(input));
+			return marshaller.marshal(port.patientRegistryDuplicatesResolved(input));
 		} catch (SimpleMarshallerException e) {
 			throw new XdsbRegistryClientException(e);
 		}
@@ -134,7 +134,7 @@ public class XdsbRegistryWebServiceClient {
 	public String revisePatientRegistryRecord(PRPAIN201302UV02 input) throws XdsbRegistryClientException{
 		XDSRegistry port = createPort();
 		try {
-			return marshaller.marshall(port.patientRegistryRecordRevised(input));
+			return marshaller.marshal(port.patientRegistryRecordRevised(input));
 		} catch (SimpleMarshallerException e) {
 			throw new XdsbRegistryClientException(e);
 		}

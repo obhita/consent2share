@@ -151,7 +151,7 @@ function loadTryMyPolicy(consentId) {
 			// populate share for purpose of use codes
 			$.each(data.shareForPurposeOfUseCodesAndValues, function(index, element){
 				// Only add Treatment option
-				if (element === "Treatment") {
+				if (element === "Healthcare Treatment") {
 					$("#tryMyPolicy_purposeOfUse").append("<option value='"+index+"'>"+element+"</option>");
 				}
 			});

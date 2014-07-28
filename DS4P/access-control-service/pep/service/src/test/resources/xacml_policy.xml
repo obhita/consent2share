@@ -88,7 +88,7 @@
                                                  AttributeId="gov.samhsa.consent2share.purpose-of-use-code"
                                                  DataType="http://www.w3.org/2001/XMLSchema#string"/>
                   </Apply>
-                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ETREAT</AttributeValue>
+                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">EMERGENCY</AttributeValue>
                </Apply>
                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
@@ -96,7 +96,7 @@
                                                  AttributeId="gov.samhsa.consent2share.purpose-of-use-code"
                                                  DataType="http://www.w3.org/2001/XMLSchema#string"/>
                   </Apply>
-                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">TREAT</AttributeValue>
+                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">TREATMENT</AttributeValue>
                </Apply>
                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
@@ -104,7 +104,7 @@
                                                  AttributeId="gov.samhsa.consent2share.purpose-of-use-code"
                                                  DataType="http://www.w3.org/2001/XMLSchema#string"/>
                   </Apply>
-                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">HRESCH</AttributeValue>
+                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">RESEARCH</AttributeValue>
                </Apply>
                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
@@ -112,7 +112,7 @@
                                                  AttributeId="gov.samhsa.consent2share.purpose-of-use-code"
                                                  DataType="http://www.w3.org/2001/XMLSchema#string"/>
                   </Apply>
-                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">PWATRNY</AttributeValue>
+                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">PAYMENT</AttributeValue>
                </Apply>
             </Apply>
             <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:dateTime-greater-than-or-equal">

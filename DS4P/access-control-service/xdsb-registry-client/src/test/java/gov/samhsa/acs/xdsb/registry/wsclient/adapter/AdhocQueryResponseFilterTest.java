@@ -34,14 +34,14 @@ public class AdhocQueryResponseFilterTest {
 		// Arrange
 		String expectedResponse = fileReader
 				.readFile("unitTestAdhocQueryResponseFiltered.xml");
-		AdhocQueryResponse responseMock = marshaller.unmarshallFromXml(
+		AdhocQueryResponse responseMock = marshaller.unmarshalFromXml(
 				AdhocQueryResponse.class,
 				fileReader.readFile("unitTestAdhocQueryResponse.xml"));
 
 		// Act
 		AdhocQueryResponse actualResponse = sut.filterByAuthor(responseMock,
 				"1114252178");
-		String actualResponseXmlString = marshaller.marshall(actualResponse);
+		String actualResponseXmlString = marshaller.marshal(actualResponse);
 
 		// Assert
 		assertXMLEqual("", expectedResponse, actualResponseXmlString);

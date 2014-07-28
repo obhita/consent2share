@@ -39,16 +39,21 @@ import gov.samhsa.consent2share.domain.provider.IndividualProvider;
 import gov.samhsa.consent2share.domain.provider.OrganizationalProvider;
 import gov.samhsa.consent2share.domain.reference.ClinicalConceptCode;
 import gov.samhsa.consent2share.domain.reference.ClinicalDocumentSectionTypeCode;
+import gov.samhsa.consent2share.domain.reference.ClinicalDocumentSectionTypeCodeRepository;
 import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCode;
+import gov.samhsa.consent2share.domain.reference.ClinicalDocumentTypeCodeRepository;
 import gov.samhsa.consent2share.domain.reference.PurposeOfUseCode;
 import gov.samhsa.consent2share.domain.valueset.ValueSetCategory;
+import gov.samhsa.consent2share.domain.valueset.ValueSetCategoryRepository;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -70,6 +75,18 @@ import com.itextpdf.text.pdf.PdfWriter;
  */
 @Component
 public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
+	
+	
+	@Autowired
+	private ValueSetCategoryRepository valueSetCategoryRepository;
+	
+	@Autowired
+	private ClinicalDocumentTypeCodeRepository clinicalDocumentTypeCodeRepository;
+	
+	@Autowired
+	private ClinicalDocumentSectionTypeCodeRepository clinicalDocumentSectionTypeCodeRepository;
+	
+	
 
 	/* (non-Javadoc)
 	 * @see gov.samhsa.consent2share.domain.consent.ConsentPdfGenerator#generate42CfrPart2Pdf(gov.samhsa.consent2share.domain.consent.Consent)
@@ -162,7 +179,7 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 
 			Chunk chunk4 = new Chunk("authorizes ");
 			Chunk chunk6 = new Chunk(" to disclose to ");
-			Chunk chunk8 = new Chunk("Share ALL medical information",fontbold);
+			Chunk chunk8 = new Chunk("Share the following medical information",fontbold);
 			chunk8.setUnderline(1, -2);
 			paragraph2.add(headerNotification);
 			paragraph2.add(chunk2);
@@ -203,10 +220,9 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 			Chunk chunk9 = null;
 			if (sensitivityParagraph != null
 					|| clinicalDocumentTypeParagraph != null
-					|| clinicalDocumentSectionTypeParagraph != null
-					|| clinicalConceptCodesParagraph != null) {
-				chunk9 = new Chunk(" except the following:");
-				chunk9.setUnderline(1, -2);
+					|| clinicalDocumentSectionTypeParagraph != null) {
+				chunk9 = new Chunk(":");
+				//chunk9.setUnderline(1, -2);
 			} else {
 				chunk9 = new Chunk(".");
 			}
@@ -254,7 +270,7 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 			Chunk chunk15;
 			if (consent.getEndDate() != null) {
 				chunk15 = new Chunk(String.format(
-						"Effecitive Date: %tm/%td/%ty\n",
+						"Effective Date: %tm/%td/%ty\n",
 						consent.getStartDate(),
 						consent.getStartDate(),
 						consent.getStartDate()));
@@ -275,15 +291,17 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 			if (sensitivityParagraph != null) {
 				document.add(sensitivityParagraph);
 			}
-			if (clinicalDocumentTypeParagraph != null) {
-				document.add(clinicalDocumentTypeParagraph);
-			}
+			
 			if (clinicalDocumentSectionTypeParagraph != null) {
 				document.add(clinicalDocumentSectionTypeParagraph);
 			}
-			if (clinicalConceptCodesParagraph != null) {
-				document.add(clinicalConceptCodesParagraph);
+			
+			if (clinicalDocumentTypeParagraph != null) {
+				document.add(clinicalDocumentTypeParagraph);
 			}
+//			if (clinicalConceptCodesParagraph != null) {
+//				document.add(clinicalConceptCodesParagraph);
+//			}
 			
 			document.add(paragraph4);
 			
@@ -393,15 +411,23 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 		Paragraph paragraph = null;
 		Set<ConsentDoNotShareSensitivityPolicyCode> consentDoNotShareSensitivityPolicyCodes = consent
 				.getDoNotShareSensitivityPolicyCodes();
-		if (consentDoNotShareSensitivityPolicyCodes.size() > 0) {
+		
+		Set<ValueSetCategory> valueSetCategorys= new HashSet<ValueSetCategory>(valueSetCategoryRepository.findAll());
+
+		if (consentDoNotShareSensitivityPolicyCodes.size() < valueSetCategorys.size()) {
 			paragraph = new Paragraph();
-			paragraph.add(new Chunk("Sensitivity Categories:"));
+			paragraph.add(new Chunk("\nSensitivity Categories:"));
 
 			List<String> nameList = new ArrayList<String>();
+
 			for (ConsentDoNotShareSensitivityPolicyCode consentSensitivityPolicyCode : consentDoNotShareSensitivityPolicyCodes) {
-				ValueSetCategory code = consentSensitivityPolicyCode.getValueSetCategory();
-				nameList.add(code.getName());
+				valueSetCategorys.remove(consentSensitivityPolicyCode
+						.getValueSetCategory());
+
 			}
+			for (ValueSetCategory valueSetCategory : valueSetCategorys)
+				nameList.add(valueSetCategory.getName());
+
 			Collections.sort(nameList);
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, 20);
 			for (String displayName : nameList) {
@@ -409,7 +435,9 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 			}
 
 			paragraph.add(list);
+			paragraph.add("\n");
 		}
+
 
 		return paragraph;
 	}
@@ -424,16 +452,23 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 		Paragraph paragraph = null;
 		Set<ConsentDoNotShareClinicalDocumentTypeCode> consentDoNotShareClinicalDocumentTypeCodes = consent
 				.getDoNotShareClinicalDocumentTypeCodes();
-		if (consentDoNotShareClinicalDocumentTypeCodes.size() > 0) {
+		
+		Set<ClinicalDocumentTypeCode> clinicalDocumentTypeCodes= new HashSet<ClinicalDocumentTypeCode>(clinicalDocumentTypeCodeRepository.findAll());
+		
+		
+		if (consentDoNotShareClinicalDocumentTypeCodes.size() < clinicalDocumentTypeCodes.size() ) {
 			paragraph = new Paragraph();
-			paragraph.add(new Chunk("Clinical Document Types:"));
+			paragraph.add(new Chunk("\nClinical Document Types:"));
 
 			List<String> nameList = new ArrayList<String>();
 			for (ConsentDoNotShareClinicalDocumentTypeCode consentClinicalDocumentTypeCode : consentDoNotShareClinicalDocumentTypeCodes) {
-				ClinicalDocumentTypeCode code = consentClinicalDocumentTypeCode
-						.getClinicalDocumentTypeCode();
-				nameList.add(code.getDisplayName());
+				clinicalDocumentTypeCodes.remove( consentClinicalDocumentTypeCode
+						.getClinicalDocumentTypeCode());
 			}
+			
+			for (ClinicalDocumentTypeCode clinicalDocumentTypeCode : clinicalDocumentTypeCodes)
+				nameList.add(clinicalDocumentTypeCode.getDisplayName());
+			
 			Collections.sort(nameList);
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, 20);
 			for (String displayName : nameList) {
@@ -456,16 +491,23 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 		Paragraph paragraph = null;
 		Set<ConsentDoNotShareClinicalDocumentSectionTypeCode> doNotShareClinicalDocumentSectionTypeCodes = consent
 				.getDoNotShareClinicalDocumentSectionTypeCodes();
-		if (doNotShareClinicalDocumentSectionTypeCodes.size() > 0) {
+		
+		Set<ClinicalDocumentSectionTypeCode> clinicalDocumentSectionTypeCodes= new HashSet<ClinicalDocumentSectionTypeCode>(clinicalDocumentSectionTypeCodeRepository.findAll());
+		
+		
+		if (doNotShareClinicalDocumentSectionTypeCodes.size() < clinicalDocumentSectionTypeCodes.size() ) {
 			paragraph = new Paragraph();
 			paragraph.add(new Chunk("Medical Information Categories:"));
 
 			List<String> nameList = new ArrayList<String>();
 			for (ConsentDoNotShareClinicalDocumentSectionTypeCode consentClinicalDocumentSectionTypeCode : doNotShareClinicalDocumentSectionTypeCodes) {
-				ClinicalDocumentSectionTypeCode code = consentClinicalDocumentSectionTypeCode
-						.getClinicalDocumentSectionTypeCode();
-				nameList.add(code.getDisplayName());
+				clinicalDocumentSectionTypeCodes.remove( consentClinicalDocumentSectionTypeCode
+						.getClinicalDocumentSectionTypeCode());
 			}
+			
+			for (ClinicalDocumentSectionTypeCode clinicalDocumentSectionTypeCode : clinicalDocumentSectionTypeCodes)
+				nameList.add(clinicalDocumentSectionTypeCode.getDisplayName());
+			
 			Collections.sort(nameList);
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, 20);
 			for (String displayName : nameList) {
@@ -474,6 +516,7 @@ public class ConsentPdfGeneratorImpl implements ConsentPdfGenerator {
 
 			paragraph.add(list);
 		}
+		
 		return paragraph;
 	}
 	

@@ -401,7 +401,8 @@ public class ConsentControllerTest {
 				.param("doNotShareSensitivityPolicyCodes", "HIV")
 				.param("doNotShareClinicalDocumentSectionTypeCodes", "46240-8")
 				.param("doNotShareClinicalDocumentTypeCodes", "18842-5")
-				.param("doNotShareForPurposeOfUseCodes", "CLINTRCH"))
+				.param("doNotShareForPurposeOfUseCodes", "CLINTRCH")
+				.param("sharedPurposeNames", "Emergency Treatment"))
 				.andExpect(status().isOk());
 		//verify(consentService).saveConsent(any(ConsentDto.class),(long)0);
 	}

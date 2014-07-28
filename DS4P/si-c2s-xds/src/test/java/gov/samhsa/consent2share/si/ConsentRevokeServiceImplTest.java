@@ -74,7 +74,7 @@ public class ConsentRevokeServiceImplTest {
 				xdsbRegistryMock.registryStoredQuery(patientUniqueIdMock, null,
 						XdsbDocumentType.PRIVACY_CONSENT, false, "")).thenReturn(
 				adhocQueryResponseMock);
-		when(marshallerMock.marshall(adhocQueryResponseMock)).thenReturn(
+		when(marshallerMock.marshal(adhocQueryResponseMock)).thenReturn(
 				adhocQueryResponseXmlMock);
 		when(documentXmlConverterMock.loadDocument(adhocQueryResponseXmlMock))
 				.thenReturn(adhocQueryResponseDocMock);

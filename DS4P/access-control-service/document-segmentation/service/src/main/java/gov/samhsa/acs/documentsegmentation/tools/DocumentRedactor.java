@@ -58,6 +58,15 @@ public interface DocumentRedactor {
 	public abstract String cleanUpGeneratedEntryIds(String document);
 
 	/**
+	 * Clean up generated service event ids.
+	 *
+	 * @param document
+	 *            the document
+	 * @return the string
+	 */
+	public abstract String cleanUpGeneratedServiceEventIds(String document);
+
+	/**
 	 * Clean up embedded clinical document from fact model.
 	 *
 	 * @param factModelXml

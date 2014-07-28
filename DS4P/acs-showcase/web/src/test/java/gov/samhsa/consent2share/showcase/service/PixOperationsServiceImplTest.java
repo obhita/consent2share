@@ -475,7 +475,7 @@ public class PixOperationsServiceImplTest {
 		// when(xdsbRegistryGetterMock.addPatientRegistryRecord(hl7v3XmlMock,eIdMock,
 		// PixManagerConstants.GLOBAL_DOMAIN_ID)).thenReturn(addMsgMock);
 		when(
-				marshallerMock.unmarshallFromXml(MCCIIN000002UV01.class,
+				marshallerMock.unmarshalFromXml(MCCIIN000002UV01.class,
 						addMsgMock)).thenReturn(expectedResponseMock);
 		// when(requestXMLToJavaMock.getPIXQueryReqObject(hl7v3XmlMock,PixManagerConstants.ENCODE_STRING)).thenReturn(requestMock);
 		// when(pixMgrServiceMock.pixManagerPRPAIN201309UV02(requestMock)).thenReturn(responseMock);
@@ -524,7 +524,7 @@ public class PixOperationsServiceImplTest {
 		// when(xdsbRegistryGetterMock.revisePatientRegistryRecord(hl7v3XmlMock,
 		// eIdMock,PixManagerConstants.GLOBAL_DOMAIN_ID)).thenReturn(updateMsgMock);
 		when(
-				marshallerMock.unmarshallFromXml(MCCIIN000002UV01.class,
+				marshallerMock.unmarshalFromXml(MCCIIN000002UV01.class,
 						updateMsgMock)).thenReturn(expectedResponseMock);
 		// when(requestXMLToJavaMock.getPIXQueryReqObject(hl7v3XmlMock,PixManagerConstants.ENCODE_STRING)).thenReturn(requestMock);
 		// when(pixMgrServiceMock.pixManagerPRPAIN201309UV02(requestMock)).thenReturn(responseMock);
@@ -609,7 +609,7 @@ public class PixOperationsServiceImplTest {
 		// when(xdsbRegistryGetterMock.addPatientRegistryRecord(hl7v3Xml,eidMock,
 		// PixManagerConstants.GLOBAL_DOMAIN_ID)).thenReturn(addMsgMock);
 		when(
-				marshallerMock.unmarshallFromXml(MCCIIN000002UV01.class,
+				marshallerMock.unmarshalFromXml(MCCIIN000002UV01.class,
 						addMsgMock)).thenReturn(expectedResponseMock);
 
 		// Act

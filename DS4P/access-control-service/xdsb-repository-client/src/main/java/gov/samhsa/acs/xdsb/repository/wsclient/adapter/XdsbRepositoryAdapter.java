@@ -148,7 +148,7 @@ public class XdsbRepositoryAdapter {
 				entryUUID);
 		SubmitObjectsRequest submitObjectRequest;
 		try {
-			submitObjectRequest = marshaller.unmarshallFromXml(
+			submitObjectRequest = marshaller.unmarshalFromXml(
 					SubmitObjectsRequest.class, submitObjectRequestXml);
 		} catch (SimpleMarshallerException e) {
 			throw new XdsbRepositoryAdapterException(e);

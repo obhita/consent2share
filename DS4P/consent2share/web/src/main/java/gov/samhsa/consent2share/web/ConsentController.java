@@ -583,6 +583,9 @@ public class ConsentController extends AbstractController {
 				&& (!isMadeFrom.isEmpty())
 				&& consentService.areThereDuplicatesInTwoSets(isMadeTo,
 						isMadeFrom) == false) {
+			if (consentDto.getSharedPurposeNames()==null){
+				throw new AjaxException(HttpStatus.UNPROCESSABLE_ENTITY, "At least one purpose of use needs to be selected.");
+			}
 
 			// Make sure username from consentDto matches a valid patient
 			// username

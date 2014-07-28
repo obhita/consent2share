@@ -189,7 +189,7 @@ public class XdsbRegistryGetterImpl implements XdsbRegistryGetter {
 		assertInputs(hl7v3Xml, eId, eIdDomain);
 		String msg = "";
 		try {
-			T input = marshaller.unmarshallFromXml(clazz, hl7v3Xml);
+			T input = marshaller.unmarshalFromXml(clazz, hl7v3Xml);
 			// set eid values
 			setEidValues((PatientIdentityFeedRequestType) input, eId, eIdDomain);
 			if (PRPAIN201301UV02.class == clazz) {

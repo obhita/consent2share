@@ -1021,7 +1021,7 @@ function initAddConsent(addConsent, isProviderAdminUser, specMedSet) {
 				}
 				
 				function checkRecommendedPurposeofsharing(callback){
-					$("#TREAT").iCheck('check');
+					$("#TREATMENT").iCheck('check');
 //					$("#ETREAT").iCheck('check');
 //					$("#CAREMGT").iCheck('check');
 					if(typeof callback === 'function'){

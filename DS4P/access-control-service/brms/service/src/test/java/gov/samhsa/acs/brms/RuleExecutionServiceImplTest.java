@@ -57,7 +57,7 @@ public class RuleExecutionServiceImplTest {
 		String factModelStringMock = "factModelStringMock";
 		FactModel factModelMock = mock(FactModel.class);
 		when(
-				marshallerMock.unmarshallFromXml(FactModel.class,
+				marshallerMock.unmarshalFromXml(FactModel.class,
 						factModelStringMock)).thenReturn(factModelMock);
 		XacmlResult xacmlResultMock = mock(XacmlResult.class);
 		when(factModelMock.getXacmlResult()).thenReturn(xacmlResultMock);
@@ -77,7 +77,7 @@ public class RuleExecutionServiceImplTest {
 		when(sessionMock.getGlobal("ruleExecutionContainer")).thenReturn(
 				ruleExecutionContainerMock);
 		String executionResponseContainerXMLStringMock = "executionResponseContainerXMLStringMock";
-		when(marshallerMock.marshall(ruleExecutionContainerMock)).thenReturn(
+		when(marshallerMock.marshal(ruleExecutionContainerMock)).thenReturn(
 				executionResponseContainerXMLStringMock);
 
 		// Act
@@ -99,7 +99,7 @@ public class RuleExecutionServiceImplTest {
 		doReturn(sessionMock).when(sut).createStatefulKnowledgeSession();
 		String factModelStringMock = "factModelStringMock";
 		when(
-				marshallerMock.unmarshallFromXml(FactModel.class,
+				marshallerMock.unmarshalFromXml(FactModel.class,
 						factModelStringMock)).thenThrow(SimpleMarshallerException.class);
 
 		// Act
@@ -121,7 +121,7 @@ public class RuleExecutionServiceImplTest {
 		String factModelStringMock = "factModelStringMock";
 		FactModel factModelMock = mock(FactModel.class);
 		when(
-				marshallerMock.unmarshallFromXml(FactModel.class,
+				marshallerMock.unmarshalFromXml(FactModel.class,
 						factModelStringMock)).thenReturn(factModelMock);
 		XacmlResult xacmlResultMock = mock(XacmlResult.class);
 		when(factModelMock.getXacmlResult()).thenReturn(xacmlResultMock);
@@ -140,7 +140,7 @@ public class RuleExecutionServiceImplTest {
 		RuleExecutionContainer ruleExecutionContainerMock = mock(RuleExecutionContainer.class);
 		when(sessionMock.getGlobal("ruleExecutionContainer")).thenReturn(
 				ruleExecutionContainerMock);
-		when(marshallerMock.marshall(ruleExecutionContainerMock)).thenThrow(
+		when(marshallerMock.marshal(ruleExecutionContainerMock)).thenThrow(
 				JAXBException.class);
 
 		// Act

@@ -137,7 +137,7 @@ public class ConsentRevokedMessageHandler extends AbstractConsentMessageHandler 
 			predicateMap.put(RESPONSE_STATUS, registryResponse.getStatus());
 			try {
 				predicateMap.put(RESPONSE_BODY,
-						marshaller.marshall(registryResponse));
+						marshaller.marshal(registryResponse));
 			} catch (SimpleMarshallerException e) {
 				throw new AuditException(e.getMessage(), e);
 			}

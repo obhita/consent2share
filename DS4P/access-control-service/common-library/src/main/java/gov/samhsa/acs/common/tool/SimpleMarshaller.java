@@ -33,7 +33,7 @@ import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
 public interface SimpleMarshaller {
 
 	/**
-	 * Unmarshall from xml string to generic type object.
+	 * Unmarshal from xml string to generic type object.
 	 * 
 	 * @param <T>
 	 *            the generic type
@@ -45,11 +45,11 @@ public interface SimpleMarshaller {
 	 * @throws SimpleMarshallerException
 	 *             the simple marshaller exception
 	 */
-	public abstract <T> T unmarshallFromXml(Class<T> clazz, String xml)
+	public abstract <T> T unmarshalFromXml(Class<T> clazz, String xml)
 			throws SimpleMarshallerException;
 
 	/**
-	 * Marshall from object to xml string.
+	 * Marshal from object to xml string.
 	 * 
 	 * @param obj
 	 *            the obj
@@ -57,7 +57,7 @@ public interface SimpleMarshaller {
 	 * @throws SimpleMarshallerException
 	 *             the simple marshaller exception
 	 */
-	public abstract String marshall(Object obj)
+	public abstract String marshal(Object obj)
 			throws SimpleMarshallerException;
 
 }

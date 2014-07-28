@@ -88,7 +88,7 @@ public class XdsbRepositoryAdapterTest {
 
 		SubmitObjectsRequest submitObjectRequest = new SubmitObjectsRequest();
 		when(
-				marshallerMock.unmarshallFromXml(SubmitObjectsRequest.class,
+				marshallerMock.unmarshalFromXml(SubmitObjectsRequest.class,
 						SUBMIT_OBJECTS_REQUEST_STRING)).thenReturn(
 				submitObjectRequest);
 
@@ -265,7 +265,7 @@ public class XdsbRepositoryAdapterTest {
 
 		SubmitObjectsRequest submitObjectRequest = new SubmitObjectsRequest();
 		when(
-				marshallerMock.unmarshallFromXml(SubmitObjectsRequest.class,
+				marshallerMock.unmarshalFromXml(SubmitObjectsRequest.class,
 						SUBMIT_OBJECTS_REQUEST_STRING)).thenThrow(
 								SimpleMarshallerException.class);
 
@@ -309,7 +309,7 @@ public class XdsbRepositoryAdapterTest {
 
 		SubmitObjectsRequest submitObjectRequest = new SubmitObjectsRequest();
 		when(
-				marshallerMock.unmarshallFromXml(SubmitObjectsRequest.class,
+				marshallerMock.unmarshalFromXml(SubmitObjectsRequest.class,
 						SUBMIT_OBJECTS_REQUEST_STRING)).thenReturn(
 								submitObjectRequest);
 

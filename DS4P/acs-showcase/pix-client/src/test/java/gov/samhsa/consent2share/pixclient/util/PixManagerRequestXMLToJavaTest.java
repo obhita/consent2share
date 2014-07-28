@@ -80,7 +80,7 @@ public class PixManagerRequestXMLToJavaTest {
 		String expectedItVersion = "XML_1.0";
 		String expectedFirstName = "WILMA";
 		when(
-				marshaller.unmarshallFromXml(
+				marshaller.unmarshalFromXml(
 						PRPAIN201301UV02.class,
 						IOUtils.toString(getClass()
 								.getClassLoader()
@@ -111,7 +111,7 @@ public class PixManagerRequestXMLToJavaTest {
 		String expectedItVersion = "XML_1.0";
 		String expectedFirstName = "WILMA";
 		when(
-				marshaller.unmarshallFromXml(
+				marshaller.unmarshalFromXml(
 						PRPAIN201301UV02.class,
 						IOUtils.toString(getClass()
 								.getClassLoader()
@@ -163,7 +163,7 @@ public class PixManagerRequestXMLToJavaTest {
 				.getClassLoader()
 				.getResource("xml/PRPA_IN201301UV02_PIXADD_VD1_Req.xml")
 				.toURI()));
-		when(marshaller.unmarshallFromXml(PRPAIN201301UV02.class, xmlString))
+		when(marshaller.unmarshalFromXml(PRPAIN201301UV02.class, xmlString))
 				.thenThrow(JAXBException.class);
 		thrown.expect(JAXBException.class);
 		// Act

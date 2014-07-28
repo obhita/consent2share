@@ -33,38 +33,14 @@ import javax.xml.bind.annotation.XmlEnumValue;
  */
 @XmlEnum
 public enum SubjectPurposeOfUse {
-	@XmlEnumValue("HMARKT")
-	healthcareMarketing("HMARKT"),
-	@XmlEnumValue("HOPERAT")
-	healthcareOperations("HOPERAT"),
-	@XmlEnumValue("HOUTCOMS")
-	outcomeMeasure("HOUTCOMS"),
-	@XmlEnumValue("HPRGRP")
-	programReporting("HPRGRP"),
-	@XmlEnumValue("PERFMSR")
-	performanceMeasure("PERFMSR"),
-	@XmlEnumValue("HPAYMT")
-	healthcarePayment("HPAYMT"),
-	@XmlEnumValue("HRESCH")
-	healthcareResearch("HRESCH"),
-	@XmlEnumValue("CLINTRCH")
-	clinicalTrialResearch("CLINTRCH"),
-	@XmlEnumValue("TREAT")
-	treatment("TREAT"),
-	@XmlEnumValue("ETREAT")
-	emergencyTreatment("ETREAT"),
-	@XmlEnumValue("POPHLTH")
-	populationHealthTreatment("POPHLTH"),	
-	@XmlEnumValue("CLINTRL")
-	clinicalTrialTreatment("CLINTRL"),		
-	@XmlEnumValue("CAREMGT")
-	careManagementTreatment("CAREMGT"),
-	@XmlEnumValue("FAMRQT")
-	familyRequested("FAMRQT"),
-	@XmlEnumValue("HLEGAL")
-	legal("HLEGAL"),
-	@XmlEnumValue("PWATRNY")
-	powerOfAttorney("PWATRNY");
+	@XmlEnumValue("TREATMENT")
+	HEALTHCARE_TREATMENT("TREATMENT"),
+	@XmlEnumValue("PAYMENT")
+	PAYMENT("PAYMENT"),
+	@XmlEnumValue("EMERGENCY")
+	EMERGENCY_TREATMENT("EMERGENCY"),
+	@XmlEnumValue("RESEARCH")
+	RESEARCH("RESEARCH");
 	
     private final String purpose;
 

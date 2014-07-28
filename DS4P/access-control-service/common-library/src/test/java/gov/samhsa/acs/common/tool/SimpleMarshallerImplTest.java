@@ -40,7 +40,7 @@ public class SimpleMarshallerImplTest {
 	@Test
 	public void testUnmarshallFromXml() throws JAXBException {
 		// Act
-		ruleExecutionContainer = marshaller.unmarshallFromXml(
+		ruleExecutionContainer = marshaller.unmarshalFromXml(
 				RuleExecutionContainer.class, ruleExecutionContainerString);
 		String[] results = new String[2];
 		int i = 0;
@@ -67,7 +67,7 @@ public class SimpleMarshallerImplTest {
 		RuleExecutionContainer r = createRuleExecutionContainer();
 		
 		// Act
-		String response = marshaller.marshall(r);
+		String response = marshaller.marshal(r);
 		
 		// Assert
 		assertEquals(EXPECTED_MARSHALL_RESPONSE,response);

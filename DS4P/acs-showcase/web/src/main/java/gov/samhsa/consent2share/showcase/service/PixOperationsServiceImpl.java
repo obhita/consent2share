@@ -620,7 +620,7 @@ public class PixOperationsServiceImpl implements PixOperationsService {
 				String eid = queryMap.get(PixManagerConstants.GLOBAL_DOMAIN_ID);
 				msg = xdsbRegistryGetter.pidFeed(pixOperation, hl7v3Xml, eid,
 						PixManagerConstants.GLOBAL_DOMAIN_ID);
-				response = marshaller.unmarshallFromXml(MCCIIN000002UV01.class,
+				response = marshaller.unmarshalFromXml(MCCIIN000002UV01.class,
 						msg);
 
 			}

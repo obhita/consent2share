@@ -222,7 +222,7 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 					.extractClinicalDocumentFromFactModel(factModelXml);
 			// remove the embedded c32 from factmodel before unmarshalling
 			factModelXml = documentRedactor.cleanUpEmbeddedClinicalDocumentFromFactModel(factModelXml);
-			factModel = marshaller.unmarshallFromXml(FactModel.class,
+			factModel = marshaller.unmarshalFromXml(FactModel.class,
 					factModelXml);
 			
 			List<CodeAndCodeSystemSetDto> codeAndCodeSystemSetDtoList=new ArrayList<CodeAndCodeSystemSetDto>();
@@ -257,7 +257,7 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 			rulesFired = brmsResponse.getRulesFired();
 
 			// unmarshall from xml to RuleExecutionContainer
-			ruleExecutionContainer = marshaller.unmarshallFromXml(
+			ruleExecutionContainer = marshaller.unmarshalFromXml(
 					RuleExecutionContainer.class, executionResponseContainer);
 
 			// FileHelper.writeStringToFile(executionResponseContainer,
@@ -272,9 +272,12 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 					ruleExecutionContainer, factModel);
 			document = redactedDocument.getRedactedDocument();
 
+			// set tryPolicyDocument in the response
+			segmentDocumentResponse.setTryPolicyDocumentXml(redactedDocument.getTryPolicyDocument());
+
 			// to get the itemActions from documentRedactor
 			executionResponseContainer = marshaller
-					.marshall(ruleExecutionContainer);
+					.marshal(ruleExecutionContainer);
 
 			// tag document
 			document = documentTagger.tagDocument(document,
@@ -282,6 +285,9 @@ public class DocumentSegmentationImpl implements DocumentSegmentation {
 
 			// clean up generatedEntryId elements from document
 			document = documentRedactor.cleanUpGeneratedEntryIds(document);
+			
+			// clean up generatedServiceEventId elements from document
+			document = documentRedactor.cleanUpGeneratedServiceEventIds(document);
 
 			// FileHelper.writeStringToFile(document, "Tagged_C32.xml");
 

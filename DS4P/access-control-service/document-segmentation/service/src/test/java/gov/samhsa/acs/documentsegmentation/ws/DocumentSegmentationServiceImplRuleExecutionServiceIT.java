@@ -18,6 +18,17 @@ import gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl;
 import gov.samhsa.acs.documentsegmentation.tools.EmbeddedClinicalDocumentExtractorImpl;
 import gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractClinicalFactLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractObligationLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractPostRedactionLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractDocumentLevelRedactionHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.Entry;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTextNodeByCode;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTextNodeByDisplayName;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.documentlevel.UnsupportedHeaderElementHandler;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.obligationlevel.Section;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.DocumentCleanupForNoEntryAndNoSection;
+import gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.RuleExecutionResponseMarkerForRedactedEntries;
 import gov.samhsa.acs.documentsegmentation.valueset.ValueSetServiceImplMock;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationService;
 import gov.samhsa.consent2share.contract.documentsegmentation.DocumentSegmentationServicePortType;
@@ -26,6 +37,9 @@ import gov.samhsa.consent2share.schema.documentsegmentation.SegmentDocumentRespo
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
@@ -38,7 +52,9 @@ import org.slf4j.LoggerFactory;
 
 public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+	public static final Set<String> unsupportedHeaders = 
+			new HashSet<String>(Arrays.asList("realmCode", "custodian"));
+	
 	protected static URL wsdlURL;
 	protected static QName serviceName;
 	protected static QName portName;
@@ -91,14 +107,38 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 				new DocumentXmlConverterImpl());
 		marshaller = new SimpleMarshallerImpl();
 		documentEncrypter = new DocumentEncrypterImpl();
-		documentRedactor = new DocumentRedactorImpl(new DocumentXmlConverterImpl(), null);
+		Set<AbstractObligationLevelRedactionHandler> obligationLevelChain = new HashSet<AbstractObligationLevelRedactionHandler>();
+		Set<AbstractClinicalFactLevelRedactionHandler> clinicalFactLevelChain = new HashSet<AbstractClinicalFactLevelRedactionHandler>();
+		Set<AbstractPostRedactionLevelRedactionHandler> postRedactionChain = new HashSet<AbstractPostRedactionLevelRedactionHandler>();
+		Set<AbstractDocumentLevelRedactionHandler> documentLevelRedactionHandlers=new HashSet<AbstractDocumentLevelRedactionHandler>();
+		documentLevelRedactionHandlers.add(new UnsupportedHeaderElementHandler(documentAccessor, unsupportedHeaders));
+		obligationLevelChain.add(new Section(
+				documentAccessor));
+		clinicalFactLevelChain.add(new Entry(
+				documentAccessor));
+		clinicalFactLevelChain
+				.add(new HumanReadableTextNodeByCode(
+						documentAccessor));
+		clinicalFactLevelChain
+				.add(new HumanReadableTextNodeByDisplayName(
+						documentAccessor));
+		postRedactionChain
+				.add(new DocumentCleanupForNoEntryAndNoSection(documentAccessor));
+		postRedactionChain
+				.add(new RuleExecutionResponseMarkerForRedactedEntries(
+						documentAccessor));
+		documentRedactor = new DocumentRedactorImpl(
+				new SimpleMarshallerImpl(), new DocumentXmlConverterImpl(), new DocumentAccessorImpl(),
+				documentLevelRedactionHandlers,obligationLevelChain, clinicalFactLevelChain,
+				postRedactionChain);
 		documentMasker = new DocumentMaskerImpl();
 		documentTagger = new DocumentTaggerImpl();
 		documentFactModelExtractor = new DocumentFactModelExtractorImpl();
 		additionalMetadataGeneratorForSegmentedClinicalDocumentImpl = new AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl();
 		documentXmlConverter = new DocumentXmlConverterImpl();
 		documentAccessor = new DocumentAccessorImpl();
-		embeddedClinicalDocumentExtractor = new EmbeddedClinicalDocumentExtractorImpl(documentXmlConverter, documentAccessor);
+		embeddedClinicalDocumentExtractor = new EmbeddedClinicalDocumentExtractorImpl(
+				documentXmlConverter, documentAccessor);
 
 		address = "http://localhost:9000/services/processDocumentservice";
 		wsdlURL = new URL(address + "?wsdl");
@@ -116,11 +156,14 @@ public class DocumentSegmentationServiceImplRuleExecutionServiceIT {
 								new DocumentSegmentationImpl(
 										ruleExecutionService,
 										null,
-										documentEditor, marshaller,
+										documentEditor,
+										marshaller,
 										documentRedactor,
 										documentTagger,
 										documentFactModelExtractor,
-										embeddedClinicalDocumentExtractor, new ValueSetServiceImplMock(fileReader), additionalMetadataGeneratorForSegmentedClinicalDocumentImpl)));
+										embeddedClinicalDocumentExtractor,
+										new ValueSetServiceImplMock(fileReader),
+										additionalMetadataGeneratorForSegmentedClinicalDocumentImpl)));
 	}
 
 	@After

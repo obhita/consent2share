@@ -155,7 +155,7 @@ public class PixManagerRequestXMLToJava {
 			// 4. Get the instance of the required JAXB Root Class from the
 			// JAXBElement.
 			try {
-				reqObj = marshaller.unmarshallFromXml(clazz, reqXMLFilePath);
+				reqObj = marshaller.unmarshalFromXml(clazz, reqXMLFilePath);
 			} catch (JAXBException e) {
 				logger.error(e.getMessage(), e);
 				throw e;
@@ -166,7 +166,7 @@ public class PixManagerRequestXMLToJava {
 			// 4. Get the instance of the required JAXB Root Class from the
 			// JAXBElement.
 			try {
-				reqObj = marshaller.unmarshallFromXml(clazz, IOUtils
+				reqObj = marshaller.unmarshalFromXml(clazz, IOUtils
 						.toString(getClass().getClassLoader()
 								.getResourceAsStream(reqXMLFilePath)));
 			} catch (IOException e) {

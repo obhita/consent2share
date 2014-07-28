@@ -95,7 +95,7 @@ public class AdhocQueryResponseFilter {
 			xPathExpr = xPathExpr.replace("$",
 					UUID_CLASSIFICATIONSCHEME_XDSDOCUMENTENTRY_AUTHOR);
 
-			String docString = marshaller.marshall(response);
+			String docString = marshaller.marshal(response);
 
 			Document xmlDocument = converter.loadDocument(docString);
 
@@ -112,7 +112,7 @@ public class AdhocQueryResponseFilter {
 						elementToBeRedacted);
 			}
 			xmlDocument.normalize();
-			return marshaller.unmarshallFromXml(AdhocQueryResponse.class,
+			return marshaller.unmarshalFromXml(AdhocQueryResponse.class,
 					converter.convertXmlDocToString(xmlDocument));
 
 		} catch (SimpleMarshallerException | DocumentAccessorException e) {

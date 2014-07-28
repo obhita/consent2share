@@ -123,7 +123,7 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 
 			// Marshal rule execution response
 			executionResponseContainerXMLString = marshaller
-					.marshall(executionResponseContainer);
+					.marshal(executionResponseContainer);
 			if(firedRuleNames.size() > 0){
 				assertAndExecuteResponse.setRulesFired(firedRuleNames.toString());	
 			}
@@ -152,7 +152,7 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
 			String factModelXmlString) {
 		FactModel factModel = null;
 		try {
-			factModel = marshaller.unmarshallFromXml(FactModel.class,
+			factModel = marshaller.unmarshalFromXml(FactModel.class,
 					factModelXmlString);
 		} catch (JAXBException e) {
 			LOGGER.error(e.getMessage(), e);

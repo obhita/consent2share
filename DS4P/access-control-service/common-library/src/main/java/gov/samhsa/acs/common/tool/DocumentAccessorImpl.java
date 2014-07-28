@@ -61,13 +61,13 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 	 * 
 	 * @see
 	 * gov.samhsa.acs.common.tool.DocumentAccessor#getElement(org.w3c.dom.Document
-	 * , java.lang.String)
+	 * , java.lang.String, java.lang.String[])
 	 */
 	@Override
-	public Element getElement(Document xmlDocument, String xPathExpr)
-			throws DocumentAccessorException {
+	public Element getElement(Document xmlDocument, String xPathExpr,
+			String... arguments) throws DocumentAccessorException {
 
-		Node node = getNode(xmlDocument, xPathExpr);
+		Node node = getNode(xmlDocument, xPathExpr, arguments);
 
 		return (Element) node;
 	}
@@ -77,11 +77,13 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 	 * 
 	 * @see
 	 * gov.samhsa.acs.common.tool.DocumentAccessor#getNode(org.w3c.dom.Document,
-	 * java.lang.String)
+	 * java.lang.String, java.lang.String[])
 	 */
 	@Override
-	public Node getNode(Document xmlDocument, String xPathExpr)
-			throws DocumentAccessorException {
+	public Node getNode(Document xmlDocument, String xPathExpr,
+			String... arguments) throws DocumentAccessorException {
+		xPathExpr = setXpathArguments(xPathExpr, arguments);
+
 		// Create XPath instance
 		XPath xpath = createXPathInstance();
 
@@ -101,11 +103,13 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 	 * 
 	 * @see
 	 * gov.samhsa.acs.common.tool.DocumentAccessor#getNodeList(org.w3c.dom.Document
-	 * , java.lang.String)
+	 * , java.lang.String, java.lang.String[])
 	 */
 	@Override
-	public NodeList getNodeList(Document xmlDocument, String xPathExpr)
-			throws DocumentAccessorException {
+	public NodeList getNodeList(Document xmlDocument, String xPathExpr,
+			String... arguments) throws DocumentAccessorException {
+		xPathExpr = setXpathArguments(xPathExpr, arguments);
+
 		// Create XPath instance
 		XPath xpath = createXPathInstance();
 
@@ -131,21 +135,46 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 		xpath.setNamespaceContext(new PepNamespaceContext());
 		return xpath;
 	}
-	
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.acs.common.tool.DocumentAccessor#addingStylesheet(org.w3c.
+	 * dom.Document, java.lang.String)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <ProcessingInstructionImpl> Document addingStylesheet(
-	        Document doc, String xslHref) throws TransformerConfigurationException, ParserConfigurationException {
-	    StringBuilder builder = new StringBuilder();
-	    builder.append("type=\"text/xsl\" href=");
-	    builder.append(xslHref);
-	    
-		ProcessingInstructionImpl pi = (ProcessingInstructionImpl) doc
-	            .createProcessingInstruction("xml-stylesheet",builder.toString());
-	    Element root = doc.getDocumentElement();
-	    doc.insertBefore((Node) pi, root);
-	    return doc;
+	public <ProcessingInstructionImpl> Document addingStylesheet(Document doc,
+			String xslHref) throws TransformerConfigurationException,
+			ParserConfigurationException {
+		StringBuilder builder = new StringBuilder();
+		builder.append("type=\"text/xsl\" href=");
+		builder.append(xslHref);
 
-	}	
+		ProcessingInstructionImpl pi = (ProcessingInstructionImpl) doc
+				.createProcessingInstruction("xml-stylesheet",
+						builder.toString());
+		Element root = doc.getDocumentElement();
+		doc.insertBefore((Node) pi, root);
+		return doc;
+
+	}
+
+	/**
+	 * Sets the xpath arguments.
+	 *
+	 * @param xPath
+	 *            the x path
+	 * @param arguments
+	 *            the arguments
+	 * @return the string
+	 */
+	private String setXpathArguments(String xPath, String... arguments) {
+		for (int i = 0; i < arguments.length; i++) {
+			xPath = xPath.replace(("%" + Integer.toString((i + 1))),
+					arguments[i]);
+		}
+		return xPath;
+	}
 }
