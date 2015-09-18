@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<included>
+
+	<property name="APP_LOG_FOLDER" value="C:\\java\\C2S_LOGS\\si" />
+	<property name="LOG_NAME" value="si-bl" />
+	
+	<property name="gov.samhsa.consent2share.si_lOGGER.level" value="warn" />
+	
+	<statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
+			by default -->
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>
+				%d{"yyyy-MM-dd HH:mm:ss,SSS"} [%thread] %-5level %logger{35} - %msg %n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG_FOLDER}/${LOG_NAME}.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>${APP_LOG_FOLDER}/${LOG_NAME}.%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches 100MB -->
+				<maxFileSize>100MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern> 
+				%d{"yyyy-MM-dd HH:mm:ss,SSS"} %level [%thread] %logger{10} [%file : %line] %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+
+	<logger name="gov.samhsa.consent2share.si" level="${gov.samhsa.consent2share.si_lOGGER.level:-warn}" />
+
+	<root>
+		<level value="Error" />
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+		<!-- <appender-ref ref="LogbackClassic" /> -->
+	</root>
+</included>

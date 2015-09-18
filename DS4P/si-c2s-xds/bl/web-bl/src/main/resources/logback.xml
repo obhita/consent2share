@@ -1,0 +1,7 @@
+<!DOCTYPE Configuration>
+
+<configuration scan="${AUTO_SCAN}" scanPeriod="${SCAN_PERIOD}">
+
+	<include file="${C2S_PROPS}/si/bl/config/logback_included.xml"/>
+
+</configuration>

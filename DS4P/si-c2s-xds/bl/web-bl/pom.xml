@@ -1,0 +1,151 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>gov.samhsa.consent2share</groupId>
+		<artifactId>si-c2s-xds-bl</artifactId>
+		<version>2.6.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>si-c2s-xds-web-bl</artifactId>
+	<packaging>war</packaging>
+
+	<name>c2s pcm-xds.b spring integration web for baseline</name>
+
+	<dependencies>
+
+		<!-- Our Own Projects -->
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>si-c2s-xds-common</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>polrep-client</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-unit</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-digester</groupId>
+			<artifactId>commons-digester</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-collections</artifactId>
+					<groupId>commons-collections</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Jasypt -->
+		<dependency>
+			<groupId>org.jasypt</groupId>
+			<artifactId>jasypt-spring31</artifactId>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>si-c2s-xds-bl</finalName>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/SIAuditService/logback-audit.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+					<exclude>**/SIAuditService/logback-audit.xml</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
+	</build>
+	
+	<profiles>
+		<!-- To include logger test: mvn clean install -PloggerCheck -->
+		<profile>
+			<id>loggerCheck</id>
+			<build>
+				<finalName>si-c2s-xds-bl</finalName>
+				<plugins>
+					<plugin>
+				        <groupId>org.codehaus.mojo</groupId>
+				        <artifactId>properties-maven-plugin</artifactId>
+				        <version>1.0-alpha-2</version>
+				        <executions>
+				           <!-- Associate the read-project-properties goal with the initialize phase, to read the properties file. -->
+				          <execution>
+				            <phase>initialize</phase>
+				            <goals>
+				              <goal>read-project-properties</goal>
+				            </goals>
+				            <configuration>
+				              <files>
+				                <file>C:/java/catalina.properties</file>
+				              </files>
+				            </configuration>
+				          </execution>
+				        </executions>
+				      </plugin>
+					<!-- mvn tomcat7:run -->
+					<plugin>
+						<groupId>org.apache.tomcat.maven</groupId>
+						<artifactId>tomcat7-maven-plugin</artifactId>
+						<version>2.2</version>
+						<configuration>
+							<path>/${project.build.finalName}</path>
+							<keystoreFile>C:/consent2share.keystore</keystoreFile>
+							<systemProperties>
+								<C2S_KEY>${C2S_KEY}</C2S_KEY>
+								<AUTO_SCAN>${AUTO_SCAN}</AUTO_SCAN>
+								<SCAN_PERIOD>${SCAN_PERIOD}</SCAN_PERIOD>
+								<C2S_PROPS>${C2S_PROPS}</C2S_PROPS>
+							</systemProperties>
+						</configuration>
+						
+						<executions>
+						<!-- At pre-integration-test phase, run the war in an embedded Tomcat server. -->
+							<execution>
+								<id>tomcat-run</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>run-war-only</goal>
+								</goals>
+								<configuration>
+									<httpsPort>8445</httpsPort>
+									<port>8085</port>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

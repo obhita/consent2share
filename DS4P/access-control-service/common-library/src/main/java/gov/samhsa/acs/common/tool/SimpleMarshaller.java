@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- *   
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions are met:
  *       * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *       * Neither the name of the <organization> nor the
  *         names of its contributors may be used to endorse or promote products
  *         derived from this software without specific prior written permission.
- *   
+ *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,14 +27,44 @@ package gov.samhsa.acs.common.tool;
 
 import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  * The Interface SimpleMarshaller.
  */
 public interface SimpleMarshaller {
 
 	/**
+	 * Marshal from object to xml string.
+	 *
+	 * @param obj
+	 *            the obj
+	 * @return the string
+	 * @throws SimpleMarshallerException
+	 *             the simple marshaller exception
+	 */
+	public abstract String marshal(Object obj) throws SimpleMarshallerException;
+
+	public abstract ByteArrayOutputStream marshalAsByteArrayOutputStream(
+			Object obj) throws SimpleMarshallerException;
+
+	/**
+	 * Marshal without root element.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param obj
+	 *            the obj
+	 * @return the string
+	 * @throws SimpleMarshallerException
+	 *             the simple marshaller exception
+	 */
+	public abstract <T> String marshalWithoutRootElement(T obj)
+			throws SimpleMarshallerException;
+
+	/**
 	 * Unmarshal from xml string to generic type object.
-	 * 
+	 *
 	 * @param <T>
 	 *            the generic type
 	 * @param clazz
@@ -47,17 +77,4 @@ public interface SimpleMarshaller {
 	 */
 	public abstract <T> T unmarshalFromXml(Class<T> clazz, String xml)
 			throws SimpleMarshallerException;
-
-	/**
-	 * Marshal from object to xml string.
-	 * 
-	 * @param obj
-	 *            the obj
-	 * @return the string
-	 * @throws SimpleMarshallerException
-	 *             the simple marshaller exception
-	 */
-	public abstract String marshal(Object obj)
-			throws SimpleMarshallerException;
-
 }

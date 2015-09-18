@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:cxf="http://cxf.apache.org/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" 
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:soap="http://cxf.apache.org/bindings/soap"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+         http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://cxf.apache.org/jaxws
+         http://cxf.apache.org/schemas/jaxws.xsd
+         http://cxf.apache.org/jaxrs
+         http://cxf.apache.org/schemas/jaxrs.xsd
+         http://www.springframework.org/schema/util
+         http://www.springframework.org/schema/util/spring-util.xsd
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Import statement optional but often required if you're declaring 
+         other CXF beans in this file such as CXF's JMX MBeans -->
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    
+	<!-- This will automatically locate any and all property files you have within your classpath. 
+		The located property files are parsed and their values can then be used within 
+		application context files in the form of ${propertyKey}. -->
+	<import resource="external-properties.xml"/>
+
+	<!-- End points -->
+	<jaxws:endpoint id="dSSPortType" implementor="#dSSPortTypeImpl"
+		wsdlLocation="classpath:wsdl/DSS.wsdl" address="/DSS">
+		<jaxws:properties>
+			<entry key="mtom-enabled" value="true" />
+		</jaxws:properties>
+	</jaxws:endpoint>
+
+	<bean id="cxfLoggingConfigurer"
+		class="gov.samhsa.acs.common.cxf.CXFLoggingConfigurer"
+		autowire="constructor">
+		<!-- set this property to enable/disable CXF Logging Interceptors, -->
+		<!-- or use loggerCheckController RESTful API to change this configuration at runtime. -->
+		<!--<property name="enableLoggingInterceptors" value="true" />-->
+	</bean>
+	
+	<bean id="loggerCheckController" class="gov.samhsa.acs.documentsegmentation.rs.instrumentation.LoggerCheckController"
+		autowire="constructor">
+	   <constructor-arg index="0" value="${instrumentationKey}" />  
+	</bean>
+	
+ 	<jaxrs:server id="loggerCheckService" address="/">
+		<jaxrs:serviceBeans>  
+            <ref bean="loggerCheckController" />  
+        </jaxrs:serviceBeans> 
+	</jaxrs:server> 
+    
+    <!-- Common Tools -->
+	<bean id="documentXmlConverterImpl" class="gov.samhsa.acs.common.tool.DocumentXmlConverterImpl" />
+	<bean id="fileReaderImpl" class="gov.samhsa.acs.common.tool.FileReaderImpl" />
+	<bean id="simpleMarshallerImpl" class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl" />
+	<bean id="documentAccessorImpl" class="gov.samhsa.acs.common.tool.DocumentAccessorImpl" />
+	<bean id="xmlTransformerImpl" class="gov.samhsa.acs.common.tool.XmlTransformerImpl" autowire="constructor" />
+
+	<!-- DSS Audit Service -->
+	<bean id="auditServiceImpl" class="gov.samhsa.acs.audit.AuditServiceImpl"
+		scope="singleton" init-method="init" destroy-method="destroy">
+		<constructor-arg value="DSSAuditService-pg" />
+	</bean>
+
+	<!-- BRMS -->
+	<!-- BRMS: Guvnor -->
+	<bean id="guvnorServiceImpl" class="gov.samhsa.acs.brms.guvnor.GuvnorServiceImpl" >
+		<constructor-arg index="0"
+			value="${guvnorService}" />
+		<constructor-arg index="1"
+			value="${guvnorServiceUsername}" />
+		<constructor-arg index="2"
+			value="${guvnorServicePassword}" />
+	</bean>
+	<bean id="ruleExecutionServiceImpl" class="gov.samhsa.acs.brms.RuleExecutionServiceImpl" autowire="constructor" />
+
+	<!-- DocumentSegmentation -->
+	<!-- DocumentSegmentation: Redaction Handlers: The implementations for "Obligation 
+		Level" and "Clinical Fact Level" redaction handlers should aim to implement 
+		a single logic to collect the nodes in the 'listOfNodes'. After these phases 
+		are executed, 'DocumentSegmentationServiceImpl' will redact the collected 
+		document nodes and start executing "Post Redaction Level" redaction handlers. 
+		In this phase, the implementations should aim to clean up and/or modify the 
+		document itself; the 'listOfNodes' will not be consumed by the 'DocumentSegmentationServiceImpl' 
+		anymore, but it will be available in the redaction handler interface and 
+		can be referred if required. IMPORTANT: The "Post Redaction Level" Redaction 
+		Handlers are not executed yet when 'tryPolicyDocumentXml' is constructed. 
+		Therefore, the changes that are made to the document at this level do not 
+		reflect on the 'tryPolicyDocumentXml' that "Try My Policy" service will recieve. -->
+
+	<!-- DocumentSegmentationService: Document Redaction Redaction Handler -->
+	<!-- Supported c32 header white list set -->
+	<util:set id="headersWhiteList" value-type="java.lang.String">
+		<bean id="realmCode " class="java.lang.String">
+			<constructor-arg value="realmCode" />
+		</bean>
+		<bean id="typeId" class="java.lang.String">
+			<constructor-arg value="typeId" />
+		</bean>
+		<bean id="templateId" class="java.lang.String">
+			<constructor-arg value="templateId" />
+		</bean>
+		<bean id="id" class="java.lang.String">
+			<constructor-arg value="id" />
+		</bean>
+		<bean id="code " class="java.lang.String">
+			<constructor-arg value="code" />
+		</bean>
+		<bean id="title" class="java.lang.String">
+			<constructor-arg value="title" />
+		</bean>
+		<bean id="effectiveTime" class="java.lang.String">
+			<constructor-arg value="effectiveTime" />
+		</bean>
+		<bean id="confidentialityCode" class="java.lang.String">
+			<constructor-arg value="confidentialityCode" />
+		</bean>
+		<bean id="languageCode " class="java.lang.String">
+			<constructor-arg value="languageCode" />
+		</bean>
+		<bean id="setId" class="java.lang.String">
+			<constructor-arg value="setId" />
+		</bean>
+		<bean id="versionNumber" class="java.lang.String">
+			<constructor-arg value="versionNumber" />
+		</bean>
+		<bean id="copyTime" class="java.lang.String">
+			<constructor-arg value="copyTime" />
+		</bean>
+		<bean id="recordTarget " class="java.lang.String">
+			<constructor-arg value="recordTarget" />
+		</bean>
+		<bean id="author" class="java.lang.String">
+			<constructor-arg value="author" />
+		</bean>
+		<bean id="dataEnterer" class="java.lang.String">
+			<constructor-arg value="dataEnterer" />
+		</bean>
+		<!-- <bean id="informant" class="java.lang.String"> -->
+		<!-- <constructor-arg value="informant" /> -->
+		<!-- </bean> -->
+		<bean id="custodian" class="java.lang.String">
+			<constructor-arg value="custodian" />
+		</bean>
+		<!-- <bean id="informationRecipient" class="java.lang.String"> -->
+		<!-- <constructor-arg value="informationRecipient" /> -->
+		<!-- </bean> -->
+		<bean id="legalAuthenticator" class="java.lang.String">
+			<constructor-arg value="legalAuthenticator" />
+		</bean>
+		<!-- <bean id="authenticator " class="java.lang.String"> -->
+		<!-- <constructor-arg value="authenticator" /> -->
+		<!-- </bean> -->
+		<!-- <bean id="participant" class="java.lang.String"> -->
+		<!-- <constructor-arg value="participant" /> -->
+		<!-- </bean> -->
+		<bean id="inFulfillmentOf" class="java.lang.String">
+			<constructor-arg value="inFulfillmentOf" />
+		</bean>
+		<bean id="documentationOf" class="java.lang.String">
+			<constructor-arg value="documentationOf" />
+		</bean>
+		<bean id="relatedDocument" class="java.lang.String">
+			<constructor-arg value="relatedDocument" />
+		</bean>
+		<bean id="authorization" class="java.lang.String">
+			<constructor-arg value="authorization" />
+		</bean>
+		<bean id="componentOf " class="java.lang.String">
+			<constructor-arg value="componentOf" />
+		</bean>
+		<bean id="component" class="java.lang.String">
+			<constructor-arg value="component" />
+		</bean>
+	</util:set>
+
+	<!-- Section White List (Any sections that are not within this list will 
+		be removed completely) -->
+	<util:set id="sectionWhiteList" value-type="java.lang.String">
+		<bean id="problems " class="java.lang.String">
+			<constructor-arg value="11450-4" />
+		</bean>
+		<bean id="allergies" class="java.lang.String">
+			<constructor-arg value="48765-2" />
+		</bean>
+		<bean id="medications" class="java.lang.String">
+			<constructor-arg value="10160-0" />
+		</bean>
+		<bean id="results" class="java.lang.String">
+			<constructor-arg value="30954-2" />
+		</bean>
+	</util:set>
+
+	<util:set id="documentLevelRedactionHandlers"
+		value-type="gov.samhsa.acs.documentsegmentation.tools.redact.impl.documentlevel.UnsupportedHeaderElementHandler">
+
+		<bean id="unsupportedHeaderElementHandler"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.documentlevel.UnsupportedHeaderElementHandler">
+			<constructor-arg ref="documentAccessorImpl" />
+			<constructor-arg ref="headersWhiteList" />
+		</bean>
+
+		<bean id="unsupportedSectionHandler"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.documentlevel.UnsupportedSectionHandler">
+			<constructor-arg ref="documentAccessorImpl" />
+			<constructor-arg ref="sectionWhiteList" />
+		</bean>
+
+	</util:set>
+
+	<!-- DocumentSegmentation: Redaction Handlers: Obligation Level Redaction 
+		Handlers -->
+	<util:set id="obligationLevelRedactionHandlers"
+		value-type="gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractObligationLevelRedactionHandler">
+		<bean id="section"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.obligationlevel.Section"
+			autowire="constructor" />
+	</util:set>
+
+	<!-- DocumentSegmentation: Redaction Handlers: Clinical Fact Level Redaction 
+		Handlers -->
+	<util:set id="clinicalFactLevelRedactionHandlers"
+		value-type="gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractClinicalFactLevelRedactionHandler">
+		<bean id="documentationOfServiceEvent"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.DocumentationOfServiceEvent"
+			autowire="constructor" />
+		<bean id="entry"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.Entry"
+			autowire="constructor" />
+		<bean id="humanReadableContentElementByCode"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableContentElementByCode"
+			autowire="constructor" />
+		<bean id="humanReadableContentElementByDisplayName"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableContentElementByDisplayName"
+			autowire="constructor" />
+		<bean id="humanReadableContentElementById"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableContentElementById"
+			autowire="constructor" />
+		<bean id="humanReadableTableRowByCode"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTableRowByCode"
+			autowire="constructor" />
+		<bean id="humanReadableTableRowByDisplayName"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTableRowByDisplayName"
+			autowire="constructor" />
+		<bean id="humanReadableTableRowById"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTableRowById"
+			autowire="constructor" />
+		<bean id="humanReadableTextNodeByCode"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTextNodeByCode"
+			autowire="constructor" />
+		<bean id="humanReadableTextNodeByDisplayName"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.clinicalfactlevel.HumanReadableTextNodeByDisplayName"
+			autowire="constructor" />
+	</util:set>
+
+	<!-- DocumentSegmentation: Redaction Handlers: Post Redaction Level Redaction 
+		Handlers -->
+	<util:set id="postRedactionLevelRedactionHandlers"
+		value-type="gov.samhsa.acs.documentsegmentation.tools.redact.base.AbstractPostRedactionLevelRedactionHandler">
+		<bean id="documentCleanupForDocumentationOfNoServiceEvent"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.DocumentCleanupForDocumentationOfNoServiceEvent"
+			autowire="constructor" />
+		<bean id="documentCleanupForNoEntryAndNoSection"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.DocumentCleanupForNoEntryAndNoSection"
+			autowire="constructor" />
+		<bean id="ruleExecutionResponseMarkerForRedactedEntries"
+			class="gov.samhsa.acs.documentsegmentation.tools.redact.impl.postredactionlevel.RuleExecutionResponseMarkerForRedactedEntries"
+			autowire="constructor" />
+	</util:set>
+
+	<!-- DocumentSegmentation: tools -->
+	<bean id="documentEditorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentEditorImpl" 
+		autowire="constructor" />
+	<bean id="documentMaskerImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentMaskerImpl"
+		autowire="constructor" />
+	<bean id="documentRedactorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentRedactorImpl"
+		autowire="constructor">
+		<constructor-arg ref="documentLevelRedactionHandlers" />
+		<constructor-arg ref="obligationLevelRedactionHandlers" />
+		<constructor-arg ref="clinicalFactLevelRedactionHandlers" />
+		<constructor-arg ref="postRedactionLevelRedactionHandlers" />
+	</bean>
+	<bean id="documentTaggerImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentTaggerImpl"
+		autowire="constructor">
+		<constructor-arg index="0" type="java.lang.String">
+			<value>
+				&lt;disclaimerText&gt;
+				&lt;title&gt;***PLEASE READ THE
+				DISCLAIMER***&lt;/title&gt;
+				&lt;text&gt;The patient has authorized
+				the sharing of their continuity of care
+				document in a C32 summary
+				format that has been provided by Prince
+				George&amp;apos;s County
+				Health Department and its affiliates as a
+				partial
+				reference service;
+				it is not to be used as a substitute for a medical intake
+				process
+				and/or diagnosis, which must be provided by the
+				patient&amp;apos;s
+				own
+				physician or reviewing practitioner.
+				&lt;br/&gt;&lt;br/&gt;CAUTION:&lt;br/&gt;The following
+				history may
+				not be complete&lt;br/&gt;
+				&lt;list&gt;
+				&lt;item&gt;Patients may have
+				purchased or obtained care through sources which
+				bypass Prince
+				George&amp;apos;s County Health Department supplying the
+				history.&lt;/item&gt;
+				&lt;item&gt;Electronic Medical Record (EMR)
+				systems may have their own unique
+				method for accepting and/or
+				formatting data sent by the system of
+				origin.&lt;/item&gt;
+				&lt;/list&gt;
+				&lt;/text&gt;
+				&lt;/disclaimerText&gt; </value>
+		</constructor-arg>
+	</bean>
+	<bean id="metadataGeneratorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.MetadataGeneratorImpl" autowire="constructor" />
+	<bean id="documentFactModelExtractorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.DocumentFactModelExtractorImpl" autowire="constructor" />
+	<bean id="additionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.AdditionalMetadataGeneratorForSegmentedClinicalDocumentImpl"
+		autowire="constructor" />
+	<bean id="embeddedClinicalDocumentExtractorImpl"
+		class="gov.samhsa.acs.documentsegmentation.tools.EmbeddedClinicalDocumentExtractorImpl"
+		autowire="constructor" />
+	<!-- TODO: This bean should be removed in production environment. It enables 
+		trusting self signed SSL certificate for development purposes. -->
+	<bean id="selfSignedSSLHelper"
+		class="gov.samhsa.acs.documentsegmentation.valueset.SelfSignedSSLHelper"
+		scope="singleton" />
+	<!-- Value Set Lookup Service -->
+	<bean id="valueSetServiceImpl"
+		class="gov.samhsa.acs.documentsegmentation.valueset.ValueSetServiceImpl"
+		autowire="constructor">
+		<constructor-arg index="0" value="${valueSetCategoryLookupService}" />
+	</bean>
+	<!-- DocumentSegmentation: document segmentation -->
+	<bean id="documentSegmentationImpl"
+		class="gov.samhsa.acs.documentsegmentation.DocumentSegmentationImpl"
+		autowire="constructor" />
+
+	<!-- DSS: dss-ws -->
+	<bean id="dSSPortTypeImpl" class="gov.samhsa.acs.pep.ws.DSSPortTypeImpl"
+		autowire="constructor">
+		<constructor-arg index="0" type="boolean" value="${defaultIsAudited}" />
+		<constructor-arg index="1" type="boolean" value="${defaultIsAuditFailureByPass}" />
+	</bean>
+    
+</beans>

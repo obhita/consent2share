@@ -1,0 +1,12 @@
+<h2>Spirit Policy Repository</h2>
+
+<h3>Get XACML Policy from Policy Repository</h3>
+
+<label>Enter Policy ID:</label>
+<input id="polId" type="text" ng-model="polId">
+<button ng-click="getPolicy(polId)" class="btn btn-primary">Get Policy</button>
+
+<div ng-show="spiritPolRepoXacml">
+	<pre style="height: 40pc; overflow-y: scroll;">{{spiritPolRepoXacml}}</pre>
+</div>
+

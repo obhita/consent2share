@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PolicySet xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd"
+    PolicySetId="urn:oasis:names:tc:xacml:2.0:example:policysetid:1" PolicyCombiningAlgId="">
+    <Description/>
+    <Target/>
+</PolicySet>

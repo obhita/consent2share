@@ -1,6 +1,5 @@
 package gov.samhsa.acs.c32.wsclient;
 
-import gov.samhsa.acs.c32.wsclient.C32WebServiceClient;
 import gov.samhsa.schemas.c32service.C32Service;
 import gov.samhsa.schemas.c32service.IC32Service;
 
@@ -19,10 +18,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
-
 public class C32WebServiceClientTest {
 
 	protected static Endpoint ep;
@@ -32,11 +27,14 @@ public class C32WebServiceClientTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		Resource resource = new ClassPathResource("/jettyServerPortForTesing.properties");
-    	Properties props = PropertiesLoaderUtils.loadProperties(resource);
-    	String portNumber = props.getProperty("jettyServerPortForTesing.number");
+		Resource resource = new ClassPathResource(
+				"/jettyServerPortForTesing.properties");
+		Properties props = PropertiesLoaderUtils.loadProperties(resource);
+		String portNumber = props
+				.getProperty("jettyServerPortForTesing.number");
 
-    	address = String.format("http://localhost:%s/services/C32Service", portNumber);
+		address = String.format("http://localhost:%s/services/C32Service",
+				portNumber);
 
 		ep = Endpoint.publish(address, new IC32ServiceImpl());
 		IC32ServiceImpl.returnedValueOfGetC32 = returnedValueOfGetC32;

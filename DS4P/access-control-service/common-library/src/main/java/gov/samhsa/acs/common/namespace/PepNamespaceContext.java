@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- *   
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions are met:
  *       * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *       * Neither the name of the <organization> nor the
  *         names of its contributors may be used to endorse or promote products
  *         derived from this software without specific prior written permission.
- *   
+ *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,7 +25,9 @@
  ******************************************************************************/
 package gov.samhsa.acs.common.namespace;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.namespace.NamespaceContext;
 
@@ -70,6 +72,23 @@ public class PepNamespaceContext implements NamespaceContext {
 	/** The Constant XACML_2_URI. */
 	public static final String XACML_2_URI = "urn:oasis:names:tc:xacml:2.0:policy:schema:os";
 
+	/** The namespace uris. */
+	private final Map<String, String> namespaceUris;
+
+	/**
+	 * Instantiates a new pep namespace context.
+	 */
+	public PepNamespaceContext() {
+		super();
+		this.namespaceUris = new HashMap<String, String>();
+		this.namespaceUris.put(HL7_PREFIX, HL7_URI);
+		this.namespaceUris.put(XENC_PREFIX, XENC_URI);
+		this.namespaceUris.put(RIM_PREFIX, RIM_URI);
+		this.namespaceUris.put(QUERY_PREFIX, QUERY_URI);
+		this.namespaceUris.put(IHE_ITI_XDSB_2007_PREFIX, IHE_ITI_XDSB_2007_URI);
+		this.namespaceUris.put(XACML_2_PREFIX, XACML_2_URI);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -78,22 +97,17 @@ public class PepNamespaceContext implements NamespaceContext {
 	 */
 	@Override
 	public String getNamespaceURI(String prefix) {
-		String uri;
-		if (prefix.equals(HL7_PREFIX))
-			uri = HL7_URI;
-		else if (prefix.equals(XENC_PREFIX))
-			uri = XENC_URI;
-		else if (prefix.equals(RIM_PREFIX))
-			uri = RIM_URI;
-		else if (prefix.equals(QUERY_PREFIX))
-			uri = QUERY_URI;
-		else if (prefix.equals(IHE_ITI_XDSB_2007_PREFIX))
-			uri = IHE_ITI_XDSB_2007_URI;
-		else if (prefix.equals(XACML_2_PREFIX))
-			uri = XACML_2_URI;
-		else
-			uri = null;
-		return uri;
+		return namespaceUris.get(prefix);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.xml.namespace.NamespaceContext#getPrefix(java.lang.String)
+	 */
+	@Override
+	public String getPrefix(String uri) {
+		throw new UnsupportedOperationException();
 	}
 
 	/*
@@ -104,16 +118,6 @@ public class PepNamespaceContext implements NamespaceContext {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Iterator getPrefixes(String val) {
-		throw new UnsupportedOperationException();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.xml.namespace.NamespaceContext#getPrefix(java.lang.String)
-	 */
-	@Override
-	public String getPrefix(String uri) {
 		throw new UnsupportedOperationException();
 	}
 }

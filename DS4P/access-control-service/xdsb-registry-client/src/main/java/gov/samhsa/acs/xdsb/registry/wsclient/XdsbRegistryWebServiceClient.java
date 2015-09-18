@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,11 +25,12 @@
  ******************************************************************************/
 package gov.samhsa.acs.xdsb.registry.wsclient;
 
+import gov.samhsa.acs.common.cxf.AbstractCXFLoggingConfigurerClient;
 import gov.samhsa.acs.common.tool.SimpleMarshaller;
 import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
 import gov.samhsa.acs.xdsb.registry.wsclient.exception.XdsbRegistryClientException;
 import gov.samhsa.ds4p.xdsbregistry.DocumentRegistryService;
-import ihe.iti.xds_b._2007.XDSRegistry;
+import gov.samhsa.ds4p.xdsbregistry.DocumentRegistryService.XDSRegistryProxy;
 
 import java.net.URL;
 
@@ -39,15 +40,22 @@ import javax.xml.ws.BindingProvider;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 
+import org.hl7.v3.MCCIIN000002UV01;
 import org.hl7.v3.PRPAIN201301UV02;
 import org.hl7.v3.PRPAIN201302UV02;
 import org.hl7.v3.PRPAIN201304UV02;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 /**
  * The Class XdsbRegistryWebServiceClient.
  */
-public class XdsbRegistryWebServiceClient {
+public class XdsbRegistryWebServiceClient extends
+		AbstractCXFLoggingConfigurerClient {
+
+	/** The logger. */
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/** The endpoint address. */
 	private final String endpointAddress;
@@ -63,98 +71,150 @@ public class XdsbRegistryWebServiceClient {
 	/** The port name. */
 	final QName portName = new QName("http://samhsa.gov/ds4p/XDSbRegistry/",
 			"XDSRegistry_HTTP_Endpoint");
-	
+
 	/** The marshaller. */
-	private SimpleMarshaller marshaller;
+	private final SimpleMarshaller marshaller;
 
 	/**
 	 * Instantiates a new xdsb registry web service client.
 	 *
-	 * @param endpointAddress the endpoint address
-	 * @param marshaller the marshaller
+	 * @param endpointAddress
+	 *            the endpoint address
+	 * @param marshaller
+	 *            the marshaller
 	 */
-	public XdsbRegistryWebServiceClient(String endpointAddress, SimpleMarshaller marshaller) {
+	public XdsbRegistryWebServiceClient(String endpointAddress,
+			SimpleMarshaller marshaller) {
 		this.endpointAddress = endpointAddress;
 		this.marshaller = marshaller;
 	}
 
 	/**
+	 * Adds the patient registry record.
+	 *
+	 * @param input
+	 *            the input
+	 * @return the string
+	 * @throws XdsbRegistryClientException
+	 *             the xdsb registry client exception
+	 */
+	public String addPatientRegistryRecord(PRPAIN201301UV02 input)
+			throws XdsbRegistryClientException {
+		try (XDSRegistryProxy port = createPort()) {
+			final MCCIIN000002UV01 patientRegistryRecordAddedResponse = port
+					.patientRegistryRecordAdded(input);
+			final String patientRegistryRecordAddedResponseString = marshaller
+					.marshal(patientRegistryRecordAddedResponse);
+			return patientRegistryRecordAddedResponseString;
+		} catch (final SimpleMarshallerException e) {
+			throw new XdsbRegistryClientException(e);
+		} catch (final Exception e) {
+			throw toXdsbRegistryClientException(e);
+		}
+	}
+
+	/**
 	 * Registry stored query.
-	 * 
+	 *
 	 * @param registryStoredQuery
 	 *            the registry stored query
 	 * @return the adhoc query response
 	 */
 	public AdhocQueryResponse registryStoredQuery(
 			AdhocQueryRequest registryStoredQuery) {
-		XDSRegistry port = createPort();
-
-		return port.registryStoredQuery(registryStoredQuery);
-	}
-
-	/**
-	 * Adds the patient registry record.
-	 *
-	 * @param input the input
-	 * @return the string
-	 * @throws XdsbRegistryClientException the xdsb registry client exception
-	 */
-	public String addPatientRegistryRecord(PRPAIN201301UV02 input) throws XdsbRegistryClientException{
-		XDSRegistry port = createPort();
-		try {
-			return marshaller.marshal(port.patientRegistryRecordAdded(input));
-		} catch (SimpleMarshallerException e) {
-			throw new XdsbRegistryClientException(e);
+		try (XDSRegistryProxy port = createPort()) {
+			final AdhocQueryResponse adhocQueryResponse = port
+					.registryStoredQuery(registryStoredQuery);
+			return adhocQueryResponse;
+		} catch (final Exception e) {
+			throw toXdsbRegistryClientException(e);
 		}
 	}
 
 	/**
 	 * Resolve patient registry duplicates.
 	 *
-	 * @param input the input
+	 * @param input
+	 *            the input
 	 * @return the string
-	 * @throws XdsbRegistryClientException the xdsb registry client exception
+	 * @throws XdsbRegistryClientException
+	 *             the xdsb registry client exception
 	 */
-	public String resolvePatientRegistryDuplicates(PRPAIN201304UV02 input) throws XdsbRegistryClientException{
-		XDSRegistry port = createPort();
-		try {
-			return marshaller.marshal(port.patientRegistryDuplicatesResolved(input));
-		} catch (SimpleMarshallerException e) {
+	public String resolvePatientRegistryDuplicates(PRPAIN201304UV02 input)
+			throws XdsbRegistryClientException {
+		try (XDSRegistryProxy port = createPort()) {
+			final MCCIIN000002UV01 patientRegistryDuplicatesResolvedResponse = port
+					.patientRegistryDuplicatesResolved(input);
+			final String patientRegistryDuplicatesResolvedResponseString = marshaller
+					.marshal(patientRegistryDuplicatesResolvedResponse);
+			return patientRegistryDuplicatesResolvedResponseString;
+		} catch (final SimpleMarshallerException e) {
 			throw new XdsbRegistryClientException(e);
+		} catch (final Exception e) {
+			throw toXdsbRegistryClientException(e);
 		}
 	}
 
 	/**
 	 * Revise patient registry record.
 	 *
-	 * @param input the input
+	 * @param input
+	 *            the input
 	 * @return the string
-	 * @throws XdsbRegistryClientException the xdsb registry client exception
+	 * @throws XdsbRegistryClientException
+	 *             the xdsb registry client exception
 	 */
-	public String revisePatientRegistryRecord(PRPAIN201302UV02 input) throws XdsbRegistryClientException{
-		XDSRegistry port = createPort();
-		try {
-			return marshaller.marshal(port.patientRegistryRecordRevised(input));
-		} catch (SimpleMarshallerException e) {
+	public String revisePatientRegistryRecord(PRPAIN201302UV02 input)
+			throws XdsbRegistryClientException {
+		try (XDSRegistryProxy port = createPort()) {
+			final MCCIIN000002UV01 patientRegistryRecordRevisedResponse = port
+					.patientRegistryRecordRevised(input);
+			final String patientRegistryRecordRevisedResponseString = marshaller
+					.marshal(patientRegistryRecordRevisedResponse);
+			return patientRegistryRecordRevisedResponseString;
+		} catch (final SimpleMarshallerException e) {
 			throw new XdsbRegistryClientException(e);
+		} catch (final Exception e) {
+			throw toXdsbRegistryClientException(e);
 		}
 	}
 
 	/**
 	 * Creates the port.
-	 * 
-	 * @return the xDS registry
+	 *
+	 * @return the XDS registry proxy
 	 */
-	private XDSRegistry createPort() {
-		XDSRegistry port = new DocumentRegistryService(wsdlURL, serviceName)
-				.getXDSRegistryHTTPEndpoint();
+	private XDSRegistryProxy createPort() {
+		return configurePort(this::createPortProxy);
+	}
 
+	/**
+	 * Creates the port proxy.
+	 *
+	 * @return the XDS registry proxy
+	 */
+	private XDSRegistryProxy createPortProxy() {
+		final XDSRegistryProxy port = new DocumentRegistryService(wsdlURL,
+				serviceName).getXDSRegistryHTTPEndpoint();
 		if (StringUtils.hasText(this.endpointAddress)) {
-			BindingProvider bp = (BindingProvider) port;
+			final BindingProvider bp = port;
 			bp.getRequestContext().put(
 					BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
 		}
-		
 		return port;
+	}
+
+	/**
+	 * To xdsb registry client exception.
+	 *
+	 * @param exception
+	 *            the exception
+	 * @return the xdsb registry client exception
+	 */
+	private XdsbRegistryClientException toXdsbRegistryClientException(
+			Exception exception) {
+		logger.error("Error closing XDS.b Registry client port");
+		logger.error(exception.getMessage(), exception);
+		return new XdsbRegistryClientException(exception);
 	}
 }

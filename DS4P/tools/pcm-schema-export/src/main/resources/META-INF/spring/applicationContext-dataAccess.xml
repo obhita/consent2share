@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<bean class="org.springframework.orm.jpa.JpaTransactionManager"
+		id="transactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<beans profile="runtime">
+		<!-- Update local database connection properties accordingly -->
+		<bean class="org.apache.commons.dbcp2.BasicDataSource"
+			destroy-method="close" id="dataSource">
+			<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+			<property name="url" value="jdbc:mysql://localhost:3306/consent2share?autoReconnect=true" />
+			<property name="username" value="root" />
+			<property name="password" value="admin" />
+					<property name="testOnBorrow" value="true"/>
+                    <property name="testOnReturn" value="true"/>
+                    <property name="testWhileIdle" value="true"/>
+                    <property name="timeBetweenEvictionRunsMillis" value="1800000"/>
+                    <property name="numTestsPerEvictionRun" value="3"/>
+                    <property name="minEvictableIdleTimeMillis" value="1800000"/>
+                    <property name="validationQuery" value="SELECT 1"/>
+		</bean>
+		<bean
+			class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+			id="entityManagerFactory">
+			<property name="persistenceUnitName" value="persistenceUnit" />
+			<property name="dataSource" ref="dataSource" />
+			<property name="jpaVendorAdapter">
+				<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+			</property>
+			<property name="packagesToScan" value="gov.samhsa.consent2share.domain"/>
+
+			<property name="jpaProperties">
+				<props>
+					<prop key="hibernate.dialect">gov.samhsa.consent2share.ImprovedMySQLDialect</prop>
+        			<prop key="hibernate.hbm2ddl.auto">create</prop>
+					<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+					<prop key="hibernate.connection.charSet">UTF-8</prop>
+				</props>
+			</property>
+		</bean>
+	</beans>
+</beans>

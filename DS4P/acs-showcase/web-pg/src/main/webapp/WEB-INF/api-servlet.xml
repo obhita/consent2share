@@ -1,0 +1,115 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<import resource="classpath:external-properties.xml"/>
+
+	<mvc:annotation-driven />
+
+	<context:component-scan base-package="gov.samhsa.consent2share" />
+	
+	<bean id="multipartResolver"
+	    class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	     <!-- one of the properties available; the maximum file size in bytes -->
+	    <property name="maxUploadSize" value="10000000"/>
+	</bean>
+
+	<!-- Common Tools -->
+	<bean id="documentXmlConverterImpl" class="gov.samhsa.acs.common.tool.DocumentXmlConverterImpl"
+		scope="prototype" />
+	<bean id="simpleMarshallerImpl" class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl"
+		scope="prototype" />
+	<bean id="documentAccessorImpl" class="gov.samhsa.acs.common.tool.DocumentAccessorImpl"
+		scope="prototype" />
+	<bean id="xmlTransformerImpl" class="gov.samhsa.acs.common.tool.XmlTransformerImpl"
+		scope="prototype" autowire="constructor"/>
+
+	<!-- XDS.b: common -->	
+	<bean id="registryErrorListSetterImpl"
+		class="gov.samhsa.acs.xdsb.common.RegistryErrorListSetterImpl"
+		scope="prototype">
+	</bean>
+	<bean id="xdsbErrorFactory"
+		class="gov.samhsa.acs.xdsb.common.XdsbErrorFactory"
+		scope="prototype" autowire="constructor">
+	</bean>
+	
+	<!-- XDS.b: registry webservice client-->
+	<bean id="xdsbRegistryWebServiceClient"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient"
+		scope="prototype" autowire="constructor">
+		<constructor-arg value="${xdsbRegistryEndpointAddress}" />
+	</bean>	
+
+	<!-- XDS.b: adapters -->
+	<bean id="retrieveDocumentSetResponseFilter"
+		class="gov.samhsa.acs.xdsb.repository.wsclient.adapter.RetrieveDocumentSetResponseFilter"
+		scope="prototype" autowire="constructor">
+	</bean>
+
+	<!-- C32 Parser Beans -->
+	<bean id="c32ParserImpl" class="gov.samhsa.consent2share.c32.C32ParserImpl"
+		scope="prototype" autowire="constructor" />
+	<bean id="c32ToGreenCcdTransformerImpl"
+		class="gov.samhsa.consent2share.c32.C32ToGreenCcdTransformerImpl"
+		scope="prototype" autowire="constructor"/>
+	<bean id="greenCcdSerializerImpl" class="gov.samhsa.consent2share.c32.GreenCcdSerializerImpl"
+		scope="prototype" />
+
+	<!-- HL7 Transformer -->
+	<bean id="hl7v3TransformerImpl" class="gov.samhsa.consent2share.hl7.Hl7v3TransformerImpl"
+		scope="prototype" autowire="constructor"/>
+
+	<!-- PIX Manager -->
+	<bean id="pixManagerServiceImpl"
+		class="gov.samhsa.consent2share.pixclient.service.PixManagerServiceImpl"
+		scope="singleton">
+		<constructor-arg index="0"
+			value="${empiWebServiceEndpointAddress}" />
+	</bean>
+	<bean id="pixManagerBean"
+		class="gov.samhsa.consent2share.pixclient.util.PixManagerBean"
+		scope="prototype" />
+	<bean id="pixManagerConstants"
+		class="gov.samhsa.consent2share.pixclient.util.PixManagerConstants"
+		scope="singleton">
+		<constructor-arg index="0"
+			value="${empiDomainId}" />
+		<constructor-arg index="1"
+			value="${empiDomainName}" />
+	</bean>
+	<bean id="pixManagerRequestXMLToJava"
+		class="gov.samhsa.consent2share.pixclient.util.PixManagerRequestXMLToJava"
+		scope="prototype" autowire="constructor">
+	</bean>
+	
+	<!-- Spirit Beans Start -->
+
+	<bean id="spiritClientHelper"
+		class="gov.samhsa.spirit.wsclient.util.SpiritClientHelper"
+		scope="singleton">
+	</bean>
+	
+	
+	<bean id="spiritAdapter"
+		class="gov.samhsa.spirit.wsclient.adapter.SpiritAdapterImpl"
+		scope="singleton">
+		<constructor-arg index="0" value="${spirit.client.endpointAddress}" />
+		<constructor-arg index="1" value="${spirit.client.org}" />
+		<constructor-arg index="2" value="${spirit.client.pwd}" />
+		<constructor-arg index="3" value="${spirit.client.rol}" />
+		<constructor-arg index="4" value="${spirit.client.user}" />
+		<constructor-arg index="5" value="${empiDomainId}" />
+		<constructor-arg index="6" value="${pid.domain.id}"/>
+		<constructor-arg index="7" value="${pid.domain.type}"/>
+		<constructor-arg index="8" value="${pid.prefix}"/>
+	</bean>
+	<!-- Spirit Beans End -->
+
+</beans>

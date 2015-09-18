@@ -25,7 +25,7 @@
  ******************************************************************************/
 package gov.samhsa.acs.xdsb.repository.wsclient.exception;
 
-public class XdsbRepositoryClientException extends Exception {
+public class XdsbRepositoryClientException extends RuntimeException {
 
 	private static final long serialVersionUID = -3847558507324093232L;
 

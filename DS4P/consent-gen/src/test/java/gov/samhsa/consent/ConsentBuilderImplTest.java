@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,8 +27,13 @@ package gov.samhsa.consent;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import gov.samhsa.acs.common.tool.XmlTransformer;
+
+import java.util.Optional;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,89 +48,126 @@ public class ConsentBuilderImplTest {
 
 	@InjectMocks
 	ConsentBuilderImpl sut;
-	
+
 	@Mock
 	ConsentDtoFactory consentDtoFactoryMock;
-	
+
 	@Mock
-	ConsentTransformer consentTransformerMock;
-	
+	XmlTransformer xmlTransformerMock;
+
+	@Mock
+	XacmlXslUrlProvider xacmlXslUrlProvider;
+
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
-	
+
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildConsent2Cdar2() throws ConsentGenException {
 
 		// Arrange
-		long consentId = 1;
-		ConsentDto consentDtoMock = mock(ConsentDto.class);
-		when(consentDtoFactoryMock.createConsentDto(anyLong())).thenReturn(consentDtoMock);
-		String cdar2Mock = "cdar2";
-		when(consentTransformerMock.transform(consentDtoMock,"c2cdar2.xsl",null)).thenReturn(cdar2Mock);
-		
+		final long consentId = 1;
+		final ConsentDto consentDtoMock = mock(ConsentDto.class);
+		final String cdar2XslUrlStrMock = "cdar2XslUrlStrMock";
+		when(consentDtoFactoryMock.createConsentDto(anyLong())).thenReturn(
+				consentDtoMock);
+		final String cdar2Mock = "cdar2Mock";
+		when(xacmlXslUrlProvider.getUrl(XslResource.CDAR2XSLNAME)).thenReturn(
+				cdar2XslUrlStrMock);
+		when(
+				xmlTransformerMock.transform(eq(consentDtoMock),
+						eq(cdar2XslUrlStrMock), isA(Optional.class),
+						isA(Optional.class))).thenReturn(cdar2Mock);
+
 		// Act
-		String cdar2 = sut.buildConsent2Cdar2(consentId);
-		
+		final String cdar2 = sut.buildConsent2Cdar2(consentId);
+
 		// Assert
-		assertEquals(cdar2Mock, cdar2);		
+		assertEquals(cdar2Mock, cdar2);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
-	public void testBuildConsent2Cdar2_ConsentGenException() throws  ConsentGenException {
+	public void testBuildConsent2Cdar2_ConsentGenException()
+			throws ConsentGenException {
 		// Arrange
 		thrown.expect(ConsentGenException.class);
-		long consentId = 1;
-		ConsentDto consentDtoMock = mock(ConsentDto.class);
-		when(consentDtoFactoryMock.createConsentDto(anyLong())).thenReturn(consentDtoMock);
-		when(consentTransformerMock.transform(consentDtoMock,"c2cdar2.xsl",null)).thenThrow( new ConsentGenException("Error in saxon transform"));
-		
+		final long consentId = 1;
+		final String cdar2XslUrlStrMock = "cdar2XslUrlStrMock";
+		final ConsentDto consentDtoMock = mock(ConsentDto.class);
+		when(consentDtoFactoryMock.createConsentDto(anyLong())).thenReturn(
+				consentDtoMock);
+		when(xacmlXslUrlProvider.getUrl(XslResource.CDAR2XSLNAME)).thenReturn(
+				cdar2XslUrlStrMock);
+		when(
+				xmlTransformerMock.transform(eq(consentDtoMock),
+						eq(cdar2XslUrlStrMock), isA(Optional.class),
+						isA(Optional.class))).thenThrow(
+				new RuntimeException("Error in saxon transform"));
+
 		// Act
 		sut.buildConsent2Cdar2(consentId);
-		
+
 		// Assert
 	}
 
-	
-	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildConsent2Xacml() throws ConsentGenException {
 		// Arrange
-		String eidMock = "eidMock";
-		Long consentId = new Long(1);
-		ConsentDto consentDtoMock = mock(ConsentDto.class);
-		PatientDto patientDtoMock = mock(PatientDto.class);
-		when(consentDtoFactoryMock.createConsentDto(consentId)).thenReturn(consentDtoMock);
+		final String mrnMock = "mrnMock";
+		final Long consentId = new Long(1);
+		final ConsentDto consentDtoMock = mock(ConsentDto.class);
+		final PatientDto patientDtoMock = mock(PatientDto.class);
+		when(consentDtoFactoryMock.createConsentDto(consentId)).thenReturn(
+				consentDtoMock);
 		when(consentDtoMock.getPatientDto()).thenReturn(patientDtoMock);
-		when(patientDtoMock.getEnterpriseIdentifier()).thenReturn(eidMock);
-		String xacmlMock = "xacml";
-		when(consentTransformerMock.transform(consentDtoMock,"c2xacml.xsl",eidMock)).thenReturn(xacmlMock);
-		
+		when(patientDtoMock.getMedicalRecordNumber()).thenReturn(mrnMock);
+
+		final String xacmlMock = "xacml";
+		final String xacmlXslUrl = "xacmlXslUrl";
+		when(xacmlXslUrlProvider.getUrl(XslResource.XACMLXSLNAME)).thenReturn(
+				xacmlXslUrl);
+		when(
+				xmlTransformerMock.transform(eq(consentDtoMock),
+						eq(xacmlXslUrl), isA(Optional.class),
+						isA(Optional.class))).thenReturn(xacmlMock);
+
 		// Act
-		String xacml = sut.buildConsent2Xacml(consentId);
-		
+		final String xacml = sut.buildConsent2Xacml(consentId);
+
 		// Assert
-		assertEquals(xacmlMock, xacml);		
-	}
-	
-	@Test
-	public void testBuildConsent2Xacml_ConsentGenException() throws  ConsentGenException {
-		// Arrange
-		String eidMock = "eidMock";
-		thrown.expect(ConsentGenException.class);
-		Long consentId = new Long(1);
-		ConsentDto consentDtoMock = mock(ConsentDto.class);
-		PatientDto patientDtoMock = mock(PatientDto.class);
-		when(consentDtoMock.getPatientDto()).thenReturn(patientDtoMock);
-		when(patientDtoMock.getEnterpriseIdentifier()).thenReturn(eidMock);
-		when(consentDtoFactoryMock.createConsentDto(consentId)).thenReturn(consentDtoMock);
-		when(consentTransformerMock.transform(consentDtoMock,"c2xacml.xsl",eidMock)).thenThrow( new ConsentGenException("Error in saxon transform"));
-		
-		// Act
-		sut.buildConsent2Xacml(consentId);
-		
-		// Assert
+		assertEquals(xacmlMock, xacml);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testBuildConsent2Xacml_ConsentGenException()
+			throws ConsentGenException {
+		// Arrange
+		final String mrnMock = "mrnMock";
+		thrown.expect(ConsentGenException.class);
+		final Long consentId = new Long(1);
+		final ConsentDto consentDtoMock = mock(ConsentDto.class);
+		final PatientDto patientDtoMock = mock(PatientDto.class);
+		when(consentDtoMock.getPatientDto()).thenReturn(patientDtoMock);
+		when(patientDtoMock.getMedicalRecordNumber()).thenReturn(mrnMock);
+		when(consentDtoFactoryMock.createConsentDto(consentId)).thenReturn(
+				consentDtoMock);
+
+		final String xacmlXslUrlMock = "xacmlXslUrlMock";
+		when(xacmlXslUrlProvider.getUrl(XslResource.XACMLXSLNAME)).thenReturn(
+				xacmlXslUrlMock);
+		when(
+				xmlTransformerMock.transform(eq(consentDtoMock),
+						eq(xacmlXslUrlMock), isA(Optional.class),
+						isA(Optional.class))).thenThrow(
+				new RuntimeException("Error in saxon transform"));
+
+		// Act
+		sut.buildConsent2Xacml(consentId);
+
+		// Assert
+	}
 
 }

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   		http://www.springframework.org/schema/beans/spring-beans.xsd
+	   		http://www.springframework.org/schema/context
+	   		http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/mvc
+			http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+
+	<import resource="external-properties.xml" />
+	
+	<import resource="applicationContext-dataAccess.xml" />
+	<import resource="applicationContext-jpa.xml" />
+	<import resource="spring-integration-context.xml" />
+	<import resource="rabbit-context.xml" />	
+	
+	<!-- Activates various annotations to be detected in bean classes -->
+	<context:annotation-config />
+
+	<!-- Scans the classpath for annotated components that will be auto-registered
+		as Spring beans. For example @Controller and @Service. Make sure to set the
+		correct base-package -->
+	<context:component-scan base-package="gov.samhsa.consent2share.si">
+	</context:component-scan>
+
+	<!-- SI Audit Service -->
+	<bean id="auditServiceImpl" class="gov.samhsa.acs.audit.AuditServiceImpl"
+		scope="singleton" init-method="init" destroy-method="destroy">
+		<constructor-arg value="SIAuditService" />
+	</bean>
+
+	<!-- Consent Getter -->
+	<bean id="consentGetterImpl" class="gov.samhsa.consent2share.si.ConsentGetterImpl"
+		autowire="constructor">
+	</bean>
+
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler">
+		<property name="nativeJdbcExtractor" ref="nativeJdbcExtractor" />
+	</bean>
+	<bean id="nativeJdbcExtractor"
+		class="org.springframework.jdbc.support.nativejdbc.C3P0NativeJdbcExtractor"
+		lazy-init="true" />
+	<bean id="signedConsentDtoRowMapper" class="gov.samhsa.consent2share.si.SignedConsentDtoRowMapper"
+		scope="singleton" autowire="constructor" />
+	<bean id="revokedConsentDtoRowMapper" class="gov.samhsa.consent2share.si.RevokedConsentDtoRowMapper"
+		scope="singleton" autowire="constructor" />
+
+	<!-- Configures the annotation-driven Spring MVC Controller programming
+		model. Note that, with Spring 3.0, this tag works in Servlet MVC only! -->
+	<mvc:annotation-driven />
+
+	<!-- Common Tools -->
+	<bean id="simpleMarshallerImpl" class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl"
+		scope="prototype" />
+
+	<!-- Spirit Client -->
+	<bean id="spiritAdapter" class="gov.samhsa.spirit.wsclient.adapter.SpiritAdapterImpl"
+		autowire="constructor">
+		<constructor-arg index="0" value="${spirit.client.endpointAddress}"/>
+		<constructor-arg index="1" value="${spirit.client.org}"/>
+		<constructor-arg index="2" value="${spirit.client.pwd}"/>
+		<constructor-arg index="3" value="${spirit.client.rol}"/>
+		<constructor-arg index="4" value="${spirit.client.user}"/>
+		<constructor-arg index="5" value="${spirit.client.domainId}"/>
+		<constructor-arg index="6" value="${spirit.client.c2s.domainId}"/>
+		<constructor-arg index="7" value="${spirit.client.c2s.domainType}"/>
+		<constructor-arg index="8" value="${spirit.client.pid.prefix}"/>
+	</bean>
+
+</beans>

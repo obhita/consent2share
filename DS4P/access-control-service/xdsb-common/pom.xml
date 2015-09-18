@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>access-control-service</artifactId>
-		<version>0.6.0-SNAPSHOT</version>
+		<version>2.6.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>xdsb-common</artifactId>
 	<name>XDS.b Common</name>
@@ -19,15 +19,36 @@
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
 		</dependency>
+
+		<!-- Test -->
 		<dependency>
 			<groupId>xmlunit</groupId>
 			<artifactId>xmlunit</artifactId>
-		</dependency>					
+		</dependency>
 	</dependencies>
 
 	<build>
 		<finalName>xdsb-common</finalName>
 		<plugins>
+			<!-- Add generated-sources as source folder -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+			        <execution>
+			         <id>add-source</id>
+			            <phase>generate-sources</phase>
+			            <goals>
+			                <goal>add-source</goal>
+			            </goals>
+			            <configuration>
+			                <sources>
+			                    <source>target/generated-sources/</source>
+			                </sources>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-xjc-plugin</artifactId>
@@ -67,7 +88,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>

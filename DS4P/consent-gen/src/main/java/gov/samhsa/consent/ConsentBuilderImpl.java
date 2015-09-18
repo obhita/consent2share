@@ -1,50 +1,85 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the <organization> nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions are met:
+ *       * Redistributions of source code must retain the above copyright
+ *         notice, this list of conditions and the following disclaimer.
+ *       * Redistributions in binary form must reproduce the above copyright
+ *         notice, this list of conditions and the following disclaimer in the
+ *         documentation and/or other materials provided with the distribution.
+ *       * Neither the name of the <organization> nor the
+ *         names of its contributors may be used to endorse or promote products
+ *         derived from this software without specific prior written permission.
+ *
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *   DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+ *   DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ *   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ *   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ *   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 package gov.samhsa.consent;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import gov.samhsa.acs.common.param.ParamsBuilder;
+import gov.samhsa.acs.common.tool.XmlTransformer;
+
+import java.util.Optional;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.util.Assert;
 
 /**
  * The Class ConsentBuilderImpl.
  */
 public class ConsentBuilderImpl implements ConsentBuilder {
 
+	/** The Constant PARAM_EID. */
+	public final static String PARAM_EID = "enterpriseIdentifier";
+
+	/** The Constant PARAM_MRN. */
+	public final static String PARAM_MRN = "medicalRecordNumber";
+
+	/** The Constant PARAM_POLICY_ID. */
+	public final static String PARAM_POLICY_ID = "policyId";
+
+	/** The c2s account org. */
+	private final String c2sAccountOrg;
+
+	/** The xacml xsl url provider. */
+	private final XacmlXslUrlProvider xacmlXslUrlProvider;
+
 	/** The consent dto factory. */
-	@Autowired
-	ConsentDtoFactory consentDtoFactory;
+	private final ConsentDtoFactory consentDtoFactory;
 
-	/** The consent transformer. */
-	@Autowired
-	ConsentTransformer consentTransformer;
+	/** The xml transformer. */
+	private final XmlTransformer xmlTransformer;
 
-	/** The Constant CDAR2XSLNAME. */
-	private final static String CDAR2XSLNAME = "c2cdar2.xsl";
-
-	/** The Constant XACMLXSLNAME. */
-	private final static String XACMLXSLNAME = "c2xacml.xsl";
+	/**
+	 * Instantiates a new consent builder impl.
+	 *
+	 * @param c2sAccountOrg
+	 *            the c2s account org
+	 * @param xacmlXslUrlProvider
+	 *            the xacml xsl url provider
+	 * @param consentDtoFactory
+	 *            the consent dto factory
+	 * @param xmlTransformer
+	 *            the xml transformer
+	 */
+	public ConsentBuilderImpl(String c2sAccountOrg,
+			XacmlXslUrlProvider xacmlXslUrlProvider,
+			ConsentDtoFactory consentDtoFactory, XmlTransformer xmlTransformer) {
+		super();
+		this.c2sAccountOrg = c2sAccountOrg;
+		this.xacmlXslUrlProvider = xacmlXslUrlProvider;
+		this.consentDtoFactory = consentDtoFactory;
+		this.xmlTransformer = xmlTransformer;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -53,10 +88,16 @@ public class ConsentBuilderImpl implements ConsentBuilder {
 	 */
 	@Override
 	public String buildConsent2Cdar2(long consentId) throws ConsentGenException {
-		ConsentDto consentDto = consentDtoFactory.createConsentDto(consentId);
-		String cdar2 = consentTransformer.transform(consentDto, CDAR2XSLNAME,
-				null);
-		return cdar2;
+		try {
+			final ConsentDto consentDto = consentDtoFactory
+					.createConsentDto(consentId);
+			final String cdar2 = xmlTransformer.transform(consentDto,
+					xacmlXslUrlProvider.getUrl(XslResource.CDAR2XSLNAME),
+					Optional.empty(), Optional.empty());
+			return cdar2;
+		} catch (final Exception e) {
+			throw new ConsentGenException(e.getMessage(), e);
+		}
 	}
 
 	/*
@@ -67,29 +108,120 @@ public class ConsentBuilderImpl implements ConsentBuilder {
 	 */
 	@Override
 	public String buildConsent2Xacml(Object obj) throws ConsentGenException {
-		ConsentDto consentDto = consentDtoFactory.createConsentDto(obj);
-		String xacml = consentTransformer.transform(consentDto, XACMLXSLNAME,
-				consentDto.getPatientDto().getEnterpriseIdentifier());
-		return xacml;
+		try {
+			final ConsentDto consentDto = consentDtoFactory
+					.createConsentDto(obj);
+			final String xacml = xmlTransformer.transform(consentDto,
+					xacmlXslUrlProvider.getUrl(XslResource.XACMLXSLNAME),
+					Optional.of(ParamsBuilder.withParam(PARAM_MRN, consentDto
+							.getPatientDto().getMedicalRecordNumber())),
+					Optional.empty());
+			return xacml;
+		} catch (final Exception e) {
+			throw new ConsentGenException(e.getMessage(), e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent.ConsentBuilder#buildConsent2XacmlPdfConsentFrom(java
+	 * .lang.Object)
+	 */
+	@Override
+	public String buildConsent2XacmlPdfConsentFrom(Object obj)
+			throws ConsentGenException {
+		try {
+			final ConsentDto consentDto = consentDtoFactory
+					.createConsentDto(obj);
+			final String consentId = consentDto.getConsentReferenceid();
+			String policyId = null;
+			if (consentId != null) {
+				policyId = buildPdfPolicyId(consentId, true);
+			}
+			final String xacml = xmlTransformer.transform(consentDto,
+					xacmlXslUrlProvider
+							.getUrl(XslResource.XACMLPDFCONSENTFROMXSLNAME),
+					Optional.of(ParamsBuilder
+							.withParam(
+									PARAM_MRN,
+									consentDto.getPatientDto()
+											.getMedicalRecordNumber()).and(
+									PARAM_POLICY_ID, policyId)), Optional
+							.empty());
+			return xacml;
+		} catch (final Exception e) {
+			throw new ConsentGenException(e.getMessage(), e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent.ConsentBuilder#buildConsent2XacmlPdfConsentTo(java
+	 * .lang.Object)
+	 */
+	@Override
+	public String buildConsent2XacmlPdfConsentTo(Object obj)
+			throws ConsentGenException {
+		try {
+			final ConsentDto consentDto = consentDtoFactory
+					.createConsentDto(obj);
+			final String consentId = consentDto.getConsentReferenceid();
+			String policyId = null;
+			if (consentId != null) {
+				policyId = buildPdfPolicyId(consentId, false);
+			}
+			final String xacml = xmlTransformer.transform(consentDto,
+					xacmlXslUrlProvider
+							.getUrl(XslResource.XACMLPDFCONSENTTOXSLNAME),
+					Optional.of(ParamsBuilder
+							.withParam(
+									PARAM_MRN,
+									consentDto.getPatientDto()
+											.getMedicalRecordNumber()).and(
+									PARAM_POLICY_ID, policyId)), Optional
+							.empty());
+			return xacml;
+		} catch (final Exception e) {
+			throw new ConsentGenException(e.getMessage(), e);
+		}
 	}
 
 	/**
-	 * Sets the consent dto factory.
-	 * 
-	 * @param consentDtoFactory
-	 *            the new consent dto factory
+	 * Builds the pdf policy id.
+	 *
+	 * @param consentId
+	 *            the consent id
+	 * @param isConsentFrom
+	 *            the is consent from
+	 * @return the string
 	 */
-	public void setConsentDtoFactory(ConsentDtoFactory consentDtoFactory) {
-		this.consentDtoFactory = consentDtoFactory;
-	}
+	protected String buildPdfPolicyId(String consentId, boolean isConsentFrom) {
+		// String id =
+		// "C2S.PG-DEV.RmETWp:&amp;2.16.840.1.113883.3.704.100.200.1.1.3.1&amp;ISO:1578821153:1427467752:XM2UoY";
+		final String[] tokens = consentId.split(":");
+		final int tokenCount = tokens.length;
+		// assert the no of elements as 5
+		Assert.isTrue(tokenCount == 5,
+				"consent reference id should split into 5 sub elements with : delimiter");
+		final String consentTo = tokens[tokenCount - 3];
+		final String consentFrom = tokens[tokenCount - 2];
+		if (isConsentFrom) {
+			tokens[tokenCount - 3] = consentFrom;
+			tokens[tokenCount - 2] = c2sAccountOrg;
 
-	/**
-	 * Sets the consent transformer.
-	 * 
-	 * @param consentTransformer
-	 *            the new consent transformer
-	 */
-	public void setConsentTransformer(ConsentTransformer consentTransformer) {
-		this.consentTransformer = consentTransformer;
+		} else {
+			tokens[tokenCount - 3] = consentTo;
+			tokens[tokenCount - 2] = c2sAccountOrg;
+
+		}
+		String policyId = StringUtils.join(tokens, ":");
+		final String[] pTokens = policyId.split("&amp;");
+		policyId = StringUtils.join(pTokens, "&");
+
+		return policyId;
 	}
 }

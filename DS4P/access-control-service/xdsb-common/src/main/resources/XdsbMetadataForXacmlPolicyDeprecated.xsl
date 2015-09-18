@@ -12,6 +12,8 @@
 	<xsl:output indent="yes" omit-xml-declaration="yes" />
 
 	<xsl:param name="homeCommunityId" as="xs:string" />
+	<xsl:param name="sourcePatientId" as="xs:string" />
+	<xsl:param name="sourcePatientDomainId" as="xs:string" />	
 	<xsl:param name="XDSDocumentEntry_uniqueId" as="xs:string" />
 	<xsl:param name="XDSSubmissionSet_uniqueId" as="xs:string" />	
 	<xsl:param name="XDSSubmissionSet_sourceId" as="xs:string" select="'1.3.6.1.4.1.21367.13.2015'" />	
@@ -19,9 +21,12 @@
 	<xsl:param name="XDSSubmissionSet_entryUUID" as="xs:string" select="'SubmissionSet'" />
 	<xsl:param name="patientUniqueId" as="xs:string"/>
 		
-	<xsl:variable name="patientIdentifier" select="$patientUniqueId" />		
+	<xsl:variable name="patientIdentifier" select="$patientUniqueId" />	
 
-	<xsl:variable name="authorIdentifier" select="$patientIdentifier" />
+	<xsl:variable name="sourcePatientIdentifier"
+		select="concat($sourcePatientId,'^^^','&amp;',$sourcePatientDomainId,'&amp;','ISO')" />	
+
+	<xsl:variable name="authorIdentifier" select="$sourcePatientIdentifier" />
 
 	<xsl:variable name="currentDateTimeUtc" select="string(adjust-dateTime-to-timezone(current-dateTime(), xs:dayTimeDuration('PT0H')))" />
 

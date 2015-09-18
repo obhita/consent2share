@@ -12,6 +12,8 @@
 	<xsl:output indent="yes" omit-xml-declaration="yes" />
 
 	<xsl:param name="homeCommunityId" as="xs:string" />
+	<xsl:param name="sourcePatientId" as="xs:string" />
+	<xsl:param name="sourcePatientDomainId" as="xs:string" />
 	<xsl:param name="XDSDocumentEntry_uniqueId" as="xs:string" />
 	<xsl:param name="XDSSubmissionSet_uniqueId" as="xs:string" />	
 	<xsl:param name="XDSSubmissionSet_sourceId" as="xs:string" select="'1.3.6.1.4.1.21367.13.2015'" />	
@@ -21,10 +23,12 @@
 	<xsl:variable name="patientId"
 		select="//Policy/Rule[@Effect='Permit']/Target/Resources/Resource/ResourceMatch/AttributeValue" />		
 	<xsl:variable name="patientIdentifier"
-		select="concat($patientId,'^^^','&amp;',$homeCommunityId,'&amp;','ISO')" />		
+		select="concat($patientId,'^^^','&amp;',$homeCommunityId,'&amp;','ISO')" />
+	<xsl:variable name="sourcePatientIdentifier"
+		select="concat($sourcePatientId,'^^^','&amp;',$sourcePatientDomainId,'&amp;','ISO')" />		
 
 	<xsl:variable name="authorIdentifier"
-		select="$patientIdentifier" />
+		select="$sourcePatientIdentifier" />
 
 	<xsl:variable name="confidentialityCode" select="'R'" />
 
@@ -119,7 +123,7 @@
 					<Slot name="sourcePatientId">
 						<ValueList>
 							<Value>
-								<xsl:value-of select="$patientIdentifier" />
+								<xsl:value-of select="$sourcePatientIdentifier" />
 							</Value>
 						</ValueList>
 					</Slot>
@@ -127,7 +131,7 @@
 						<ValueList>
 
 							<Value>
-								<xsl:value-of select="concat('PID-3|', $patientIdentifier)" />
+								<xsl:value-of select="concat('PID-3|', $sourcePatientIdentifier)" />
 							</Value>
 							<Value>
 								<xsl:value-of
@@ -158,7 +162,7 @@
 						<Slot name="authorPerson">
 							<ValueList>
 								<Value>
-									<xsl:value-of select="$patientIdentifier" />
+									<xsl:value-of select="$sourcePatientIdentifier" />
 								</Value>
 							</ValueList>
 						</Slot>

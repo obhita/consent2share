@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:soap="http://cxf.apache.org/bindings/soap" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	default-lazy-init="true" default-init-method="afterPropertiesSet"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
+		 http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+	<!-- Import statement optional but often required if you're declaring other 
+		CXF beans in this file such as CXF's JMX MBeans -->
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	
+	<!-- This will automatically locate any and all property files you have within your classpath. 
+		The located property files are parsed and their values can then be used within 
+		application context files in the form of ${propertyKey}. -->
+	<import resource="external-properties.xml"/>
+
+	<!-- End points -->
+	<jaxws:endpoint id="policyTryingService" implementor="#policyTryingServiceImpl"
+		wsdlLocation="classpath:wsdl/TryPolicy.wsdl" address="/policyTryingService">
+	</jaxws:endpoint>
+
+	<bean id="cxfLoggingConfigurer"
+		class="gov.samhsa.acs.common.cxf.CXFLoggingConfigurer"
+		autowire="constructor">
+		<!-- set this property to enable/disable CXF Logging Interceptors, -->
+		<!-- or use loggerCheckController RESTful API to change this configuration at runtime. -->
+		<!--<property name="enableLoggingInterceptors" value="true" />-->
+	</bean>
+	
+	<bean id="loggerCheckController" class="gov.samhsa.acs.trypolicy.rs.instrumentation.LoggerCheckController"
+		autowire="constructor">
+	   <constructor-arg index="0" value="${instrumentationKey}" />  
+	</bean>
+	
+ 	<jaxrs:server id="loggerCheckService" address="/">
+		<jaxrs:serviceBeans>  
+            <ref bean="loggerCheckController" />  
+        </jaxrs:serviceBeans> 
+	</jaxrs:server> 
+
+	<!-- Common Tools -->
+	<bean id="documentXmlConverterImpl" class="gov.samhsa.acs.common.tool.DocumentXmlConverterImpl" />
+	<bean id="simpleMarshallerImpl" class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl" />
+	<bean id="documentAccessorImpl" class="gov.samhsa.acs.common.tool.DocumentAccessorImpl" />
+
+	<!-- PDP -->
+	<!-- PDP: request generator -->
+	<bean id="requestGenerator" class="gov.samhsa.acs.contexthandler.RequestGenerator" />
+	
+	<!-- PDP: pdp -->
+	<bean id="policyDecisionPointImpl" class="gov.samhsa.acs.contexthandler.PolicyDecisionPointImpl" autowire="constructor" />
+	
+	<!-- ContextHandler -->
+	<!-- ContextHandler: context handler -->
+	<bean id="contextHandlerImpl" class="gov.samhsa.acs.contexthandler.ContextHandlerImpl" autowire="constructor" />
+
+	<!-- DocumentSegmentation -->	
+	<bean id="dSSWebServiceClient" class="gov.samhsa.acs.dss.wsclient.DSSWebServiceClient">
+		<constructor-arg index="0" value="${documentSegmentationService}"/>
+	</bean>
+
+	<!-- TryMyPolicy -->	
+	<bean id="policyTryingImpl" class="gov.samhsa.acs.trypolicy.PolicyTryingImpl" autowire="constructor" />
+
+	<!-- TryMyPolicy: PolicyTrying Web Service -->
+	<bean id="policyTryingServiceImpl" class="gov.samhsa.acs.trypolicy.ws.PolicyTryingServiceImpl" autowire="constructor" />
+
+</beans>

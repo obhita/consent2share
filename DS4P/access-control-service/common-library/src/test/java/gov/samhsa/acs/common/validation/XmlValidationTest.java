@@ -1,5 +1,6 @@
 package gov.samhsa.acs.common.validation;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -12,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.xml.sax.SAXParseException;
 
 public class XmlValidationTest {
 	
@@ -47,5 +49,17 @@ public class XmlValidationTest {
 	@Test
 	public void testValidateString() throws InvalidXmlDocumentException, XmlDocumentReadFailureException {
 		assertTrue(sut.validate(validC32));
+	}
+	
+	@Test
+	public void testValidateWithAllErrors() throws XmlDocumentReadFailureException{
+		// Act
+		XmlValidationResult result = sut.validateWithAllErrors(invalidC32);
+		
+		// Assert
+		assertEquals(2, result.getExceptions().size());
+		for(SAXParseException e: result.getExceptions()){
+			assertTrue(e.getMessage().contains("noSuchElement") || e.getMessage().contains("noSuchElement2"));
+		}		
 	}
 }

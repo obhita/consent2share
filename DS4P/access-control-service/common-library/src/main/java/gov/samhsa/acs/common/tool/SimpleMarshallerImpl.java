@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- *   
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions are met:
  *       * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *       * Neither the name of the <organization> nor the
  *         names of its contributors may be used to endorse or promote products
  *         derived from this software without specific prior written permission.
- *   
+ *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,12 +28,16 @@ package gov.samhsa.acs.common.tool;
 import gov.samhsa.acs.common.tool.exception.SimpleMarshallerException;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 
 /**
  * The Class MarshallerImpl.
@@ -42,9 +46,55 @@ public class SimpleMarshallerImpl implements SimpleMarshaller {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see gov.samhsa.acs.common.tool.Marshaller#
-	 * unmarshallFromXml(java.lang.Class, java.lang.String)
+	 *
+	 * @see gov.samhsa.acs.common.tool.Marshaller# marshall(java.lang.Object)
+	 */
+	@Override
+	public String marshal(Object obj) throws SimpleMarshallerException {
+		return marshal(obj, obj.getClass());
+	}
+
+	@Override
+	public ByteArrayOutputStream marshalAsByteArrayOutputStream(Object obj)
+			throws SimpleMarshallerException {
+		try {
+			final ByteArrayOutputStream marshalresult = new ByteArrayOutputStream();
+
+			JAXBContext jaxbContext;
+			jaxbContext = JAXBContext.newInstance(obj.getClass());
+			final Marshaller marshaller = jaxbContext.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+					Boolean.TRUE);
+			marshaller.marshal(obj, marshalresult);
+
+			return marshalresult;
+		} catch (final Exception e) {
+			throw new SimpleMarshallerException(e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * gov.samhsa.acs.common.tool.SimpleMarshaller#marshalWithoutRootElement
+	 * (java.lang.Object)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> String marshalWithoutRootElement(T obj)
+			throws SimpleMarshallerException {
+		final JAXBElement<T> wrappedJaxbElement = new JAXBElement<T>(new QName(
+				obj.getClass().getSimpleName()), (Class<T>) obj.getClass(), obj);
+		return marshal(wrappedJaxbElement, obj.getClass());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * gov.samhsa.acs.common.tool.SimpleMarshaller#unmarshalFromXml(java.lang
+	 * .Class, java.lang.String)
 	 */
 	@Override
 	public <T> T unmarshalFromXml(Class<T> clazz, String xml)
@@ -52,23 +102,31 @@ public class SimpleMarshallerImpl implements SimpleMarshaller {
 		JAXBContext context;
 		try {
 			context = JAXBContext.newInstance(clazz);
-		} catch (JAXBException e) {
+		} catch (final JAXBException e) {
 			throw new SimpleMarshallerException(e);
 		}
-		return unmarshallFromXml(context, clazz, xml);
+		return unmarshalFromXml(context, clazz, xml);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see gov.samhsa.acs.common.tool.Marshaller# marshall(java.lang.Object)
+	/**
+	 * Marshal.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param obj
+	 *            the obj
+	 * @param contextClass
+	 *            the context class
+	 * @return the string
+	 * @throws SimpleMarshallerException
+	 *             the simple marshaller exception
 	 */
-	@Override
-	public String marshal(Object obj) throws SimpleMarshallerException {
+	private <T> String marshal(Object obj, Class<T> contextClass)
+			throws SimpleMarshallerException {
 		JAXBContext context;
 		String output;
 		try {
-			context = JAXBContext.newInstance(obj.getClass());
+			context = JAXBContext.newInstance(contextClass);
 
 			// Create the marshaller, this is the nifty little thing that will
 			// actually transform the object into XML
@@ -80,22 +138,37 @@ public class SimpleMarshallerImpl implements SimpleMarshaller {
 			// Marshal the javaObject and write the XML to the stringWriter
 			marshaller.marshal(obj, stringWriter);
 			output = stringWriter.toString();
-		} catch (JAXBException e) {
+		} catch (final JAXBException e) {
 			throw new SimpleMarshallerException(e);
 		}
 		return output;
 	}
 
+	/**
+	 * Unmarshal from xml.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param context
+	 *            the context
+	 * @param clazz
+	 *            the clazz
+	 * @param xml
+	 *            the xml
+	 * @return the t
+	 * @throws SimpleMarshallerException
+	 *             the simple marshaller exception
+	 */
 	@SuppressWarnings("unchecked")
-	private <T> T unmarshallFromXml(JAXBContext context, Class<T> clazz,
+	private <T> T unmarshalFromXml(JAXBContext context, Class<T> clazz,
 			String xml) throws SimpleMarshallerException {
 		Unmarshaller um;
 		try {
 			um = context.createUnmarshaller();
-			ByteArrayInputStream input = new ByteArrayInputStream(
-					xml.getBytes());
+			final ByteArrayInputStream input = new ByteArrayInputStream(
+					xml.getBytes("UTF-8"));
 			return (T) um.unmarshal(input);
-		} catch (JAXBException e) {
+		} catch (JAXBException | UnsupportedEncodingException e) {
 			throw new SimpleMarshallerException(e);
 		}
 	}

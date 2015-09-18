@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,41 +32,34 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The Class UriResolverImpl.
  */
 class UriResolverImpl implements URIResolver {
 
-	/* (non-Javadoc)
-	 * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.xml.transform.URIResolver#resolve(java.lang.String,
+	 * java.lang.String)
 	 */
 	@Override
 	public Source resolve(String href, String base) throws TransformerException {
 		try {
-			InputStream is = Thread.currentThread().getContextClassLoader()
+			final InputStream is = Thread.currentThread()
+					.getContextClassLoader()
 					.getResourceAsStream("C32ToGreenCcd/" + href);
-			Source source = new StreamSource(is);
+			final Source source = new StreamSource(is);
 			source.setSystemId("C32ToGreenCcd/" + href);
 			return source;
-			
-			/*
-			// Use DOMSource
-			InputStream is = Thread.currentThread().getContextClassLoader()
-					.getResourceAsStream("C32ToGreenCcd/" + href);
-			InputSource xslInputSource = new InputSource(is);
-
-			DocumentBuilderFactory dFactory = DocumentBuilderFactory
-					.newInstance();
-			dFactory.setNamespaceAware(true);
-			DocumentBuilder dBuilder = dFactory.newDocumentBuilder();
-			Document xslDoc = dBuilder.parse(xslInputSource);
-			DOMSource xslDomSource = new DOMSource(xslDoc);
-			xslDomSource.setSystemId("C32ToGreenCcd/" + href);
-			return xslDomSource;*/
-			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-            return null;
+		} catch (final Exception e) {
+			logger.error(e.getMessage(), e);
+			throw new TransformerException(e);
 		}
 	}
 }

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>gov.samhsa.consent2share</groupId>
 		<artifactId>access-control-service</artifactId>
-		<version>0.6.0-SNAPSHOT</version>
+		<version>2.6.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>c32-service-client</artifactId>
 	<name>C32 Web Service Client</name>
@@ -14,9 +14,14 @@
 	<dependencies>
 
 		<dependency>
+			<groupId>gov.samhsa.consent2share</groupId>
+			<artifactId>common-library</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-frontend-jaxws</artifactId>
-			<scope>runtime</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -32,19 +37,17 @@
 
 		<!-- Testing -->
 
-		<!-- Web stack-specific dependencies that are internally needed by the
+		<!-- Web stack-specific dependencies that are internally needed by the 
 			Endpoint object as it exposes a web service -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http-jetty</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- Below used by embedded Jetty (which implements Endpoint in CXF) -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
@@ -70,17 +73,29 @@
 		</testResources>
 
 		<plugins>
+			<!-- Add generated-sources as source folder -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>target/generated-sources/</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- Generate Java classes from WSDL during build -->
 			<plugin>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
-				<dependencies>
-					<dependency>
-						<groupId>xerces</groupId>
-						<artifactId>xercesImpl</artifactId>
-						<version>${xercesImpl.version}</version>
-					</dependency>
-				</dependencies>
 				<executions>
 					<execution>
 						<id>generate-sources</id>
@@ -94,6 +109,9 @@
 									<extraargs>
 										<extraarg>-client</extraarg>
 										<!-- <extraarg>-impl</extraarg> -->
+										<!-- -fe cxf to generate the port code AutoCloseable -->
+										<extraarg>-fe</extraarg>
+										<extraarg>cxf</extraarg>
 									</extraargs>
 								</wsdlOption>
 							</wsdlOptions>

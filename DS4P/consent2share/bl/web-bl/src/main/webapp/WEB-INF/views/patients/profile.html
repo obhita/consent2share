@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+	
+<!-- <head th:include="fragment/common :: headerFragment">
+<meta charset="utf-8" />
+title needs to be dynamic
+<title>Consent2Share</title>
+<meta name="description" content="Consent Management System" />
+<meta name="author" content="FEiSystems" />
+END: Meta
+START: Mobile Specific
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+END: Mobile Specific
+START: CSS
+<link id="bootstrap-style" href="../../../resources/css/bootstrap.css"
+	rel="stylesheet" />
+<link href="../../../resources/css/font-awesome.css" rel="stylesheet" type="text/css" />
+<link href="../../../resources/css/themes-style.css" rel="stylesheet" />
+<link href="../../../resources/css/sentinel-style.css" rel="stylesheet" />
+END: CSS
+
+The HTML5 shim, for IE6-8 support of HTML5 elements
+[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]
+START: Favicon
+   <link rel="shortcut icon" href="images/favicon.ico">
+END: Favicon
+
+</head> -->
+
+<!-- COPIED FROM HEADER FRAGMENT -->
+<!-- Remove this section after Bootstrap update and restore fragment -->
+<head>
+	<meta charset="utf-8" />
+	<!-- title needs to be dynamic -->
+	<title>Consent2Share</title>
+	<meta name="description" content="Consent Management System" />
+	<meta name="author" content="FEiSystems" />
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<!-- END: Meta -->
+	<!-- START: Mobile Specific -->
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- END: Mobile Specific -->
+	<!-- START: CSS -->
+	
+	<!-- Bootstrap related CSS files -->
+	<link id="bootstrap-style" href="../../resources/css/modules/bootstrap.css"
+		rel="stylesheet" th:href="@{/resources/css/modules/bootstrap.css}" />
+	<link href="../../resources/css/modules/font-awesome.css"
+		th:href="@{/resources/css/modules/font-awesome.css}" rel="stylesheet" />
+	<link href="../../resources/css/modules/jquery-ui.css"
+		th:href="@{/resources/css/modules/jquery-ui.css}" rel="stylesheet" />
+	<!-- Plug-in Stylesheets -->
+	<link href="../../resources/css/modules/joyride-2-0-3.css" rel="stylesheet"
+		th:href="@{/resources/css/modules/joyride-2-0-3.css}" />
+	
+	<!-- Custom CSS Files -->
+	<link href="../../resources/css/custom/themes-style.css" rel="stylesheet"
+		th:href="@{/resources/css/custom/themes-style.css}" />
+	<link href="../../resources/css/custom/c2s-core-style.css" rel="stylesheet"
+		th:href="@{/resources/css/custom/c2s-core-style.css}" />
+	
+	<!-- END: CSS -->
+	
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
+	    
+	<!-- START: Favicon -->
+	<link rel="icon" href="../../resources/img/favicon.ico"  
+		th:href="@{/resources/img/favicon.ico}" type="image/x-icon"/>
+	<link rel="shortcut icon" href="../../resources/img/favicon.ico"  
+		th:href="@{/resources/img/favicon.ico}" type="image/x-icon"/>
+	<!-- END: Favicon -->
+</head>
+<!-- END COPIED FROM HEADER FRAGMENT -->
+
+<body>
+
+<div class="outmost-holder">
+	<!-- START: Page Header -->
+	<nav class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='My Profile',currentPageURI='/patients/profile.html'">
+		<div class="navbar-container">
+			<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/patient_fragments :: navbarHeaderFragmentNoLang">
+			
+			<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE navbarHeaderFragment -->
+			<!-- The code below is here only to enhance source code readability -->
+			
+					<a class="btn btn-info btn-mainmenu" data-toggle="collapse"
+						data-target=".top-nav.navbar-collapse,.sidebar-nav.navbar-collapse">
+						<span class="fa fa-bars"></span>
+					</a>
+					<h1>
+						<span class="nav-title">My Profile</span>
+					</h1>
+
+					<span th:include="fragment/common :: logoFragment">
+						<div style="position: relative;">
+							<a id="logoFragment" class="navbar-brand brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+							<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
+						</div>
+					</span>
+
+					<!-- COMPONENT: Header Menu-->
+
+					<div th:include="fragment/myaccount_menu :: myaccountMenuFragment"
+						class="btn-group pull-right">
+
+						<a class="btn btn-default" href="#"> <span class="glyphicon glyphicon-envelope"></span><span
+							class="hidden-sm hidden-md"> Message Center</span> <span
+							class="label label-warning hidden-sm">3</span>
+						</a>
+
+						<!-- COMPONENT: User Dropdown -->
+
+						<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+							<span class="glyphicon glyphicon-user">&nbsp;</span><span
+							class="hidden-sm hidden-md" th:text="#{header_my_account}">
+								My Account</span> <span class="caret"></span>
+						</a>
+
+						<ul role="menu" class="dropdown-menu">
+							<li role="menuitem"><a href="profile.html"
+								th:href="@{/patients/profile.html}"
+								th:text="#{header_my_profile}">My Profile</a></li>
+							<li role="menuitem"><a href="profile.html"
+								th:href="@{/patients/profile.html}"
+								th:text="#{header_change_password}">Change Password</a></li>
+							<li role="menuitem" aria-disabled="true" class="divider"></li>
+							<li role="menuitem"><a href="../index.html"
+								th:href="@{/resources/j_spring_security_logout}"
+								th:text="#{header_logout}">Logout</a></li>
+						</ul>
+					</div>
+			<!-- END OF SECTION REPLACED BY THYMELEAF -->
+			</div>
+		</div>
+	</nav>
+	
+	<div id="under-header"></div>
+	
+	<div class="container-fluid">
+		<div id="content">
+
+			<!-- START: Side Nav Menu -->
+
+			<div th:substituteby="fragment/patient_fragments :: sideNavMenuFragment" class="col-md-2 col-sm-3 main-menu-span">
+				<!-- EVERYTHING INSIDE HERE IS REPLACED BY THYMELEAF WITH THE sideNavMenuFragment -->
+				<!-- The code below is here as a backup only in the event of a Thymeleaf malfunction -->
+
+				<div class="nav-collapse sidebar-nav">
+					<ul class="nav nav-tabs nav-stacked main-menu" role="menu">
+						<li class="nav-header hidden-md" role="menuitem"></li>
+
+						<li class="active" role="menuitem"><a href="#">
+								<div class="glyphicon glyphicon-home glyphicon-large"></div> <span
+								class="hidden-md" th:text="#{sidebar_my_home}"> My
+									Home</span>
+						</a></li>
+
+						<li role="menuitem"><a href="../consents/listConsents.html"
+							th:href="@{/consents/listConsents.html}"><div
+									class="glyphicon glyphicon-file"></div> <span class="hidden-md"
+								th:text="#{sidebar_my_consents}"> My Consents</span></a></li>
+
+						<li role="menuitem"><a href="connectionMain.html"><div
+									class="glyphicon glyphicon-random"></div> <span class="hidden-md"
+								th:text="#{sidebar_my_contacts}"> My Providers </span></a></li>
+
+						<li role="menuitem"><a href="profile.html"><div
+									class="glyphicon glyphicon-user"></div> <span class="hidden-md"
+								th:text="#{sidebar_my_profile}"> My Profile</span></a></li>
+
+						<li role="menuitem"><a href="../inbox/inboxMain.html"
+							th:href="@{/inbox/inboxMain.html}"><div class="glyphicon glyphicon-inbox"></div>
+								<span class="hidden-md" th:text="#{sidebar_in_box}">
+									Message Center</span></a></li>
+
+
+						<li role="menuitem"><a href="activityHistory.html"><div
+									class="glyphicon glyphicon-time"></div> <span class="hidden-md"
+								th:text="#{sidebar_activity_history}"> Activity History</span></a></li>
+
+						<li role="menuitem"><a
+							href="../clinicaldocuments/mymedicalinfo.html"
+							th:href="@{/patients/medicalinfo.html}"><div
+									class="glyphicon glyphicon-folder-open"></div> <span class="hidden-md"
+								th:text="#{sidebar_medical_documents}"> Medical
+									Documents</span></a></li>
+
+						<li class="shortcut-button" role="menuitem"><a
+							href="../changePassword.html" th:href="@{/changePassword.html}"><div
+									class="glyphicon glyphicon-unlock-alt"></div> <span class="hidden-md"
+								th:text="#{sidebar_change_password}"> Change Password</span></a></li>
+
+						<li class="shortcut-button" role="menuitem"><a
+							href="../index.html"
+							th:href="@{/resources/j_spring_security_logout}"><div
+									class="glyphicon glyphicon-off"></div> <span class="hidden-md"
+								th:text="#{sidebar_logout}"> Logout</span></a></li>
+					</ul>
+				</div>
+
+				<!-- END OF SECTION REPLACED BY THYMELEAF -->
+			</div>
+
+			<!-- END: Side Nav Menu -->
+
+
+			<!-- JavaScrip Enable Message -->
+			<noscript th:substituteby="fragment/common :: noscriptFragment">
+				<div class="alert alert-warning col-md-10 col-sm-9">
+					<p id="h4-style" class="alert-heading">Warning!</p>
+					<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
+					target="_blank">JavaScript</a>enabled to use this site.</p>
+				</div>
+			</noscript>
+			
+			<!-- END : Page Header -->
+
+
+			<!-- START: Content Region-->
+
+			<div class="col-sm-9 col-md-10">
+				<div>
+
+					<!-- COMPONENT: Healthcare Providers -->
+
+					<div>
+						<div class="row">
+							<div class="col-xs-12 col-sm-12">
+								<span id="updatedMessage" class="h3-style" th:text="${updatedMessage}">Updated your profile successfully.</span>
+							</div>
+						</div>
+
+						<section class="top-margin10">
+							<form id="profileForm" action="#" th:action="@{/patients/profile.html}" th:object="${patientProfileDto}" method="post">
+								<fieldset id="edit-login-required">
+
+									<legend>Edit Required Account Information</legend>
+
+									<div class="required-info-group top-margin10">
+										<div class="row">
+											<div class="form-group col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div>
+													<label for="first_name">First Name</label>
+												</div>
+												<div>
+													<input id="first_name" name="firstname" type="text" aria-required="true" th:field="*{firstName}" class="form-control" />
+												</div>
+												<div id="fname_server_error_text" class="required-text" th:errors="*{firstName}">First name is required.</div>
+												<div id="fname_client_error_text" class="required-text" style="display: none;">First name is required.</div>
+											</div>
+										</div>
+
+										<div class="row">
+											<div class="form-group col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div>
+													<label for="last_name">Last Name</label>
+												</div>
+												<div>
+													<input id="last_name" name="lastname" type="text" aria-required="true" th:field="*{lastName}" class="form-control inline-block" />
+												</div>
+												<div id="lname_server_error_text" class="required-text" th:errors="*{lastName}">Last name must be between 2 and 30 characters.</div>
+												<div id="lname_client_error_text" class="required-text" style="display: none">Last name is required.</div>
+											</div>
+										</div>
+
+										<div class="row">
+											<div class="form-group col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div>
+													<label for="gender">Gender</label>
+												</div>
+												<div>
+													<select id="gender" th:field="*{administrativeGenderCode}" class="form-control">
+														<option selected="selected" value="">--- Please Select ---</option>
+														<option th:each="gender : ${administrativeGenderCodes}"
+															th:value="${gender.code}" th:text="${gender.displayName}">F</option>
+													</select>
+												</div>
+												<div id="gender_server_error_text" class="required-text" th:errors="*{administrativeGenderCode}">Gender Selection is required.</div>
+												<div id="gender_client_error_text" class="required-text" style="display: none;">Gender Selection is required.</div>
+											</div>
+										</div>
+
+										<div class="row">
+											<div class="form-group col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div>
+													<label for="dob" class="control-label">Date of Birth</label>
+												</div>
+												<div id="dob" class="align-selects">
+													<input type="hidden" id="date" data-format="MM/DD/YYYY" data-template="MMM D YYYY"
+														name="date" th:field="*{birthDate}" />
+													<label class="sr-only" for="month">Month</label>
+													<select id="month" class="form-control">
+														<option selected="selected" value="  ">Month</option>
+														<option value="01">January</option>
+														<option value="02">February</option>
+														<option value="03">March</option>
+														<option value="04">April</option>
+														<option value="05">May</option>
+														<option value="06">June</option>
+														<option value="07">July</option>
+														<option value="08">August</option>
+														<option value="09">September</option>
+														<option value="10">October</option>
+														<option value="11">November</option>
+														<option value="12">December</option>
+													</select>
+													<label class="sr-only" for="day">Day</label>
+													<select id="day" class="form-control">
+														<option selected="selected" value="  ">Day</option>
+														<option value="01">01</option>
+														<option value="02">02</option>
+														<option value="03">03</option>
+														<option value="04">04</option>
+														<option value="05">05</option>
+														<option value="06">06</option>
+														<option value="07">07</option>
+														<option value="08">08</option>
+														<option value="09">09</option>
+														<option value="10">10</option>
+														<option value="11">11</option>
+														<option value="12">12</option>
+														<option value="13">13</option>
+														<option value="14">14</option>
+														<option value="15">15</option>
+														<option value="16">16</option>
+														<option value="17">17</option>
+														<option value="18">18</option>
+														<option value="19">19</option>
+														<option value="20">20</option>
+														<option value="21">21</option>
+														<option value="22">22</option>
+														<option value="23">23</option>
+														<option value="24">24</option>
+														<option value="25">25</option>
+														<option value="26">26</option>
+														<option value="27">27</option>
+														<option value="28">28</option>
+														<option value="29">29</option>
+														<option value="30">30</option>
+														<option value="31">31</option>
+													</select>
+													<label class="sr-only" for="year">Year</label>
+													<select id="year" class="form-control">
+														<option selected="selected" value="    ">Year</option>
+													</select>
+												</div>
+												<div id="dob_server_error_text" class="required-text" th:errors="*{birthDate}">Date of Birth is required.</div>
+												<div id="dob_client_error_text" class="required-text" style="display: none;">Date of Birth is required.</div>
+											</div>
+										</div>
+
+										<div class="row">
+											<div class="form-group col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div>
+													<label for="email">Email</label>
+												</div>
+												<div>
+													<input id="email" name="email" type="text" aria-required="true" th:field="*{email}" class="form-control inline-block" />
+												</div>
+												<div id="email_server_error_text" class="required-text" th:errors="*{email}">Please provide a valid email address.</div>
+												<div id="email_client_error_text" class="required-text" style="display: none;">Please provide a valid email address.</div>
+											</div>
+										</div>
+									</div>									
+
+									<div class="clearfix"></div>
+								</fieldset>
+
+								<fieldset id="edit-login-additional">
+
+									<legend>Edit Additional Account Information</legend>
+
+									<div class="row">
+										<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4 top-margin10">
+											<div id="addressInputContainer" class="username-container">
+												<div>
+													<label for="addressInputContainer">Address</label>
+												</div>
+												
+												<div class="form-group">
+													<div>
+														<label for="street">Street Address</label>
+													</div>
+													<div>
+														<input id="street" name="streetAddressLine" type="text" th:field="*{addressStreetAddressLine}" class="form-control" />
+													</div>
+													<div id="street_server_error_text" class="required-text" th:errors="*{addressStreetAddressLine}">Please provide a valid street address.</div>
+													<div id="street_client_error_text" class="required-text" style="display: none;">Please provide a valid street address.</div>
+												</div>
+												
+												<div class="form-group">	
+													<div>
+														<label for="city">City</label>
+													</div>
+													<div>
+														<input id="city" name="city" type="text" th:field="*{addressCity}" class="form-control" />
+													</div>
+													<div id="city_server_error_text" class="required-text" th:errors="*{addressCity}">Please provide a valid city.</div>
+													<div id="city_client_error_text" class="required-text" style="display: none;">Please provide a valid city.</div>
+												</div>
+												
+												<div class="form-group">
+													<div>
+														<label for="state">State</label>
+													</div>
+													<div>
+														<select id="state" th:field="*{addressStateCode}" class="form-control">
+															<option selected="selected" value="">--- Please Select ---</option>
+															<option th:each="addressState : ${stateCodes}" th:value="${addressState.code}" th:text="${addressState.displayName}">Alabama</option>
+														</select>
+													</div>
+													<div id="state_server_error_text" class="required-text" th:errors="*{addressCity}">Please select a valid state.</div>
+													<div id="state_client_error_text" class="required-text" style="display: none;">Please select a valid state.</div>
+												</div>
+												
+												<div class="form-group">
+													<div>
+														<label for="zip">Zip Code</label>
+													</div>
+													<div>
+														<input id="zip" name="postalCode" type="text" th:field="*{addressPostalCode}" class="form-control" />
+													</div>
+													<div id="zip_server_error_text" class="required-text" th:errors="*{addressPostalCode}">Please provide a valid zip code</div>
+													<div id="zip_client_error_text" class="required-text" style="display: none;">Please provide a valid zip code</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									
+									<div class="other-info-group">
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div class="form-group">
+													<div>
+														<label for="phone">Phone Number</label>
+													</div>
+													<div>
+														<input id="phone" name="telephone" type="text" th:field="*{telephoneTelephone}" class="form-control" />
+													</div>
+													<div id="phone_server_error_text" class="required-text" th:errors="*{telephoneTelephone}">
+														Please provide a valid phone number. For example <span style="white-space: nowrap;">123-456-7890.</span>
+													</div>
+													<div id="phone_client_error_text" class="required-text" style="display: none;">
+														Please provide a valid phone number. For example <span style="white-space: nowrap;">123-456-7890.</span>
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div class="form-group">
+													<div>
+														<label for="socialsecurity">Social Security Number</label>
+													</div>
+													<div>
+														<input id="socialsecurity" name="socialSecurityNumber" type="text" th:field="*{socialSecurityNumber}" class="form-control" />
+													</div>
+													<div id="ssn_server_error_text" class="required-text" th:errors="*{socialSecurityNumber}">Please provide a valid social security number. For example 123-45-6789.</div>
+													<div id="ssn_client_error_text" class="required-text" style="display: none;">Please provide a valid social security number. For example 123-45-6789.</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div class="form-group">
+													<div>
+														<label for="medical_record_number">Medical Record Number (MRN)</label>
+													</div>
+													<div>
+														<p id="medical_record_number" class="form-control-static align-static-form-control" th:text="*{medicalRecordNumber}"></p>
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div class="form-group">
+													<div>
+														<label for="enterprise_identifier">Enterprise Identifier (EID)</label>
+													</div>
+													<div>
+														<p id="enterprise_identifier" class="form-control-static align-static-form-control" th:text="*{enterpriseIdentifier}?: 'You must enter a valid MRN to view the Enterprise Identifier.'" >
+															You must enter a valid MRN to view the Enterprise Identifier.
+														</p>
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div class="form-group">
+													<div>
+														<label class="control-label" for="maritalStatusCode">Marital Status</label>
+													</div>
+													<div>
+														<select id="maritalStatusCode" th:field="*{maritalStatusCode.code}" class="form-control">
+															<option selected="selected" value="">--- Please Select ---</option>
+															<option th:each="maritalStatus : ${maritalStatusCodes}"
+																	th:value="${maritalStatus.code}" th:text="${maritalStatus.displayName}">Married</option>
+														</select>
+													</div>
+													<div id="maritalStatusCode_server_error_text" class="required-text" th:errors="*{maritalStatusCode.code}">Please select a valid marital status.</div>
+													<div id="maritalStatusCode_client_error_text" class="required-text" style="display: none;">Please select a valid marital status.</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div class="form-group">
+													<div>
+														<label class="control-label" for="religiousAffiliationCode">Religious Affiliation</label>
+													</div>
+													<div>
+														<select id="religiousAffiliationCode" th:field="*{religiousAffiliationCode.code}" class="form-control">
+															<option selected="selected" value="">--- Please Select ---</option>
+															<option th:each="religiousAffiliation : ${religiousAffiliationCodes}"
+																	th:value="${religiousAffiliation.code}" th:text="${religiousAffiliation.displayName}">Voodoo</option>
+														</select>
+													</div>
+													<div id="religiousAffiliationCode_server_error_text" class="required-text" th:errors="*{religiousAffiliationCode.code}">Please select a valid religious affiliation.</div>
+													<div id="religiousAffiliationCode_client_error_text" class="required-text" style="display: none;">Please select a valid religious affiliation.</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div class="form-group">
+													<div>
+														<label class="control-label" for="raceCode">Race/Ethnicity</label>
+													</div>
+													<div>
+														<select id="raceCode" th:field="*{raceCode.code}" class="form-control">
+															<option selected="selected" value="">--- Please Select ---</option>
+															<option th:each="race : ${raceCodes}"
+																	th:value="${race.code}" th:text="${race.displayName}">White</option>
+														</select>
+													</div>
+													<div id="raceCode_server_error_text" class="required-text" th:errors="*{raceCode.code}">Please select a valid race/ethnicity.</div>
+													<div id="raceCode_client_error_text" class="required-text" style="display: none;">Please select a valid race/ethnicity.</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4">
+												<div class="form-group">
+													<div>
+														<label class="control-label" for="languageCode">Primary Language Spoken</label>
+													</div>
+													<div>
+														<select id="languageCode" th:field="*{languageCode.code}" class="form-control">
+															<option selected="selected" value="">--- Please Select ---</option>
+															<option th:each="language : ${languageCodes}"
+																	th:value="${language.code}" th:text="${language.displayName}">English, US</option>
+														</select>
+													</div>
+													<div id="languageCode_server_error_text" class="required-text" th:errors="*{raceCode.code}">Please select a valid language.</div>
+													<div id="languageCode_client_error_text" class="required-text" style="display: none;">Please select a valid language.</div>
+												</div>
+											</div>
+										</div>
+											
+									</div>
+									
+									<div class="clearfix"></div>
+
+									<div class="bottom-btn-group">
+										<div class="row">
+											<div class="col-xs-12 col-sm-12">
+												<button id="cancelProfileUpdate" type="button" class="btn btn-default">Cancel</button>
+	
+												<!-- Button trigger modal -->
+												<button id="saveProfile" type="button" class="btn btn-primary"
+														data-toggle="modal" data-target="#username_password_modal">Save</button>
+											</div>
+										</div>
+									</div>
+									
+									<!-- Modal -->
+									<div class="modal fade" id="username_password_modal" tabindex="-1"
+										role="dialog" aria-labelledby="username_password_modal_title" aria-hidden="true">
+										<div class="modal-dialog" role="document">
+											<div class="modal-content">
+												<div class="modal-header">
+													<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+													<h4 id="username_password_modal_title" class="modal-title">Please re-enter your username and password:</h4>
+												</div>
+												<div class="modal-body">
+													<div id="username-password-container">
+													
+														<div class="row">
+															<div class="col-xs-12 col-sm-12">
+																<div class="form-group">
+																	<label for="user_name">Username</label>
+																	<input id="user_name" name="username" type="text" 
+																		   class="form-control" aria-required="true" th:field="*{username}" />
+																	<div id="username_server_error_text" class="required-text" th:errors="*{username}">Username is required.</div>
+																	<div id="username_client_error_text" class="required-text" style="display: none;">Username is required.</div>
+																</div>
+															</div>
+														</div>
+
+														<div class="row">
+															<div class="col-xs-12 col-sm-12">
+																<div class="form-group">
+																	<label for="password">Password</label>
+																	<input id="password" name="password" type="password"
+																		   class="form-control" aria-required="true" th:field="*{password}" autocomplete="off"/>
+																	<div id="pwd_server_error_text" class="required-text" th:errors="*{password}">Password is required.</div>
+																	<div id="pwd_client_error_text" class="required-text" style="display: none;">Password is required.</div>
+																</div>
+															</div>
+														</div>
+														
+													</div>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+													<button id="profileFormSubmitButton" type="submit" value="Submit" class="btn btn-sm btn-primary">Submit</button>
+												</div>
+											</div>
+											<!-- /.modal-content -->
+										</div>
+										<!-- /.modal-dialog -->
+									</div>
+									<!-- /.modal -->
+								</fieldset>
+							</form>
+
+							
+						</section>
+					</div>
+					<!-- COMPONENT: Connections -->
+				</div>
+			</div>
+			<!--/#content.col-md-10-->
+		</div>
+			<!--/fluid-row-->
+			<!-- END: Content Region -->
+
+			<!-- ELEMENT: Divider -->
+
+	</div>
+	<div class="spacer-for-footer clearfix"></div>
+</div>
+
+<!-- START: Footer Region -->
+	
+<!-- 	
+<footer class="bottom"
+		th:include="fragment/common :: [//footer[@id='center-footer']]">
+
+		COMPONENT: Copyright Information
+		<p class="top-margin10 pull-left">
+			&copy; <a class="footer-link" href="" target="_blank">A SAMHSA
+				Public Service</a> 2013
+		</p>
+
+</footer> -->
+
+<!-- COPIED FROM FOOTER FRAGMENT -->
+<!-- Remove this section after Bootstrap update and restore fragment -->
+<footer class="bottom" id="center-footer">
+
+	<div>
+		<!-- COMPONENT: Copyright Information -->
+		<!-- 				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p> -->
+	</div>
+
+	<div class="hidden">
+		<!-- Include jQuery JavaScript on all pages using footer fragment -->
+		<script src="../../resources/js/jquery.min.js"
+			th:src="@{/resources/js/jquery.min.js}" type="text/javascript"></script>
+
+		<!-- Include bootstrap.js JavaScript file on all pages using footer fragment -->
+		<script src="../../resources/js/bootstrap.js"
+			th:src="@{/resources/js/bootstrap.js}" type="text/javascript"></script>
+
+		<!-- Include custom JavaScript from footerFragment.js file on all pages using footer fragment -->
+		<script src="../../resources/js/jquery-ui.min.js"
+			th:src="@{/resources/js/jquery-ui.min.js}" type="text/javascript"></script>
+		<script src="../../resources/js/webpage-js/sessionTimeout.js"
+			th:src="@{/resources/js/webpage-js/sessionTimeout.js}"
+			type="text/javascript"></script>
+		<script src="../../resources/js/webpage-js/footerFragment.js"
+			th:src="@{/resources/js/webpage-js/footerFragment.js}"
+			type="text/javascript"></script>
+	</div>
+
+</footer>
+<!-- END COPIED FROM FOOTER FRAGMENT -->
+
+<!-- END: Footer Region -->
+
+	<!-- START: JavaScript-->
+	
+		<script src="../../../resources/js/modernizr.mq.js" 
+				th:src="@{/resources/js/modernizr.mq.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/moment.min.1.7.2.js" 
+				th:src="@{/resources/js/moment.min.1.7.2.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/dateValidator.js" 
+				th:src="@{/resources/js/dateValidator.js}"
+				type="text/javascript"></script>
+		
+		
+		<!-- Custom JavaScript -->
+		
+		<!-- Modified for Bootstrap Fix -->
+		<script src="../../../resources/js/webpage-js/profile_registration.js" 
+				th:src="@{/resources/js/webpage-js/profile_registration.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/webpage-js/userAccountInfoValidation.js" 
+				th:src="@{/resources/js/webpage-js/userAccountInfoValidation.js}"
+				type="text/javascript"></script>
+		<script src="../../../resources/js/webpage-js/profile.js" 
+				th:src="@{/resources/js/webpage-js/profile.js}"
+				type="text/javascript"></script>
+		<!-- End of modified for Bootstrap fix -->
+	
+	<!-- END: JavaScript-->		
+
+</body>
+</html>

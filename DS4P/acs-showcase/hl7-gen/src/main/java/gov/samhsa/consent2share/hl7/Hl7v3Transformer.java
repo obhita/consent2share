@@ -25,32 +25,56 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.hl7;
 
+/**
+ * The Interface Hl7v3Transformer.
+ */
 public interface Hl7v3Transformer {
-	
 
-	/** The Constant XSLTURI. */
-	public final static String XSLTPIXADDURI = "c32ToHl7v3Pixadd.xsl";
-	public final static String XSLTPIXUPDATEURI = "c32ToHl7v3PixUpdate.xsl";
-	public final static String XSLTPIXQUERYURI = "c32ToHl7v3PixQuery.xsl";	
-	public final static String XMLPIXQUERYURI = "Hl7v3PixQuery.xml";
+	/** The Constant XSLT_PATIENT_DTO_TO_PIX_ADD. */
+	public final static String XSLT_PATIENT_DTO_TO_PIX_ADD = "patientDtoHl7v3PixAdd.xsl";
+
+	/** The Constant XSLT_PATIENT_DTO_TO_PIX_UPDATE. */
+	public final static String XSLT_PATIENT_DTO_TO_PIX_UPDATE = "patientDtoHl7v3PixUpdate.xsl";
+
+	/** The Constant XSLT_C32_TO_PIX_ADD. */
+	public final static String XSLT_C32_TO_PIX_ADD = "c32ToHl7v3PixAdd.xsl";
+
+	/** The Constant XSLT_C32_TO_PIX_UPDATE. */
+	public final static String XSLT_C32_TO_PIX_UPDATE = "c32ToHl7v3PixUpdate.xsl";
+
+	/** The Constant XSLT_C32_TO_PIX_QUERY. */
+	public final static String XSLT_C32_TO_PIX_QUERY = "c32ToHl7v3PixQuery.xsl";
+
+	/** The Constant XML_PIX_QUERY. */
+	public final static String XML_PIX_QUERY = "Hl7v3PixQuery.xml";
+
 	/**
-	 * Transform c32 to green ccd.
+	 * Transform to hl7v3 pix xml.
 	 *
-	 * @param c32xml the c32xml
+	 * @param xml
+	 *            the xml
+	 * @param XSLTURI
+	 *            the xslturi
 	 * @return the string
-	 * @throws C32ToGreenCcdTransformerException the c32 to green ccd transformer exception
+	 * @throws Hl7v3TransformerException
+	 *             the hl7v3 transformer exception
 	 */
-	public String transformC32ToHl7v3PixXml(String c32xml, String XSLTURI)
+	public String transformToHl7v3PixXml(String xml, String XSLTURI)
 			throws Hl7v3TransformerException;
 
 	/**
 	 * Transform c32 to green ccd.
 	 *
-	 * @param mrn the medical record no of patient
-	 * @param mrnDomain the eHRdomain id
-	 * @param xsltUri the xsl for pixquery
+	 * @param mrn
+	 *            the medical record no of patient
+	 * @param mrnDomain
+	 *            the eHRdomain id
+	 * @param xsltUri
+	 *            the xsl for pixquery
 	 * @return the string
-	 * @throws C32ToGreenCcdTransformerException the c32 to green ccd transformer exception
-	 */	
-	public String getPixQueryXml(String mrn, String mrnDomain, String xsltUri) throws Hl7v3TransformerException ;	
+	 * @throws Hl7v3TransformerException
+	 *             the hl7v3 transformer exception
+	 */
+	public String getPixQueryXml(String mrn, String mrnDomain, String xsltUri)
+			throws Hl7v3TransformerException;
 }

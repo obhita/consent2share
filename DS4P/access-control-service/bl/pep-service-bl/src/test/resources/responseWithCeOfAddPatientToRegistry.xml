@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns:MCCI_IN000002UV01 xmlns:ns="urn:hl7-org:v3" ITSVersion="XML_1.0">
+	<ns:id root="urn:uuid:fb0fe36a-a13c-48e8-96bc-fa5dfce916aa"/>
+	<ns:creationTime value="20121220120251"/>
+	<ns:versionCode code="V3PR1"/>
+	<ns:interactionId displayable="true" extension="MCCI_IN000002UV01" root="2.16.840.1.113883"/>
+	<ns:processingCode code="P"/>
+	<ns:processingModeCode code="T"/>
+	<ns:acceptAckCode code="NE"/>
+	<ns:receiver typeCode="RCV">
+		<device xmlns="urn:hl7-org:v3" determinerCode="INSTANCE">
+			<id root="1.2.840.114350.1.13.99998.8734"/>
+		</device>
+	</ns:receiver>
+	<ns:sender typeCode="SND">
+		<ns:device classCode="DEV" determinerCode="INSTANCE">
+			<ns:id root="1.3.6.1.4.1.21367.2010.1.3.4.610"/>
+			<ns:name>GATEWAY_VANGENT_XDSbRegistry</ns:name>
+		</ns:device>
+	</ns:sender>
+	<ns:acknowledgement>
+		<ns:typeCode code="CE"/>
+		<ns:targetMessage>
+			<id xmlns="urn:hl7-org:v3" root="cdc0d3fa-4467-11dc-a6be-3603d686610257"/>
+		</ns:targetMessage>
+		<ns:acknowledgementDetail>
+			<ns:text>Patient ID 10^^^&amp;1.2.840.114350.1.13.99998.8734&amp;ISO already exists - skipping ADD!</ns:text>
+		</ns:acknowledgementDetail>
+	</ns:acknowledgement>
+</ns:MCCI_IN000002UV01>
+

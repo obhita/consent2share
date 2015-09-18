@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- *   
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions are met:
  *       * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *       * Neither the name of the <organization> nor the
  *         names of its contributors may be used to endorse or promote products
  *         derived from this software without specific prior written permission.
- *   
+ *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,28 +25,28 @@
  ******************************************************************************/
 package gov.samhsa.acs.xdsb.registry.wsclient.exception;
 
-public class XdsbRegistryClientException extends Exception {
+public class XdsbRegistryClientException extends RuntimeException {
 
 	private static final long serialVersionUID = 3699721168110612162L;
 
 	public XdsbRegistryClientException() {
-		super();		
+		super();
+	}
+
+	public XdsbRegistryClientException(String message) {
+		super(message);
+	}
+
+	public XdsbRegistryClientException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 	public XdsbRegistryClientException(String message, Throwable cause,
 			boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);		
-	}
-
-	public XdsbRegistryClientException(String message, Throwable cause) {
-		super(message, cause);		
-	}
-
-	public XdsbRegistryClientException(String message) {
-		super(message);		
+		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
 	public XdsbRegistryClientException(Throwable cause) {
-		super(cause);		
+		super(cause);
 	}
 }

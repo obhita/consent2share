@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,6 +25,10 @@
  ******************************************************************************/
 package gov.samhsa.acs.c32.wsclient;
 
+import gov.samhsa.acs.common.cxf.AbstractCXFLoggingConfigurerClient;
+import gov.samhsa.schemas.c32service.C32Service;
+import gov.samhsa.schemas.c32service.C32Service.IC32ServiceProxy;
+
 import java.net.URL;
 import java.util.Date;
 
@@ -35,42 +39,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import gov.samhsa.schemas.c32service.*;
-
 /**
  * The Class C32WebServiceClient.
  */
-public class C32WebServiceClient {
-	
-	/** The Constant LOGGER. */
-	private static final Logger LOGGER = LoggerFactory
+public class C32WebServiceClient extends AbstractCXFLoggingConfigurerClient {
+
+	/** The logger. */
+	private final Logger logger = LoggerFactory
 			.getLogger(C32WebServiceClient.class);
-	
+
 	/** The endpoint address. */
-	private String endpointAddress;
-
-	/**
-	 * The main method.
-	 *
-	 * @param args the arguments
-	 */
-	public static void main(String[] args) {
-		final String patientId = "PUI100010060001";
-		/*
-		 * if (args.length != 1) {
-		 * System.out.println("Usage: C32Service &lt;patient id>");
-		 * System.exit(-1); }
-		 */
-
-		C32WebServiceClient c32Service = new C32WebServiceClient(null);
-		// String patientId = args[0];
-		c32Service.run(patientId);
-	}
+	private final String endpointAddress;
 
 	/**
 	 * Instantiates a new c32 web service client.
 	 *
-	 * @param endpointAddress the endpoint address
+	 * @param endpointAddress
+	 *            the endpoint address
 	 */
 	public C32WebServiceClient(String endpointAddress) {
 		this.endpointAddress = endpointAddress;
@@ -79,46 +64,50 @@ public class C32WebServiceClient {
 	/**
 	 * Gets the c32.
 	 *
-	 * @param patientId the patient id
+	 * @param patientId
+	 *            the patient id
 	 * @return the c32
 	 */
 	public String getC32(String patientId) {
-		IC32Service port;
-		if (StringUtils.hasText(this.endpointAddress))
-		{
-			port = createPort(endpointAddress);
+		try (IC32ServiceProxy port = createPort(this.endpointAddress)) {
+			return port.getC32(patientId);
+		} catch (final Exception e) {
+			throw toC32WebServiceClientException(e);
 		}
-		else
-		{
-			// Using default endpoint address defined in the wsdl:port of wsdl file
-			port = createPort();
-		}
-		
-		return getC32(port, patientId);
-	}
-
-	/**
-	 * Gets the c32.
-	 *
-	 * @param port the port
-	 * @param patientId the patient id
-	 * @return the c32
-	 */
-	private String getC32(IC32Service port, String patientId) {
-		return port.getC32(patientId);
 	}
 
 	/**
 	 * Creates the port.
 	 *
-	 * @return the i c32 service
+	 * @return the i c32 service proxy
 	 */
-	private IC32Service createPort() {
-		final URL WSDL_LOCATION = this.getClass().getClassLoader().getResource("C32Service.wsdl");
+	private IC32ServiceProxy createPort() {
+		return configurePort(this::createPortProxy);
+	}
+
+	/**
+	 * Creates the port.
+	 *
+	 * @param endpointAddress
+	 *            the endpoint address
+	 * @return the i c32 service proxy
+	 */
+	private IC32ServiceProxy createPort(String endpointAddress) {
+		return configurePort(() -> createPortProxy(endpointAddress));
+	}
+
+	/**
+	 * Creates the port proxy.
+	 *
+	 * @return the i c32 service proxy
+	 */
+	private IC32ServiceProxy createPortProxy() {
+		final URL WSDL_LOCATION = this.getClass().getClassLoader()
+				.getResource("C32Service.wsdl");
 		final QName SERVICE = new QName("http://schemas.samhsa.gov/c32service",
 				"C32Service");
 
-		IC32Service port = new C32Service(WSDL_LOCATION, SERVICE)
+		final IC32ServiceProxy port = new C32Service(WSDL_LOCATION, SERVICE)
 				.getBasicHttpBindingIC32Service();
 		return port;
 	}
@@ -126,24 +115,29 @@ public class C32WebServiceClient {
 	/**
 	 * Creates the port.
 	 *
-	 * @param endpointAddress the endpoint address
+	 * @param endpointAddress
+	 *            the endpoint address
 	 * @return the i c32 service
 	 */
-	private IC32Service createPort(String endpointAddress) {
-		IC32Service port = createPort();
-		BindingProvider bp = (BindingProvider) port;
-		bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-				endpointAddress);
+	private IC32ServiceProxy createPortProxy(String endpointAddress) {
+		final IC32ServiceProxy port = createPort();
+		if (StringUtils.hasText(endpointAddress)) {
+			final BindingProvider bp = port;
+			bp.getRequestContext().put(
+					BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
+		}
 		return port;
 	}
 
 	/**
 	 * Run.
 	 *
-	 * @param patientId the patient id
+	 * @param patientId
+	 *            the patient id
 	 */
 	private void run(String patientId) {
-		try {
+		// Get a reference to the SOAP service interface.
+		try (IC32ServiceProxy port = createPort()) {
 			// Add the certificate that is not accepted to your key store and
 			// tell your Java/socket factory to use this "trust store"
 			// System.setProperty( "javax.net.ssl.trustStore",
@@ -153,14 +147,12 @@ public class C32WebServiceClient {
 			// Or turn off SSL check
 			// XTrustProvider.install();
 
-			LOGGER.debug("Creating C32 service instance ...");
+			logger.debug("Creating C32 service instance ...");
 			long start = new Date().getTime();
-			// Get a reference to the SOAP service interface.
-			IC32Service port = createPort();
 
 			long end = new Date().getTime();
-			LOGGER.debug("...Done! IC32Service instance: {}", port);
-			LOGGER.debug(
+			logger.debug("...Done! IC32Service instance: {}", port);
+			logger.debug(
 					"Time required to initialize c32 service interface: {} seconds",
 					(end - start) / 1000f);
 
@@ -171,16 +163,50 @@ public class C32WebServiceClient {
 			// String c32 =
 			// getC32("http://taolinpc2.fei.local/Rem.Web/C32Service.svc",
 			// patientId);
-			String c32 = getC32(port, patientId);
+			final String c32 = port.getC32(patientId);
 			end = new Date().getTime();
-			LOGGER.debug("Time required to invoke 'getC32': {} seconds",
+			logger.debug("Time required to invoke 'getC32': {} seconds",
 					(end - start) / 1000f);
 
 			System.out.print(c32);
-			LOGGER.debug("");
-			LOGGER.debug("Program complete, exiting");
+			logger.debug("");
+			logger.debug("Program complete, exiting");
 		} catch (final Exception e) {
-			LOGGER.error("An exception occurred, exiting", e);
+			logger.error("An exception occurred, exiting", e);
+			throw toC32WebServiceClientException(e);
 		}
+	}
+
+	/**
+	 * To c32 web service client exception.
+	 *
+	 * @param exception
+	 *            the exception
+	 * @return the c32 web service client exception
+	 */
+	private C32WebServiceClientException toC32WebServiceClientException(
+			Exception exception) {
+		logger.error("Error closing C32WebServiceClient port");
+		logger.error(exception.getMessage(), exception);
+		return new C32WebServiceClientException(exception);
+	}
+
+	/**
+	 * The main method.
+	 *
+	 * @param args
+	 *            the arguments
+	 */
+	public static void main(String[] args) {
+		final String patientId = "PUI100010060001";
+		/*
+		 * if (args.length != 1) {
+		 * System.out.println("Usage: C32Service &lt;patient id>");
+		 * System.exit(-1); }
+		 */
+
+		final C32WebServiceClient c32Service = new C32WebServiceClient(null);
+		// String patientId = args[0];
+		c32Service.run(patientId);
 	}
 }

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   		http://www.springframework.org/schema/beans/spring-beans.xsd
+	   		http://www.springframework.org/schema/context
+	   		http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/mvc
+			http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<bean id="propertyPlaceholderConfigurer" class="org.jasypt.spring31.properties.EncryptablePropertyPlaceholderConfigurer">
+	    <constructor-arg ref="configurationEncryptor" />
+	    <property name="ignoreUnresolvablePlaceholders" value="true"/>
+	    <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+	    <property name="searchSystemEnvironment" value="false"/>
+	    <property name="locations">
+	        <list>
+	            <value>file:${C2S_PROPS}/si/bl/config/*.properties</value>
+	        </list>
+	    </property>
+	</bean> 
+
+	<bean id="configurationEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+	  	<property name="config" ref="environmentVariablesConfiguration" />
+	</bean>
+	
+	<bean id="environmentVariablesConfiguration"
+		      class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+		<property name="algorithm" value="PBEWithMD5AndDES" />
+		<property name="passwordSysPropertyName" value="C2S_KEY" />
+	</bean>
+
+	<import resource="applicationContext-dataAccess.xml" />
+	<import resource="applicationContext-jpa.xml" />
+	<import resource="spring-integration-context.xml" />
+	<import resource="rabbit-context.xml" />
+
+	<!-- Activates various annotations to be detected in bean classes -->
+	<context:annotation-config />
+
+	<!-- Scans the classpath for annotated components that will be auto-registered
+		as Spring beans. For example @Controller and @Service. Make sure to set the
+		correct base-package -->
+	<context:component-scan
+		base-package="gov.samhsa.consent2share.si">
+	</context:component-scan>
+
+	<!-- Configures the annotation-driven Spring MVC Controller programming
+		model. Note that, with Spring 3.0, this tag works in Servlet MVC only! -->
+	<mvc:annotation-driven />
+
+	<!-- SI Audit Service -->
+	<bean id="auditServiceImpl" class="gov.samhsa.acs.audit.AuditServiceImpl" scope="singleton" init-method="init" destroy-method="destroy">
+		<constructor-arg value="SIAuditService" />
+	</bean>
+
+	<!-- Consent Getter: required -->
+	<bean id="consentGetterImpl"
+		class="gov.samhsa.consent2share.si.ConsentGetterImpl"
+		autowire="constructor">
+	</bean>
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler">
+        <property name="nativeJdbcExtractor" ref="nativeJdbcExtractor"/>
+    </bean>
+    <bean id="nativeJdbcExtractor"
+		class="org.springframework.jdbc.support.nativejdbc.C3P0NativeJdbcExtractor"
+		lazy-init="true" />
+	<bean id="signedConsentDtoRowMapper"
+		class="gov.samhsa.consent2share.si.SignedConsentDtoRowMapper"
+		scope="singleton" autowire="constructor"/>
+	<bean id="revokedConsentDtoRowMapper"
+		class="gov.samhsa.consent2share.si.RevokedConsentDtoRowMapper"
+		scope="singleton" autowire="constructor"/>
+	
+	<!-- Common Tools: required -->
+	<bean id="simpleMarshallerImpl"
+		class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl"
+		scope="prototype" />
+	
+	<!-- Policy Repository Client: enable to integrate with Policy Repository -->
+	<bean id="polRepRestClient"
+		class="gov.samhsa.acs.polrep.client.PolRepRestClient"
+		scope="prototype">
+		<constructor-arg index="0" value="${c2s.polrep.scheme}" />
+		<constructor-arg index="1" value="${c2s.polrep.host}" />
+		<constructor-arg index="2" value="${c2s.polrep.port}" />
+		<constructor-arg index="3" value="${c2s.polrep.context}" />
+		<constructor-arg index="4" value="${c2s.polrep.version}" />
+	</bean>
+
+</beans>

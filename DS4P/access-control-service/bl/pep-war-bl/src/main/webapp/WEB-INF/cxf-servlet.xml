@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:soap="http://cxf.apache.org/bindings/soap" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	default-lazy-init="true" default-init-method="afterPropertiesSet"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
+		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+	<!-- Import statement optional but often required if you're declaring other 
+		CXF beans in this file such as CXF's JMX MBeans -->
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+
+	<!-- This will automatically locate any and all property files you have within your classpath. 
+	The located property files are parsed and their values can then be used within 
+	application context files in the form of ${propertyKey}. -->
+	<import resource="external-properties.xml"/>
+	
+	<!-- End points -->
+	<jaxws:endpoint id="PepService" implementor="#pepPortTypeImpl"
+		wsdlLocation="classpath:wsdl/Pep.wsdl" address="/PepService">
+		<jaxws:properties>
+			<entry key="mtom-enabled" value="true" />
+
+			<!-- Use only if not using WS-SecureConversation -->
+			<entry key="ws-security.callback-handler"
+				value="gov.samhsa.acs.pep.saml.ServiceKeystorePasswordCallback" />
+			<entry key="ws-security.signature.properties" value="serviceKeystore.properties" />
+			<!-- Use only if using WS-SecureConversation -->
+			<!--entry key="ws-security.callback-handler.sct" value="service.ServiceKeystorePasswordCallback"/> 
+				<entry key="ws-security.signature.properties.sct" value="serviceKeystore.properties"/ -->
+			<!-- Uncomment below element if Metro clients present -->
+			<!--entry key="ws-security.is-bsp-compliant" value="false"/ -->
+		</jaxws:properties>
+	</jaxws:endpoint>
+
+	<!-- New beans -->
+
+	<!-- Common Tools -->
+	<bean id="documentXmlConverterImpl" class="gov.samhsa.acs.common.tool.DocumentXmlConverterImpl"
+		scope="prototype" />
+	<bean id="fileReaderImpl" class="gov.samhsa.acs.common.tool.FileReaderImpl"
+		scope="prototype" />
+	<bean id="simpleMarshallerImpl" class="gov.samhsa.acs.common.tool.SimpleMarshallerImpl"
+		scope="prototype" />
+	<bean id="documentAccessorImpl" class="gov.samhsa.acs.common.tool.DocumentAccessorImpl"
+		scope="prototype" />
+	<bean id="xmlTransformerImpl" class="gov.samhsa.acs.common.tool.XmlTransformerImpl"
+		scope="prototype" autowire="constructor" />
+
+	<!-- ACS Audit Service -->
+	<bean id="auditServiceImpl" class="gov.samhsa.acs.audit.AuditServiceImpl"
+		scope="singleton" init-method="init" destroy-method="destroy">
+		<constructor-arg value="AcsAuditService" />
+	</bean>
+
+	<!-- XDS.b -->
+	<!-- XDS.b: common -->
+	<bean id="registryErrorListSetterPepImpl" class="gov.samhsa.acs.pep.xdsb.RegistryErrorListSetterPepImpl"
+		scope="prototype">
+	</bean>
+	<bean id="xdsbErrorFactory" class="gov.samhsa.acs.xdsb.common.XdsbErrorFactory"
+		scope="prototype" autowire="constructor">
+	</bean>
+	<!-- XDS.b: clients -->
+	<bean id="contentTypeRebuildingOutboundSoapInterceptor"
+		class="gov.samhsa.acs.common.cxf.ContentTypeRebuildingOutboundSoapInterceptor"/>
+	<bean id="xdsbRegistryWebServiceClient"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.XdsbRegistryWebServiceClient"
+		scope="prototype" autowire="constructor">
+		<constructor-arg value="${xdsbRegistry}" />
+	</bean>
+	<bean id="xdsbRepositorybWebServiceClient"
+		class="gov.samhsa.acs.xdsb.repository.wsclient.XDSRepositorybWebServiceClient"
+		scope="prototype">
+		<constructor-arg value="${xdsbRepository}" />
+		<property name="outInterceptors">
+			<list>
+				<ref bean="contentTypeRebuildingOutboundSoapInterceptor"/>
+			</list>
+		</property>
+	</bean>
+	<!-- XDS.b: adapters -->
+	<bean id="adhocQueryResponseFilter"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.adapter.AdhocQueryResponseFilter"
+		scope="prototype" autowire="constructor">
+	</bean>
+	<bean id="xdsbRegistryAdapter"
+		class="gov.samhsa.acs.xdsb.registry.wsclient.adapter.XdsbRegistryAdapter"
+		scope="prototype" autowire="constructor">
+	</bean>
+	<bean id="retrieveDocumentSetResponseFilter"
+		class="gov.samhsa.acs.xdsb.repository.wsclient.adapter.RetrieveDocumentSetResponseFilter"
+		scope="prototype" autowire="constructor">
+	</bean>
+	<bean id="xdsbRepositoryAdapter"
+		class="gov.samhsa.acs.xdsb.repository.wsclient.adapter.XdsbRepositoryAdapter"
+		scope="prototype" autowire="constructor">
+	</bean>
+
+	<!-- PDP -->
+	<!-- PDP: PolRepPolicyProvider: enable for Policy Repository integration -->
+	<bean id="hl7v3TransformerImpl" class="gov.samhsa.consent2share.hl7.Hl7v3TransformerImpl"
+		scope="prototype" autowire="constructor"/>
+	<bean id="pixManagerRequestXMLToJava" class="gov.samhsa.consent2share.pixclient.util.PixManagerRequestXMLToJava"
+		scope="prototype" autowire="constructor"/>
+	<bean id="pixManagerMessageHelper" class="gov.samhsa.consent2share.pixclient.util.PixManagerMessageHelper"
+		scope="prototype"/>
+	<bean id="pixManagerServiceImpl" class="gov.samhsa.consent2share.pixclient.service.PixManagerServiceImpl"
+		scope="prototype">
+		<constructor-arg index="0" value="${empi}"/>
+	</bean>
+	<bean id="polRepRestClient" class="gov.samhsa.acs.polrep.client.PolRepRestClient"
+		scope="prototype">
+		<constructor-arg index="0" value="${c2sPolrepScheme}"/>
+		<constructor-arg index="1" value="${c2sPolrepHost}"/>
+		<constructor-arg index="2" value="${c2sPolrepPort}"/>
+		<constructor-arg index="3" value="${c2sPolrepContext}"/>
+		<constructor-arg index="4" value="${c2sPolrepVersion}"/>
+	</bean>
+	<bean id="polRepPolicyProvider" class="gov.samhsa.acs.contexthandler.PolRepPolicyProvider"
+		scope="prototype" autowire="constructor">
+		<constructor-arg index="0" value="${pidDomainId}"/>
+		<constructor-arg index="1" value="${pidDomainType}"/>
+	</bean>
+
+	<!-- PDP: request generator -->
+	<bean id="requestGenerator" class="gov.samhsa.acs.contexthandler.RequestGenerator"
+		scope="prototype">
+	</bean>
+	<!-- PDP: pdp -->
+	<bean id="policyDecisionPointImpl" class="gov.samhsa.acs.contexthandler.PolicyDecisionPointImpl"
+		scope="prototype" autowire="constructor">
+	</bean>
+
+	<!-- ContextHandler -->
+	<!-- ContextHandler: context handler -->
+	<bean id="contextHandlerImpl" class="gov.samhsa.acs.contexthandler.ContextHandlerImpl"
+		scope="prototype" autowire="constructor">
+	</bean>
+
+	<bean id="dSSWebServiceClient" class=" gov.samhsa.acs.dss.wsclient.DSSWebServiceClient">
+		<constructor-arg index="0" value="${documentSegmentationService}"/>
+	</bean>
+
+	<!-- PEP -->
+	<!-- PEP: DataHandlerToBytesConverter -->
+	<bean id="dataHandlerToBytesConverterImpl" class="gov.samhsa.acs.pep.DataHandlerToBytesConverterImpl"
+		scope="prototype">
+	</bean>
+
+	<!-- PEP: pep -->
+	<bean id="policyEnforcementPointImpl" class="gov.samhsa.acs.pep.PolicyEnforcementPointImpl"
+		scope="prototype" autowire="constructor">
+		<constructor-arg index="0" type="boolean" value="${isAuditFailureByPass}" />
+	</bean>
+
+	<bean id="webServiceContext" class="org.apache.cxf.jaxws.context.WebServiceContextImpl"
+		scope="prototype">
+	</bean>
+
+	<bean id="samlTokenParser" class="gov.samhsa.acs.pep.saml.SamlTokenParser"
+		scope="prototype">
+	</bean>
+
+	<bean id="samlTokenPrincipal" class="org.apache.wss4j.common.principal.SAMLTokenPrincipal"
+		scope="prototype">
+	</bean>
+
+	<!-- PEP: pep-ws -->
+	<bean id="pepPortTypeImpl" class="gov.samhsa.acs.pep.ws.PepPortTypeImpl"
+		scope="prototype" autowire="constructor" />
+
+	<!-- Enable AspectJ style of Spring AOP -->
+	<aop:aspectj-autoproxy />
+
+	<!-- Configure Aspect Beans, without this Aspects advices wont execute -->
+	<bean name="aspectUtils" class="gov.samhsa.acs.pep.aspect.AspectUtils"
+		scope="prototype" />
+	<bean name="loggingAspect" class="gov.samhsa.acs.pep.aspect.LoggingAspect"
+		scope="prototype" />
+
+	<bean id="cxfLoggingConfigurer"
+		class="gov.samhsa.acs.common.cxf.CXFLoggingConfigurer"
+		autowire="constructor">
+		<!-- set this property to enable/disable CXF Logging Interceptors, -->
+		<!-- or use loggerCheckController RESTful API to change this configuration at runtime. -->
+		<!--<property name="enableLoggingInterceptors" value="true" />-->
+	</bean>
+	
+	<bean id="loggerCheckController" class="gov.samhsa.acs.pep.rs.instrumentation.LoggerCheckController"
+		autowire="constructor">
+		<constructor-arg index="0" value="${instrumentationKey}" />  
+	</bean>
+	
+	<jaxrs:server id="loggerCheckService" address="/">
+		<jaxrs:serviceBeans>  
+			<ref bean="loggerCheckController" />  
+		</jaxrs:serviceBeans> 
+	</jaxrs:server> 
+
+</beans>

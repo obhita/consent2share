@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 
 import org.hl7.v3.types.MCCIIN000002UV01;
 import org.hl7.v3.types.PRPAIN201301UV02;
@@ -17,13 +16,15 @@ import org.hl7.v3.types.PRPAIN201304UV02;
 import org.hl7.v3.types.PRPAIN201309UV02;
 import org.hl7.v3.types.PRPAIN201310UV02;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openhie.openpixpdq.services.PIXManagerPortType;
-import org.openhie.openpixpdq.services.PIXManagerService;
+import org.openhie.openpixpdq.services.PIXManagerService.PIXManagerPortTypeProxy;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PixManagerServiceImplTest {
@@ -32,11 +33,15 @@ public class PixManagerServiceImplTest {
 	private String address;
 	private QName serviceName;
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
 	@InjectMocks
+	@Spy
 	PixManagerServiceImpl sut;
 
 	@Mock
-	PIXManagerPortType pIXManagerPortTypeMock;
+	PIXManagerPortTypeProxy pIXManagerPortTypeMock;
 
 	@Before
 	public void setup() throws MalformedURLException {
@@ -45,45 +50,41 @@ public class PixManagerServiceImplTest {
 
 		address = "http://localhost:12345/services/PIXManager_Service";
 		wsdlURL = ClassLoader.getSystemResource("PIXPDQManager.wsdl");
-		sut.setPort(pIXManagerPortTypeMock);
-	}
-
-	@Test
-	public void testPixManagerServiceImpl() {
-		// Act
-		PixManagerServiceImpl pmsImpl = new PixManagerServiceImpl("");
-
-		// Assert
-		assertEquals(sut.getClass(), pmsImpl.getClass());
-	}
-
-	@Test
-	public void testPixManagerServiceImplString() {
-		// Arrange
-		String endPtAddr = address;
-
-		// Act
-		PixManagerServiceImpl pmsImpl = new PixManagerServiceImpl(endPtAddr);
-
-		pmsImpl.setPort(pIXManagerPortTypeMock);
-
-		// Assert
-		assertEquals(sut.getClass(), pmsImpl.getClass());
-		assertEquals(pmsImpl.getPort(), sut.getPort());
+		when(sut.createPort()).thenReturn(pIXManagerPortTypeMock);
 	}
 
 	@Test
 	public void testPixManagerPRPAIN201301UV02() {
 		// Arrange
-		PRPAIN201301UV02 pRPAIN201301UV02Mock = mock(PRPAIN201301UV02.class);
-		MCCIIN000002UV01 mCCIIN000002UV01Mock = mock(MCCIIN000002UV01.class);
+		final PRPAIN201301UV02 pRPAIN201301UV02Mock = mock(PRPAIN201301UV02.class);
+		final MCCIIN000002UV01 mCCIIN000002UV01Mock = mock(MCCIIN000002UV01.class);
 		when(
 				pIXManagerPortTypeMock
-						.pixManagerPRPAIN201301UV02(pRPAIN201301UV02Mock))
+				.pixManagerPRPAIN201301UV02(pRPAIN201301UV02Mock))
 				.thenReturn(mCCIIN000002UV01Mock);
 
 		// Act
-		MCCIIN000002UV01 actualObj = sut
+		final MCCIIN000002UV01 actualObj = sut
+				.pixManagerPRPAIN201301UV02(pRPAIN201301UV02Mock);
+
+		// Assert
+		assertEquals(mCCIIN000002UV01Mock, actualObj);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testPixManagerPRPAIN201301UV02_Throws_PixManagerServiceException() {
+		// Arrange
+		thrown.expect(PixManagerServiceException.class);
+		final PRPAIN201301UV02 pRPAIN201301UV02Mock = mock(PRPAIN201301UV02.class);
+		final MCCIIN000002UV01 mCCIIN000002UV01Mock = mock(MCCIIN000002UV01.class);
+		when(
+				pIXManagerPortTypeMock
+				.pixManagerPRPAIN201301UV02(pRPAIN201301UV02Mock))
+				.thenThrow(Exception.class);
+
+		// Act
+		final MCCIIN000002UV01 actualObj = sut
 				.pixManagerPRPAIN201301UV02(pRPAIN201301UV02Mock);
 
 		// Assert
@@ -93,15 +94,35 @@ public class PixManagerServiceImplTest {
 	@Test
 	public void testPixManagerPRPAIN201302UV02() {
 		// Arrange
-		PRPAIN201302UV02 pRPAIN201302UV02Mock = mock(PRPAIN201302UV02.class);
-		MCCIIN000002UV01 mCCIIN000002UV01Mock = mock(MCCIIN000002UV01.class);
+		final PRPAIN201302UV02 pRPAIN201302UV02Mock = mock(PRPAIN201302UV02.class);
+		final MCCIIN000002UV01 mCCIIN000002UV01Mock = mock(MCCIIN000002UV01.class);
 		when(
 				pIXManagerPortTypeMock
-						.pixManagerPRPAIN201302UV02(pRPAIN201302UV02Mock))
+				.pixManagerPRPAIN201302UV02(pRPAIN201302UV02Mock))
 				.thenReturn(mCCIIN000002UV01Mock);
 
 		// Act
-		MCCIIN000002UV01 actualObj = sut
+		final MCCIIN000002UV01 actualObj = sut
+				.pixManagerPRPAIN201302UV02(pRPAIN201302UV02Mock);
+
+		// Assert
+		assertEquals(mCCIIN000002UV01Mock, actualObj);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testPixManagerPRPAIN201302UV02_Throws_PixManagerServiceException() {
+		// Arrange
+		thrown.expect(PixManagerServiceException.class);
+		final PRPAIN201302UV02 pRPAIN201302UV02Mock = mock(PRPAIN201302UV02.class);
+		final MCCIIN000002UV01 mCCIIN000002UV01Mock = mock(MCCIIN000002UV01.class);
+		when(
+				pIXManagerPortTypeMock
+				.pixManagerPRPAIN201302UV02(pRPAIN201302UV02Mock))
+				.thenThrow(Exception.class);
+
+		// Act
+		final MCCIIN000002UV01 actualObj = sut
 				.pixManagerPRPAIN201302UV02(pRPAIN201302UV02Mock);
 
 		// Assert
@@ -111,15 +132,35 @@ public class PixManagerServiceImplTest {
 	@Test
 	public void testPixManagerPRPAIN201304UV02() {
 		// Arrange
-		PRPAIN201304UV02 pRPAIN201304UV02Mock = mock(PRPAIN201304UV02.class);
-		MCCIIN000002UV01 mCCIIN000002UV01Mock = mock(MCCIIN000002UV01.class);
+		final PRPAIN201304UV02 pRPAIN201304UV02Mock = mock(PRPAIN201304UV02.class);
+		final MCCIIN000002UV01 mCCIIN000002UV01Mock = mock(MCCIIN000002UV01.class);
 		when(
 				pIXManagerPortTypeMock
-						.pixManagerPRPAIN201304UV02(pRPAIN201304UV02Mock))
+				.pixManagerPRPAIN201304UV02(pRPAIN201304UV02Mock))
 				.thenReturn(mCCIIN000002UV01Mock);
 
 		// Act
-		MCCIIN000002UV01 actualObj = sut
+		final MCCIIN000002UV01 actualObj = sut
+				.pixManagerPRPAIN201304UV02(pRPAIN201304UV02Mock);
+
+		// Assert
+		assertEquals(mCCIIN000002UV01Mock, actualObj);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testPixManagerPRPAIN201304UV02_Throws_PixManagerServiceException() {
+		// Arrange
+		thrown.expect(PixManagerServiceException.class);
+		final PRPAIN201304UV02 pRPAIN201304UV02Mock = mock(PRPAIN201304UV02.class);
+		final MCCIIN000002UV01 mCCIIN000002UV01Mock = mock(MCCIIN000002UV01.class);
+		when(
+				pIXManagerPortTypeMock
+				.pixManagerPRPAIN201304UV02(pRPAIN201304UV02Mock))
+				.thenThrow(Exception.class);
+
+		// Act
+		final MCCIIN000002UV01 actualObj = sut
 				.pixManagerPRPAIN201304UV02(pRPAIN201304UV02Mock);
 
 		// Assert
@@ -129,27 +170,44 @@ public class PixManagerServiceImplTest {
 	@Test
 	public void testPixManagerPRPAIN201309UV02() {
 		// Arrange
-		PRPAIN201309UV02 pRPAIN201309UV02Mock = mock(PRPAIN201309UV02.class);
-		PRPAIN201310UV02 pRPAIN201310UV02Mock = mock(PRPAIN201310UV02.class);
+		final PRPAIN201309UV02 pRPAIN201309UV02Mock = mock(PRPAIN201309UV02.class);
+		final PRPAIN201310UV02 pRPAIN201310UV02Mock = mock(PRPAIN201310UV02.class);
 		when(
 				pIXManagerPortTypeMock
-						.pixManagerPRPAIN201309UV02(pRPAIN201309UV02Mock))
+				.pixManagerPRPAIN201309UV02(pRPAIN201309UV02Mock))
 				.thenReturn(pRPAIN201310UV02Mock);
 
 		// Act
-		PRPAIN201310UV02 actualObj = sut
+		final PRPAIN201310UV02 actualObj = sut
 				.pixManagerPRPAIN201309UV02(pRPAIN201309UV02Mock);
 
 		// Assert
 		assertEquals(pRPAIN201310UV02Mock, actualObj);
 	}
 
-	private PIXManagerPortType createPort() {
-		PIXManagerPortType port = new PIXManagerService(wsdlURL, serviceName)
-				.getPIXManagerPortSoap12();
-		BindingProvider bp = (BindingProvider) port;
-		bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-				address);
-		return port;
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testPixManagerPRPAIN201309UV02_Throws_PixManagerServiceException() {
+		// Arrange
+		thrown.expect(PixManagerServiceException.class);
+		final PRPAIN201309UV02 pRPAIN201309UV02Mock = mock(PRPAIN201309UV02.class);
+		final PRPAIN201310UV02 pRPAIN201310UV02Mock = mock(PRPAIN201310UV02.class);
+		when(
+				pIXManagerPortTypeMock
+				.pixManagerPRPAIN201309UV02(pRPAIN201309UV02Mock))
+				.thenThrow(Exception.class);
+
+		// Act
+		final PRPAIN201310UV02 actualObj = sut
+				.pixManagerPRPAIN201309UV02(pRPAIN201309UV02Mock);
+
+		// Assert
+		assertEquals(pRPAIN201310UV02Mock, actualObj);
 	}
+
+	@Test
+	public void testPixManagerServiceImplString() {
+		assertEquals(pIXManagerPortTypeMock, sut.createPort());
+	}
+
 }

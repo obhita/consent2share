@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,109 +25,94 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.hl7;
 
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import gov.samhsa.acs.common.tool.XmlTransformer;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import java.io.InputStream;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class Hl7v3TransformerImpl.
+ */
 public class Hl7v3TransformerImpl implements Hl7v3Transformer {
 
 	/** The logger. */
-	final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	// Set up transformer
-	// Since Saxon is a dependency of this project, its
-	// TransformerFactory will be picked
-	private TransformerFactory transformerFactory = TransformerFactory
-			.newInstance();
+	/** The xml transformer. */
+	private final XmlTransformer xmlTransformer;
 
-	@Override
-	public String transformC32ToHl7v3PixXml(String c32xml, String XSLTURI)
-			throws Hl7v3TransformerException {
-		try {
-			InputStream styleIs = Thread.currentThread()
-					.getContextClassLoader().getResourceAsStream(XSLTURI);
-			StreamSource styleSource = new StreamSource(styleIs);
-
-			Transformer transformer = transformerFactory
-					.newTransformer(styleSource);
-
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-			// Get xml source
-			StringReader xmlReader = new StringReader(c32xml);
-			StreamSource xmlSource = new StreamSource(xmlReader);
-
-			// Transform
-			StringWriter writer = new StringWriter();
-			StreamResult streamResult = new StreamResult(writer);
-			transformer.transform(xmlSource, streamResult);
-
-			String hl7v3PixXML = writer.toString();
-
-			styleIs.close();
-			xmlReader.close();
-			writer.close();
-
-			return hl7v3PixXML;
-
-		} catch (Exception e) {
-
-			String errorMessage = "Error happended when trying to transform C32 to hl7v3PixAdd";
-
-			logger.error(errorMessage, e);
-
-			Hl7v3TransformerException transformerException = new Hl7v3TransformerException(
-					errorMessage, e);
-
-			throw transformerException;
-		}
+	/**
+	 * Instantiates a new hl7v3 transformer impl.
+	 *
+	 * @param xmlTransformer
+	 *            the xml transformer
+	 */
+	public Hl7v3TransformerImpl(XmlTransformer xmlTransformer) {
+		super();
+		this.xmlTransformer = xmlTransformer;
 	}
 
-	public void setTransformerFactory(TransformerFactory transformerFactory) {
-		this.transformerFactory = transformerFactory;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent2share.hl7.Hl7v3Transformer#getPixQueryXml(java.lang
+	 * .String, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public String getPixQueryXml(String mrn, String mrnDomain, String xsltUri)
 			throws Hl7v3TransformerException {
 		String newxsltUri = "";
-
 		try {
-			String extension = "@extension";
-			String root = "@root";
+			final String extension = "@extension";
+			final String root = "@root";
 			String queryXML = xsltUri;
 			if (null != xsltUri && !xsltUri.startsWith("<?xml")) {
 				// read the xsl file from resources folder
-				InputStream styleIs = Thread.currentThread()
+				final InputStream styleIs = Thread.currentThread()
 						.getContextClassLoader().getResourceAsStream(xsltUri);
 				queryXML = IOUtils.toString(styleIs, "UTF-8");
 			}
-
 			newxsltUri = queryXML.replaceAll(extension, mrn);
 			newxsltUri = newxsltUri.replaceAll(root, mrnDomain);
-		} catch (Exception e) {
-
-			String errorMessage = "Error happended when trying to mrn data to hl7v3PixQuery";
-
+		} catch (final Exception e) {
+			final String errorMessage = "Error happended when trying to mrn data to hl7v3PixQuery";
 			logger.error(errorMessage, e);
-
-			Hl7v3TransformerException transformerException = new Hl7v3TransformerException(
+			final Hl7v3TransformerException transformerException = new Hl7v3TransformerException(
 					errorMessage, e);
-
 			throw transformerException;
 		}
-
 		return newxsltUri;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * gov.samhsa.consent2share.hl7.Hl7v3Transformer#transformToHl7v3PixXml(
+	 * java.lang.String, java.lang.String)
+	 */
+	@Override
+	public String transformToHl7v3PixXml(String xml, String XSLTURI)
+			throws Hl7v3TransformerException {
+		try {
+			final String xslUrl = Thread.currentThread()
+					.getContextClassLoader().getResource(XSLTURI).toString();
+			final String hl7v3PixXML = xmlTransformer.transform(xml, xslUrl,
+					Optional.empty(), Optional.empty());
+			logger.debug("hl7v3PixXML:");
+			logger.debug(hl7v3PixXML);
+			return hl7v3PixXML;
+		} catch (final Exception e) {
+			final String errorMessage = "Error happended when trying to transform xml to PIX xml";
+			logger.error(errorMessage, e);
+			final Hl7v3TransformerException transformerException = new Hl7v3TransformerException(
+					errorMessage, e);
+			throw transformerException;
+		}
 	}
 }

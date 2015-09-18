@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>gov.samhsa.consent2share</groupId>
+		<artifactId>access-control-service</artifactId>
+		<version>2.6.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>access-control-service-bl</artifactId>
+	<packaging>pom</packaging>
+	<name>Access Control Service Baseline</name>
+	
+	<modules>
+		<!-- bl projects -->
+		<module>context-handler-service-bl</module>
+		<module>pep-client-bl</module>
+		<module>pep-service-bl</module>
+		<module>pep-war-bl</module>
+		<module>xdsb-common-bl</module>
+		<module>try-policy-web-bl</module>
+		<module>document-segmentation-web-bl</module>
+	</modules>
+
+</project>

@@ -33,6 +33,7 @@ public class PixManagerBean {
 	private String updateMessage = "";
 	private String queryMessage = "";
 	private Map<String, String> queryIdMap;
+	private boolean isSuccess;
 
 	public String getAddMessage() {
 		return addMessage;
@@ -64,5 +65,13 @@ public class PixManagerBean {
 
 	public void setQueryIdMap(Map<String, String> queryIdMap) {
 		this.queryIdMap = queryIdMap;
+	}
+
+	public boolean isSuccess() {
+		return isSuccess;
+	}
+
+	public void setSuccess(boolean isSuccess) {
+		this.isSuccess = isSuccess;
 	}
 }

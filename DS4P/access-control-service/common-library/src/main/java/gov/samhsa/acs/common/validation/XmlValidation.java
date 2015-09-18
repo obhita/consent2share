@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- *   
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions are met:
  *       * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *       * Neither the name of the <organization> nor the
  *         names of its contributors may be used to endorse or promote products
  *         derived from this software without specific prior written permission.
- *   
+ *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,7 +32,6 @@ import gov.samhsa.acs.common.validation.exception.XmlSchemaFailureException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 import javax.xml.XMLConstants;
@@ -56,34 +55,47 @@ public class XmlValidation {
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	/** The schema base path. */
+	private final String schemaBasePath;
+
+	/** The schema. */
+	private Schema schema;
+
 	/** The validator. */
 	private Validator validator;
 
 	/**
 	 * Instantiates a new xml validation.
 	 *
-	 * @param xsdInputStream the xsd input stream
-	 * @param schemaBasePath the schema base path
+	 * @param xsdInputStream
+	 *            the xsd input stream
+	 * @param schemaBasePath
+	 *            the schema base path
 	 */
 	public XmlValidation(InputStream xsdInputStream, String schemaBasePath) {
 		LSResourceResolver resourceResolver = null;
 		Assert.hasText(schemaBasePath, "'schemaBasePath' must not be empty.");
-		resourceResolver = new ResourceResolver(schemaBasePath);
+		Assert.notNull(xsdInputStream, "'xsdInputStream' must not be null.");
+		this.schemaBasePath = schemaBasePath;
+		resourceResolver = new ResourceResolver(this.schemaBasePath);
 		try {
-			this.validator = createValidator(xsdInputStream, resourceResolver);
-		} catch (XmlSchemaFailureException e) {
+			this.schema = createSchema(xsdInputStream, resourceResolver);
+			this.validator = createValidator(this.schema);
+		} catch (final XmlSchemaFailureException e) {
 			logger.error("XmlValidation initialization is failed: the schema cannot be loaded.");
-			//logger.error(e.getMessage(), e);
 		}
 	}
 
 	/**
 	 * Validate.
 	 *
-	 * @param xmlInputStream the xml input stream
+	 * @param xmlInputStream
+	 *            the xml input stream
 	 * @return true, if successful
-	 * @throws InvalidXmlDocumentException the invalid xml document exception
-	 * @throws XmlDocumentReadFailureException the xml document read failure exception
+	 * @throws InvalidXmlDocumentException
+	 *             the invalid xml document exception
+	 * @throws XmlDocumentReadFailureException
+	 *             the xml document read failure exception
 	 */
 	public boolean validate(InputStream xmlInputStream)
 			throws InvalidXmlDocumentException, XmlDocumentReadFailureException {
@@ -93,10 +105,10 @@ public class XmlValidation {
 
 		try {
 			validator.validate(new StreamSource(xmlInputStream));
-		} catch (SAXException e) {
+		} catch (final SAXException e) {
 			logger.error(e.getMessage());
 			throw new InvalidXmlDocumentException(e);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			logger.error(e.getMessage());
 			throw new XmlDocumentReadFailureException(e);
 		}
@@ -106,42 +118,109 @@ public class XmlValidation {
 	/**
 	 * Validate.
 	 *
-	 * @param xml the xml
+	 * @param xml
+	 *            the xml
 	 * @return true, if successful
-	 * @throws InvalidXmlDocumentException the invalid xml document exception
-	 * @throws XmlDocumentReadFailureException the xml document read failure exception
-	 * @throws UnsupportedEncodingException 
+	 * @throws InvalidXmlDocumentException
+	 *             the invalid xml document exception
+	 * @throws XmlDocumentReadFailureException
+	 *             the xml document read failure exception
 	 */
 	public boolean validate(String xml) throws InvalidXmlDocumentException,
 			XmlDocumentReadFailureException {
-		return validate(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))));
+		return validate(new ByteArrayInputStream(xml.getBytes(Charset
+				.forName("UTF-8"))));
 	}
 
 	/**
-	 * Creates the validator.
+	 * Validate with all errors.
 	 *
-	 * @param xsdInputStream the xsd input stream
-	 * @param resourceResolver the resource resolver
-	 * @return the validator
-	 * @throws XmlSchemaFailureException the xml schema failure exception
+	 * @param xmlInputStream
+	 *            the xml input stream
+	 * @return the xml validation result
+	 * @throws XmlDocumentReadFailureException
+	 *             the xml document read failure exception
 	 */
-	private Validator createValidator(InputStream xsdInputStream,
+	public XmlValidationResult validateWithAllErrors(InputStream xmlInputStream)
+			throws XmlDocumentReadFailureException {
+		Validator validatorWithAllErrors = null;
+		XmlValidationResult result = null;
+		try {
+			validatorWithAllErrors = createValidator(this.schema);
+			Assert.notNull(
+					validatorWithAllErrors,
+					"There has been an error during XmlValidation initialization, the validatorWithAllErrors cannot be null.");
+			result = new XmlValidationResult();
+			validatorWithAllErrors
+					.setErrorHandler(new ErrorHandlerImpl(result));
+			validatorWithAllErrors.validate(new StreamSource(xmlInputStream));
+		} catch (final XmlSchemaFailureException e) {
+			logger.error("XmlValidation initialization is failed: the schema cannot be loaded.");
+		} catch (final SAXException e) {
+			// Do nothing
+		} catch (final IOException e) {
+			logger.error(e.getMessage());
+			throw new XmlDocumentReadFailureException(e);
+		}
+		return result;
+	}
+
+	/**
+	 * Validate with all errors.
+	 *
+	 * @param xml
+	 *            the xml
+	 * @return the xml validation result
+	 * @throws XmlDocumentReadFailureException
+	 *             the xml document read failure exception
+	 */
+	public XmlValidationResult validateWithAllErrors(String xml)
+			throws XmlDocumentReadFailureException {
+		return validateWithAllErrors(new ByteArrayInputStream(
+				xml.getBytes(Charset.forName("UTF-8"))));
+	}
+
+	/**
+	 * Creates the schema.
+	 *
+	 * @param xsdInputStream
+	 *            the xsd input stream
+	 * @param resourceResolver
+	 *            the resource resolver
+	 * @return the schema
+	 * @throws XmlSchemaFailureException
+	 *             the xml schema failure exception
+	 */
+	private Schema createSchema(InputStream xsdInputStream,
 			LSResourceResolver resourceResolver)
 			throws XmlSchemaFailureException {
-		SchemaFactory factory = SchemaFactory
+		final SchemaFactory factory = SchemaFactory
 				.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		Source schemaSource = new StreamSource(xsdInputStream);
+		final Source schemaSource = new StreamSource(xsdInputStream);
 		if (resourceResolver != null) {
 			factory.setResourceResolver(resourceResolver);
 		}
 		Schema schema;
 		try {
 			schema = factory.newSchema(schemaSource);
-		} catch (SAXException e) {
+		} catch (final SAXException e) {
 			logger.error(e.getMessage());
 			throw new XmlSchemaFailureException(e);
 		}
-		Validator validator = schema.newValidator();
-		return validator;
+		return schema;
+	}
+
+	/**
+	 * Creates the validator.
+	 *
+	 * @param schema
+	 *            the schema
+	 * @return the validator
+	 * @throws XmlSchemaFailureException
+	 *             the xml schema failure exception
+	 */
+	private Validator createValidator(Schema schema)
+			throws XmlSchemaFailureException {
+		return schema.newValidator();
 	}
 }

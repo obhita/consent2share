@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- <head th:include="fragment/common :: headerFragment" >
+	<meta charset="utf-8" />
+	title needs to be dynamic
+	<title>Consent2Share</title>
+	<meta name="description" content="Consent Management System" />
+	<meta name="author" content="FEiSystems" />
+	END: Meta
+	START: Mobile Specific
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	END: Mobile Specific
+	START: CSS
+	<link id="bootstrap-style" href="../../resources/css/bootstrap.css" rel="stylesheet"/>
+	<link href="../../resources/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+	<link href="../../resources/css/bootstrap-toggle-buttons.css" rel="stylesheet"/>
+	<link href="../../resources/css/themes-style.css" rel="stylesheet"/>
+	<link href="../../resources/css/sentinel-style.css" rel="stylesheet"/>
+
+	END: CSS
+	The HTML5 shim, for IE6-8 support of HTML5 elements
+	[if lt IE 9]>
+	        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]
+	START: Favicon
+	   <link rel="shortcut icon" href="images/favicon.ico">
+	END: Favicon
+	
+
+</head> -->
+
+<!-- COPIED FROM HEADER FRAGMENT -->
+<!-- Remove this section after Bootstrap update and restore fragment -->
+<head>
+	<meta charset="utf-8" />
+	<!-- title needs to be dynamic -->
+	<title>Consent2Share</title>
+	<meta name="description" content="Consent Management System" />
+	<meta name="author" content="FEiSystems" />
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<!-- END: Meta -->
+	<!-- START: Mobile Specific -->
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- END: Mobile Specific -->
+	<!-- START: CSS -->
+	
+	<!-- Bootstrap related CSS files -->
+	<link id="bootstrap-style" href="../../resources/css/modules/bootstrap.css"
+		rel="stylesheet" th:href="@{/resources/css/modules/bootstrap.css}" />
+	<link href="../../resources/css/modules/font-awesome.css"
+		th:href="@{/resources/css/modules/font-awesome.css}" rel="stylesheet" />
+	<link href="../../resources/css/modules/jquery-ui.css"
+		th:href="@{/resources/css/modules/jquery-ui.css}" rel="stylesheet" />
+	<!-- Plug-in Stylesheets -->
+	<link href="../../resources/css/modules/joyride-2-0-3.css" rel="stylesheet"
+		th:href="@{/resources/css/modules/joyride-2-0-3.css}" />
+	
+	<!-- Custom CSS Files -->
+	<link href="../../resources/css/custom/themes-style.css" rel="stylesheet"
+		th:href="@{/resources/css/custom/themes-style.css}" />
+	<link href="../../resources/css/custom/c2s-core-style.css" rel="stylesheet"
+		th:href="@{/resources/css/custom/c2s-core-style.css}" />
+	
+	<!-- END: CSS -->
+	
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
+	    
+	<!-- START: Favicon -->
+	<link rel="icon" href="../../resources/img/favicon.ico"  
+		th:href="@{/resources/img/favicon.ico}" type="image/x-icon"/>
+	<link rel="shortcut icon" href="../../resources/img/favicon.ico"  
+		th:href="@{/resources/img/favicon.ico}" type="image/x-icon"/>
+	<!-- END: Favicon -->
+</head>
+<!-- END COPIED FROM HEADER FRAGMENT -->
+
+<body>
+	<div class="outmost-holder">
+		<!-- START: Page Header -->
+		
+		<nav class="navbar navbar-static-top" role="banner" th:with="currentPageTitle='Create Account',backPageURI='/registrationLinkToPatient.html'">
+			<div class="navbar-container">
+				<div class="navbar-header navbar-inner-header" role="navigation" th:substituteby="fragment/common :: navbarHeaderFragmentBackOnly">
+					<a th:substituteby="fragment/common :: backButtonFragment" id="bread-crumb-btn" th:href="@{${backPageURI}}" href="#" class="btn btn-info" >
+						<span class="fa fa-chevron-left fa-white"></span>
+					</a>
+					
+					<h1>
+						<span class="nav-title" th:text="${currentPageTitle}">Page Title</span>
+					</h1>
+		
+					<span th:substituteby="fragment/common :: logoFragment">
+						<div style="position: relative;">
+							<a id="logoFragment" class="navbar-brand brand" th:href="@{/index.html}"  href="index.html"><span id="brand-blue"></span><img src="../../resources/img/consent2share-04.svg" th:src="@{/resources/img/consent2share-04.svg}" /></a>
+							<span id="watermark"><i><p>This site is for DEMONSTRATION PURPOSES only.</p></i></span>
+						</div>
+					</span>
+		 		</div>
+		 	</div>	
+		</nav>		  
+		
+		<div id="under-header"></div>
+		     
+		<!-- END : Page Header -->
+		
+		<div class="row main-content-wrapper">					
+			<div id="content">
+		
+			<!-- JavaScript Enable Message -->		
+			<noscript th:substituteby="fragment/common :: noscriptFragment">
+	
+				<div class="alert alert-warning col-md-10 col-sm-10">
+					<p id="h4-style" class="alert-heading">Warning!</p>
+					<p>You need to have <a href="https://en.wikipedia.org/wiki/JavaScript" th:href="@{https://en.wikipedia.org/wiki/JavaScript}"
+					target="_blank">JavaScript</a>enabled to use this site.</p>
+				</div>
+			</noscript>
+					
+			<!-- START: Content Region-->
+		
+			<div id="page-fullcontent-holder" role="main" class="col-xs-12 col-sm-10 col-sm-offset-1">			
+				<div class="row">			
+		
+				<!-- !COMPONENT: Create CMS Account -->
+			
+					<div class="col-sm-9">
+						
+						 <section class="top-margin10">
+							<form id="signupForm" th:action="@{/registrationLinkToPatient_createUsername.html}" th:object="${signupLinkToPatientDto}" th:inline="text" method="post">
+									<fieldset id="login-thirdparty" class="row">
+					                    
+					                    	<legend>Create Username and Password</legend>
+					                    	<div class="alert alert-info top-margin10">Please create a Username and Password for your account. A Username must be between 3 and 30 characters long. Remember your Username and Password. You will need them to log in to your account.</div>															
+		
+											<div class="row">
+				                                	<div class="col-xs-12 col-sm-8">
+				                                		<div class="username-container">
+							                            		<div class="form-group">
+					                                    			<div>
+									                                	<label for="user_name">Username</label>
+								        	                        	<input id="user_name" name="username" type="text"  aria-required="true"  th:field="*{username}" class="form-control"/>
+								            	                    	<span class="required-text" th:errors="*{username}">Username must be between 3 and 30 characters long.</span>
+								                	                	<span id="username_client_error_text" class="required-text" style="display: none;">Username must be between 3 and 30 characters long.</span>
+								                    	            </div>
+							                            	    </div>
+						                                	
+							                                    <div class="form-group">
+					        	                            		<div>
+							    	                                	<label for="password">Password</label>
+						        		                            	<input id="password" name="password" type="password"  aria-required="true" th:field="*{password}" class="form-control"/>
+						                	                    		<span class="required-text" th:errors="*{password}">Password is required.</span>
+							                	                    	<span id="password_client_error_text" class="required-text" style="display: none;">Password is required.</span>	                                    
+							                    	                </div>
+							                    	                <div>
+							    	                                	<label for="reenterPassword">Re-enter Password</label>
+						        		                            	<input id="reenterPassword" name="password" type="password"  aria-required="true" th:field="*{repeatPassword}" class="form-control"/>
+						                	                    		<span class="required-text" th:errors="*{password}">Repeat password is required.</span>
+							                	                    	<span id="password_client_error_text2" class="required-text" style="display: none;">Repeat password is required.</span>	                                    
+							                    	                </div>
+						                                    	</div>
+						                                    	
+					                                    </div>	
+													</div> <!-- end username-container -->
+											</div><!-- end required-info-group -->
+											
+											<input type="hidden" name="token" th:value="*{token}" />
+											<input type="hidden" name="verificationCode" th:value="*{verificationCode}" />
+											<input type="hidden" name="birthDate"  th:value="*{birthDate==null}?  '' : *{#dates.format(birthDate, 'MM/dd/yyyy')}" />
+		                               	
+			                               	<div class="submit-cancel-btn-group  top-margin15">
+			                               		<button type="button" class="btn btn-default" onClick="window.location.href='#'" style="margin: 0 10px 0 0;">Clear</button>
+			                               		<button id="signupFormSubmitButton" type="submit" class="btn btn-primary">Submit</button>
+			                               	</div>
+			                      	</fieldset>
+		                   </form>
+		               </section>
+					</div>
+		
+				</div><!--/#content.col-sm-10-->
+			</div><!--/row-->
+			</div>
+			<!-- END: Content Region -->
+		</div>
+		
+		<div class="spacer-for-footer clearfix"></div> 
+	</div>
+	
+	
+	<!-- START: Footer Region -->
+	<!-- 		<footer class="bottom" th:include="fragment/common :: [//footer[@id='center-footer']]">
+	
+			COMPONENT: Copyright Information
+			<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p>
+	</footer> -->
+
+	<!-- COPIED FROM FOOTER FRAGMENT -->
+	<!-- Remove this section after Bootstrap update and restore fragment -->
+	<footer class="bottom" id="center-footer">
+
+		<div>
+			<!-- COMPONENT: Copyright Information -->
+			<!-- 				<p class="top-margin10 pull-left">&copy; <a class="footer-link" href="" target="_blank">A SAMHSA Public Service</a> 2013</p> -->
+		</div>
+
+		<div class="hidden">
+			<!-- Include jQuery JavaScript on all pages using footer fragment -->
+			<script src="../../resources/js/jquery.min.js"
+				th:src="@{/resources/js/jquery.min.js}" type="text/javascript"></script>
+
+			<!-- Include bootstrap.js JavaScript file on all pages using footer fragment -->
+			<script src="../../resources/js/bootstrap.js"
+				th:src="@{/resources/js/bootstrap.js}" type="text/javascript"></script>
+
+			<!-- Include custom JavaScript from footerFragment.js file on all pages using footer fragment -->
+			<script src="../../resources/js/jquery-ui.min.js"
+				th:src="@{/resources/js/jquery-ui.min.js}" type="text/javascript"></script>
+			<script src="../../resources/js/webpage-js/sessionTimeout.js"
+				th:src="@{/resources/js/webpage-js/sessionTimeout.js}"
+				type="text/javascript"></script>
+			<script src="../../resources/js/webpage-js/footerFragment.js"
+				th:src="@{/resources/js/webpage-js/footerFragment.js}"
+				type="text/javascript"></script>
+		</div>
+
+	</footer>
+	<!-- END COPIED FROM FOOTER FRAGMENT -->
+	
+	
+	<!-- START: JavaScript-->
+		<script src="../../resources/js/modernizr.mq.js" 
+				th:src="@{/resources/js/modernizr.mq.js}"
+				type="text/javascript"></script>
+		<script src="../../resources/js/jquery.pstrength-min.1.2.js" 
+				th:src="@{/resources/js/jquery.pstrength-min.1.2.js}"
+				type="text/javascript"></script>
+		
+		<script src="../../resources/js/moment.min.1.7.2.js" 
+				th:src="@{/resources/js/moment.min.1.7.2.js}"
+				type="text/javascript"></script>
+		<script src="../../resources/js/dateValidator.js" 
+				th:src="@{/resources/js/dateValidator.js}"
+				type="text/javascript"></script>
+		
+		<!-- Custom JavaScript -->
+		
+		<!-- Modified for Bootstrap Fix -->
+		<script src="../../resources/js/webpage-js/userAccountInfoValidation.js" 
+				th:src="@{/resources/js/webpage-js/userAccountInfoValidation.js}"
+				type="text/javascript"></script>
+		
+		<script src="../../../resources/js/webpage-js/profile_registration.js" 
+				th:src="@{/resources/js/webpage-js/profile_registration.js}"
+				type="text/javascript"></script>
+				
+		<script src="../../resources/js/webpage-js/registationLinkToPatient_createUsername.js"
+				th:src="@{/resources/js/webpage-js/registationLinkToPatient_createUsername.js}"
+				type="text/javascript"></script>
+		<!-- End of modified for Bootstrap fix -->
+				
+	<!-- END: JavaScript-->	
+</body>
+</html>

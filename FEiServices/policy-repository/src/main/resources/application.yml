@@ -1,0 +1,44 @@
+# application.yml template
+spring:
+  datasource:
+    initialize: false
+#    url: 
+#    username: 
+#    password: 
+    driverClassName: com.mysql.jdbc.Driver
+    validationQuery: select 1
+    testOnBorrow: true
+    testOnReturn: true
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 1800000
+    numTestsPerEvictionRun: 3
+    minEvictableIdleTimeMillis: 1800000
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        hbm2ddl:
+          auto: validate
+    hibernate:
+      ddl-auto: none
+      naming_strategy: org.hibernate.cfg.DefaultNamingStrategy
+logging:
+  file: C:/java/polrep/polrep.log
+  level:
+    org:
+      springframework:
+        web: ERROR
+      hibernate: ERROR
+      herasaf: ERROR
+    com:
+      feisystems:
+        polrep: ERROR
+polrep:
+  policySet:
+    combiningAlgs:
+      first-applicable: urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:first-applicable
+      ordered-deny-overrides: urn:oasis:names:tc:xacml:1.1:policy-combining-algorithm:ordered-deny-overrides
+      ordered-permit-overrides: urn:oasis:names:tc:xacml:1.1:policy-combining-algorithm:ordered-permit-overrides
+      deny-overrides: urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:deny-overrides
+      only-one-applicable: urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:only-one-applicable
+      permit-overrides: urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:permit-overrides

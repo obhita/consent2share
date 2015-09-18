@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,15 +25,11 @@
  ******************************************************************************/
 package gov.samhsa.consent2share.c32;
 
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import gov.samhsa.acs.common.tool.XmlTransformer;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import java.util.Optional;
+
+import javax.xml.transform.URIResolver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +46,20 @@ public class C32ToGreenCcdTransformerImpl implements C32ToGreenCcdTransformer {
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	/** The xml transformer. */
+	private final XmlTransformer xmlTransformer;
+
+	/**
+	 * Instantiates a new c32 to green ccd transformer impl.
+	 *
+	 * @param xmlTransformer
+	 *            the xml transformer
+	 */
+	public C32ToGreenCcdTransformerImpl(XmlTransformer xmlTransformer) {
+		super();
+		this.xmlTransformer = xmlTransformer;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -63,60 +73,20 @@ public class C32ToGreenCcdTransformerImpl implements C32ToGreenCcdTransformer {
 		Assert.hasText(c32xml);
 
 		try {
-			// Set up transformer
-			// Since Saxon is a dependency of this project, its
-			// TransformerFactory will be picked
-			TransformerFactory transformerFactory = TransformerFactory
-					.newInstance();
-			transformerFactory.setURIResolver(new UriResolverImpl());
-
-			InputStream styleIs = Thread.currentThread()
-					.getContextClassLoader().getResourceAsStream(XSLTURI);
-			StreamSource styleSource = new StreamSource(styleIs);
-
-			Transformer transformer = transformerFactory
-					.newTransformer(styleSource);
-
-			/*
-			 * // Transformer using DOMSource DocumentBuilderFactory dFactory =
-			 * DocumentBuilderFactory.newInstance();
-			 * dFactory.setNamespaceAware(true); DocumentBuilder dBuilder =
-			 * dFactory.newDocumentBuilder(); InputSource xslInputSource = new
-			 * InputSource(styleIs); Document xslDoc =
-			 * dBuilder.parse(xslInputSource); DOMSource xslDomSource = new
-			 * DOMSource(xslDoc); Transformer transformer =
-			 * transformerFactory.newTransformer(xslDomSource);
-			 */
-
-			transformer.setOutputProperty(OutputKeys.INDENT, "no");
-			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-			// Get xml source
-			StringReader xmlReader = new StringReader(c32xml);
-			StreamSource xmlSource = new StreamSource(xmlReader);
-
-			// Transform
-			StringWriter writer = new StringWriter();
-			StreamResult streamResult = new StreamResult(writer);
-			transformer.transform(xmlSource, streamResult);
-
-			String greenCcd = writer.toString();
-
-			styleIs.close();
-			xmlReader.close();
-			writer.close();
-
+			final String xslUrl = Thread.currentThread()
+					.getContextClassLoader().getResource(XSLTURI).toString();
+			final Optional<URIResolver> uriResolver = Optional
+					.of(new UriResolverImpl());
+			final String greenCcd = xmlTransformer.transform(c32xml, xslUrl,
+					Optional.empty(), uriResolver);
+			logger.debug("greenCcd:");
+			logger.debug(greenCcd);
 			return greenCcd;
-
-		} catch (Exception e) {
-
-			String errorMessage = "Error happended when trying to transform C32 to Green CCD";
-
+		} catch (final Exception e) {
+			final String errorMessage = "Error happended when trying to transform C32 to Green CCD";
 			logger.error(errorMessage, e);
-
-			C32ToGreenCcdTransformerException transformerException = new C32ToGreenCcdTransformerException(
+			final C32ToGreenCcdTransformerException transformerException = new C32ToGreenCcdTransformerException(
 					errorMessage, e);
-
 			throw transformerException;
 		}
 	}

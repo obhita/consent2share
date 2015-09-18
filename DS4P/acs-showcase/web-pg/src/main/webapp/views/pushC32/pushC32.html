@@ -1,0 +1,46 @@
+<h2>Push C32 from REM EHR #1 to REM EHR #2</h2>
+
+<h3>Patients</h3>
+<table class="table table-striped">
+	<tr ng-repeat="patient in ehrNumOne.patients">
+		<td>Id: {{patient.id}}</td>
+		<td>Full Name: {{patient.fullName}}</td>
+		<td>
+			<div class="pull-right">
+				<button ng-click="pushC32(patient)">Push C32</button>
+			</div>
+		</td>
+	</tr>
+</table>
+
+
+<div ng-show="ehrNumOne.selectedPatient.c32Xml">
+
+	<!--  <pre style="height: 10pc; overflow-y: scroll;">{{ehrNumOne.selectedPatient.c32Xml}}</pre>  -->
+</div>
+
+<!-- 
+  <div ng-controller="acsshowcase">
+ Provider:
+<select data-ng-options="o.name for o in options" data-ng-model="selectedOption"></select> 
+ 
+      <select ng-model="color" ng-options="provider.name for provider in providers"></select><br>
+   Patient:
+      <select ng-model="color" ng-options="patient.name for patient in patients"></select><br>    
+  </div>
+  
+  -->
+  <div ng-show="ehrNumOne.selectedPatient.xdsbRegAddMsg">
+	<h3>XdsbRegAdd Operation :: {{ehrNumOne.selectedPatient.id}} ::
+		{{ehrNumOne.selectedPatient.fullName}}</h3>
+	<div ng-if=" true == ehrNumOne.selectedPatient.isError">
+		<font color='red'>
+			<h4>XDS.b PIDFEED.Add Failed!</h4>
+			{{ehrNumOne.selectedPatient.xdsbRegAddMsg.acknowledgement[0].acknowledgementDetail[0].text.content[0]}}
+		</font>
+	</div>
+	<div ng-if=" true != ehrNumOne.selectedPatient.isError">
+		<h4>XDS.b PIDFEED.Add Succeeded!</h4>
+	</div>
+</div>
+  

@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Open Behavioral Health Information Technology Architecture (OBHITA.org)
- *   
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions are met:
  *       * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
  *       * Neither the name of the <organization> nor the
  *         names of its contributors may be used to endorse or promote products
  *         derived from this software without specific prior written permission.
- *   
+ *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -39,26 +39,41 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
 
 /**
  * The Class DocumentAccessorImpl.
  */
 public class DocumentAccessorImpl implements DocumentAccessor {
 
-	/** The xpath factory. */
-	private XPathFactory xpathFact;
-
-	/**
-	 * Instantiates a new document accessor impl.
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * gov.samhsa.acs.common.tool.DocumentAccessor#addingStylesheet(org.w3c.
+	 * dom.Document, java.lang.String)
 	 */
-	public DocumentAccessorImpl() {
-		super();
-		this.xpathFact = XPathFactory.newInstance();
+	@SuppressWarnings("unchecked")
+	@Override
+	public <ProcessingInstructionImpl> Document addingStylesheet(Document doc,
+			String xslHref) throws TransformerConfigurationException,
+			ParserConfigurationException {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("type=\"text/xsl\" href=");
+		builder.append(xslHref);
+
+		final ProcessingInstructionImpl pi = (ProcessingInstructionImpl) doc
+				.createProcessingInstruction("xml-stylesheet",
+						builder.toString());
+		final Element root = doc.getDocumentElement();
+		doc.insertBefore((Node) pi, root);
+		return doc;
+
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * gov.samhsa.acs.common.tool.DocumentAccessor#getElement(org.w3c.dom.Document
 	 * , java.lang.String, java.lang.String[])
@@ -67,14 +82,14 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 	public Element getElement(Document xmlDocument, String xPathExpr,
 			String... arguments) throws DocumentAccessorException {
 
-		Node node = getNode(xmlDocument, xPathExpr, arguments);
+		final Node node = getNode(xmlDocument, xPathExpr, arguments);
 
 		return (Element) node;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * gov.samhsa.acs.common.tool.DocumentAccessor#getNode(org.w3c.dom.Document,
 	 * java.lang.String, java.lang.String[])
@@ -85,14 +100,14 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 		xPathExpr = setXpathArguments(xPathExpr, arguments);
 
 		// Create XPath instance
-		XPath xpath = createXPathInstance();
+		final XPath xpath = xpath();
 
 		// Evaluate XPath expression against parsed document
 		Node node;
 		try {
 			node = (Node) xpath.evaluate(xPathExpr, xmlDocument,
 					XPathConstants.NODE);
-		} catch (XPathExpressionException e) {
+		} catch (final XPathExpressionException e) {
 			throw new DocumentAccessorException(e);
 		}
 		return node;
@@ -100,7 +115,7 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * gov.samhsa.acs.common.tool.DocumentAccessor#getNodeList(org.w3c.dom.Document
 	 * , java.lang.String, java.lang.String[])
@@ -111,54 +126,36 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 		xPathExpr = setXpathArguments(xPathExpr, arguments);
 
 		// Create XPath instance
-		XPath xpath = createXPathInstance();
+		final XPath xpath = xpath();
 
 		// Evaluate XPath expression against parsed document
 		NodeList nodeList;
 		try {
 			nodeList = (NodeList) xpath.evaluate(xPathExpr, xmlDocument,
 					XPathConstants.NODESET);
-		} catch (XPathExpressionException e) {
+		} catch (final XPathExpressionException e) {
 			throw new DocumentAccessorException(e);
 		}
 		return nodeList;
 	}
 
-	/**
-	 * Creates the x path instance.
-	 * 
-	 * @return the x path
-	 */
-	private XPath createXPathInstance() {
-		// Create XPath instance
-		XPath xpath = this.xpathFact.newXPath();
-		xpath.setNamespaceContext(new PepNamespaceContext());
-		return xpath;
-	}
-
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
-	 * gov.samhsa.acs.common.tool.DocumentAccessor#addingStylesheet(org.w3c.
-	 * dom.Document, java.lang.String)
+	 * gov.samhsa.acs.common.tool.DocumentAccessor#getProcessingInstruction(
+	 * org.w3c.dom.Document, java.lang.String, java.lang.String[])
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public <ProcessingInstructionImpl> Document addingStylesheet(Document doc,
-			String xslHref) throws TransformerConfigurationException,
-			ParserConfigurationException {
-		StringBuilder builder = new StringBuilder();
-		builder.append("type=\"text/xsl\" href=");
-		builder.append(xslHref);
-
-		ProcessingInstructionImpl pi = (ProcessingInstructionImpl) doc
-				.createProcessingInstruction("xml-stylesheet",
-						builder.toString());
-		Element root = doc.getDocumentElement();
-		doc.insertBefore((Node) pi, root);
-		return doc;
-
+	public ProcessingInstruction getProcessingInstruction(Document xmlDocument,
+			String xPathExpr, String... arguments)
+			throws DocumentAccessorException {
+		try {
+			return (ProcessingInstruction) getNode(xmlDocument, xPathExpr,
+					arguments);
+		} catch (final Exception e) {
+			throw new DocumentAccessorException(e);
+		}
 	}
 
 	/**
@@ -172,9 +169,20 @@ public class DocumentAccessorImpl implements DocumentAccessor {
 	 */
 	private String setXpathArguments(String xPath, String... arguments) {
 		for (int i = 0; i < arguments.length; i++) {
-			xPath = xPath.replace(("%" + Integer.toString((i + 1))),
-					arguments[i]);
+			xPath = xPath.replace("%" + Integer.toString(i + 1), arguments[i]);
 		}
 		return xPath;
+	}
+
+	/**
+	 * Creates the x path instance.
+	 *
+	 * @return the x path
+	 */
+	private XPath xpath() {
+		// Create XPath instance
+		final XPath xpath = XPathFactory.newInstance().newXPath();
+		xpath.setNamespaceContext(new PepNamespaceContext());
+		return xpath;
 	}
 }

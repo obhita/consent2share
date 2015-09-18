@@ -4,19 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import gov.samhsa.acs.common.tool.DocumentXmlConverterImpl;
-import gov.samhsa.acs.common.tool.FileReaderImpl;
-import gov.samhsa.acs.common.util.FileHelper;
+import gov.samhsa.consent2share.commonunit.xml.XmlComparator;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,9 +94,12 @@ public class DocumentXmlConverterImplTest {
 		// Assert
 		assertNotNull(docString);
 		String s1 = fileReader.readFile("xmlString1.txt");
-		assertTrue(docString.startsWith(s1));
+		assertNotNull(s1, "s1 is null");
+		assertNotNull(docString, "docString is null");
+		assertTrue(XmlComparator.compareXMLs(s1, docString, Arrays.asList(""))
+				.similar());
 	}
-	
+
 	@Test
 	public void testConverXmlDocToString_2() throws Exception {
 		// Arrange
@@ -112,9 +112,10 @@ public class DocumentXmlConverterImplTest {
 		// Assert
 		assertNotNull(docString);
 		String s2 = fileReader.readFile("xmlString2.txt");
-		assertTrue(docString.contains(s2));
+		assertTrue(XmlComparator.compareXMLs(s2, docString, Arrays.asList(""))
+				.similar());
 	}
-	
+
 	@Test
 	public void testConverXmlDocToString_3() throws Exception {
 		// Arrange
@@ -127,7 +128,8 @@ public class DocumentXmlConverterImplTest {
 		// Assert
 		assertNotNull(docString);
 		String s3 = fileReader.readFile("xmlString3.txt");
-		assertTrue(docString.contains(s3));
+		assertTrue(XmlComparator.compareXMLs(s3, docString, Arrays.asList(""))
+				.similar());
 	}
 
 	private static Document readDocument(String filePath) throws IOException,
