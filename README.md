@@ -1,3 +1,5 @@
+# Note: Consent2Share is moved to [BHITS](https://github.com/BHITS/ "Github BHITS") #
+
 # Consent2Share #
 
 ## About Consent2Share ##
