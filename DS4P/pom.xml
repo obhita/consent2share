@@ -200,7 +200,7 @@
 		<itextpdf.version>5.4.0</itextpdf.version>
 
 		<spring-amqp.version>1.1.4.RELEASE</spring-amqp.version>
-		<commons-collections.version>3.2.1</commons-collections.version>
+		<commons-collections.version>3.2.2</commons-collections.version>
 		<commons-beanutils-version>1.9.1</commons-beanutils-version>
 		<validation-api.version>1.0.0.GA</validation-api.version>
 		<cglib-nodep.version>2.2.2</cglib-nodep.version>
