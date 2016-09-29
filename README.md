@@ -1,4 +1,4 @@
-# Note: Consent2Share is moved to [BHITS](https://github.com/BHITS/ "Github BHITS") #
+# Note: Consent2Share is now upgraded with new Microservices Architecture and maintained by BHITS development team. Please get the latest code from [BHITS on Github](https://github.com/bhits/ "BHITS on Github") #
 
 # Consent2Share #
 
@@ -24,5 +24,5 @@ The C2S Access Control Serves components are a set of integrated applications wh
 
 ## Project Site ##
 
-Click [here](http://bhits.github.io/Consent2Share/ "Consent2Share Project Site") to go to Consent2Share project site to watch demos to learn more about this project.
+Click [here](http://obhita.github.io/Consent2Share/ "Consent2Share Project Site") to go to Consent2Share project site to watch demos to learn more about this project.
 
