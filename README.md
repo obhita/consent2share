@@ -24,5 +24,5 @@ The C2S Access Control Serves components are a set of integrated applications wh
 
 ## Project Site ##
 
-Click [here](http://obhita.github.io/Consent2Share/ "Consent2Share Project Site") to go to Consent2Share project site to watch demos to learn more about this project.
+Click [here](http://obhita.github.io/consent2share/ "Consent2Share Project Site") to go to Consent2Share project site to watch demos to learn more about this project.
 
